@@ -536,3 +536,237 @@
   align-items: center;
   text-align: center;
 }
+
+
+
+
+/**
+ * Teasearch Paginator Styles
+ * 
+ * Da aggiungere al file CSS del modulo teasearch_filter
+ */
+
+/* =================================================================
+   PAGINATOR CONTAINER
+   ================================================================= */
+.teasearch-paginator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1rem;
+  margin-top: 2rem;
+  border-top: 1px solid var(--light-border, #dee2e6);
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* =================================================================
+   PAGE NAVIGATION - LEFT SIDE
+   ================================================================= */
+.paginator-pages {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+/* Pulsanti generici */
+.paginator-btn,
+.paginator-page {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--light-border, #dee2e6);
+  background: var(--white, #ffffff);
+  color: var(--body-text, #333333);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.paginator-btn:hover,
+.paginator-page:hover {
+  background: var(--filter-group-hover, #f8f9fa);
+  border-color: var(--item-primary, #2c5f2d);
+  color: var(--item-primary, #2c5f2d);
+  text-decoration: none;
+}
+
+/* Pagina corrente */
+.paginator-page-current {
+  background: var(--item-primary, #2c5f2d);
+  border-color: var(--item-primary, #2c5f2d);
+  color: var(--white, #ffffff);
+  cursor: default;
+  font-weight: 600;
+}
+
+.paginator-page-current:hover {
+  background: var(--item-primary, #2c5f2d);
+  border-color: var(--item-primary, #2c5f2d);
+  color: var(--white, #ffffff);
+}
+
+/* Pulsanti freccia */
+.paginator-first,
+.paginator-prev,
+.paginator-next,
+.paginator-last {
+  font-size: 1.2rem;
+  font-weight: 700;
+  min-width: 2.5rem;
+}
+
+/* Dots (…) */
+.paginator-dots {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.5rem;
+  color: var(--body-text, #666666);
+  font-size: 1.2rem;
+  font-weight: 700;
+  user-select: none;
+}
+
+/* =================================================================
+   RESULTS PER PAGE SELECTOR - RIGHT SIDE
+   ================================================================= */
+.paginator-per-page {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.paginator-label {
+  font-size: 0.9rem;
+  color: var(--body-text, #666666);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.paginator-per-page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--light-border, #dee2e6);
+  background: var(--white, #ffffff);
+  color: var(--body-text, #333333);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.paginator-per-page-btn:hover {
+  background: var(--filter-group-hover, #f8f9fa);
+  border-color: var(--item-primary, #2c5f2d);
+  color: var(--item-primary, #2c5f2d);
+  text-decoration: none;
+}
+
+.paginator-per-page-current {
+  background: var(--item-primary, #2c5f2d);
+  border-color: var(--item-primary, #2c5f2d);
+  color: var(--white, #ffffff);
+  cursor: default;
+  font-weight: 600;
+}
+
+.paginator-per-page-current:hover {
+  background: var(--item-primary, #2c5f2d);
+  border-color: var(--item-primary, #2c5f2d);
+  color: var(--white, #ffffff);
+}
+
+/* =================================================================
+   RESPONSIVE
+   ================================================================= */
+@media (max-width: 768px) {
+  .teasearch-paginator {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .paginator-pages {
+    justify-content: center;
+  }
+
+  .paginator-per-page {
+    justify-content: center;
+  }
+
+  .paginator-btn,
+  .paginator-page,
+  .paginator-per-page-btn {
+    min-width: 2.25rem;
+    height: 2.25rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .paginator-label {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .paginator-btn,
+  .paginator-page,
+  .paginator-per-page-btn {
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0.3rem 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  /* Nascondi label su schermi molto piccoli */
+  .paginator-label {
+    display: none;
+  }
+}
+
+/* =================================================================
+   DARK MODE SUPPORT (opzionale)
+   ================================================================= */
+@media (prefers-color-scheme: dark) {
+  .teasearch-paginator {
+    border-top-color: #444444;
+  }
+
+  .paginator-btn,
+  .paginator-page,
+  .paginator-per-page-btn {
+    background: #2a2a2a;
+    border-color: #444444;
+    color: #e0e0e0;
+  }
+
+  .paginator-btn:hover,
+  .paginator-page:hover,
+  .paginator-per-page-btn:hover {
+    background: #3a3a3a;
+    border-color: var(--item-primary, #4a8f4c);
+  }
+
+  .paginator-dots {
+    color: #999999;
+  }
+
+  .paginator-label {
+    color: #b0b0b0;
+  }
+}

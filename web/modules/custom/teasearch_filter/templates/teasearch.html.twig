@@ -36,6 +36,17 @@
     {% if entities %}
       {% include 'modules/custom/teasearch_filter/templates/partials/results-header.html.twig' %}
       {% include 'modules/custom/teasearch_filter/templates/partials/results-list.html.twig' %}
+
+      {# Paginator #}
+      {% if paginator_data %}
+        {% set current_query = app.request.query.all %}
+        {% include 'modules/custom/teasearch_filter/templates/partials/paginator.html.twig' with {
+          'paginator_data': paginator_data,
+          'content_type': content_type,
+          'current_query': current_query
+        } %}
+      {% endif %}
+
     {% else %}
       {% include 'modules/custom/teasearch_filter/templates/partials/no-results.html.twig' %}
     {% endif %}

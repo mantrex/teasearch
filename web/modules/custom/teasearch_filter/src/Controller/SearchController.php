@@ -46,6 +46,17 @@ class SearchController extends ControllerBase
     $this->entityTypeManager = $entity_type_manager;
   }
 
+  private function getPaginatorConfig()
+  {
+    return [
+      'paginator' => TRUE,  // Abilita/disabilita il paginatore
+      'results' => [10, 25, 50],  // Opzioni per risultati per pagina (vuoto = solo default)
+      'results_default' => 10,  // Numero default di risultati per pagina
+      'pages' => 5,  // Numero massimo di pagine mostrate prima di [>]
+      'additional_buttons' => TRUE,  // Mostra [<<] e [>>]
+    ];
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -123,20 +134,49 @@ class SearchController extends ControllerBase
     $century_data = $this->prepareCenturyData($filters, $content_type_config, $request);
     $date_data = $this->prepareDateData($filters, $content_type_config, $request);
 
+    // INIZIO MODIFICHE PAGINATORE
+    // Get paginator configuration
+    $paginator_config = $this->getPaginatorConfig();
+
+    // Get pagination parameters from request or session
+    $page = (int) $request->query->get('page', 0);
+    $per_page = $request->query->get('per_page');
+
+    // Gestione sessione per per_page
+    $session = $request->getSession();
+    $session_key = "teasearch_filter.{$content_type}.per_page";
+
+    if ($per_page === null) {
+      $per_page = $session->get($session_key, $paginator_config['results_default']);
+    } else {
+      $per_page = (int) $per_page;
+      $session->set($session_key, $per_page);
+    }
+    // FINE MODIFICHE PAGINATORE
 
     // Search entities
     $entity_type = $content_type_config['type'] ?? 'node';
     if ($entity_type === 'user') {
-      $entities = $this->searchUsers($content_type_config, $request);
+      $entities = $this->searchUsers($content_type_config, $request, $page, $per_page);
       $total = count($entities);
     } else {
-      list($entities, $total) = $this->searchNodes($content_type_config, $request);
+      list($entities, $total) = $this->searchNodes($content_type_config, $request, $page, $per_page);
     }
 
     // Process entities for display with custom functions support
     foreach ($entities as &$entity) {
       $entity = $this->processEntityForDisplay($entity, $content_type_config);
     }
+
+    // INIZIO MODIFICHE PAGINATORE
+    // Prepare paginator data
+    $paginator_data = $this->preparePaginatorData(
+      $total,
+      $page,
+      $per_page,
+      $paginator_config
+    );
+    // FINE MODIFICHE PAGINATORE
 
     // Build render array
     return [
@@ -154,6 +194,12 @@ class SearchController extends ControllerBase
       '#century_data' => $century_data,
       '#date_data' => $date_data,
       '#module_path' => $request->getBasePath() . '/' . \Drupal::service('extension.list.module')->getPath('teasearch_filter'),
+      // INIZIO MODIFICHE PAGINATORE
+      '#paginator_config' => $paginator_config,
+      '#paginator_data' => $paginator_data,
+      '#current_page' => $page,
+      '#per_page' => $per_page,
+      // FINE MODIFICHE PAGINATORE
       '#attached' => [
         'library' => [
           'teasearch_filter/teasearch_filter_styles',
@@ -166,7 +212,6 @@ class SearchController extends ControllerBase
       ],
     ];
   }
-
   /**
    * Get category title from categories entity.
    */
@@ -208,7 +253,8 @@ class SearchController extends ControllerBase
   /**
    * Search nodes.
    */
-  private function searchNodes($config, Request $request)
+
+  private function searchNodes($config, Request $request, $page = 0, $per_page = 20)
   {
     $machine_name = $config['machine_name'];
     $filters = $config['filters'] ?: [];
@@ -232,8 +278,7 @@ class SearchController extends ControllerBase
     $total = $total_query->count()->execute();
 
     // Apply pagination
-    $page = $request->query->get('page', 0);
-    $limit = 20;
+    $limit = $per_page;
     $offset = $page * $limit;
 
     $ids = $query->sort('created', 'DESC')
@@ -244,11 +289,10 @@ class SearchController extends ControllerBase
 
     return [$entities, $total];
   }
-
   /**
    * Search users.
    */
-  private function searchUsers($config, Request $request)
+  private function searchUsers($config, Request $request, $page = 0, $per_page = 20)
   {
     $filters = $config['filters'] ?: [];
 
@@ -258,13 +302,65 @@ class SearchController extends ControllerBase
 
     $this->applyFiltersToQuery($query, $filters, $request, 'user');
 
+    // Get total count
+    $total_query = clone $query;
+    $total = $total_query->count()->execute();
+
+    // Apply pagination
+    $limit = $per_page;
+    $offset = $page * $limit;
+
     $ids = $query->sort('created', 'DESC')
-      ->range(0, 50)
+      ->range($offset, $limit)
       ->execute();
 
-    return $this->entityTypeManager->getStorage('user')->loadMultiple($ids);
+    $entities = $this->entityTypeManager->getStorage('user')->loadMultiple($ids);
+
+    return [$entities, $total];
   }
 
+
+  private function preparePaginatorData($total_results, $current_page, $per_page, $config)
+  {
+    if (!$config['paginator'] || $total_results == 0) {
+      return NULL;
+    }
+
+    $total_pages = (int) ceil($total_results / $per_page);
+    $max_pages_display = $config['pages'];
+
+    // Calcola range pagine da mostrare
+    $start_page = max(0, $current_page - floor($max_pages_display / 2));
+    $end_page = min($total_pages - 1, $start_page + $max_pages_display - 1);
+
+    // Aggiusta start se siamo vicini alla fine
+    if ($end_page - $start_page < $max_pages_display - 1) {
+      $start_page = max(0, $end_page - $max_pages_display + 1);
+    }
+
+    $pages = [];
+    for ($i = $start_page; $i <= $end_page; $i++) {
+      $pages[] = $i;
+    }
+
+    return [
+      'total_pages' => $total_pages,
+      'current_page' => $current_page,
+      'per_page' => $per_page,
+      'results_options' => $config['results'],
+      'results_default' => $config['results_default'],
+      'pages' => $pages,
+      'has_prev' => $current_page > 0,
+      'has_next' => $current_page < $total_pages - 1,
+      'has_first' => $config['additional_buttons'] && $current_page > 0,
+      'has_last' => $config['additional_buttons'] && $current_page < $total_pages - 1,
+      'show_more_prev' => $start_page > 0,
+      'show_more_next' => $end_page < $total_pages - 1,
+    ];
+  }
+
+
+  
   /**
    * Apply WHERE conditions from configuration.
    */
@@ -498,7 +594,7 @@ class SearchController extends ControllerBase
     // Applica il filtro solo se almeno uno dei due valori è presente
     $this->applyNodeYearRangeFilter($query, $from_field, $to_field, $year_from, $year_to);
   }
-  
+
   /**
    * Apply year range filter to node query.
    */
@@ -865,7 +961,7 @@ class SearchController extends ControllerBase
           $options[$term->tid] = [
             'label' => $term->name ?? '',
             'count' => $count,
-            'selected' => in_array((string)$term->tid, $selected, true)
+            'selected' => in_array((string) $term->tid, $selected, true)
           ];
         }
       } catch (\Exception $e) {

@@ -185,9 +185,8 @@ class CarouselController
     // ==================================
 // 2) Altri content type - distribuzione equa degli slot
 // ==================================
-
-    // ==================================
-// 2) Altri content type - distribuzione round-robin ciclica
+// ==================================
+// 2) Altri content type - distribuzione round-robin ciclica con randomizzazione
 // ==================================
     $others = [];
     $bundles = array_keys($config['valid_content_types']);
@@ -214,6 +213,9 @@ class CarouselController
           if (!empty($poolNids)) {
             $poolNodes = $storage->loadMultiple($poolNids);
             $pools[$bundle] = array_values($poolNodes); // Array indicizzato numericamente
+
+            // RANDOMIZZA ogni pool prima del round-robin
+            shuffle($pools[$bundle]);
           } else {
             $pools[$bundle] = [];
           }
@@ -237,7 +239,6 @@ class CarouselController
             }
 
             // Cerca il prossimo elemento non usato da questo bundle
-            $found = false;
             while ($currentIndex[$bundle] < count($pools[$bundle])) {
               $node = $pools[$bundle][$currentIndex[$bundle]];
               $nid = $node->id();
@@ -268,7 +269,6 @@ class CarouselController
                 $currentIndex[$bundle]++;
                 $slotsAdded++;
                 $addedInThisRound = true;
-                $found = true;
                 break;
               }
 
@@ -283,6 +283,7 @@ class CarouselController
         }
       }
     }
+
     // ==========================
     // 3) Composizione / Ordinamento
     // ==========================
