@@ -30,6 +30,7 @@ function teasearch_filter_theme($existing, $type, $theme, $path)
         'paginator_data' => NULL,
         'current_page' => NULL,
         'per_page' => NULL,
+        'current_query' => NULL
       ],
       'template' => 'teasearch',
     ],

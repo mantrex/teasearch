@@ -39,7 +39,7 @@
 
       {# Paginator #}
       {% if paginator_data %}
-        {% set current_query = app.request.query.all %}
+       
         {% include 'modules/custom/teasearch_filter/templates/partials/paginator.html.twig' with {
           'paginator_data': paginator_data,
           'content_type': content_type,

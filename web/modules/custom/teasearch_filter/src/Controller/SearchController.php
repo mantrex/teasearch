@@ -54,6 +54,7 @@ class SearchController extends ControllerBase
       'results_default' => 10,  // Numero default di risultati per pagina
       'pages' => 5,  // Numero massimo di pagine mostrate prima di [>]
       'additional_buttons' => TRUE,  // Mostra [<<] e [>>]
+      'always_show' => TRUE,  // Se TRUE, mostra sempre il paginatore anche con 1 sola pagina
     ];
   }
 
@@ -320,13 +321,32 @@ class SearchController extends ControllerBase
   }
 
 
+
+  /**
+   * SOSTITUIRE IL METODO preparePaginatorData() in SearchController.php
+   */
+
   private function preparePaginatorData($total_results, $current_page, $per_page, $config)
   {
-    if (!$config['paginator'] || $total_results == 0) {
+    // Se il paginatore è disabilitato, ritorna NULL
+    if (!$config['paginator']) {
+      return NULL;
+    }
+
+    // Se non ci sono risultati, ritorna NULL
+    if ($total_results == 0) {
       return NULL;
     }
 
     $total_pages = (int) ceil($total_results / $per_page);
+
+    // Se always_show è FALSE e c'è solo 1 pagina, non mostrare il paginatore
+    if (!isset($config['always_show']) || !$config['always_show']) {
+      if ($total_pages <= 1) {
+        return NULL;
+      }
+    }
+
     $max_pages_display = $config['pages'];
 
     // Calcola range pagine da mostrare
@@ -360,7 +380,7 @@ class SearchController extends ControllerBase
   }
 
 
-  
+
   /**
    * Apply WHERE conditions from configuration.
    */
