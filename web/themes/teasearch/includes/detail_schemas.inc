@@ -1328,8 +1328,8 @@ function teasearch_get_detail_schemas()
       ],
 
       "people" => [
-        "label" => "People",
-        "type" => "people_roles"
+        "label" => "People", 
+        "type" => "people_roles" 
       ],
 
       "field_license" => [

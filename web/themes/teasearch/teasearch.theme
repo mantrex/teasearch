@@ -555,12 +555,21 @@ function teasearch_render_fields($node, $fields_config)
   $content_type = $node->bundle();
   
   foreach ($fields_config as $field_identifier => $field_config) {
-    
+
     // Caso 1: Separatore (stringa semplice)
     if (is_string($field_config)) {
+      $separator_label = $field_config;
+
+      $translations = teasearch_translations();
+      $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+
+      if (isset($translations[$content_type][$current_language][$field_identifier])) {
+        $separator_label = $translations[$content_type][$current_language][$field_identifier];
+      }
+
       $rendered_fields[$field_identifier] = [
         'type' => 'separator',
-        'content' => $field_config, // es. "PROFILE"
+        'content' => $separator_label,
         'label' => NULL,
         'wrapper_class' => 'separator',
       ];

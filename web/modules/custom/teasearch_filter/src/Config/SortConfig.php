@@ -97,8 +97,7 @@ class SortConfig
             'field' => 'field_year',
             'direction' => 'DESC',
             'tiebreakers' => [
-              ['field' => 'field_year', 'direction' => 'ASC'],
-              ['field' => 'field_title', 'direction' => 'ASC'],
+              ['field' => 'title', 'direction' => 'ASC'],
               ['type' => 'last_updated', 'direction' => 'DESC'],
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
@@ -110,8 +109,7 @@ class SortConfig
             'field' => 'field_year',
             'direction' => 'ASC',
             'tiebreakers' => [
-              ['field' => 'field_year', 'direction' => 'ASC'],
-              ['field' => 'field_title', 'direction' => 'ASC'],
+              ['field' => 'title', 'direction' => 'ASC'],
               ['type' => 'last_updated', 'direction' => 'DESC'],
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
@@ -120,7 +118,7 @@ class SortConfig
             'label' => 'Title (A-Z)',
             'label_it' => 'Titolo (A–Z)',
             'type' => 'field',
-            'field' => 'field_title',
+            'field' => 'title',
             'direction' => 'ASC',
             'tiebreakers' => [
               ['type' => 'last_updated', 'direction' => 'DESC'],
@@ -182,7 +180,7 @@ class SortConfig
             'direction' => 'ASC',
             'tiebreakers' => [
               ['field' => 'field_year_range.year_to', 'direction' => 'ASC'],
-              ['field' => 'field_title', 'direction' => 'ASC'],
+              ['field' => 'title', 'direction' => 'ASC'],
               ['type' => 'last_updated', 'direction' => 'DESC'],
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
@@ -195,7 +193,7 @@ class SortConfig
             'direction' => 'DESC',
             'tiebreakers' => [
               ['field' => 'field_year_range.year_from', 'direction' => 'ASC'],
-              ['field' => 'field_title', 'direction' => 'ASC'],
+              ['field' => 'title', 'direction' => 'ASC'],
               ['type' => 'last_updated', 'direction' => 'DESC'],
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
@@ -204,7 +202,7 @@ class SortConfig
             'label' => 'Title (A-Z)',
             'label_it' => 'Titolo (A–Z)',
             'type' => 'field',
-            'field' => 'field_title',
+            'field' => 'title',
             'direction' => 'ASC',
             'tiebreakers' => [
               ['type' => 'last_updated', 'direction' => 'DESC'],
@@ -266,7 +264,7 @@ class SortConfig
             'direction' => 'DESC',
             'tiebreakers' => [
               ['type' => 'last_updated', 'direction' => 'DESC'],
-              ['field' => 'field_title', 'direction' => 'ASC'],
+              ['field' => 'title', 'direction' => 'ASC'],
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
           ],
@@ -278,7 +276,7 @@ class SortConfig
             'direction' => 'ASC',
             'tiebreakers' => [
               ['type' => 'last_updated', 'direction' => 'DESC'],
-              ['field' => 'field_title', 'direction' => 'ASC'],
+              ['field' => 'title', 'direction' => 'ASC'],
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
           ],
@@ -295,7 +293,7 @@ class SortConfig
             'label' => 'Title (A-Z)',
             'label_it' => 'Titolo (A–Z)',
             'type' => 'field',
-            'field' => 'field_title',
+            'field' => 'title',
             'direction' => 'ASC',
             'tiebreakers' => [
               ['type' => 'last_updated', 'direction' => 'DESC'],
@@ -348,7 +346,7 @@ class SortConfig
             'direction' => 'DESC',
             'tiebreakers' => [
               ['type' => 'last_updated', 'direction' => 'DESC'],
-              ['field' => 'field_title', 'direction' => 'ASC'],
+              ['field' => 'title', 'direction' => 'ASC'],
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
           ],
@@ -360,7 +358,7 @@ class SortConfig
             'direction' => 'ASC',
             'tiebreakers' => [
               ['type' => 'last_updated', 'direction' => 'DESC'],
-              ['field' => 'field_title', 'direction' => 'ASC'],
+              ['field' => 'title', 'direction' => 'ASC'],
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
           ],
@@ -377,7 +375,7 @@ class SortConfig
             'label' => 'Title (A-Z)',
             'label_it' => 'Titolo (A–Z)',
             'type' => 'field',
-            'field' => 'field_title',
+            'field' => 'title',
             'direction' => 'ASC',
             'tiebreakers' => [
               ['type' => 'last_updated', 'direction' => 'DESC'],
@@ -430,7 +428,7 @@ class SortConfig
             'direction' => 'DESC',
             'tiebreakers' => [
               ['type' => 'last_updated', 'direction' => 'DESC'],
-              ['field' => 'field_title', 'direction' => 'ASC'],
+              ['field' => 'title', 'direction' => 'ASC'],
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
           ],
@@ -447,7 +445,7 @@ class SortConfig
             'label' => 'Title (A-Z)',
             'label_it' => 'Titolo (A–Z)',
             'type' => 'field',
-            'field' => 'field_title',
+            'field' => 'title',
             'direction' => 'ASC',
             'tiebreakers' => [
               ['type' => 'last_updated', 'direction' => 'DESC'],
@@ -477,7 +475,7 @@ class SortConfig
 
     ];
   }
-
+  
   /**
    * Restituisce la config sort per un singolo content_type.
    *

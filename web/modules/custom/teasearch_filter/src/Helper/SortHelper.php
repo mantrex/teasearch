@@ -155,27 +155,24 @@ class SortHelper
 
   /**
    * Risolve il nome del campo per la EntityQuery.
+   *
+   * Il campo viene usato ESATTAMENTE come scritto nella SortConfig:
+   *   'title'       → campo base Drupal (label del nodo)
+   *   'field_title' → campo custom aggiunto al content type
+   *   'nid', 'uid', 'changed', ecc. → campi base Drupal
+   *
+   * NON viene aggiunto né rimosso nessun prefisso automaticamente.
    */
   private static function resolveFieldName(array $option, string $entity_type): ?string
   {
     $type = $option['type'] ?? 'field';
 
     if ($type === 'last_updated') {
-      return $entity_type === 'user' ? 'changed' : 'changed';
+      return 'changed';
     }
 
     if ($type === 'field') {
-      $field = $option['field'] ?? NULL;
-      if (!$field)
-        return NULL;
-
-      // Campi speciali senza prefisso field_
-      $no_prefix = ['nid', 'uid', 'created', 'changed', 'title', 'status'];
-      if (in_array($field, $no_prefix)) {
-        return $field;
-      }
-      // Alcuni campi potrebbero già avere field_ nel config
-      return $field;
+      return $option['field'] ?? NULL;
     }
 
     return NULL;
@@ -183,6 +180,7 @@ class SortHelper
 
   /**
    * Risolve il nome del campo per un tiebreaker.
+   * Stessa logica di resolveFieldName — campo usato così com'è dalla config.
    */
   private static function resolveTiebreakerField(array $tb, string $entity_type): ?string
   {
@@ -244,19 +242,29 @@ class SortHelper
 
   /**
    * Legge il valore di un campo semplice da una entity.
+   *
+   * Regola: il campo viene usato ESATTAMENTE come scritto nella SortConfig.
+   *   'title'       → campo base Drupal → $entity->label()
+   *   'field_title' → campo custom      → $entity->get('field_title')->value
+   *   'nid'         → $entity->id()
+   *   'uid'         → $entity->id()
+   *   'field_year_range.year_from' → campo con subproperty
    */
   private static function extractFieldValue($entity, string $field_name)
   {
     if (empty($field_name))
       return '';
 
-    // Campi speciali
-    if ($field_name === 'nid')
+    // Campi base Drupal — non hanno hasField(), si leggono direttamente
+    if ($field_name === 'nid' || $field_name === 'uid') {
       return (int) $entity->id();
-    if ($field_name === 'uid')
-      return (int) $entity->id();
-    if ($field_name === 'title')
+    }
+
+    // 'title' = campo base Drupal (label del nodo/utente)
+    // NON confondere con 'field_title' che è un campo custom
+    if ($field_name === 'title') {
       return strtolower($entity->label() ?? '');
+    }
 
     // Campo con subproperty es. field_year_range.year_from
     if (str_contains($field_name, '.')) {
@@ -268,13 +276,13 @@ class SortHelper
       return '';
     }
 
+    // Tutti gli altri campi (field_title, field_year, field_lastname, ecc.)
     if (!$entity->hasField($field_name))
       return '';
     if ($entity->get($field_name)->isEmpty())
       return '';
 
     $value = $entity->get($field_name)->value;
-    // Tenta la conversione numerica per campi year/number
     if (is_numeric($value))
       return (float) $value;
     return strtolower((string) $value);
