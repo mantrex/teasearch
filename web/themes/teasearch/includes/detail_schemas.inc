@@ -1323,6 +1323,7 @@ function teasearch_get_detail_schemas()
       ],
       "field_teasearch_contributors" => [
         "label" => "Contributors",
+        "type" => "people_reference_list"
       ],
 
       "systemdate" => [

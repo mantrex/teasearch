@@ -11,10 +11,3 @@ teasearch_filter_details_state:
   dependencies:
     - core/drupal
     - core/once
-global_search_sync:
-  version: 1.x
-  js:
-    js/global-search-sync.js: {}
-  dependencies:
-    - core/drupal
-    - core/once

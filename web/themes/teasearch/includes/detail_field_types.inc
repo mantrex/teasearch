@@ -1014,10 +1014,10 @@ function teasearch_build_contribution($node, $content_type, $role, $language)
   if ($authors_string) {
     $parts[] = $authors_string;
   }
-
+  $roleLabel = "";
   // 3. RUOLO
   if ($role) {
-    $parts[] = '(' . $role . ')';
+    $roleLabel = ' (' . $role . ')';
   }
 
   if (empty($parts)) {
@@ -1032,7 +1032,7 @@ function teasearch_build_contribution($node, $content_type, $role, $language)
   $url_string = $url->toString();
 
   // Ritorno la contribution come link
-  return '<a href="' . $url_string . '">' . htmlspecialchars($contribution_text) . '</a>';
+  return '<a href="' . $url_string . '">' . htmlspecialchars($contribution_text) . '</a>'.$roleLabel;
 }
 
 
@@ -1453,7 +1453,7 @@ function teasearch_render_field_people_roles($node, $field_config, $field_identi
     if (!empty($people_names)) {
       // Formato: field AUTHOR followed by: (role)
       $people_list = implode(', ', $people_names);
-      $all_items[] = $people_list . ' <em>(' . htmlspecialchars($role_label) . ')</em>';
+      $all_items[] = $people_list . ' (' . htmlspecialchars($role_label) . ')';
     }
   }
 
@@ -1496,7 +1496,7 @@ function teasearch_render_field_referenced_in($node, $field_config, $field_ident
       'template' => 'box4',
     ],
     'primary_sources' => [
-      'field' => 'field_teasearch_references',
+      'fields' => ['field_teasearch_references','field_curated_references'],
       'template' => 'box4',
     ],
     'images' => [
@@ -1586,10 +1586,9 @@ function teasearch_render_field_referenced_in($node, $field_config, $field_ident
         }
 
         if ($citation_data) {
-          \Drupal::logger('teasearch')->notice('    Citation built: @title', ['@title' => $citation_data['title_sort']]);
           $grouped_by_category[$content_type][] = $citation_data;
         } else {
-          \Drupal::logger('teasearch')->warning('    Citation NOT built for node @nid', ['@nid' => $ref_nid]);
+
         }
       }
     }
@@ -1978,6 +1977,7 @@ function teasearch_render_field_curated_references($node, $field_config, $field_
     // Costruisci la citazione completa (link)
     if (!empty($citation_parts)) {
       $citation_text = implode(' ', $citation_parts);
+
       $url = $bib_node->toUrl()->toString();
       $citation_html = '<a href="' . htmlspecialchars($url) . '">' . htmlspecialchars($citation_text) . '</a>';
 
@@ -2282,44 +2282,46 @@ function teasearch_build_box2_citation($node, $content_type, $current_language, 
 
   // 1. TITLE
   // Priority: TITLE_(LATIN) se presente, altrimenti TRANSLATED_TITLE
-  $title_latin = '';
+  // 1. TITLE
+  $title_main = ''; // Titolo principale (field_title_latin O title del nodo)
   $title_original = '';
   $title_translated = '';
 
-  // Per alcuni content types il titolo principale è in field_title_latin
+  // Priorità 1: field_title_latin
   if ($node->hasField('field_title_latin') && !$node->get('field_title_latin')->isEmpty()) {
-    $title_latin = $node->get('field_title_latin')->value;
+    $title_main = $node->get('field_title_latin')->value;
+  }
+  // Priorità 2: title del nodo
+  elseif (!empty($node->getTitle())) {
+    $title_main = $node->getTitle();
   }
 
-  // Titolo originale
+  // field_title_original
   if ($node->hasField('field_title_original') && !$node->get('field_title_original')->isEmpty()) {
     $title_original = $node->get('field_title_original')->value;
   }
 
-  // Titolo tradotto
+  // field_title_translated
   if ($node->hasField('field_title_translated') && !$node->get('field_title_translated')->isEmpty()) {
     $title_translated = $node->get('field_title_translated')->value;
   }
 
-  // Logica BOX-2: if field TITLE_(LATIN) HAS VALUE: TITLE_(LATIN) + TITLE_(ORIG_NON-LATIN) + dash
-  //                else: field TRANSLATED_TITLE + dash
+  // Costruisci il titolo finale
   $title_for_display = '';
   $title_for_sort = '';
 
-  if (!empty($title_latin)) {
-    $title_parts_display = [$title_latin];
+  if (!empty($title_main)) {
+    // C'è un titolo principale: mostra title_main + title_original
+    $title_parts = [$title_main];
     if (!empty($title_original)) {
-      $title_parts_display[] = $title_original;
+      $title_parts[] = $title_original;
     }
-    $title_for_display = implode(' ', $title_parts_display);
-    $title_for_sort = $title_latin;
+    $title_for_display = implode(' ', $title_parts);
+    $title_for_sort = $title_main;
   } elseif (!empty($title_translated)) {
+    // NON c'è titolo principale: mostra solo title_translated
     $title_for_display = $title_translated;
     $title_for_sort = $title_translated;
-  } else {
-    // Fallback: usa il titolo del nodo
-    $title_for_display = $node->getTitle();
-    $title_for_sort = $node->getTitle();
   }
 
   if (!empty($title_for_display)) {
@@ -2593,9 +2595,11 @@ function teasearch_build_box1_citation($node, $current_language, &$seen_surnames
   }
 
   // 4. (Category) - solo se richiesto (BOX-3)
+  $citation_label = "";
   if ($add_category) {
+  
     $category_label = $current_language === 'it' ? 'Bibliografia' : 'Bibliography';
-    $citation_parts[] = '(' . $category_label . ')';
+    $citation_label = ' (' . $category_label . ')';
   }
 
   if (empty($citation_parts)) {
@@ -2607,7 +2611,7 @@ function teasearch_build_box1_citation($node, $current_language, &$seen_surnames
 
   // Link alla pagina del nodo
   $url = $node->toUrl()->toString();
-  $citation_html = '<a href="' . htmlspecialchars($url) . '">' . htmlspecialchars($citation_text) . '</a>';
+  $citation_html = '<a href="' . htmlspecialchars($url) . '">' . htmlspecialchars($citation_text). '</a>'.$citation_label;
 
   return [
     'citation' => $citation_html,
@@ -3747,6 +3751,7 @@ function teasearch_render_field_pdf($node, $field_config, $field_identifier)
 function teasearch_render_field_news_type_badge($node, $field_config, $field_identifier)
 {
   $output_parts = [];
+  $publication_date = '';
 
   // ========================================================================
   // PARTE 1: DATA (field_date)
@@ -3784,8 +3789,26 @@ function teasearch_render_field_news_type_badge($node, $field_config, $field_ide
 
     if ($news_type) {
       $category_label = t('Category');
-      $output_parts[] = '<div class="news-badge-type">'.$category_label. ": " . htmlspecialchars($news_type) . '</div>';
+      $output_parts[] = '<div class="news-badge-type">' . $category_label . ": " . htmlspecialchars($news_type) . '</div>';
     }
+  }
+
+  // ========================================================================
+  // PARTE 3: PUBLICATION DATE (created date o field_publication_date)
+  // ========================================================================
+  // Prova prima field_publication_date se esiste
+  if ($node->hasField('field_publication_date') && !$node->get('field_publication_date')->isEmpty()) {
+    $pub_date_value = $node->get('field_publication_date')->value;
+    if ($pub_date_value) {
+      // Formatta la data (assumo formato YYYY-MM-DD)
+      $date = new \DateTime($pub_date_value);
+      $publication_date = '<div class="news-publication-date">' . $date->format('d/m/Y') . '</div>';
+    }
+  }
+  // Altrimenti usa la created date del nodo
+  else {
+    $created_timestamp = $node->getCreatedTime();
+    $publication_date = '<div class="news-publication-date">' . date('d/m/Y', $created_timestamp) . '</div>';
   }
 
   // ========================================================================
@@ -3795,8 +3818,7 @@ function teasearch_render_field_news_type_badge($node, $field_config, $field_ide
     return NULL;
   }
 
-  return '<div class="news-type-badge-box">' . implode('', $output_parts) . '</div>';
+  return '<div class="news-type-badge-wrapper"><div class="news-type-badge-box">' . implode('', $output_parts) . '</div>' . $publication_date . '</div>';
 }
-
 
 

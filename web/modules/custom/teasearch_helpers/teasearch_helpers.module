@@ -1,0 +1,9 @@
+<?php
+
+/**
+ * @file
+ * Modulo Teasearch Helpers - carica le funzioni helper globali.
+ */
+
+// Include il file con le funzioni helper
+require_once __DIR__ . '/teasearch_helpers.inc';

@@ -1,0 +1,5 @@
+services:
+  teasearch_helpers.twig_extension:
+    class: Drupal\teasearch_helpers\TwigExtension\TeasearchHelpersTwigExtension
+    tags:
+      - { name: twig.extension }

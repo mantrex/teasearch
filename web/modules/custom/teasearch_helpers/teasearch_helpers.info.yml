@@ -1,0 +1,5 @@
+name: 'Teasearch Helpers'
+type: module
+description: 'Helper functions globali per Teasearch'
+core_version_requirement: ^11
+package: 'Teasearch'

@@ -112,6 +112,15 @@ class GlobalSearchBlock extends BlockBase implements ContainerFactoryPluginInter
     $current_content_type = $current_request->query->get('content_type', 'all');
 
 
+    $current_path = \Drupal::service('path.current')->getPath();
+    if (preg_match('#^/category/([^/]+)#', $current_path, $matches)) {
+      $path_content_type = $matches[1];
+      // Verifica che sia un content type valido
+      if (isset($content_types[$path_content_type])) {
+        $current_content_type = $path_content_type;
+      }
+    }
+
     // Subito dopo getCategoryWeights()
     \Drupal::logger('teasearch_filter')->notice('Weights: @weights', ['@weights' => print_r($category_weights, TRUE)]);
 
@@ -200,20 +209,61 @@ class GlobalSearchBlock extends BlockBase implements ContainerFactoryPluginInter
   }
 
 
-  /*
+
+  /**
+   * {@inheritdoc}
+   */
+  /**
+   * {@inheritdoc}
+   */
   public function access(\Drupal\Core\Session\AccountInterface $account, $return_as_object = FALSE)
   {
     $request = \Drupal::request();
     $current_path = $request->getPathInfo();
 
-    // Nascondi il blocco se siamo in una pagina di dettaglio (es: /category/texts/123 o /en/category/texts/title)
-    // Pattern: /category/{content_type}/{anything}
-    if (preg_match('#^/([a-z]{2}/)?category/[^/]+/.+#', $current_path)) {
-      $access = \Drupal\Core\Access\AccessResult::forbidden();
-    } else {
-      $access = \Drupal\Core\Access\AccessResult::allowed();
+    // Rimuovi prefisso lingua se presente
+    $path_without_lang = preg_replace('#^/[a-z]{2}/#', '/', $current_path);
+
+    // NASCONDI in:
+    // 1. Pagine di dettaglio: /category/{type}/QUALCOSA
+    // 2. Pagine di dettaglio nodo: /node/{id}
+    // 3. Pagine di dettaglio news: /news/{anything}
+    // 4. Pagina carousel-all: /carousel-all
+    // 5. Pagina news lista: /news (opzionale con flag)
+
+    $hideNews = true; // Imposta a false se vuoi mostrare nella lista news
+
+    $forbidden = false;
+
+    // Dettagli categoria
+    if (preg_match('#^/category/[^/]+/.+#', $path_without_lang)) {
+      $forbidden = true;
     }
 
+    // Dettagli nodo
+    if (preg_match('#^/node/\d+#', $path_without_lang)) {
+      $forbidden = true;
+    }
+
+    // Dettagli news (URL con path pattern /news/titolo)
+    if (preg_match('#^/news/.+#', $path_without_lang)) {
+      $forbidden = true;
+    }
+
+    // Carousel-all
+    if (preg_match('#^/carousel-all#', $path_without_lang)) {
+      $forbidden = true;
+    }
+
+    // News lista (opzionale) - deve essere DOPO il check del dettaglio
+    if ($hideNews && $path_without_lang === '/news') {
+      $forbidden = true;
+    }
+
+    $access = $forbidden
+      ? \Drupal\Core\Access\AccessResult::forbidden()
+      : \Drupal\Core\Access\AccessResult::allowed();
+
     return $return_as_object ? $access : $access->isAllowed();
-  }*/
+  }
 }

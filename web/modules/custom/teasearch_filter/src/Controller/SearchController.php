@@ -15,6 +15,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Drupal\teasearch_filter\Helper\CustomFieldHelper;
 use Drupal\teasearch_filter\Helper\SearchHelper;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\node\NodeInterface;
+
 /**
  * Search controller for teasearch_filter module.
  */
@@ -238,36 +241,68 @@ class SearchController extends ControllerBase
   /**
    * Get category title from categories entity.
    */
-  private function getCategoryTitle($content_type)
+  private function getCategoryTitle(string $content_type): string
   {
     try {
-      $query = $this->entityTypeManager->getStorage('node')->getQuery()
+      $content_type_lower = trim(strtolower($content_type));
+
+      $storage = $this->entityTypeManager->getStorage('node');
+      $all_nids = $storage->getQuery()
         ->accessCheck(TRUE)
         ->condition('type', 'categories')
-        ->condition('status', 1);
+        ->condition('status', 1)
+        ->execute();
 
-      $nids = $query->execute();
+      if (!$all_nids) {
+        return $this->getCategoryTitleFallback($content_type);
+      }
 
-      if (!empty($nids)) {
-        $category_nodes = $this->entityTypeManager->getStorage('node')->loadMultiple($nids);
+      $all_nodes = $storage->loadMultiple($all_nids);
+      $lm = \Drupal::languageManager();
+      $langcode = $lm->getCurrentLanguage()->getId();
 
-        foreach ($category_nodes as $category_node) {
-          if ($category_node->hasField('field_category_menu_list') && !$category_node->get('field_category_menu_list')->isEmpty()) {
-            $field_value = $category_node->get('field_category_menu_list')->getString();
+      foreach ($all_nodes as $node) {
+        if (!$node->hasField('field_category_menu_list') || $node->get('field_category_menu_list')->isEmpty()) {
+          continue;
+        }
 
-            if (trim($field_value) === trim($content_type)) {
-              if ($category_node->hasField('field_link_title') && !$category_node->get('field_link_title')->isEmpty()) {
-                return $category_node->get('field_link_title')->value;
-              }
+        $menu_field = $node->get('field_category_menu_list');
+        $field_definition = $menu_field->getFieldDefinition();
+        $allowed_values = $field_definition->getSetting('allowed_values');
+
+        // ✅ Itera su tutti i valori della lista
+        foreach ($menu_field as $item) {
+          $machine_name = $item->value; // es. "first_reference"
+          $label = $allowed_values[$machine_name] ?? ''; // es. "Texts"
+
+          // ✅ Confronta la LABEL in minuscolo
+          if (strtolower($label) === $content_type_lower) {
+            // ✅ MATCH! Prendi field_link_title tradotto
+            if (!$node->hasField('field_link_title') || $node->get('field_link_title')->isEmpty()) {
+              continue;
             }
+
+            $translated = $node->hasTranslation($langcode)
+              ? $node->getTranslation($langcode)
+              : $node;
+
+            return $translated->get('field_link_title')->value;
           }
         }
       }
-    } catch (\Exception $e) {
-      \Drupal::logger('teasearch_filter')->error('Error in getCategoryTitle: @message', ['@message' => $e->getMessage()]);
+
+    } catch (\Throwable $e) {
+      \Drupal::logger('teasearch_filter')->error('Error in getCategoryTitle: @message', [
+        '@message' => $e->getMessage()
+      ]);
     }
 
-    // Fallback to configured title
+    return $this->getCategoryTitleFallback($content_type);
+  }
+
+  
+  private function getCategoryTitleFallback(string $content_type): string
+  {
     $config = $this->configFactory->get('teasearch_filter.settings');
     $content_types = $config->get('content_types') ?: [];
     return $content_types[$content_type]['label'] ?? ucfirst($content_type);
@@ -1329,6 +1364,7 @@ class SearchController extends ControllerBase
     $content_type_config = $content_types[$content_type];
 
     $filters = $content_type_config['filters'] ?: [];
+
     $page_title = $this->getCategoryTitle($content_type);
 
     // Build filter form
