@@ -199,6 +199,7 @@ class SearchController extends ControllerBase
       '#paginator_config' => $paginator_config,
       '#paginator_data' => $paginator_data,
       '#current_page' => $page,
+      '#current_query' => $request->query->all(),
       '#per_page' => $per_page,
       // FINE MODIFICHE PAGINATORE
       '#attached' => [
