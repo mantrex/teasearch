@@ -1,0 +1,40 @@
+body {
+  border:0;
+  padding:0;
+}
+
+.site-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Full viewport height */
+}
+
+.site-content {
+  flex: 1; /* Allow main content to expand and push the footer down */
+}
+
+/* Example color overrides */
+.site-header {
+  background-color: #6b9f00; /* A green shade */
+  box-shadow: #222222 0px 0px 3px 0px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.footer-section {
+  background-color: #6b4c00; /* A brown shade */
+  color: #fff;
+  padding: 20px 0;
+  height:230px;
+}
+
+/* Adjust brand logo, spacing, etc. */
+.navbar-brand img {
+ width:120px;
+}
+
+
+.region-footer .footer-logo img {
+  width:150px;
+}

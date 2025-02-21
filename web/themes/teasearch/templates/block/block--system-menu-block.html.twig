@@ -1,0 +1,20 @@
+<nav class="navbar navbar-expand-lg navbar-dark main-menu" >
+	<div class="container-fluid">
+		<!-- Logo on the left -->
+		<a class="navbar-brand" href="{{ path('<front>') }}">
+			<img src="{{ directory }}/images/teasearch-logo.svg" alt="Teasearch Logo"/>
+		</a>
+
+		<!-- Hamburger menu for mobile -->
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainMenu" aria-controls="mainMenu" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<!-- Menu items pushed to the right -->
+		<div class="collapse navbar-collapse" id="mainMenu">
+			<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+				{{ content }}
+			</ul>
+		</div>
+	</div>
+</nav>

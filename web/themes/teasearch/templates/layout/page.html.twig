@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="{{ language.getId() }}">
+  <head>
+    {{ head }}
+    <head-placeholder token="{{ placeholder_token }}" />
+    <title>{{ head_title|safe_join(' | ') }}</title>
+    {{ styles }}
+    {{ scripts }}
+  </head>
+  <body{{ attributes }}>
+  <div class="site-wrapper">
+    {{ page_top }}
+    {#{{ page }}#}
+
+    {# HEADER #}
+    {% if page.header %}
+      <header class="site-header" role="banner">
+        <div >
+          {{ page.header }}
+        </div>
+      </header>
+    {% endif %}
+
+    {# HERO (OPTIONAL) #}
+    {% if page.hero %}
+      <section class="hero-section">
+        {{ page.hero }}
+      </section>
+    {% endif %}
+
+    {# MAIN CONTENT #}
+    <main role="main" class=" site-content my-4">
+      <div class="container">
+        {% if page.content %}
+          {{ page.content }}
+        {% endif %}
+      </div>
+    </main>
+
+    {# FOOTER #}
+
+      <footer class="site-footer footer-section" role="contentinfo">
+        <div class="container">
+          {{ page.footer }}
+        </div>
+      </footer>
+  
+
+    {{ page_bottom }}
+    </div>
+  </body>
+</html>

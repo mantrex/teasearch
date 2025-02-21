@@ -1,0 +1,7 @@
+Options +FollowSymLinks
+Options -Indexes
+
+# First, explicitly set PHP 7.4-FPM handler for PHP files
+<FilesMatch "\.ph(p|tml)$">
+    SetHandler "proxy:unix:/var/run/php/php8.3-fpm.sock|fcgi://localhost"
+</FilesMatch>

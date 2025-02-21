@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 550 300">
+  <path style="fill: rgb(255, 255, 255); transform-origin: 102.778px 85.218px;" d="M 3.123 4.539 C 3.123 4.539 2.934 39.246 3.463 56.39 C 3.993 73.56 2.905 82.381 4.651 95.208 C 6.825 111.181 15.167 120.474 15.167 120.474 L 33.38 138.315 L 48.99 146.882 L 74.963 151.897 L 217.639 152.297 L 224.851 104.354 L 213.711 57.672 C 213.711 57.672 164.904 14.427 141.183 8.609 C 123.637 4.306 111.953 5.018 112.358 4.57 C 112.358 1.126 3.123 3.335 3.123 4.539 Z"/>
+  <g id="Capa_1" transform="matrix(0.759477, 0, 0, 0.793155, -10.133277, -9.114662)" style="">
+    <g id="SVGRepo_bgCarrier" stroke-width="0" transform="matrix(0.56687, 0, 0, 0.559442, 65.768494, 31.050718)" style=""/>
+    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" transform="matrix(0.56687, 0, 0, 0.559442, 65.768494, 31.050718)" style=""/>
+    <g id="SVGRepo_iconCarrier" transform="matrix(0.56687, 0, 0, 0.559442, 65.768494, 31.050718)" style="">
+      <g>
+        <path d="M 521.268 454.796 L 410.768 344.196 C 440.568 307.896 458.368 261.396 458.368 210.796 C 458.368 94.496 364.068 0.196 247.768 0.196 C 131.468 0.196 37.168 94.496 37.168 210.796 C 37.168 327.096 131.468 421.396 247.768 421.396 C 298.568 421.396 345.168 403.396 381.568 373.396 L 492.068 483.896 C 504.968 495.696 517.068 488.096 521.268 483.896 C 529.668 475.596 529.668 463.096 521.268 454.796 Z M 78.268 210.796 C 78.268 117.196 154.168 41.296 247.768 41.296 C 341.368 41.296 417.368 117.196 417.368 210.796 C 417.368 304.396 341.468 380.296 247.868 380.296 C 154.268 380.296 78.268 304.396 78.268 210.796 Z" style="stroke-width: 9.15071px; fill: rgb(255, 255, 255); stroke: rgb(137, 168, 40);"/>
+      </g>
+    </g>
+  </g>
+  <text style="fill: rgb(137, 168, 40); font-family: Arial, sans-serif; font-size: 80px; letter-spacing: 3.1px; white-space: pre;" x="89.295" y="131.26">tea</text>
+  <text style="fill: rgb(255, 255, 255); font-family: Arial, sans-serif; font-size: 80px; letter-spacing: 2.5px; white-space: pre;" x="231.917" y="132.565">search</text>
+  <text style="fill: rgb(255, 255, 255); font-family: Arial, sans-serif; font-size: 44px; white-space: pre;" x="7.3" y="294.309">Tea Science &amp; Culture Hub</text>
+</svg>

@@ -1,0 +1,16 @@
+
+bootstrap:
+  css: 
+    theme:
+      ../../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css: {}
+  js:
+    ../../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js: {}
+global-scripts:
+  dependencies:
+    - core/jquery
+  js:
+    js/custom.js: {}
+global-styling:
+  css:
+    theme:
+      css/style.css: {} 
