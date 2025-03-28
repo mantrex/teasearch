@@ -1,0 +1,556 @@
+field.value.custom:
+  type: sequence
+  label: 'Default value'
+  sequence:
+    type: ignore
+
+field.field_settings.custom:
+  type: mapping
+  label: 'Custom field settings'
+  mapping:
+    add_more_label:
+      type: string
+      label: 'Add another button label'
+    field_settings:
+      type: sequence
+      label: 'Field settings'
+      sequence:
+        type: custom_field.widget.[%key]
+        label: 'Custom field widget'
+
+field.storage_settings.custom:
+  type: mapping
+  label: 'Custom field settings'
+  mapping:
+    columns:
+      type: sequence
+      label: 'Columns'
+      sequence:
+        type: custom_field.column
+        label: 'Column'
+
+field.widget.settings.*:
+  type: custom_field_widget_base
+
+field.widget.settings.custom_flex:
+  type: custom_field_widget_base
+  mapping:
+    columns:
+      type: sequence
+      label: 'Column settings'
+      sequence:
+        type: string
+    breakpoint:
+      type: string
+      label: 'Stack items on:'
+
+field.widget.settings.custom_stacked:
+  type: custom_field_widget_base
+
+custom_field_widget_base:
+  type: mapping
+  label: 'Custom field widget settings'
+  mapping:
+    label:
+      type: boolean
+      label: 'Show field label?'
+    wrapper:
+      type: string
+      label: 'Wrapper'
+    open:
+      type: boolean
+      label: 'Show open by default?'
+
+custom_field_formatter_base:
+  type: mapping
+  label: 'Custom field formatter settings'
+  mapping:
+    fields:
+      type: sequence
+      label: 'Field settings'
+      sequence:
+        type: custom_field.formatter.[%key]
+
+custom_field.formatter.*:
+  type: mapping
+  label: 'Formatter settings'
+  mapping:
+    format_type:
+      type: string
+      label: 'Format type'
+    wrappers:
+      type: mapping
+      label: 'Style settings'
+      mapping:
+        field_wrapper_tag:
+          type: string
+          label: 'Field wrapper tag'
+        field_wrapper_classes:
+          type: string
+          label: 'Field wrapper classes'
+        field_tag:
+          type: string
+          label: 'Field tag'
+        field_classes:
+          type: string
+          label: 'Field classes'
+        label_tag:
+          type: string
+          label: 'Label tag'
+        label_classes:
+          type: string
+          label: 'Label classes'
+    formatter_settings:
+      type: mapping
+      label: 'Settings'
+      mapping:
+        always_build_output:
+          type: boolean
+          label: 'Always build output'
+        decimal_separator:
+          type: string
+          label: 'Decimal marker'
+        format:
+          type: string
+          label: 'Output format'
+        format_custom_true:
+          type: string
+          label: 'Custom output for TRUE'
+        format_custom_false:
+          type: string
+          label: 'Custom output for FALSE'
+        image_link:
+          type: string
+          label: 'Link image to'
+        image_style:
+          type: string
+          label: 'Image style'
+        image_loading:
+          type: mapping
+          label: 'Image loading settings'
+          mapping:
+            attribute:
+              type: string
+              label: 'Loading attribute'
+        key_label:
+          type: string
+          label: 'Key label'
+        value_label:
+          type: string
+          label: 'Value label'
+        label_display:
+          type: string
+          label: 'Label display'
+        field_label:
+          type: string
+          label: 'Field label'
+        prefix_suffix:
+          type: boolean
+          label: 'Display prefix/suffix'
+        title:
+          type: string
+          label: 'Title'
+        trim_length:
+          type: integer
+          label: 'Trim link text length'
+        url_plain:
+          type: boolean
+          label: 'Show URL as plain text'
+        rel:
+          type: boolean
+          label: 'Add rel="nofollow" to links'
+        scale:
+          type: integer
+          label: 'Scale'
+        target:
+          type: boolean
+          label: 'Open link in new window'
+        thousand_separator:
+          type: string
+          label: 'Thousand marker'
+        timezone_override:
+          type: string
+          label: 'Time zone override'
+        format_type:
+          type: string
+          label: 'Date format'
+        date_format:
+          type: string
+          label: 'Date/time format'
+        future_format:
+          type: string
+          label: 'Future format'
+        past_format:
+          type: string
+          label: 'Past format'
+        granularity:
+          type: integer
+          label: 'Granularity'
+        view_mode:
+          type: string
+          label: 'View mode'
+        link:
+          type: boolean
+          label: 'Link label to the referenced entity'
+        hierarchy_display:
+          type: string
+          label: 'Terms to display'
+        hierarchy_link:
+          type: boolean
+          label: 'Link each term'
+        hierarchy_wrap:
+          type: string
+          label: 'Wrap each term'
+        hierarchy_separator:
+          type: string
+          label: 'Separator'
+        hierarchy_reverse:
+          type: boolean
+          label: 'Reverse order'
+
+field.formatter.settings.custom_formatter:
+  type: custom_field_formatter_base
+  label: 'Default'
+
+field.formatter.settings.custom_inline:
+  type: custom_field_formatter_base
+  label: 'Inline'
+  mapping:
+    show_labels:
+      type: boolean
+      label: 'Show labels?'
+    label_separator:
+      type: string
+      label: 'Label separator'
+    item_separator:
+      type: string
+      label: 'Item separator'
+
+field.formatter.settings.custom_list:
+  type: custom_field_formatter_base
+  label: 'HTML list'
+  mapping:
+    list_type:
+      type: string
+      label: 'List type'
+
+field.formatter.settings.custom_table:
+  type: custom_field_formatter_base
+  label: 'Table'
+
+field.formatter.settings.custom_template:
+  type: mapping
+  label: 'Custom template'
+  mapping:
+    template:
+      type: string
+      label: 'Template'
+    tokens:
+      type: string
+      label: 'Tokens'
+    advanced_tokens:
+      type: mapping
+      label: 'Advanced tokens'
+      mapping:
+        recursion_limit:
+          type: integer
+          label: 'Recursion limit'
+        global_types:
+          type: boolean
+          label: 'Global types'
+
+custom_field.column:
+  type: mapping
+  label: 'Column'
+  mapping:
+    name:
+      type: string
+      label: 'Name'
+    type:
+      type: string
+      label: 'Type'
+    max_length:
+      type: string
+      label: 'Max length'
+    unsigned:
+      type: integer
+      label: 'Unsigned'
+    precision:
+      type: string
+      label: 'Precision'
+    scale:
+      type: string
+      label: 'Scale'
+    size:
+      type: string
+      label: 'Size'
+    datetime_type:
+      type: string
+      label: 'Date type'
+    target_type:
+      type: string
+      label: 'Type of item to reference'
+    uri_scheme:
+      type: string
+      label: 'Upload destination'
+
+custom_field.widget.*:
+  type: mapping
+  label: 'Custom field widget'
+  mapping:
+    type:
+      type: string
+      label: 'Type'
+    weight:
+      type: integer
+      label: 'Weight'
+    check_empty:
+      type: boolean
+      label: 'Check empty?'
+    widget_settings:
+      type: mapping
+      label: 'Widget settings'
+      mapping:
+        label:
+          type: label
+          label: 'Label'
+        translatable:
+          type: boolean
+          label: 'Users may translate this field'
+        settings:
+          type: mapping
+          label: 'Settings'
+          mapping:
+            allowed_views:
+              type: sequence
+              label: 'Views'
+              sequence:
+                type: custom_field.allowed_views.[%key]
+            alt_field:
+              type: boolean
+              label: 'Enable Alt field'
+            alt_field_required:
+              type: boolean
+              label: 'Alt field required'
+            title_field:
+              type: boolean
+              label: 'Enable Title field'
+            title_field_required:
+              type: boolean
+              label: 'Title field required'
+            preview_image_style:
+              type: string
+              label: 'Preview image style'
+            description:
+              type: text
+              label: 'Help text'
+            description_display:
+              type: string
+              label: 'Help text position'
+            size:
+              type: integer
+              label: 'Size of textfield'
+            placeholder:
+              type: label
+              label: 'Placeholder'
+            table_empty:
+              type: string
+              label: 'Empty text'
+            key_label:
+              type: label
+              label: 'Key label'
+            value_label:
+              type: label
+              label: 'Value label'
+            max_resolution:
+              type: string
+              label: 'Maximum image resolution'
+            min_resolution:
+              type: string
+              label: 'Minimum image resolution'
+            maxlength:
+              type: integer
+              label: 'Max length'
+            maxlength_js:
+              type: boolean
+              label: 'Show max length character count'
+            min:
+              type: integer
+              label: 'Minimum'
+            max:
+              type: integer
+              label: 'Maximum'
+            pattern:
+              type: string
+              label: 'Telephone format'
+            prefix:
+              type: label
+              label: 'Prefix'
+            suffix:
+              type: label
+              label: 'Suffix'
+            required:
+              type: boolean
+              label: 'Required'
+            default_colors:
+              type: string
+              label: 'Default colors'
+            empty_option:
+              type: string
+              label: 'Empty option'
+            allowed_values:
+              type: sequence
+              label: 'Allowed values list'
+              sequence:
+                type: mapping
+                label: 'Allowed value with label'
+                mapping:
+                  key:
+                    type: string
+                    label: 'Value'
+                  value:
+                    type: label
+                    label: 'Label'
+            rows:
+              type: integer
+              label: 'Rows'
+            formatted:
+              type: boolean
+              label: 'Enable wysiwyg'
+            default_format:
+              type: string
+              label: 'Default format'
+            format:
+              type: mapping
+              label: 'Format settings'
+              mapping:
+                guidelines:
+                  type: boolean
+                  label: 'Show format guidelines'
+                help:
+                  type: boolean
+                  label: 'Show format help'
+            link_type:
+              type: integer
+              label: 'Allowed link type'
+            field_prefix:
+              type: string
+              label: 'Field prefix'
+            field_prefix_custom:
+              type: string
+              label: 'Custom field prefix'
+            date_order:
+              type: string
+              label: 'Date part order'
+            time_type:
+              type: string
+              label: 'Time type'
+            increment:
+              type: integer
+              label: 'increment'
+            file_directory:
+              type: string
+              label: 'File directory'
+            file_extensions:
+              type: string
+              label: 'Allowed file extensions'
+            force_default:
+              type: boolean
+              label: 'Always use default value'
+            max_filesize:
+              type: string
+              label: 'Maximum upload size'
+            progress_indicator:
+              type: string
+              label: 'Progress indicator'
+            match_operator:
+              type: string
+              label: 'Match operator'
+            match_limit:
+              type: integer
+              label: 'Match limit'
+            handler:
+              type: string
+              label: 'Handler'
+            handler_settings:
+              type: mapping
+              label: 'Handler settings'
+              mapping:
+                include_anonymous:
+                  type: boolean
+                  label: 'Include anonymous'
+                filter:
+                  type: mapping
+                  label: 'Filter'
+                  mapping:
+                    type:
+                      type: string
+                      label: 'Type'
+                sort:
+                  type: mapping
+                  label: 'Sort'
+                  mapping:
+                    field:
+                      type: string
+                      label: 'Sort by'
+                    direction:
+                      type: string
+                      label: 'Sort direction'
+                auto_create:
+                  type: boolean
+                  label: "Create referenced entities if they don't already exist"
+                target_bundles:
+                  type: sequence
+                  label: 'Target bundles'
+                  sequence:
+                    type: string
+                    label: 'Bundle'
+                auto_create_bundle:
+                  type: string
+                  label: 'Store new items in'
+                view:
+                  type: mapping
+                  label: 'View used to select the entities'
+                  mapping:
+                    view_name:
+                      type: string
+                      label: 'View machine name'
+                    display_name:
+                      type: string
+                      label: 'View display name'
+                    arguments:
+                      type: sequence
+                      label: 'View arguments'
+                      sequence:
+                        type: custom_field.view_arguments.[%key]
+            media_types:
+              type: sequence
+              label: 'Allowed media types, in display order'
+              sequence:
+                type: string
+                label: 'Media type ID'
+            token_browser:
+              type: mapping
+              label: 'Token browser'
+              mapping:
+                recursion_limit:
+                  type: integer
+                  label: 'Recursion limit'
+                global_types:
+                  type: boolean
+                  label: 'Global types'
+            force_deepest_level:
+              type: boolean
+              label: 'Force deepest level'
+            level_labels:
+              type: boolean
+              label: 'Show level labels'
+
+custom_field.view_arguments.*:
+  type: string
+
+custom_field.allowed_views.*:
+  type: sequence
+  sequence:
+    type: string
+    label: 'Views display'

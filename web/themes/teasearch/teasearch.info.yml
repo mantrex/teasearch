@@ -6,6 +6,7 @@ libraries:
   - teasearch/bootstrap
   - teasearch/global-scripts
   - teasearch/global-styling
+  - teasearch/login.css
 regions:
   header: Header
   hero: Hero

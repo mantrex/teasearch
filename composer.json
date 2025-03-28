@@ -19,8 +19,12 @@
         "drupal/core-composer-scaffold": "^11.1",
         "drupal/core-project-message": "^11.1",
         "drupal/core-recommended": "^11.1",
+        "drupal/custom_field": "^3.1",
+        "drupal/field_group": "^3.6",
         "drupal/gin": "^4.0",
         "drupal/gin_toolbar": "^2.0",
+        "drupal/migrate_plus": "^6.0",
+        "drupal/redirect": "^1.11",
         "drupal/vani": "^11.0",
         "drush/drush": "*",
         "twbs/bootstrap": "^5.3"

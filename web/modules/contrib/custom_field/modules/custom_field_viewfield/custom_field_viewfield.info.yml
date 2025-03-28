@@ -1,0 +1,13 @@
+name: Custom Field - Viewfield
+type: module
+description: Defines an entity reference field type to display a view.
+core_version_requirement: ^10.2 || ^11
+package: Field
+dependencies:
+  - custom_field:custom_field
+  - drupal:views
+
+# Information added by Drupal.org packaging script on 2025-03-24
+version: '3.1.5'
+project: 'custom_field'
+datestamp: 1742793815

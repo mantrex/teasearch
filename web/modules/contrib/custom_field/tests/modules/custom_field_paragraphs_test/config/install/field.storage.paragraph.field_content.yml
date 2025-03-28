@@ -1,0 +1,39 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - custom_field
+    - media
+    - paragraphs
+id: paragraph.field_content
+field_name: field_content
+entity_type: paragraph
+type: custom
+settings:
+  columns:
+    title:
+      name: title
+      type: string
+      max_length: '255'
+      unsigned: 0
+      precision: '10'
+      scale: '2'
+      size: normal
+      datetime_type: datetime
+    media:
+      name: media
+      type: entity_reference
+      max_length: '255'
+      unsigned: 0
+      precision: '10'
+      scale: '2'
+      size: normal
+      datetime_type: datetime
+      target_type: media
+module: custom_field
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.card.field_content
+    - paragraphs.paragraphs_type.card
+  module:
+    - custom_field
+id: paragraph.card.default
+targetEntityType: paragraph
+bundle: card
+mode: default
+content:
+  field_content:
+    type: custom_stacked
+    weight: 0
+    region: content
+    settings:
+      label: true
+      wrapper: div
+      open: true
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

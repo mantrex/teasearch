@@ -1,0 +1,719 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.custom_field_entity_test.field_test
+    - field.field.node.custom_field_entity_test.field_test_multiple
+    - field.field.node.custom_field_entity_test.field_test_unlimited
+    - node.type.custom_field_entity_test
+  module:
+    - custom_field
+    - user
+id: node.custom_field_entity_test.default
+targetEntityType: node
+bundle: custom_field_entity_test
+mode: default
+content:
+  field_test:
+    type: custom_formatter
+    label: above
+    settings:
+      fields:
+        string_test:
+          format_type: string
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+        string_long_test:
+          format_type: text_default
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+        integer_test:
+          format_type: number_integer
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+            thousand_separator: ','
+        decimal_test:
+          format_type: number_decimal
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            decimal_separator: .
+            label_display: above
+            prefix_suffix: false
+            scale: 2
+            thousand_separator: ','
+        float_test:
+          format_type: number_decimal
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            decimal_separator: .
+            label_display: above
+            prefix_suffix: false
+            scale: 2
+            thousand_separator: ','
+        email_test:
+          format_type: email_mailto
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+        telephone_test:
+          format_type: telephone_link
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            title: ''
+        uri_test:
+          format_type: uri_link
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            title: ''
+            trim_length: 80
+            url_plain: false
+            rel: false
+            target: false
+        boolean_test:
+          format_type: boolean
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            format: yes-no
+            format_custom_true: ''
+            format_custom_false: ''
+        uuid_test:
+          format_type: string
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+        color_test:
+          format_type: string
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+        map_test:
+          format_type: string
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+        map_string_test:
+          format_type: string
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+        datetime_test:
+          format_type: datetime_default
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            timezone_override: ''
+            format_type: medium
+        entity_reference_test:
+          format_type: entity_reference_label
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            link: true
+        file_test:
+          format_type: file_default
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+        image_test:
+          format_type: image
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            image_link: content
+            image_style: ''
+            image_loading:
+              attribute: lazy
+            label_display: above
+        viewfield_test:
+          format_type: viewfield_default
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            always_build_output: false
+            label_display: above
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  field_test_multiple:
+    type: custom_formatter
+    label: above
+    settings:
+      fields:
+        string_test:
+          format_type: string
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+        string_long_test:
+          format_type: text_default
+          formatter_settings:
+            label_display: above
+        integer_test:
+          format_type: number_integer
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+            thousand_separator: ','
+        decimal_test:
+          format_type: number_decimal
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            decimal_separator: .
+            label_display: above
+            prefix_suffix: false
+            scale: 2
+            thousand_separator: ','
+        float_test:
+          format_type: number_decimal
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            decimal_separator: .
+            label_display: above
+            prefix_suffix: false
+            scale: 2
+            thousand_separator: ','
+        email_test:
+          format_type: email_mailto
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+        telephone_test:
+          format_type: telephone_link
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            title: ''
+        uri_test:
+          format_type: uri_link
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            title: ''
+            trim_length: 80
+            url_plain: false
+            rel: false
+            target: false
+        boolean_test:
+          format_type: boolean
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            format: yes-no
+            format_custom_true: ''
+            format_custom_false: ''
+        uuid_test:
+          format_type: string
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+        color_test:
+          format_type: string
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+        map_test:
+          format_type: string
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+        map_string_test:
+          format_type: string
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+        datetime_test:
+          format_type: datetime_default
+          formatter_settings:
+            label_display: above
+            timezone_override: ''
+            format_type: medium
+        entity_reference_test:
+          format_type: entity_reference_label
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            link: true
+        file_test:
+          format_type: file_default
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+        image_test:
+          format_type: image
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            image_link: content
+            image_style: ''
+            image_loading:
+              attribute: lazy
+            label_display: above
+        viewfield_test:
+          format_type: viewfield_default
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            always_build_output: false
+            label_display: above
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  field_test_unlimited:
+    type: custom_formatter
+    label: above
+    settings:
+      fields:
+        string_test:
+          format_type: string
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+        string_long_test:
+          format_type: text_default
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+        integer_test:
+          format_type: number_integer
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+            thousand_separator: ','
+        decimal_test:
+          format_type: number_decimal
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            decimal_separator: .
+            label_display: above
+            prefix_suffix: false
+            scale: 2
+            thousand_separator: ','
+        float_test:
+          format_type: number_decimal
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            decimal_separator: .
+            label_display: above
+            prefix_suffix: false
+            scale: 2
+            thousand_separator: ','
+        email_test:
+          format_type: email_mailto
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+        telephone_test:
+          format_type: telephone_link
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            title: ''
+        uri_test:
+          format_type: uri_link
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            title: ''
+            trim_length: 80
+            url_plain: false
+            rel: false
+            target: false
+        boolean_test:
+          format_type: boolean
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            format: yes-no
+            format_custom_true: ''
+            format_custom_false: ''
+        uuid_test:
+          format_type: string
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+        color_test:
+          format_type: string
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+        map_test:
+          format_type: string
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+        map_string_test:
+          format_type: string
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            prefix_suffix: false
+        datetime_test:
+          format_type: datetime_default
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            timezone_override: ''
+            format_type: medium
+        entity_reference_test:
+          format_type: entity_reference_label
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            link: true
+        file_test:
+          format_type: file_default
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+        image_test:
+          format_type: image
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            image_link: content
+            image_style: ''
+            image_loading:
+              attribute: lazy
+            label_display: above
+        viewfield_test:
+          format_type: viewfield_default
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            always_build_output: false
+            label_display: above
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden: {  }

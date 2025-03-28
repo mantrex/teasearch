@@ -1,0 +1,167 @@
+<?php
+
+/**
+ * @file
+ * Contains custom_field.module.
+ */
+
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Field\FieldTypeCategoryManagerInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Template\Attribute;
+use Drupal\custom_field\Plugin\Field\FieldType\CustomFieldItemListInterface;
+use Drupal\custom_field\TagManagerInterface;
+
+/**
+ * Implements hook_help().
+ */
+function custom_field_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the flexfield module.
+    case 'help.page.custom_field':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Create simple, but flexible, multivalue fields without the hassle of entity references.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function custom_field_theme(): array {
+  $item = ['render element' => 'elements'];
+  return [
+    'custom_field' => $item,
+    'custom_field_item' => $item,
+    'custom_field_hierarchical_formatter' => [
+      'variables' => [
+        'terms' => [],
+        'wrapper' => '',
+        'separator' => ' » ',
+        'link' => FALSE,
+      ],
+      'file' => 'custom_field_hierarchical_formatter.theme.inc',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function custom_field_theme_suggestions_custom_field(array $variables): array {
+  return [
+    'custom_field__' . $variables['elements']['#field_name'],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function custom_field_theme_suggestions_custom_field_item(array $variables): array {
+  $hook = 'custom_field_item';
+  return [
+    $hook . '__' . $variables['elements']['#field_name'],
+    $hook . '__' . $variables['elements']['#field_name'] . '__' . $variables['elements']['#type'],
+    $hook . '__' . $variables['elements']['#field_name'] . '__' . $variables['elements']['#type'] . '__' . $variables['elements']['#name'],
+    $hook . '__' . $variables['elements']['#field_name'] . '__' . $variables['elements']['#name'],
+  ];
+}
+
+/**
+ * Prepares variables for custom-field template.
+ */
+function template_preprocess_custom_field(array &$variables): void {
+  $variables['items'] = $variables['elements']['#items'];
+  $variables['field_name'] = $variables['elements']['#field_name'];
+  // Set the item attributes.
+  foreach ($variables['elements']['#items'] as &$item) {
+    // Attributes are optional, so we check if it's set first and process
+    // appropriately.
+    if (isset($item['attributes'])) {
+      $item['attributes'] = new Attribute($item['attributes']);
+    }
+    else {
+      $item['attributes'] = new Attribute();
+    }
+  }
+}
+
+/**
+ * Prepares variables for custom-field-item template.
+ */
+function template_preprocess_custom_field_item(array &$variables): void {
+  $wrappers = $variables['elements']['#wrappers'];
+  // Set wrapper classes.
+  if (!empty($wrappers['field_wrapper_classes'])) {
+    $wrapper_classes = explode(' ', $wrappers['field_wrapper_classes']);
+    foreach ($wrapper_classes as $class) {
+      $variables['attributes']['class'][] = Html::cleanCssIdentifier($class, []);
+    }
+  }
+  // Set field classes.
+  if (!empty($wrappers['field_classes'])) {
+    $field_classes = explode(' ', $wrappers['field_classes']);
+    foreach ($field_classes as $class) {
+      $variables['content_attributes']['class'][] = Html::cleanCssIdentifier($class, []);
+    }
+  }
+  // Set label classes.
+  if (!empty($wrappers['label_classes'])) {
+    $label_classes = explode(' ', $wrappers['label_classes']);
+    foreach ($label_classes as $class) {
+      $variables['title_attributes']['class'][] = Html::cleanCssIdentifier($class, []);
+    }
+  }
+
+  $variables['display_label_tag'] = $wrappers['label_tag'] !== TagManagerInterface::NO_MARKUP_VALUE;
+  $variables['display_field_tag'] = $wrappers['field_tag'] !== TagManagerInterface::NO_MARKUP_VALUE;
+  $variables['display_field_wrapper_tag'] = $wrappers['field_wrapper_tag'] !== TagManagerInterface::NO_MARKUP_VALUE;
+  $variables['field_wrapper_tag'] = $wrappers['field_wrapper_tag'];
+  $variables['field_tag'] = $wrappers['field_tag'];
+  $variables['label_tag'] = $wrappers['label_tag'];
+  $variables['label'] = $variables['elements']['#label'];
+  $variables['label_display'] = $variables['elements']['#label_display'];
+  $variables['label_hidden'] = ($variables['elements']['#label_display'] == 'hidden');
+  $variables['value'] = $variables['elements']['#value'];
+  $variables['name'] = $variables['elements']['#name'];
+  $variables['type'] = $variables['elements']['#type'];
+  $variables['field_name'] = $variables['elements']['#field_name'];
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function custom_field_form_field_config_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (($field_config = $form_state->get('field_config')) && $field_config->get('field_type') == 'custom') {
+    array_unshift(
+      $form['actions']['submit']['#submit'],
+      'Drupal\custom_field\Plugin\Field\FieldType\CustomItem::submitStorageConfigEditForm'
+    );
+  }
+}
+
+/**
+ * Implements hook_field_type_category_info_alter().
+ */
+function custom_field_field_type_category_info_alter(&$definitions) {
+  // The `custom` field type belongs in the `general` category, so the libraries
+  // need to be attached using an alter hook.
+  $definitions[FieldTypeCategoryManagerInterface::FALLBACK_CATEGORY]['libraries'][] = 'custom_field/drupal.custom-icon';
+}
+
+/**
+ * Implements hook_field_widget_complete_form_alter().
+ */
+function custom_field_field_widget_complete_form_alter(&$element, FormStateInterface $form_state, $context) {
+  $items = $context['items'];
+  if ($items instanceof CustomFieldItemListInterface) {
+    $add_more_label = $items->getItemDefinition()->getSetting('add_more_label') ?? '';
+    if (isset($element['widget']['add_more']) && !empty(trim($add_more_label))) {
+      $element['widget']['add_more']['#value'] = $add_more_label;
+    }
+  }
+}

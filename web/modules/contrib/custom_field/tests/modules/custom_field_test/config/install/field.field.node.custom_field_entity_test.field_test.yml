@@ -1,0 +1,283 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_test
+    - node.type.custom_field_entity_test
+    - views.view.content_recent
+  module:
+    - custom_field
+id: node.custom_field_entity_test.field_test
+field_name: field_test
+entity_type: node
+bundle: custom_field_entity_test
+label: 'Custom Field Test'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  field_settings:
+    string_test:
+      type: text
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'String test'
+        settings:
+          description: ''
+          description_display: after
+          size: 60
+          placeholder: ''
+          maxlength: 255
+          maxlength_js: false
+          prefix: ''
+          suffix: ''
+          required: false
+    string_long_test:
+      type: textarea
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'String long test'
+        settings:
+          description: ''
+          description_display: after
+          placeholder: ''
+          maxlength: null
+          maxlength_js: false
+          required: false
+          rows: 5
+          formatted: false
+          default_format: plain_text
+          format:
+            guidelines: true
+            help: true
+    integer_test:
+      type: integer
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'Integer test'
+        settings:
+          description: ''
+          description_display: after
+          placeholder: ''
+          min: null
+          max: null
+          prefix: ''
+          suffix: ''
+          required: false
+    decimal_test:
+      type: decimal
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'Decimal test'
+        settings:
+          description: ''
+          description_display: after
+          placeholder: ''
+          min: null
+          max: null
+          prefix: ''
+          suffix: ''
+          required: false
+    float_test:
+      type: float
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'Float test'
+        settings:
+          description: ''
+          description_display: after
+          placeholder: ''
+          min: null
+          max: null
+          prefix: ''
+          suffix: ''
+          required: false
+    email_test:
+      type: email
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'Email test'
+        settings:
+          description: ''
+          description_display: after
+          size: 60
+          placeholder: ''
+          required: false
+    telephone_test:
+      type: telephone
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'Telephone test'
+        settings:
+          description: ''
+          description_display: after
+          size: 60
+          placeholder: ''
+          maxlength: 255
+          maxlength_js: false
+          prefix: ''
+          suffix: ''
+          required: false
+          pattern: ''
+    uri_test:
+      type: url
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'Uri test'
+        settings:
+          description: ''
+          description_display: after
+          size: 60
+          placeholder: ''
+          maxlength: 254
+          maxlength_js: false
+          required: false
+          link_type: 17
+          field_prefix: default
+          field_prefix_custom: ''
+    boolean_test:
+      type: checkbox
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'Boolean test'
+        settings:
+          description: ''
+          description_display: after
+          required: false
+    uuid_test:
+      type: uuid
+      weight: 0
+      check_empty: false
+    color_test:
+      type: color
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'Color test'
+        settings:
+          description: ''
+          description_display: after
+          required: false
+    map_test:
+      type: map_key_value
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'Map test'
+        settings:
+          description: ''
+          description_display: after
+          table_empty: ''
+          key_label: Key
+          value_label: Value
+          required: false
+    map_string_test:
+      type: map_text
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'Map string test'
+        settings:
+          description: ''
+          description_display: after
+          table_empty: ''
+          required: false
+    datetime_test:
+      type: datetime_default
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'Datetime test'
+        settings:
+          description: ''
+          description_display: after
+          required: false
+    entity_reference_test:
+      type: entity_reference_autocomplete
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'Entity reference test'
+        settings:
+          description: ''
+          description_display: after
+          size: 60
+          placeholder: ''
+          required: false
+          match_operator: CONTAINS
+          match_limit: 10
+          handler: 'default:node'
+          handler_settings:
+            sort:
+              field: _none
+              direction: ASC
+            auto_create: false
+            target_bundles:
+              article: article
+            auto_create_bundle: ''
+    file_test:
+      type: file_generic
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'File test'
+        settings:
+          description: ''
+          description_display: after
+          required: false
+          file_directory: '[date:custom:Y]-[date:custom:m]'
+          file_extensions: txt
+          max_filesize: ''
+          progress_indicator: throbber
+    image_test:
+      type: image_image
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'Image test'
+        settings:
+          alt_field: true
+          alt_field_required: true
+          title_field: true
+          title_field_required: false
+          description: ''
+          description_display: after
+          max_resolution: ''
+          min_resolution: ''
+          required: false
+          file_directory: '[date:custom:Y]-[date:custom:m]'
+          file_extensions: 'png gif jpg jpeg'
+          max_filesize: ''
+          progress_indicator: throbber
+          preview_image_style: ''
+    viewfield_test:
+      type: viewfield_select
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'Viewfield test'
+        settings:
+          allowed_views:
+            content_recent:
+              block_1: block_1
+              default: '0'
+          description: ''
+          description_display: after
+          required: false
+          empty_option: '- None -'
+          force_default: false
+          token_browser:
+            recursion_limit: 3
+            global_types: false
+field_type: custom

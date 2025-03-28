@@ -3,6 +3,7 @@ bootstrap:
   css: 
     theme:
       ../../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css: {}
+      css/login.css: {}
   js:
     ../../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js: {}
 global-scripts:

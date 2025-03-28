@@ -1,0 +1,62 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_content
+    - media.type.document
+    - media.type.image
+    - paragraphs.paragraphs_type.card
+  module:
+    - custom_field
+id: paragraph.card.field_content
+field_name: field_content
+entity_type: paragraph
+bundle: card
+label: Content
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  field_settings:
+    title:
+      type: text
+      weight: -10
+      check_empty: false
+      widget_settings:
+        label: Title
+        settings:
+          description: ''
+          description_display: after
+          size: 60
+          placeholder: ''
+          maxlength: 255
+          maxlength_js: false
+          prefix: ''
+          suffix: ''
+          required: true
+    media:
+      type: media_library_widget
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: Media
+        settings:
+          description: ''
+          description_display: after
+          required: false
+          handler: 'default:media'
+          handler_settings:
+            sort:
+              field: _none
+              direction: ASC
+            auto_create: false
+            target_bundles:
+              document: document
+              image: image
+            auto_create_bundle: document
+          media_types:
+            - image
+            - document
+field_type: custom

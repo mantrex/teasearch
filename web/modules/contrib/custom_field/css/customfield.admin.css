@@ -1,0 +1,36 @@
+/**
+ * @file
+ * Stylesheet for the custom_field admin interface.
+ */
+
+.customfield-settings-table td {
+  vertical-align: top;
+}
+
+/* Make inner tables align vertically */
+.customfield-settings-table table td {
+  vertical-align: middle;
+}
+
+.customfield-settings-table td .form-item:not(.form-type--radio) {
+  margin-bottom: 1rem;
+}
+
+.customfield-settings-table td table td .form-item,
+.customfield-map-table tr .form-item {
+  margin-bottom: 0 !important;
+}
+
+/* Avoid flexbox crushing the "type" select. */
+.customfield-settings-table .form-select {
+  min-width: 140px;
+}
+
+/* Helper class to put settings inline. See the NumericBase Flex Field type. */
+.customfield-settings-inline {
+  display: flex;
+}
+
+.customfield-settings-inline > .form-item {
+  flex: 0 1 100%;
+}

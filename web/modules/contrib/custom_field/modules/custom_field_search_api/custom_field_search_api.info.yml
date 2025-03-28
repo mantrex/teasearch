@@ -1,0 +1,13 @@
+name: "Search API: Custom Field"
+type: module
+description: "Extends Search API integration with the Custom Field module."
+core_version_requirement: ^10.2 || ^11
+package: Search
+dependencies:
+  - custom_field:custom_field
+  - search_api:search_api
+
+# Information added by Drupal.org packaging script on 2025-03-24
+version: '3.1.5'
+project: 'custom_field'
+datestamp: 1742793815

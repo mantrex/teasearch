@@ -1,0 +1,13 @@
+name: "GraphQL Compose: Custom Field"
+type: module
+description: "Enable GraphQL for the Custom Field module."
+core_version_requirement: ^10.2 || ^11
+package: GraphQL Compose
+dependencies:
+  - custom_field:custom_field
+  - graphql_compose:graphql_compose
+
+# Information added by Drupal.org packaging script on 2025-03-24
+version: '3.1.5'
+project: 'custom_field'
+datestamp: 1742793815

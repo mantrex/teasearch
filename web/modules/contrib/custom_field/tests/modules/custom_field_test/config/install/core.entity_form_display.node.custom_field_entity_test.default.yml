@@ -1,0 +1,155 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.custom_field_entity_test.field_test
+    - field.field.node.custom_field_entity_test.field_test_multiple
+    - field.field.node.custom_field_entity_test.field_test_unlimited
+    - node.type.custom_field_entity_test
+  module:
+    - custom_field
+    - path
+id: node.custom_field_entity_test.default
+targetEntityType: node
+bundle: custom_field_entity_test
+mode: default
+content:
+  created:
+    type: datetime_timestamp
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_test:
+    type: custom_flex
+    weight: 121
+    region: content
+    settings:
+      label: true
+      wrapper: div
+      open: true
+      columns:
+        string_test: '12'
+        string_long_test: '12'
+        integer_test: '12'
+        decimal_test: '12'
+        float_test: '12'
+        email_test: '12'
+        telephone_test: '12'
+        uri_test: '12'
+        boolean_test: '12'
+        uuid_test: '12'
+        color_test: '12'
+        map_test: '12'
+        map_string_test: '12'
+        datetime_test: '12'
+        entity_reference_test: '12'
+        file_test: '12'
+        image_test: '12'
+        viewfield_test: '12'
+      breakpoint: ''
+    third_party_settings: {  }
+  field_test_multiple:
+    type: custom_flex
+    weight: 121
+    region: content
+    settings:
+      label: true
+      wrapper: div
+      open: true
+      columns:
+        string_test: '12'
+        string_long_test: '12'
+        integer_test: '12'
+        decimal_test: '12'
+        float_test: '12'
+        email_test: '12'
+        telephone_test: '12'
+        uri_test: '12'
+        boolean_test: '12'
+        uuid_test: '12'
+        color_test: '12'
+        map_test: '12'
+        map_string_test: '12'
+        datetime_test: '12'
+        entity_reference_test: '12'
+        file_test: '12'
+        image_test: '12'
+        viewfield_test: '12'
+      breakpoint: ''
+    third_party_settings: {  }
+  field_test_unlimited:
+    type: custom_flex
+    weight: 121
+    region: content
+    settings:
+      label: true
+      wrapper: div
+      open: true
+      columns:
+        string_test: '12'
+        string_long_test: '12'
+        integer_test: '12'
+        decimal_test: '12'
+        float_test: '12'
+        email_test: '12'
+        telephone_test: '12'
+        uri_test: '12'
+        boolean_test: '12'
+        uuid_test: '12'
+        color_test: '12'
+        map_test: '12'
+        map_string_test: '12'
+        datetime_test: '12'
+        entity_reference_test: '12'
+        file_test: '12'
+        image_test: '12'
+        viewfield_test: '12'
+      breakpoint: ''
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 30
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  promote:
+    type: boolean_checkbox
+    weight: 15
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 120
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  sticky:
+    type: boolean_checkbox
+    weight: 16
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: -5
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 5
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden: {  }

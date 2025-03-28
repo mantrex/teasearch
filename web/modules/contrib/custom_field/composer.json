@@ -1,0 +1,23 @@
+{
+  "name": "drupal/custom_field",
+  "type": "drupal-module",
+  "description": "Create simple, but flexible, multivalue fields without the hassle of entity references.",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+",
+  "homepage": "https://www.drupal.org/project/custom_field",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/custom_field",
+    "source": "http://cgit.drupalcode.org/custom_field"
+  },
+  "require": {
+    "drupal/core": "^10.2 || ^11.0"
+  },
+  "require-dev": {
+    "drupal/feeds": "3.x-dev",
+    "drupal/linkit": "^6.1 || ^7.x-dev",
+    "drupal/graphql_compose": "^2.2",
+    "drupal/paragraphs": "^1.18",
+    "drupal/search_api": "^1.35"
+  }
+}

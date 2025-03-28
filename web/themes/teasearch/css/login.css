@@ -1,0 +1,35 @@
+/* In themes/your_theme/css/login.css */
+body.path-user.page-login {
+  background-color: #f4f4f4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.user-login-form {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  width: 350px;
+}
+
+.user-login-form input[type="text"],
+.user-login-form input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.user-login-form .form-submit {
+  width: 100%;
+  padding: 10px;
+  background-color: #00902e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}

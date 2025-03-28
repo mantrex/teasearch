@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 550 300">
-  <path style="fill: rgb(255, 255, 255); transform-origin: 102.778px 85.218px;" d="M 3.123 4.539 C 3.123 4.539 2.934 39.246 3.463 56.39 C 3.993 73.56 2.905 82.381 4.651 95.208 C 6.825 111.181 15.167 120.474 15.167 120.474 L 33.38 138.315 L 48.99 146.882 L 74.963 151.897 L 217.639 152.297 L 224.851 104.354 L 213.711 57.672 C 213.711 57.672 164.904 14.427 141.183 8.609 C 123.637 4.306 111.953 5.018 112.358 4.57 C 112.358 1.126 3.123 3.335 3.123 4.539 Z"/>
-  <g id="Capa_1" transform="matrix(0.759477, 0, 0, 0.793155, -10.133277, -9.114662)" style="">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0.522 20.508 537.8 298.798">
+  <path style="fill: rgb(255, 255, 255); transform-origin: 100.586px 104.77px;" d="M 0.931 24.091 C 0.931 24.091 0.742 58.798 1.271 75.942 C 1.801 93.112 0.713 101.933 2.459 114.76 C 4.633 130.733 12.975 140.026 12.975 140.026 L 20.971 148.811 L 31.188 157.867 L 38.709 163.031 L 46.798 166.434 L 72.771 171.449 L 215.447 171.849 L 222.659 123.906 L 211.519 77.224 C 211.519 77.224 199.101 58.492 169.122 43.236 C 160.717 38.959 160.116 38.792 147.29 35.722 C 143.192 34.741 134.338 32.36 126.619 30.383 C 127 30.197 117.53 27.977 113.451 26.914 C 102.479 24.056 81.852 22.615 80.413 22.603 C 47.212 22.315 0.931 23.319 0.931 24.091 Z"/>
+  <g id="Capa_1" transform="matrix(0.759477, 0, 0, 0.793155, -12.324848, 10.437386)" style="">
     <g id="SVGRepo_bgCarrier" stroke-width="0" transform="matrix(0.56687, 0, 0, 0.559442, 65.768494, 31.050718)" style=""/>
     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" transform="matrix(0.56687, 0, 0, 0.559442, 65.768494, 31.050718)" style=""/>
     <g id="SVGRepo_iconCarrier" transform="matrix(0.56687, 0, 0, 0.559442, 65.768494, 31.050718)" style="">
@@ -10,7 +10,7 @@
       </g>
     </g>
   </g>
-  <text style="fill: rgb(137, 168, 40); font-family: Arial, sans-serif; font-size: 80px; letter-spacing: 3.1px; white-space: pre;" x="89.295" y="131.26">tea</text>
-  <text style="fill: rgb(255, 255, 255); font-family: Arial, sans-serif; font-size: 80px; letter-spacing: 2.5px; white-space: pre;" x="231.917" y="132.565">search</text>
-  <text style="fill: rgb(255, 255, 255); font-family: Arial, sans-serif; font-size: 44px; white-space: pre;" x="7.3" y="294.309">Tea Science &amp; Culture Hub</text>
+  <text style="fill: rgb(137, 168, 40); font-family: Arial, sans-serif; font-size: 80px; letter-spacing: 3.1px; white-space: pre;" x="91.103" y="152.812">tea</text>
+  <text style="fill: rgb(255, 255, 255); font-family: Arial, sans-serif; font-size: 80px; letter-spacing: 2.5px; white-space: pre;" x="237.583" y="152.655">search</text>
+  <text style="fill: rgb(255, 255, 255); font-family: Arial, sans-serif; font-size: 44px; white-space: pre;" x="5.108" y="313.861">Tea Science &amp; Culture Hub</text>
 </svg>
