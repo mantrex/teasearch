@@ -1,0 +1,19 @@
+uuid: 161e61e7-6b2d-4b6a-afc5-b143d4f9ce4e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_author
+    - node.type.primary_sources
+id: node.primary_sources.field_author
+field_name: field_author
+entity_type: node
+bundle: primary_sources
+label: Author
+description: "Use the following order: lastname, firstname. Be sure to divide lastname and firstname with one single comma.\r\n"
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

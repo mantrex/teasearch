@@ -1,0 +1,27 @@
+uuid: c638b149-6ca1-4c68-a482-c77282eb99de
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_pdf_file
+    - node.type.primary_sources
+  module:
+    - file
+id: node.primary_sources.field_pdf_file
+field_name: field_pdf_file
+entity_type: node
+bundle: primary_sources
+label: 'PDF File'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: '[date:custom:Y]-[date:custom:m]'
+  file_extensions: pdf
+  max_filesize: '10 MB'
+  description_field: false
+field_type: file

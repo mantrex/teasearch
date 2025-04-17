@@ -1,0 +1,21 @@
+uuid: 729e4108-ad7b-4edb-8b15-dc3ded3f9e1b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_first_published_at
+    - node.type.primary_sources
+  module:
+    - datetime
+id: node.primary_sources.field_first_published_at
+field_name: field_first_published_at
+entity_type: node
+bundle: primary_sources
+label: 'First Published At'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

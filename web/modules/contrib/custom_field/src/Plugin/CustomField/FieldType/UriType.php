@@ -4,22 +4,22 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Component\Utility\Random;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 
 /**
- * Plugin implementation of the 'uri' custom field type.
- *
- * @CustomFieldType(
- *   id = "uri",
- *   label = @Translation("URI"),
- *   description = @Translation("A field containing a URI."),
- *   category = @Translation("General"),
- *   default_widget = "url",
- *   default_formatter = "uri_link",
- * )
+ * Plugin implementation of the 'uri' field type.
  */
+#[CustomFieldType(
+  id: 'uri',
+  label: new TranslatableMarkup('URI'),
+  description: new TranslatableMarkup('A field containing a URI.'),
+  category: new TranslatableMarkup('General'),
+  default_widget: 'url',
+  default_formatter: 'uri_link',
+)]
 class UriType extends CustomFieldTypeBase {
 
   /**

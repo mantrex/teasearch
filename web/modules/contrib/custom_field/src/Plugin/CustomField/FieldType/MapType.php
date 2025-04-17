@@ -5,21 +5,21 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\MapDataDefinition;
+use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'map' custom field type.
- *
- * @CustomFieldType(
- *   id = "map",
- *   label = @Translation("Serialized - Key/Value"),
- *   description = @Translation("A field for storing a serialized array of values."),
- *   category = @Translation("Map"),
- *   default_widget = "map_key_value",
- *   default_formatter = "string",
- * )
+ * Plugin implementation of the 'map' field type.
  */
+#[CustomFieldType(
+  id: 'map',
+  label: new TranslatableMarkup('Serialized - Key/Value'),
+  description: new TranslatableMarkup('A field for storing a serialized array of values.'),
+  category: new TranslatableMarkup('Map'),
+  default_widget: 'map_key_value',
+  default_formatter: 'string',
+)]
 class MapType extends CustomFieldTypeBase {
 
   /**

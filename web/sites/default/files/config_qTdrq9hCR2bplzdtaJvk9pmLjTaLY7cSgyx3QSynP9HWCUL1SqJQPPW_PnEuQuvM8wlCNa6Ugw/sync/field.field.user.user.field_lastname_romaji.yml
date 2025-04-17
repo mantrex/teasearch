@@ -1,0 +1,20 @@
+uuid: 0c502520-a4be-4f5e-9227-a61c2eef7fc4
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_lastname_romaji
+  module:
+    - user
+id: user.user.field_lastname_romaji
+field_name: field_lastname_romaji
+entity_type: user
+bundle: user
+label: 'Lastname (a)'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

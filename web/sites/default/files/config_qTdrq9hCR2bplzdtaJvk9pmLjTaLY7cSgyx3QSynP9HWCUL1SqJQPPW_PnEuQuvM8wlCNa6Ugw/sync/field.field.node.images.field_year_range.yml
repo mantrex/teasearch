@@ -1,0 +1,72 @@
+uuid: 3031fa75-3829-4e80-9789-bf303a447c26
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_year_range
+    - node.type.images
+  module:
+    - custom_field
+id: node.images.field_year_range
+field_name: field_year_range
+entity_type: node
+bundle: images
+label: 'Date / Century'
+description: 'Insert the label for the century and the start and end date. For example for "2nd century" insert: From year: 100 To Year: 199, Century: 1st Century, for 15 century insert: From year: 1400 To Year: 1499, Century: 15th century.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  add_more_label: ''
+  field_settings:
+    year_from:
+      type: integer
+      weight: -10
+      check_empty: false
+      widget_settings:
+        label: 'From year'
+        translatable: false
+        settings:
+          description: 'Insert the starting year period, use - for BC years'
+          description_display: after
+          placeholder: ''
+          min: -100000
+          max: 3000
+          prefix: ''
+          suffix: ''
+          required: false
+    year_to:
+      type: integer
+      weight: -9
+      check_empty: false
+      widget_settings:
+        label: 'To Year'
+        translatable: false
+        settings:
+          description: 'Insert the end year period, use - for BC years'
+          description_display: after
+          placeholder: ''
+          min: -100000
+          max: 3000
+          prefix: ''
+          suffix: ''
+          required: false
+    century_label:
+      type: text
+      weight: -8
+      check_empty: false
+      widget_settings:
+        label: 'Century text'
+        translatable: false
+        settings:
+          description: ''
+          description_display: after
+          size: 60
+          placeholder: ''
+          maxlength: 64
+          maxlength_js: false
+          prefix: ''
+          suffix: ''
+          required: false
+field_type: custom

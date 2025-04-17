@@ -9,23 +9,23 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
 use Drupal\file\Element\ManagedFile;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the 'file_generic' custom field widget.
- *
- * @FieldWidget(
- *   id = "file_generic",
- *   label = @Translation("File"),
- *   category = @Translation("General"),
- *   data_types = {
- *     "file",
- *   }
- * )
+ * Plugin implementation of the 'file_generic' widget.
  */
+#[CustomFieldWidget(
+  id: 'file_generic',
+  label: new TranslatableMarkup('File'),
+  category: new TranslatableMarkup('General'),
+  field_types: [
+    'file',
+  ],
+)]
 class FileWidget extends CustomFieldWidgetBase {
 
   /**

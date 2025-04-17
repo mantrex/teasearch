@@ -4,12 +4,14 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the 'uuid' custom field widget.
+ * Plugin implementation of the 'uuid' widget.
  *
  * Simple uuid custom field widget. This doesn't actually render as an editable
  * widget on the form. Rather it sets a UUID on the field when the custom field
@@ -19,17 +21,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * custom field item without having to rely on any of the exposed fields which
  * could change at any given time (i.e. content is updated, or delta is changed
  * with a manual reorder).
- *
- * @FieldWidget(
- *   id = "uuid",
- *   label = @Translation("UUID"),
- *   never_check_empty = TRUE,
- *   category = @Translation("General"),
- *   data_types = {
- *     "uuid",
- *   }
- * )
  */
+#[CustomFieldWidget(
+  id: 'uuid',
+  label: new TranslatableMarkup('UUID'),
+  category: new TranslatableMarkup('General'),
+  field_types: [
+    'uuid',
+  ],
+)]
 class UuidWidget extends CustomFieldWidgetBase {
 
   /**
@@ -73,7 +73,8 @@ class UuidWidget extends CustomFieldWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element['description'] = [
-      '#markup' => '<em>This will set a UUID on the custom field item the first time it is created and can be used as a unique identifier for the item in your custom code. This is the main use for this field type.</em>',
+      '#type' => 'fieldset',
+      '#description' => $this->t('This widget set a UUID value on the field the first time it is created and can be used as a unique identifier for the item in your custom code. This is the main use for the <em>uuid</em> field type.'),
     ];
 
     return $element;

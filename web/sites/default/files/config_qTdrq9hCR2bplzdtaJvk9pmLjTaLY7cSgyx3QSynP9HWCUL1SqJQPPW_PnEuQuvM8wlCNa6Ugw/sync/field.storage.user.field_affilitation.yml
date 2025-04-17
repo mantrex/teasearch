@@ -1,0 +1,21 @@
+uuid: ca835c28-a51a-4a59-b241-e21f184c6adc
+langcode: en
+status: true
+dependencies:
+  module:
+    - user
+id: user.field_affilitation
+field_name: field_affilitation
+entity_type: user
+type: string
+settings:
+  max_length: 512
+  case_sensitive: false
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

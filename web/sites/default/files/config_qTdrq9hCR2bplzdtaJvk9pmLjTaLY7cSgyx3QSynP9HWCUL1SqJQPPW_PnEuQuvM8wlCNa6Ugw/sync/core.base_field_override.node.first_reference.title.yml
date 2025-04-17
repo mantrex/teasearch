@@ -1,0 +1,18 @@
+uuid: dfb0dd1e-9a57-428e-9bc0-87734f419566
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.first_reference
+id: node.first_reference.title
+field_name: title
+entity_type: node
+bundle: first_reference
+label: Title
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,25 @@
+uuid: ea38580f-6cc9-4eea-af79-c22120f2e495
+langcode: it
+status: true
+dependencies:
+  content:
+    - 'block_content:footerblk:fed880be-1ca7-455a-8d6c-edc567307d0f'
+  module:
+    - block_content
+  theme:
+    - teasearch
+id: teasearch_footer01
+theme: teasearch
+region: footer
+weight: 0
+provider: null
+plugin: 'block_content:fed880be-1ca7-455a-8d6c-edc567307d0f'
+settings:
+  id: 'block_content:fed880be-1ca7-455a-8d6c-edc567307d0f'
+  label: footer01
+  label_display: '0'
+  provider: block_content
+  status: true
+  info: ''
+  view_mode: full
+visibility: {  }

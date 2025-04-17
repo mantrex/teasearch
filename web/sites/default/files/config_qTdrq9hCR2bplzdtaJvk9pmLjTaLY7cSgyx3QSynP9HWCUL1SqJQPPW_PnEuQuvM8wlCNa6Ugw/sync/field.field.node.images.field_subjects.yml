@@ -1,0 +1,29 @@
+uuid: 3f1e1274-fb63-4db8-aec8-ad176b455405
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_subjects
+    - node.type.images
+    - taxonomy.vocabulary.subjects
+id: node.images.field_subjects
+field_name: field_subjects
+entity_type: node
+bundle: images
+label: Subjects
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      subjects: subjects
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

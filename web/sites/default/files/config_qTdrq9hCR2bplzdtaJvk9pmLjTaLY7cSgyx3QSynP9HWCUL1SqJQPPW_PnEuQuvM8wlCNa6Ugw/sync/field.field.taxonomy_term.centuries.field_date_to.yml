@@ -1,0 +1,21 @@
+uuid: 93349561-fd86-496b-ae8e-72eda03f6328
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_date_to
+    - taxonomy.vocabulary.centuries
+  module:
+    - datetime
+id: taxonomy_term.centuries.field_date_to
+field_name: field_date_to
+entity_type: taxonomy_term
+bundle: centuries
+label: 'Date to'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

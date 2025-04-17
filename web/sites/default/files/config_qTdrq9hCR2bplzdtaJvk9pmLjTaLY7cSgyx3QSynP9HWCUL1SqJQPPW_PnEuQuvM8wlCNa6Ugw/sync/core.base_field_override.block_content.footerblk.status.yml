@@ -1,0 +1,22 @@
+uuid: 42fdd322-caaa-443f-84b2-03324f87d33f
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.footerblk
+id: block_content.footerblk.status
+field_name: status
+entity_type: block_content
+bundle: footerblk
+label: Published
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 1
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

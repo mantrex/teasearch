@@ -1,0 +1,22 @@
+uuid: 936dedfb-1e34-453a-9812-d73fc76321a6
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_excerpts
+    - node.type.primary_sources
+  module:
+    - text
+id: node.primary_sources.field_excerpts
+field_name: field_excerpts
+entity_type: node
+bundle: primary_sources
+label: Excerpts
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

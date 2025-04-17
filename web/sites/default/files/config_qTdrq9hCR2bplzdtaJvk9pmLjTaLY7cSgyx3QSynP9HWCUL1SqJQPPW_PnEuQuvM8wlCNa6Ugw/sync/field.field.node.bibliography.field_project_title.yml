@@ -1,0 +1,19 @@
+uuid: eb560768-1a18-4cf9-8582-8e1e55e6444b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_project_title
+    - node.type.bibliography
+id: node.bibliography.field_project_title
+field_name: field_project_title
+entity_type: node
+bundle: bibliography
+label: 'Book or journal title'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -4,21 +4,22 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomField\DateTimeWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'datetime_datelist' custom field widget.
- *
- * @FieldWidget(
- *   id = "datetime_datelist",
- *   label = @Translation("Select list"),
- *   category = @Translation("Date"),
- *   data_types = {
- *     "datetime",
- *   }
- * )
+ * Plugin implementation of the 'datetime_datelist' widget.
  */
+#[CustomFieldWidget(
+  id: 'datetime_datelist',
+  label: new TranslatableMarkup('Select list'),
+  category: new TranslatableMarkup('Date'),
+  field_types: [
+    'datetime',
+  ],
+)]
 class DateTimeDatelistWidget extends DateTimeWidgetBase {
 
   /**

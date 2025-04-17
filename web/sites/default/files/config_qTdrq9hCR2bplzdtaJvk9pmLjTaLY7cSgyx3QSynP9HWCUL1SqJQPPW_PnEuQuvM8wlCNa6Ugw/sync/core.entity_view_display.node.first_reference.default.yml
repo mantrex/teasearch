@@ -1,0 +1,90 @@
+uuid: 3995d742-643a-49d8-980a-5242ed5da032
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.first_reference.field_authors_reference
+    - field.field.node.first_reference.field_bibliography
+    - field.field.node.first_reference.field_content
+    - field.field.node.first_reference.field_first_published_at
+    - field.field.node.first_reference.field_links
+    - field.field.node.first_reference.field_scientific_advisors
+    - field.field.node.first_reference.field_subjects
+    - node.type.first_reference
+  module:
+    - datetime
+    - link
+    - text
+    - user
+id: node.first_reference.default
+targetEntityType: node
+bundle: first_reference
+mode: default
+content:
+  field_authors_reference:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 120
+    region: content
+  field_bibliography:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 111
+    region: content
+  field_content:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  field_first_published_at:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 113
+    region: content
+  field_links:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 110
+    region: content
+  field_scientific_advisors:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 121
+    region: content
+  field_subjects:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 112
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  langcode: true

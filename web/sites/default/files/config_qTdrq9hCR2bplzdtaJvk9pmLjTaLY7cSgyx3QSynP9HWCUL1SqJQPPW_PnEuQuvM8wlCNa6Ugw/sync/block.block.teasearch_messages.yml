@@ -1,0 +1,22 @@
+uuid: a5164bf1-e481-4dd2-910e-2a097e1a5c58
+langcode: it
+status: false
+dependencies:
+  module:
+    - system
+  theme:
+    - teasearch
+_core:
+  default_config_hash: '-Ac3ISpIT0PQ-whzD7_dw0SdKi6dAbRFNWdSjOiVDqg'
+id: teasearch_messages
+theme: teasearch
+region: header
+weight: 0
+provider: null
+plugin: system_messages_block
+settings:
+  id: system_messages_block
+  label: 'Messaggi di stato'
+  label_display: '0'
+  provider: system
+visibility: {  }

@@ -4,21 +4,22 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomField\EntityReferenceOptionsWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'entity_reference_select' custom field widget.
- *
- * @FieldWidget(
- *   id = "entity_reference_select",
- *   label = @Translation("Select"),
- *   category = @Translation("Reference"),
- *   data_types = {
- *     "entity_reference",
- *   }
- * )
+ * Plugin implementation of the 'entity_reference_select' widget.
  */
+#[CustomFieldWidget(
+  id: 'entity_reference_select',
+  label: new TranslatableMarkup('Select'),
+  category: new TranslatableMarkup('Reference'),
+  field_types: [
+    'entity_reference',
+  ],
+)]
 class EntityReferenceSelectWidget extends EntityReferenceOptionsWidgetBase {
 
   /**

@@ -3,23 +3,23 @@
 namespace Drupal\custom_field\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Plugin implementation of the 'custom_table' formatter.
- *
- * Formats the custom field items as html table.
- *
- * @FieldFormatter(
- *   id = "custom_table",
- *   label = @Translation("Table"),
- *   weight = 2,
- *   field_types = {
- *     "custom"
- *   }
- * )
  */
+#[FieldFormatter(
+  id: 'custom_table',
+  label: new TranslatableMarkup('Table'),
+  description: new TranslatableMarkup('Formats the custom field items as html table.'),
+  field_types: [
+    'custom',
+  ],
+  weight: 2,
+)]
 class CustomTableFormatter extends BaseFormatter {
 
   /**
@@ -48,7 +48,8 @@ class CustomTableFormatter extends BaseFormatter {
       $custom_items = $this->getCustomFieldItems();
       $header = [];
       foreach ($custom_items as $name => $custom_item) {
-        $is_hidden = $settings['fields'][$name]['format_type'] === 'hidden' ?? FALSE;
+        $setting = $settings['fields'][$name] ?? [];
+        $is_hidden = isset($setting['format_type']) && $setting['format_type'] === 'hidden';
         if ($is_hidden) {
           continue;
         }
@@ -72,7 +73,8 @@ class CustomTableFormatter extends BaseFormatter {
         $elements[0]['#rows'][$delta]['class'][] = $component . '__item';
         $values = $this->getFormattedValues($item, $langcode);
         foreach ($custom_items as $name => $custom_item) {
-          $is_hidden = $settings['fields'][$name]['format_type'] === 'hidden' ?? FALSE;
+          $setting = $settings['fields'][$name] ?? [];
+          $is_hidden = isset($setting['format_type']) && $setting['format_type'] === 'hidden';
           if ($is_hidden) {
             continue;
           }

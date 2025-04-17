@@ -1,0 +1,31 @@
+uuid: faba39a2-b58c-4009-83fe-f81587f54e2d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.taxonomy_term.subjects.field_key
+    - taxonomy.vocabulary.subjects
+  module:
+    - text
+id: taxonomy_term.subjects.default
+targetEntityType: taxonomy_term
+bundle: subjects
+mode: default
+content:
+  description:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_key:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  langcode: true

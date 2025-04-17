@@ -4,22 +4,22 @@ namespace Drupal\custom_field_viewfield\Plugin\CustomField\FieldType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomField\FieldType\EntityReference;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 
 /**
- * Plugin implementation of the 'boolean' custom field type.
- *
- * @CustomFieldType(
- *   id = "viewfield",
- *   label = @Translation("Viewfield"),
- *   description = @Translation("Defines a entity reference field type to display a view."),
- *   category = @Translation("Reference"),
- *   default_widget = "viewfield_select",
- *   default_formatter = "viewfield_default",
- * )
+ * Plugin implementation of the 'viewfield' field type.
  */
+#[CustomFieldType(
+  id: 'viewfield',
+  label: new TranslatableMarkup('Viewfield'),
+  description: new TranslatableMarkup('Defines a entity reference field type to display a view.'),
+  category: new TranslatableMarkup('Reference'),
+  default_widget: 'viewfield_select',
+  default_formatter: 'viewfield_default',
+)]
 class ViewfieldType extends EntityReference {
 
   /**

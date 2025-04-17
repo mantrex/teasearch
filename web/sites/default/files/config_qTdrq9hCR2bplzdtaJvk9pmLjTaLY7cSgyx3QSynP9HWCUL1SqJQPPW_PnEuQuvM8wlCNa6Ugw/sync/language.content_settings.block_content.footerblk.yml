@@ -1,0 +1,18 @@
+uuid: 6d3dd945-6b7c-47db-bc77-8c50d0786df6
+langcode: it
+status: true
+dependencies:
+  config:
+    - block_content.type.footerblk
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: false
+    bundle_settings:
+      untranslatable_fields_hide: '0'
+id: block_content.footerblk
+target_entity_type_id: block_content
+target_bundle: footerblk
+default_langcode: site_default
+language_alterable: false

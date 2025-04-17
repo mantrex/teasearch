@@ -4,21 +4,22 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomField\NumberWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'integer' custom field widget.
- *
- * @FieldWidget(
- *   id = "integer",
- *   label = @Translation("Integer"),
- *   category = @Translation("Number"),
- *   data_types = {
- *     "integer",
- *   },
- * )
+ * Plugin implementation of the 'integer' widget.
  */
+#[CustomFieldWidget(
+  id: 'integer',
+  label: new TranslatableMarkup('Integer'),
+  category: new TranslatableMarkup('Number'),
+  field_types: [
+    'integer',
+  ],
+)]
 class IntegerWidget extends NumberWidgetBase {
 
   /**

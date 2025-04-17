@@ -4,27 +4,26 @@ namespace Drupal\custom_field_viewfield\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
 use Drupal\views\Plugin\views\pager\None;
 use Drupal\views\Views;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the 'viewfield_default' custom field formatter.
- *
- * Value renders as it is entered by the user.
- *
- * @FieldFormatter(
- *   id = "viewfield_default",
- *   label = @Translation("Viewfield"),
- *   field_types = {
- *     "viewfield",
- *   }
- * )
+ * Plugin implementation of the 'viewfield_default' formatter.
  */
+#[FieldFormatter(
+  id: 'viewfield_default',
+  label: new TranslatableMarkup('Viewfield'),
+  field_types: [
+    'viewfield',
+  ],
+)]
 class ViewfieldDefaultFormatter extends CustomFieldFormatterBase implements ContainerFactoryPluginInterface {
 
   /**

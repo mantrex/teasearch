@@ -1,0 +1,21 @@
+uuid: fae7ec71-4d18-4c5b-8baf-c52ebd6ea1b6
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_first_published_at
+    - node.type.images
+  module:
+    - datetime
+id: node.images.field_first_published_at
+field_name: field_first_published_at
+entity_type: node
+bundle: images
+label: 'First Published At'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

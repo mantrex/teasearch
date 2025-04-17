@@ -2,15 +2,17 @@
 
 namespace Drupal\custom_field\Plugin\CustomField\FeedsType;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldFeedsType;
+
 /**
- * Plugin implementation of the 'string' feeds type.
- *
- * @CustomFieldFeedsType(
- *   id = "email",
- *   label = @Translation("E-mail"),
- *   mark_unique = TRUE,
- * )
+ * Plugin implementation of the 'email' feeds type.
  */
+#[CustomFieldFeedsType(
+  id: 'email',
+  label: new TranslatableMarkup('E-mail'),
+  mark_unique: TRUE,
+)]
 class EmailTarget extends BaseTarget {
 
   /**

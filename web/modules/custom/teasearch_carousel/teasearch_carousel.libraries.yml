@@ -1,0 +1,12 @@
+carousel:
+  version: 1.x
+  js:
+    js/carousel-init.js: {}
+    https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js: {}
+  css:
+    theme:
+      css/carousel.css: {}
+      https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css: {}
+  dependencies:
+    - core/jquery
+    - core/drupal

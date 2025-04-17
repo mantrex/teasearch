@@ -5,21 +5,21 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'string' custom field type.
- *
- * @CustomFieldType(
- *   id = "string",
- *   label = @Translation("Text (plain)"),
- *   description = @Translation("A field containing a plain string value."),
- *   category = @Translation("Text"),
- *   default_widget = "text",
- *   default_formatter = "string",
- * )
+ * Plugin implementation of the 'string' field type.
  */
+#[CustomFieldType(
+  id: 'string',
+  label: new TranslatableMarkup('Text (plain)'),
+  description: new TranslatableMarkup('A field containing a plain string value.'),
+  category: new TranslatableMarkup('Text'),
+  default_widget: 'text',
+  default_formatter: 'string',
+)]
 class StringType extends CustomFieldTypeBase {
 
   /**

@@ -4,21 +4,22 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomField\MapWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'map_key_value' custom field widget.
- *
- * @FieldWidget(
- *   id = "map_key_value",
- *   label = @Translation("Map: Key/Value"),
- *   category = @Translation("Map"),
- *   data_types = {
- *     "map",
- *   },
- * )
+ * Plugin implementation of the 'map_key_value' widget.
  */
+#[CustomFieldWidget(
+  id: 'map_key_value',
+  label: new TranslatableMarkup('Map: Key/Value'),
+  category: new TranslatableMarkup('Map'),
+  field_types: [
+    'map',
+  ],
+)]
 class MapKeyValueWidget extends MapWidgetBase {
 
   /**

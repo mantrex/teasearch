@@ -5,21 +5,22 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
 
 /**
- * Plugin implementation of the 'text' custom field widget.
- *
- * @FieldWidget(
- *   id = "text",
- *   label = @Translation("Text"),
- *   category = @Translation("Text"),
- *   data_types = {
- *     "string",
- *   }
- * )
+ * Plugin implementation of the 'text' widget.
  */
+#[CustomFieldWidget(
+  id: 'text',
+  label: new TranslatableMarkup('Text'),
+  category: new TranslatableMarkup('Text'),
+  field_types: [
+    'string',
+  ],
+)]
 class TextWidget extends CustomFieldWidgetBase {
 
   /**

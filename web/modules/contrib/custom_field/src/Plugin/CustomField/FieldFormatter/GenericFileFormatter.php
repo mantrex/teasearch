@@ -3,20 +3,21 @@
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Plugin implementation of the 'file_default' formatter.
- *
- * @FieldFormatter(
- *   id = "file_default",
- *   label = @Translation("Generic file"),
- *   field_types = {
- *     "file",
- *     "image",
- *   }
- * )
  */
+#[FieldFormatter(
+  id: 'file_default',
+  label: new TranslatableMarkup('Generic file'),
+  field_types: [
+    'file',
+    'image',
+  ],
+)]
 class GenericFileFormatter extends EntityReferenceFormatterBase {
 
   /**

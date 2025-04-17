@@ -4,21 +4,22 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomField\DateTimeWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'datetime_default' custom field widget.
- *
- * @FieldWidget(
- *   id = "datetime_default",
- *   label = @Translation("Date and time"),
- *   category = @Translation("Date"),
- *   data_types = {
- *     "datetime",
- *   }
- * )
+ * Plugin implementation of the 'datetime_default' widget.
  */
+#[CustomFieldWidget(
+  id: 'datetime_default',
+  label: new TranslatableMarkup('Date and time'),
+  category: new TranslatableMarkup('Date'),
+  field_types: [
+    'datetime',
+  ],
+)]
 class DateTimeDefaultWidget extends DateTimeWidgetBase {
 
   /**

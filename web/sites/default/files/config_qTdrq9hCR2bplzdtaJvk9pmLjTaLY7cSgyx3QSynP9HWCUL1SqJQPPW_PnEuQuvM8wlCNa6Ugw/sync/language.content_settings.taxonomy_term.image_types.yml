@@ -1,0 +1,11 @@
+uuid: a0e28f28-e63c-4a52-bae7-42f31760f1b7
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.image_types
+id: taxonomy_term.image_types
+target_entity_type_id: taxonomy_term
+target_bundle: image_types
+default_langcode: site_default
+language_alterable: false

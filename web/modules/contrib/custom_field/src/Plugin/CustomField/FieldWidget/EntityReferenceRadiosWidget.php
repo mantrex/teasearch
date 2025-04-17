@@ -4,21 +4,22 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomField\EntityReferenceOptionsWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'entity_reference_radios' custom field widget.
- *
- * @FieldWidget(
- *   id = "entity_reference_radios",
- *   label = @Translation("Radios"),
- *   category = @Translation("Reference"),
- *   data_types = {
- *     "entity_reference",
- *   }
- * )
+ * Plugin implementation of the 'entity_reference_radios' widget.
  */
+#[CustomFieldWidget(
+  id: 'entity_reference_radios',
+  label: new TranslatableMarkup('Radios'),
+  category: new TranslatableMarkup('Reference'),
+  field_types: [
+    'entity_reference',
+  ],
+)]
 class EntityReferenceRadiosWidget extends EntityReferenceOptionsWidgetBase {
 
   /**

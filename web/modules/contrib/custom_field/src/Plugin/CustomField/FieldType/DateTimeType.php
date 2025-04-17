@@ -5,21 +5,21 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'datetime' custom field type.
- *
- * @CustomFieldType(
- *   id = "datetime",
- *   label = @Translation("Date"),
- *   description = @Translation("A field containing a Date."),
- *   category = @Translation("General"),
- *   default_widget = "datetime_default",
- *   default_formatter = "datetime_default",
- * )
+ * Plugin implementation of the 'datetime' field type.
  */
+#[CustomFieldType(
+  id: 'datetime',
+  label: new TranslatableMarkup('Date'),
+  description: new TranslatableMarkup('A field containing a Date.'),
+  category: new TranslatableMarkup('General'),
+  default_widget: 'datetime_default',
+  default_formatter: 'datetime_default',
+)]
 class DateTimeType extends CustomFieldTypeBase {
 
   /**

@@ -1,0 +1,21 @@
+uuid: 7dd6761e-aef4-40f8-987b-916f389c60ce
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_date_range
+    - node.type.primary_sources
+  module:
+    - datetime_range
+id: node.primary_sources.field_date_range
+field_name: field_date_range
+entity_type: node
+bundle: primary_sources
+label: 'Date range'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: daterange

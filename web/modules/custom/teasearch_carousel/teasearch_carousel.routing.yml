@@ -1,0 +1,7 @@
+carousel_data.endpoint:
+  path: '/carousel-data'
+  defaults:
+    _controller: '\Drupal\teasearch_carousel\Controller\CarouselController::getData'
+    _format: 'json'
+  requirements:
+    _permission: 'TRUE'

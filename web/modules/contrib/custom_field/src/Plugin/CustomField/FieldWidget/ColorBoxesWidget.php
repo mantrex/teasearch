@@ -5,22 +5,21 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'color_boxes' custom field widget.
- *
- * Simple color custom field widget.
- *
- * @FieldWidget(
- *   id = "color_boxes",
- *   label = @Translation("Color boxes"),
- *   category = @Translation("General"),
- *   data_types = {
- *     "color",
- *   }
- * )
+ * Plugin implementation of the 'color_boxes' widget.
  */
+#[CustomFieldWidget(
+  id: 'color_boxes',
+  label: new TranslatableMarkup('Color boxes'),
+  category: new TranslatableMarkup('General'),
+  field_types: [
+    'color',
+  ],
+)]
 class ColorBoxesWidget extends ColorWidget {
 
   /**

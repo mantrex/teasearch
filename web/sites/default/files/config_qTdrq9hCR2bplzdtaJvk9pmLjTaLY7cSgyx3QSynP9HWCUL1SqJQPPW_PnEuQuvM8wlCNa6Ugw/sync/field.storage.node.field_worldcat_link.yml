@@ -1,0 +1,19 @@
+uuid: 9677b359-5710-4724-aeca-2ccf4be2d31a
+langcode: en
+status: true
+dependencies:
+  module:
+    - link
+    - node
+id: node.field_worldcat_link
+field_name: field_worldcat_link
+entity_type: node
+type: link
+settings: {  }
+module: link
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

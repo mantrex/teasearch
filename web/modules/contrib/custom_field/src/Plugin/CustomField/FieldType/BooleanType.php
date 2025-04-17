@@ -4,22 +4,22 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'boolean' custom field type.
- *
- * @CustomFieldType(
- *   id = "boolean",
- *   label = @Translation("Boolean"),
- *   description = @Translation("A field containing a boolean value."),
- *   never_check_empty = TRUE,
- *   category = @Translation("General"),
- *   default_widget = "checkbox",
- *   default_formatter = "boolean",
- * )
+ * Plugin implementation of the 'boolean' field type.
  */
+#[CustomFieldType(
+  id: 'boolean',
+  label: new TranslatableMarkup('Boolean'),
+  description: new TranslatableMarkup('Field to store a true or false value.'),
+  category: new TranslatableMarkup('General'),
+  default_widget: 'checkbox',
+  default_formatter: 'boolean',
+  never_check_empty: TRUE,
+)]
 class BooleanType extends CustomFieldTypeBase {
 
   /**

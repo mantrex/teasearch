@@ -5,6 +5,7 @@ namespace Drupal\custom_field\Plugin;
 use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 
@@ -39,6 +40,7 @@ class CustomFieldFormatterManager extends DefaultPluginManager implements Custom
       $namespaces,
       $module_handler,
       'Drupal\custom_field\Plugin\CustomFieldFormatterInterface',
+      FieldFormatter::class,
       'Drupal\Core\Field\Annotation\FieldFormatter'
     );
 

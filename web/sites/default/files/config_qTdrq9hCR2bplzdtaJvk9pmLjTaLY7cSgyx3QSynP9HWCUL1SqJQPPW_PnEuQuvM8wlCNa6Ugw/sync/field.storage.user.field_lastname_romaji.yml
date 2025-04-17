@@ -1,0 +1,21 @@
+uuid: 40846340-b9f9-44e9-b7a5-92895b6c2d9f
+langcode: en
+status: true
+dependencies:
+  module:
+    - user
+id: user.field_lastname_romaji
+field_name: field_lastname_romaji
+entity_type: user
+type: string
+settings:
+  max_length: 64
+  case_sensitive: false
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

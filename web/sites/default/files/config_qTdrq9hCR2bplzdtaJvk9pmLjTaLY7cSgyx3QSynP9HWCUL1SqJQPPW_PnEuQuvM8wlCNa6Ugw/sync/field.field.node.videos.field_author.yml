@@ -1,0 +1,19 @@
+uuid: 980448ee-28b9-47d1-8de5-c415da34f897
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_author
+    - node.type.videos
+id: node.videos.field_author
+field_name: field_author
+entity_type: node
+bundle: videos
+label: Author
+description: 'Use the following order: lastname, firstname'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

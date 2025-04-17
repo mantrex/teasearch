@@ -3,20 +3,21 @@
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'Time ago' formatter for 'datetime' fields.
- *
- * @FieldFormatter(
- *   id = "datetime_time_ago",
- *   label = @Translation("Time ago"),
- *   field_types = {
- *     "datetime"
- *   }
- * )
+ * Plugin implementation of the 'datetime_time_ago' formatter.
  */
+#[FieldFormatter(
+  id: 'datetime_time_ago',
+  label: new TranslatableMarkup('Time ago'),
+  field_types: [
+    'datetime',
+  ],
+)]
 class DateTimeTimeAgoFormatter extends TimestampAgoFormatter {
 
   /**

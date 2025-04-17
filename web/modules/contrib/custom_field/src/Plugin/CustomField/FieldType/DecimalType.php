@@ -4,21 +4,25 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'decimal' custom field type.
- *
- * @CustomFieldType(
- *   id = "decimal",
- *   label = @Translation("Number (decimal)"),
- *   description = @Translation("This field stores a number in the database in a fixed decimal format."),
- *   category = @Translation("Number"),
- *   default_widget = "decimal",
- *   default_formatter = "number_decimal"
- * )
+ * Plugin implementation of the 'decimal' field type.
  */
+#[CustomFieldType(
+  id: "decimal",
+  label: new TranslatableMarkup("Number (decimal)"),
+  description: [
+    new TranslatableMarkup("Ideal for exact counts and measures (prices, temperatures, distances, volumes, etc.)"),
+    new TranslatableMarkup("Stores a number in the database in a fixed decimal format"),
+    new TranslatableMarkup("For example, 12.34 km or € when used for further detailed calculations (such as summing many of these)"),
+  ],
+  category: new TranslatableMarkup("Number"),
+  default_widget: "decimal",
+  default_formatter: "number_decimal",
+)]
 class DecimalType extends CustomFieldTypeBase {
 
   /**
@@ -43,7 +47,7 @@ class DecimalType extends CustomFieldTypeBase {
   public static function propertyDefinitions(array $settings): array {
     ['name' => $name] = $settings;
 
-    $properties[$name] = DataDefinition::create('string')
+    $properties[$name] = DataDefinition::create('decimal')
       ->setLabel(new TranslatableMarkup('@name', ['@name' => $name]))
       ->setRequired(FALSE);
 

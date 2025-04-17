@@ -6,19 +6,20 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldFeedsType;
 use Drupal\feeds\Exception\EmptyFeedException;
 use Drupal\feeds\Exception\TargetValidationException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'file' feeds type.
- *
- * @CustomFieldFeedsType(
- *   id = "file",
- *   label = @Translation("File"),
- *   mark_unique = FALSE,
- * )
  */
+#[CustomFieldFeedsType(
+  id: 'file',
+  label: new TranslatableMarkup('File'),
+  mark_unique: FALSE,
+)]
 class FileTarget extends EntityReferenceTarget {
 
   /**

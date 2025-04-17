@@ -2,15 +2,17 @@
 
 namespace Drupal\custom_field\Plugin\CustomField\FeedsType;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldFeedsType;
+
 /**
  * Plugin implementation of the 'string' feeds type.
- *
- * @CustomFieldFeedsType(
- *   id = "string",
- *   label = @Translation("String"),
- *   mark_unique = TRUE,
- * )
  */
+#[CustomFieldFeedsType(
+  id: 'string',
+  label: new TranslatableMarkup('String'),
+  mark_unique: TRUE,
+)]
 class StringTarget extends BaseTarget {
 
   /**

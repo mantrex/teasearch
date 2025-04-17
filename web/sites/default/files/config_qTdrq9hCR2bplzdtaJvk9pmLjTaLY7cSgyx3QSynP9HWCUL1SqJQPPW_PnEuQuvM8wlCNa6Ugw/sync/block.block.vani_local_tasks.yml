@@ -1,0 +1,22 @@
+uuid: b90d6be2-f386-4f8e-87bc-cd03414c8c12
+langcode: en
+status: true
+dependencies:
+  theme:
+    - vani
+_core:
+  default_config_hash: u2RKeim3-akpSCGTmGM1DZE9WwDy25PG3yGXOgNCFZk
+id: vani_local_tasks
+theme: vani
+region: content
+weight: -7
+provider: null
+plugin: local_tasks_block
+settings:
+  id: local_tasks_block
+  label: Tabs
+  label_display: '0'
+  provider: core
+  primary: true
+  secondary: true
+visibility: {  }

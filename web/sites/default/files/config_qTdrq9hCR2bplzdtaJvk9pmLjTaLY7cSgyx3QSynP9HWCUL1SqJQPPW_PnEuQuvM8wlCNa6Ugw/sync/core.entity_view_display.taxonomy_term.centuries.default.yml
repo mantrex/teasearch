@@ -1,0 +1,52 @@
+uuid: 1d22349d-694b-4e62-99b6-6fa831d101cc
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.taxonomy_term.centuries.field_date_from
+    - field.field.taxonomy_term.centuries.field_date_to
+    - field.field.taxonomy_term.centuries.field_key
+    - taxonomy.vocabulary.centuries
+  module:
+    - datetime
+    - text
+id: taxonomy_term.centuries.default
+targetEntityType: taxonomy_term
+bundle: centuries
+mode: default
+content:
+  description:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_date_from:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_date_to:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_key:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  langcode: true

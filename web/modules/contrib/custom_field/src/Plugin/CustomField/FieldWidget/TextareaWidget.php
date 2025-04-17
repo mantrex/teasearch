@@ -4,22 +4,23 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
- * Plugin implementation of the 'textarea' custom field widget.
- *
- * @FieldWidget(
- *   id = "textarea",
- *   label = @Translation("Text area (multiple rows)"),
- *   category = @Translation("Text"),
- *   data_types = {
- *     "string_long",
- *   }
- * )
+ * Plugin implementation of the 'textarea' widget.
  */
+#[CustomFieldWidget(
+  id: 'textarea',
+  label: new TranslatableMarkup('Text area (multiple rows)'),
+  category: new TranslatableMarkup('Text'),
+  field_types: [
+    'string_long',
+  ],
+)]
 class TextareaWidget extends CustomFieldWidgetBase {
 
   /**

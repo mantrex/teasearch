@@ -1,0 +1,25 @@
+uuid: 65438323-3bb5-42f9-8c8c-82dd3aaff503
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_scientific_advisors
+    - node.type.primary_sources
+id: node.primary_sources.field_scientific_advisors
+field_name: field_scientific_advisors
+entity_type: node
+bundle: primary_sources
+label: 'Scientific Advisors'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: views
+  handler_settings:
+    view:
+      view_name: getcontributors
+      display_name: entity_reference_1
+      arguments: {  }
+field_type: entity_reference

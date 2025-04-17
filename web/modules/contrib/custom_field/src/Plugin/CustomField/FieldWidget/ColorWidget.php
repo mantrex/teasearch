@@ -4,21 +4,22 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
 
 /**
- * Plugin implementation of the 'color' custom field widget.
- *
- * @FieldWidget(
- *   id = "color",
- *   label = @Translation("Color"),
- *   category = @Translation("General"),
- *   data_types = {
- *     "color",
- *   }
- * )
+ * Plugin implementation of the 'color' widget.
  */
+#[CustomFieldWidget(
+  id: 'color',
+  label: new TranslatableMarkup('Color'),
+  category: new TranslatableMarkup('General'),
+  field_types: [
+    'color',
+  ],
+)]
 class ColorWidget extends CustomFieldWidgetBase {
 
   /**

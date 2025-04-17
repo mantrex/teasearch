@@ -1,67 +1,59 @@
 # Custom Field
 
-Defines a new "Custom Field" field type that lets you create simple inline
-multiple-value fields without having to use entity references.
+Dynamic custom field types with extensive widget and formatter plugin support. 
+A highly performant & scalable alternative to paragraphs and entity reference by
+storing data in a single table.
 
 ## Features
 
 - Multiple-value fields without entity references
-- Inline field widgets (Custom Field items) using a customizable
-  css-flexbox-based layout system
+- Inline field widgets using a customizable css-flexbox-based layout system
 - Multiple field formatters: CustomField (custom theme hook), Inline, HTML List,
   Table, Custom Template (similar to views' field rewrite functionality)
-- Clone existing Custom Field definitions
-- Data storage and property definitions are aligned with Drupal Core field
-  types.
+- Clone field settings from **ANY** entity type
+- Add/Remove columns to fields with existing data.
+  [See documentation](https://www.drupal.org/docs/extending-drupal/contributed-modules/contributed-module-documentation/custom-field/addremove-columns-to-custom-fields-with-existing-data)
+- Performance & scalability - Eliminates unnecessary field table bloat and 
+  configuration files
+- Reduce overhead - May replace the need for additional contrib modules
+
+## Integrations
+
+- [Feeds](https://www.drupal.org/project/feeds)
+- [Linkit](https://www.drupal.org/project/linkit)
+- [GraphQL Compose](https://www.drupal.org/project/graphql_compose)
+- [Search API](https://www.drupal.org/project/search_api)
+
+## Migrate to Custom fields
+
+You can use the [Field Updater Service](https://www.drupal.org/project/field_updater_service)
+module to map 1 or more fields in a configuration entity and use the provided 
+service in an update hook from your custom module.
+
+## Included sub-modules
+
+- custom_field_graphql - [GraphQL compose](https://www.drupal.org/project/graphql_compose)
+  integration.
+- custom_field_linkit - [Linkit](https://www.drupal.org/project/linkit)
+  integration.
+- custom_field_media - Provides a *Media Library* widget.
+- custom_field_search_api - Enhances [Search API](https://www.drupal.org/project/search_api)
+  integration.
+- custom_field_viewfield - Provides the ability to reference and display views.
+
+## Field types, widgets & formatters
+
+- [Overview of included field types, widgets & formatters](https://www.drupal.org/docs/extending-drupal/contributed-modules/contributed-module-documentation/custom-field/field-types-widgets-formatters)
+- [Extending Custom Field widget plugins](https://www.drupal.org/docs/extending-drupal/contributed-modules/contributed-module-documentation/custom-field/extending-custom-field-widget-plugins)
+- [Extending Custom Field formatter plugins](https://www.drupal.org/docs/extending-drupal/contributed-modules/contributed-module-documentation/custom-field/extending-custom-field-formatter-plugins)
 
 ## Why this module?
 
 In some cases, Drupal's field api for single value fields is overkill for
 storing simple field data that would be better to consolidate in a single table.
-One "Custom Field" can contain many columns in a single table which can lead to
+One *Custom Field* can contain many columns in a single table which can lead to
 a substantial boost in performance by eliminating unnecessary joins and allowing
 for simpler configuration management.
-
-## What types of fields are not supported in a "Custom Field"?
-
-- Entity Reference fields
-
-## Included Custom Field widget types:
-
-- Textfield
-- Textarea - Formatted text supported
-- Select
-- Radios
-- Checkbox
-- Color
-- Email
-- Integer
-- Decimal
-- Float
-- Telephone
-- Uuid
-- Map key/value - Serialized data of key/value pairs. Could be used as an array
-  of attributes for  decoupled sites or rendered in custom theme functions.
-- Url
-
-## Disclaimer
-
-This module is for simple, multi-fields and is not meant to be a full-on
-replacement for using entity references. If you need a multi-field with nested
-multi-value fields, or uses a complex field type, you're still better off using
-something like Paragraphs to satisfy your needs. Paragraphs composed of
-"Custom Fields" however can be a powerful combination and most likely eliminate
-bloated paragraph child hierarchy.
-
-### Note
-
-Theres work happening in Core to improve the user experience for multi-value
-fields by adding a Remove button. Until this makes it's way into core, there's
-a patch available that significantly enhances the viability of multi-value
-custom fields replacing the need for paragraphs and inline entity reference for
-their widget functionality.
-[#1038316: Allow for deletion of a single value of a multiple value field](https://www.drupal.org/project/drupal/issues/1038316).
-[Patch in comment #242 generally works well in our testing:](https://www.drupal.org/project/drupal/issues/1038316#comment-14308196).
 
 ## Requirements
 
@@ -76,4 +68,3 @@ information, see
 ## Maintainers
 
 - Andy Marquis - [apmsooner](https://www.drupal.org/u/apmsooner)
-- Damien McKenna - [DamienMcKenna](https://www.drupal.org/u/damienmckenna)

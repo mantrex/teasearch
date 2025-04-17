@@ -4,21 +4,21 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'integer' custom field type.
- *
- * @CustomFieldType(
- *   id = "integer",
- *   label = @Translation("Number (integer)"),
- *   description = @Translation("This field stores a number in the database as an integer."),
- *   category = @Translation("Number"),
- *   default_widget = "integer",
- *   default_formatter = "number_integer",
- * )
+ * Plugin implementation of the 'integer' field type.
  */
+#[CustomFieldType(
+  id: 'integer',
+  label: new TranslatableMarkup('Number (integer)'),
+  description: new TranslatableMarkup('This field stores a number in the database as an integer.'),
+  category: new TranslatableMarkup('Number'),
+  default_widget: 'integer',
+  default_formatter: 'number_integer',
+)]
 class IntegerType extends CustomFieldTypeBase {
 
   /**

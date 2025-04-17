@@ -6,6 +6,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 
 /**
  * Provides the custom field widget plugin manager.
@@ -31,6 +32,7 @@ class CustomFieldWidgetManager extends DefaultPluginManager implements CustomFie
       $namespaces,
       $module_handler,
       'Drupal\custom_field\Plugin\CustomFieldWidgetInterface',
+      CustomFieldWidget::class,
       'Drupal\Core\Field\Annotation\FieldWidget'
     );
 
@@ -56,7 +58,7 @@ class CustomFieldWidgetManager extends DefaultPluginManager implements CustomFie
     $definitions = $this->getDefinitions();
     $widgets = [];
     foreach ($definitions as $definition) {
-      if (in_array($type, $definition['data_types'])) {
+      if (in_array($type, $definition['field_types'])) {
         $widgets[] = $definition['id'];
       }
     }

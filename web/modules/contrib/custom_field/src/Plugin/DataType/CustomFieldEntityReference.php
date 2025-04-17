@@ -4,21 +4,23 @@ namespace Drupal\custom_field\Plugin\DataType;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\TypedData\Attribute\DataType;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\TypedData\TypedData;
+use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 
 /**
- * The "custom_field_entity_reference" data type.
+ * Defines the "custom_field_entity_reference" data type.
  *
  * The "custom_field_entity_reference" data type provides a way to process
  * entity as part of values.
- *
- * @DataType(
- *   id = "custom_field_entity_reference",
- *   label = @Translation("Entity reference"),
- *   definition_class = "\Drupal\custom_field\TypedData\CustomFieldDataDefinition"
- * )
  */
+#[DataType(
+  id: 'custom_field_entity_reference',
+  label: new TranslatableMarkup('Entity reference'),
+  definition_class: CustomFieldDataDefinition::class,
+)]
 class CustomFieldEntityReference extends TypedData implements PrimitiveInterface {
 
   /**

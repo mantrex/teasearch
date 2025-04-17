@@ -1,0 +1,19 @@
+uuid: c5661231-dc48-4dc7-ac20-8a44345d4b69
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_title_translated
+    - node.type.images
+id: node.images.field_title_translated
+field_name: field_title_translated
+entity_type: node
+bundle: images
+label: 'English translation of the title'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

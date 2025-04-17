@@ -4,21 +4,22 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomField\NumberWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'float' custom field widget.
- *
- * @FieldWidget(
- *   id = "float",
- *   label = @Translation("Float"),
- *   category = @Translation("Number"),
- *   data_types = {
- *     "float",
- *   },
- * )
+ * Plugin implementation of the 'float' widget.
  */
+#[CustomFieldWidget(
+  id: 'float',
+  label: new TranslatableMarkup('Float'),
+  category: new TranslatableMarkup('Number'),
+  field_types: [
+    'float',
+  ],
+)]
 class FloatWidget extends NumberWidgetBase {
 
   /**

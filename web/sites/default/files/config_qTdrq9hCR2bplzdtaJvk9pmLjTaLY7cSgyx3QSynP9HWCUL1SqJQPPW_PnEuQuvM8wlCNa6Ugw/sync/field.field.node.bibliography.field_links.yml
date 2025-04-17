@@ -1,0 +1,23 @@
+uuid: c76e3e96-f72b-404b-a4a5-5c68bb00f81f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_links
+    - node.type.bibliography
+  module:
+    - link
+id: node.bibliography.field_links
+field_name: field_links
+entity_type: node
+bundle: bibliography
+label: 'Other links'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 17
+field_type: link

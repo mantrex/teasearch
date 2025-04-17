@@ -1,0 +1,22 @@
+uuid: 18dc39bf-67e9-463c-bf09-3afb43ef10e4
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.first_reference
+id: node.first_reference.status
+field_name: status
+entity_type: node
+bundle: first_reference
+label: Published
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

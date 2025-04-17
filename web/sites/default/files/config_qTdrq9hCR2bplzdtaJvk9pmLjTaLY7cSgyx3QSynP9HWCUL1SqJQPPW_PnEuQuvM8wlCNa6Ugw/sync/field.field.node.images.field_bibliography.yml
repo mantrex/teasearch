@@ -1,0 +1,29 @@
+uuid: 7712037b-adba-442a-b78a-1cec5fd3e864
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_bibliography
+    - node.type.bibliography
+    - node.type.images
+id: node.images.field_bibliography
+field_name: field_bibliography
+entity_type: node
+bundle: images
+label: Bibliography
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      bibliography: bibliography
+    sort:
+      field: field_author
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

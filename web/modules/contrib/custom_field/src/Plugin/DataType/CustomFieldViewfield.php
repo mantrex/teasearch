@@ -4,24 +4,23 @@ namespace Drupal\custom_field\Plugin\DataType;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\TypedData\Attribute\DataType;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\TypedData\TypedData;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\custom_field\Plugin\Field\FieldType\CustomItem;
+use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 
 /**
  * The "custom_field_viewfield" data type.
- *
- * This data type provides a way to process entity and additional metadata as
- * part of values.
- *
- * @DataType(
- *   id = "custom_field_viewfield",
- *   label = @Translation("Viewfield"),
- *   definition_class = "\Drupal\custom_field\TypedData\CustomFieldDataDefinition"
- * )
  */
+#[DataType(
+  id: 'custom_field_viewfield',
+  label: new TranslatableMarkup('Viewfield'),
+  definition_class: CustomFieldDataDefinition::class,
+)]
 class CustomFieldViewfield extends TypedData implements PrimitiveInterface {
 
   /**

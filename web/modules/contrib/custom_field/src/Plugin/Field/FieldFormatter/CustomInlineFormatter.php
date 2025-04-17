@@ -3,24 +3,23 @@
 namespace Drupal\custom_field\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Plugin implementation of the 'custom_inline' formatter.
- *
- * Renders the items inline using a simple separator and no additional wrapper
- * markup.
- *
- * @FieldFormatter(
- *   id = "custom_inline",
- *   label = @Translation("Inline"),
- *   weight = 1,
- *   field_types = {
- *     "custom"
- *   }
- * )
  */
+#[FieldFormatter(
+  id: 'custom_inline',
+  label: new TranslatableMarkup('Inline'),
+  description: new TranslatableMarkup('Renders the items inline using a simple separator and no additional wrapper markup'),
+  field_types: [
+    'custom',
+  ],
+  weight: 1,
+)]
 class CustomInlineFormatter extends BaseFormatter {
 
   /**

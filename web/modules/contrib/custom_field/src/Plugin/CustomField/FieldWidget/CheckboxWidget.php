@@ -4,21 +4,22 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
 
 /**
- * Plugin implementation of the 'checkbox' custom field widget.
- *
- * @FieldWidget(
- *   id = "checkbox",
- *   label = @Translation("Checkbox"),
- *   category = @Translation("General"),
- *   data_types = {
- *     "boolean",
- *   }
- * )
+ * Plugin implementation of the 'checkbox' widget.
  */
+#[CustomFieldWidget(
+  id: 'checkbox',
+  label: new TranslatableMarkup('Checkbox'),
+  category: new TranslatableMarkup('General'),
+  field_types: [
+    'boolean',
+  ],
+)]
 class CheckboxWidget extends CustomFieldWidgetBase {
 
   /**

@@ -1,0 +1,19 @@
+uuid: 5acd2421-1fa4-4bda-8f11-f296765e5d35
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_author
+    - node.type.images
+id: node.images.field_author
+field_name: field_author
+entity_type: node
+bundle: images
+label: Author
+description: 'Use the following order: firstname lastname'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

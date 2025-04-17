@@ -1,0 +1,9 @@
+uuid: 0fe9c197-0c38-4248-946f-bc36c1ede351
+langcode: en
+status: true
+dependencies: {  }
+name: 'Image types'
+vid: image_types
+description: null
+weight: 0
+new_revision: false

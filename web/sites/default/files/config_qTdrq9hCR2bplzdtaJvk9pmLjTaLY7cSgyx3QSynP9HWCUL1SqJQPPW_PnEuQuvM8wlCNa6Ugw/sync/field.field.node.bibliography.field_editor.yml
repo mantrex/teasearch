@@ -1,0 +1,19 @@
+uuid: 3645faab-a89f-4eeb-a017-dba4dc605bc8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_editor
+    - node.type.bibliography
+id: node.bibliography.field_editor
+field_name: field_editor
+entity_type: node
+bundle: bibliography
+label: Editor
+description: 'Edited by'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

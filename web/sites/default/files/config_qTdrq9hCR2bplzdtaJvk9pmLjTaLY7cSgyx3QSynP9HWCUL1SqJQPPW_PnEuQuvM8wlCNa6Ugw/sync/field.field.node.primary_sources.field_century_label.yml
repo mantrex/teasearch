@@ -1,0 +1,19 @@
+uuid: 18773815-3fc3-4337-a97b-3d705f0dcd82
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_century_label
+    - node.type.primary_sources
+id: node.primary_sources.field_century_label
+field_name: field_century_label
+entity_type: node
+bundle: primary_sources
+label: 'Century label'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,25 @@
+uuid: 2a08ea80-06f6-4c5a-94af-2d3b9b1c0e2d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_authors_reference
+    - node.type.images
+id: node.images.field_authors_reference
+field_name: field_authors_reference
+entity_type: node
+bundle: images
+label: Authors
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: views
+  handler_settings:
+    view:
+      view_name: getcontributors
+      display_name: entity_reference_1
+      arguments: {  }
+field_type: entity_reference

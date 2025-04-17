@@ -4,23 +4,24 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomField\ListWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'select' custom field widget.
- *
- * @FieldWidget(
- *   id = "select",
- *   label = @Translation("Select list"),
- *   category = @Translation("Lists"),
- *   data_types = {
- *     "string",
- *     "integer",
- *     "float",
- *   },
- * )
+ * Plugin implementation of the 'select' widget.
  */
+#[CustomFieldWidget(
+  id: 'select',
+  label: new TranslatableMarkup('Select list'),
+  category: new TranslatableMarkup('Lists'),
+  field_types: [
+    'string',
+    'integer',
+    'float',
+  ],
+)]
 class SelectWidget extends ListWidgetBase {
 
   /**

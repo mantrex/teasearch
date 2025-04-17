@@ -21,12 +21,6 @@
       </header>
     {% endif %}
 
-    {# HERO (OPTIONAL) #}
-    {% if page.hero %}
-      <section class="hero-section">
-        {{ page.hero }}
-      </section>
-    {% endif %}
 
     {# MAIN CONTENT #}
     <main role="main" class=" site-content my-4">
@@ -36,6 +30,13 @@
         {% endif %}
       </div>
     </main>
+
+        {# HERO (OPTIONAL) #}
+    {% if page.hero %}
+      <section class="hero-section">
+        {{ page.hero }}
+      </section>
+    {% endif %}
 
     {# FOOTER #}
 

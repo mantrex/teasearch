@@ -1,0 +1,19 @@
+uuid: f9e2898b-961f-44a5-a939-14a76d5cf3ba
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_authors_original
+    - node.type.bibliography
+id: node.bibliography.field_authors_original
+field_name: field_authors_original
+entity_type: node
+bundle: bibliography
+label: authors_original
+description: 'Insert each author full name if present in the same order of the authors (original latin script or romanized form)'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

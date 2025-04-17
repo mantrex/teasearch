@@ -4,23 +4,24 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomField\FieldType\EmailType;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
 
 /**
- * Plugin implementation of the 'email' custom field widget.
- *
- * @FieldWidget(
- *   id = "email",
- *   label = @Translation("E-mail"),
- *   category = @Translation("General"),
- *   data_types = {
- *     "string",
- *     "email",
- *   }
- * )
+ * Plugin implementation of the 'email' widget.
  */
+#[CustomFieldWidget(
+  id: 'email',
+  label: new TranslatableMarkup('E-mail'),
+  category: new TranslatableMarkup('General'),
+  field_types: [
+    'email',
+    'string',
+  ],
+)]
 class EmailWidget extends CustomFieldWidgetBase {
 
   /**

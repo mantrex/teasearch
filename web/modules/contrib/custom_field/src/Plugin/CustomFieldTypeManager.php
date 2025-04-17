@@ -8,6 +8,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\custom_field\Attribute\CustomFieldType;
 
 /**
  * Provides the custom field type plugin manager.
@@ -33,6 +34,7 @@ class CustomFieldTypeManager extends DefaultPluginManager implements CustomField
       $namespaces,
       $module_handler,
       'Drupal\custom_field\Plugin\CustomFieldTypeInterface',
+      CustomFieldType::class,
       'Drupal\custom_field\Annotation\CustomFieldType'
     );
 

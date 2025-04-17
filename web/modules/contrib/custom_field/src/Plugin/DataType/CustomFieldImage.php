@@ -4,24 +4,26 @@ namespace Drupal\custom_field\Plugin\DataType;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\TypedData\Attribute\DataType;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\TypedData\TypedData;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\custom_field\Plugin\Field\FieldType\CustomItem;
+use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 
 /**
  * The "custom_field_image" data type.
  *
  * The "custom_field_image" data type provides a way to process entity and
  * additional metadata as part of values.
- *
- * @DataType(
- *   id = "custom_field_image",
- *   label = @Translation("Image"),
- *   definition_class = "\Drupal\custom_field\TypedData\CustomFieldDataDefinition"
- * )
  */
+#[DataType(
+  id: 'custom_field_image',
+  label: new TranslatableMarkup('Image'),
+  definition_class: CustomFieldDataDefinition::class,
+)]
 class CustomFieldImage extends TypedData implements PrimitiveInterface {
 
   /**

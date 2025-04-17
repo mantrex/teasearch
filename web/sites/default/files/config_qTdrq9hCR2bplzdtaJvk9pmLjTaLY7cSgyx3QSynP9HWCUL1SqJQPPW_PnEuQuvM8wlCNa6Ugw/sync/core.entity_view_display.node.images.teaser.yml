@@ -1,0 +1,65 @@
+uuid: cff52c64-1bd3-4484-b0d4-540bcf87b22f
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.images.field_author
+    - field.field.node.images.field_author_original
+    - field.field.node.images.field_authors_reference
+    - field.field.node.images.field_bibliography
+    - field.field.node.images.field_country
+    - field.field.node.images.field_description
+    - field.field.node.images.field_first_published_at
+    - field.field.node.images.field_image
+    - field.field.node.images.field_image_types
+    - field.field.node.images.field_language
+    - field.field.node.images.field_scientific_advisors
+    - field.field.node.images.field_subjects
+    - field.field.node.images.field_title_original
+    - field.field.node.images.field_title_translated
+    - field.field.node.images.field_usage_rights
+    - field.field.node.images.field_year_range
+    - image.style.medium
+    - node.type.images
+  module:
+    - image
+    - user
+id: node.images.teaser
+targetEntityType: node
+bundle: images
+mode: teaser
+content:
+  field_image:
+    type: image
+    label: hidden
+    settings:
+      image_link: content
+      image_style: medium
+      image_loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: -1
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  field_author: true
+  field_author_original: true
+  field_authors_reference: true
+  field_bibliography: true
+  field_country: true
+  field_description: true
+  field_first_published_at: true
+  field_image_types: true
+  field_language: true
+  field_scientific_advisors: true
+  field_subjects: true
+  field_title_original: true
+  field_title_translated: true
+  field_usage_rights: true
+  field_year_range: true
+  langcode: true

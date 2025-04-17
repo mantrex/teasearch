@@ -14,6 +14,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomField\EntityReferenceWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\field_ui\FieldUI;
@@ -23,18 +24,17 @@ use Drupal\media_library\MediaLibraryUiBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the 'media_library_widget' custom field widget.
- *
- * @FieldWidget(
- *   id = "media_library_widget",
- *   label = @Translation("Media library"),
- *   description = @Translation("Allows you to select items from the media library."),
- *   category = @Translation("Media"),
- *   data_types = {
- *     "entity_reference",
- *   }
- * )
+ * Plugin implementation of the 'media_library_widget' widget.
  */
+#[CustomFieldWidget(
+  id: 'media_library_widget',
+  label: new TranslatableMarkup('Media library'),
+  description: new TranslatableMarkup('Allows you to select items from the media library.'),
+  category: new TranslatableMarkup('Media'),
+  field_types: [
+    'entity_reference',
+  ],
+)]
 class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCallbackInterface {
 
   /**

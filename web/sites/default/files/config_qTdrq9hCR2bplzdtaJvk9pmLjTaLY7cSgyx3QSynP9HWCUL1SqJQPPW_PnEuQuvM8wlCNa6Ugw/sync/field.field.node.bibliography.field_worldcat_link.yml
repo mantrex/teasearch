@@ -1,0 +1,23 @@
+uuid: 8cec5357-db99-4974-b7cf-b0748f76b17b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_worldcat_link
+    - node.type.bibliography
+  module:
+    - link
+id: node.bibliography.field_worldcat_link
+field_name: field_worldcat_link
+entity_type: node
+bundle: bibliography
+label: 'WorldCat link'
+description: 'If you have a WorldCat link, put it here'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 16
+field_type: link

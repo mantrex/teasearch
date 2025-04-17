@@ -1,0 +1,18 @@
+uuid: ed92d378-f048-4072-b92d-28cf5af27e3e
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+third_party_settings:
+  menu_ui:
+    available_menus:
+      - main
+    parent: 'main:'
+name: 'First Reference'
+type: first_reference
+description: null
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: true

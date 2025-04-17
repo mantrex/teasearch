@@ -4,18 +4,19 @@ namespace Drupal\custom_field\Plugin\CustomField\FeedsType;
 
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Datetime\TimeZoneFormHelper;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldFeedsType;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'datetime' feeds type.
- *
- * @CustomFieldFeedsType(
- *   id = "datetime",
- *   label = @Translation("Datetime"),
- *   mark_unique = TRUE,
- * )
  */
+#[CustomFieldFeedsType(
+  id: 'datetime',
+  label: new TranslatableMarkup('Datetime'),
+  mark_unique: TRUE,
+)]
 class DatetimeTarget extends BaseTarget {
 
   /**

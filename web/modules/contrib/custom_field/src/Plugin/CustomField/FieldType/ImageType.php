@@ -9,24 +9,33 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\DataReferenceDefinition;
+use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 use Drupal\file\Entity\File;
 use Drupal\image\Entity\ImageStyle;
 
 /**
- * Plugin implementation of the 'file' custom field type.
- *
- * @CustomFieldType(
- *   id = "image",
- *   label = @Translation("Image"),
- *   description = @Translation("This field stores the ID of a file as an integer value."),
- *   category = @Translation("Reference"),
- *   default_widget = "image_image",
- *   default_formatter = "image",
- *   constraints = {"ReferenceAccess" = {}, "FileValidation" = {}}
- * )
+ * Plugin implementation of the 'image' field type.
  */
+#[CustomFieldType(
+  id: 'image',
+  label: new TranslatableMarkup('Image'),
+  description: [
+    new TranslatableMarkup("For uploading images"),
+    new TranslatableMarkup("Allows a user to upload an image with configurable extensions, image dimensions, upload size"),
+    new TranslatableMarkup(
+      "Can be configured with options such as allowed file extensions, maximum upload size and image dimensions minimums/maximums"
+    ),
+  ],
+  category: new TranslatableMarkup('File upload'),
+  default_widget: 'image_image',
+  default_formatter: 'image',
+  constraints: [
+    'ReferenceAccess' => [],
+    'FileValidation' => [],
+  ],
+)]
 class ImageType extends FileType {
 
   /**

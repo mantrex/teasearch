@@ -1,0 +1,23 @@
+uuid: ce7a746c-c9cd-4b0c-8782-9bd2dfed5282
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_duration
+    - node.type.videos
+id: node.videos.field_duration
+field_name: field_duration
+entity_type: node
+bundle: videos
+label: Duration
+description: 'Duration in seconds'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: 1.0
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

@@ -4,22 +4,23 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the 'timestamp' formatter as time ago.
- *
- * @FieldFormatter(
- *   id = "timestamp_ago",
- *   label = @Translation("Time ago"),
- *   field_types = {
- *     "timestamp",
- *   }
- * )
+ * Plugin implementation of the 'timestamp_ago' formatter.
  */
+#[FieldFormatter(
+  id: 'timestamp_ago',
+  label: new TranslatableMarkup('Time ago'),
+  field_types: [
+    'timestamp',
+  ],
+)]
 class TimestampAgoFormatter extends CustomFieldFormatterBase {
 
   /**

@@ -4,22 +4,23 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomField\EntityReferenceWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\user\EntityOwnerInterface;
 
 /**
- * Plugin implementation of the 'entity_reference_autocomplete' field widget.
- *
- * @FieldWidget(
- *   id = "entity_reference_autocomplete",
- *   label = @Translation("Autocomplete"),
- *   category = @Translation("Reference"),
- *   data_types = {
- *     "entity_reference",
- *   }
- * )
+ * Plugin implementation of the 'entity_reference_autocomplete' widget.
  */
+#[CustomFieldWidget(
+  id: 'entity_reference_autocomplete',
+  label: new TranslatableMarkup('Autocomplete'),
+  category: new TranslatableMarkup('Reference'),
+  field_types: [
+    'entity_reference',
+  ],
+)]
 class EntityReferenceAutocompleteWidget extends EntityReferenceWidgetBase {
 
   /**

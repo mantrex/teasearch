@@ -4,21 +4,21 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'float' custom field type.
- *
- * @CustomFieldType(
- *   id = "float",
- *   label = @Translation("Number (float)"),
- *   description = @Translation("This field stores a number in the database in a floating point format."),
- *   category = @Translation("Number"),
- *   default_widget = "float",
- *   default_formatter = "number_decimal"
- * )
+ * Plugin implementation of the 'float' field type.
  */
+#[CustomFieldType(
+  id: 'float',
+  label: new TranslatableMarkup('Number (float)'),
+  description: new TranslatableMarkup('This field stores a number in the database in a floating point format.'),
+  category: new TranslatableMarkup('Number'),
+  default_widget: 'float',
+  default_formatter: 'number_decimal',
+)]
 class FloatType extends CustomFieldTypeBase {
 
   /**

@@ -2,24 +2,25 @@
 
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\file\FileInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'image_url' formatter.
- *
- * @FieldFormatter(
- *   id = "image_url",
- *   label = @Translation("URL to image"),
- *   field_types = {
- *     "image",
- *   }
- * )
  */
+#[FieldFormatter(
+  id: 'image_url',
+  label: new TranslatableMarkup('URL to image'),
+  field_types: [
+    'image',
+  ],
+)]
 class ImageUrlFormatter extends EntityReferenceFormatterBase {
 
   /**

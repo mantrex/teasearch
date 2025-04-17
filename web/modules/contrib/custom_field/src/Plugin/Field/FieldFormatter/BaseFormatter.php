@@ -396,7 +396,33 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
    * {@inheritdoc}
    */
   public function viewValue(FieldItemInterface $item, string $langcode): array {
-    return [];
+    $field_name = $this->fieldDefinition->get('field_name');
+    $output = [
+      '#theme' => 'custom_field',
+      '#field_name' => $field_name,
+      '#items' => [],
+    ];
+
+    $values = $this->getFormattedValues($item, $langcode);
+
+    foreach ($values as $value) {
+      if ($value !== NULL && $value !== '') {
+        $output['#items'][] = [
+          '#theme' => 'custom_field_item',
+          '#field_name' => $field_name,
+          '#name' => $value['name'],
+          '#value' => $value['value']['#markup'],
+          '#label' => $value['label'],
+          '#label_display' => $value['label_display'],
+          '#type' => $value['type'],
+          '#wrappers' => $value['wrappers'],
+          '#entity_type' => $value['entity_type'],
+          '#lang_code' => $langcode,
+        ];
+      }
+    }
+
+    return $output;
   }
 
   /**

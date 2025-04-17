@@ -5,6 +5,7 @@ namespace Drupal\custom_field\Plugin\Field\FieldType;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -12,6 +13,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformStateInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface;
 use Drupal\field\Entity\FieldConfig;
@@ -19,16 +21,15 @@ use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Plugin implementation of the 'custom' field type.
- *
- * @FieldType(
- *   id = "custom",
- *   label = @Translation("Custom field"),
- *   description = @Translation("A field of fields stored in a single table."),
- *   default_widget = "custom_stacked",
- *   default_formatter = "custom_formatter",
- *   list_class = "\Drupal\custom_field\Plugin\Field\FieldType\CustomItemList",
- * )
  */
+#[FieldType(
+  id: 'custom',
+  label: new TranslatableMarkup('Custom field'),
+  description: new TranslatableMarkup('A field of fields stored in a single table.'),
+  default_widget: 'custom_stacked',
+  default_formatter: 'custom_formatter',
+  list_class: '\Drupal\custom_field\Plugin\Field\FieldType\CustomItemList',
+)]
 class CustomItem extends FieldItemBase {
 
   use StringTranslationTrait;
@@ -333,14 +334,18 @@ class CustomItem extends FieldItemBase {
         '#parents' => [...$parents, 'columns'],
       ],
       'items' => [
-        '#type' => 'fieldset',
+        '#type' => 'container',
         '#parents' => [...$parents, 'items'],
         '#title' => $this->t('Custom field items'),
         '#prefix' => '<div id="' . $wrapper_id . '">',
         '#suffix' => '</div>',
+        '#attributes' => [
+          'style' => 'display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem;',
+        ],
       ],
       'actions' => [
         '#type' => 'actions',
+        '#weight' => -9,
       ],
     ];
 
@@ -390,17 +395,27 @@ class CustomItem extends FieldItemBase {
 
     foreach ($settings['items'] as $i => $item) {
       $type = $item['type'] ?? '';
+      $element['items'][$i] = [
+        '#type' => 'details',
+        '#title' => $this->t('@label', ['@label' => $item['name']]),
+        '#attributes' => [
+          'style' => 'margin-top: 0; margin-bottom: 0;',
+        ],
+        '#open' => !$has_data,
+      ];
       $element['items'][$i]['name'] = [
         '#type' => 'machine_name',
-        '#description' => $this->t('A unique machine-readable name containing only letters, numbers, or underscores. This will be used in the column name on the field table in the database.'),
+        '#description' => $this->t('A unique machine-readable name containing only letters, numbers, or underscores.'),
         '#default_value' => $item['name'],
         '#disabled' => $has_data,
         '#machine_name' => [
+          'source' => ['items', $i, 'name'],
           'exists' => [$this, 'machineNameExists'],
           'label' => $this->t('Machine-readable name'),
-          'standalone' => TRUE,
+          'standalone' => FALSE,
         ],
         '#maxlength' => $max_name_length,
+        '#size' => 20,
       ];
       $element['items'][$i]['type'] = [
         '#type' => 'select',
@@ -577,11 +592,16 @@ class CustomItem extends FieldItemBase {
     if (!$has_data) {
       $element['actions']['add'] = [
         '#type' => 'submit',
-        '#value' => $this->t('Add another'),
+        '#value' => $this->t('Add sub-field'),
         '#submit' => [get_class($this) . '::addSubmit'],
         '#ajax' => [
           'callback' => [$this, 'actionCallback'],
           'wrapper' => $wrapper_id,
+        ],
+        '#attributes' => [
+          'class' => [
+            'button--primary',
+          ],
         ],
       ];
       if (!empty($sources)) {
@@ -1075,7 +1095,7 @@ class CustomItem extends FieldItemBase {
       if (!$instance::isApplicable($custom_item)) {
         unset($definitions[$key]);
       }
-      if (!in_array($type, $definition['data_types'])) {
+      if (!in_array($type, $definition['field_types'])) {
         unset($definitions[$key]);
       }
     }

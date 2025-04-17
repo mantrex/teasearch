@@ -2,15 +2,17 @@
 
 namespace Drupal\custom_field\Plugin\CustomField\FeedsType;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldFeedsType;
+
 /**
  * Plugin implementation of the 'uri' feeds type.
- *
- * @CustomFieldFeedsType(
- *   id = "uri",
- *   label = @Translation("Uri"),
- *   mark_unique = TRUE,
- * )
  */
+#[CustomFieldFeedsType(
+  id: 'uri',
+  label: new TranslatableMarkup('Uri'),
+  mark_unique: TRUE,
+)]
 class UriTarget extends BaseTarget {
 
   /**

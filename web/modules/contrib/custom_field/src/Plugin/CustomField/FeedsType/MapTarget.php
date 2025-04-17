@@ -2,15 +2,17 @@
 
 namespace Drupal\custom_field\Plugin\CustomField\FeedsType;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldFeedsType;
+
 /**
  * Plugin implementation of the 'map' feeds type.
- *
- * @CustomFieldFeedsType(
- *   id = "map",
- *   label = @Translation("Serialized - Key/Value"),
- *   mark_unique = FALSE,
- * )
  */
+#[CustomFieldFeedsType(
+  id: 'map',
+  label: new TranslatableMarkup('Serialized - Key/Value'),
+  mark_unique: FALSE,
+)]
 class MapTarget extends BaseTarget {
 
   /**

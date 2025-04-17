@@ -5,6 +5,7 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomField\FieldType\ImageType;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\file\Element\ManagedFile;
@@ -12,17 +13,16 @@ use Drupal\image\Entity\ImageStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the 'image_image' custom field widget.
- *
- * @FieldWidget(
- *   id = "image_image",
- *   label = @Translation("Image"),
- *   category = @Translation("General"),
- *   data_types = {
- *     "image",
- *   }
- * )
+ * Plugin implementation of the 'image_image' widget.
  */
+#[CustomFieldWidget(
+  id: 'image_image',
+  label: new TranslatableMarkup('Image'),
+  category: new TranslatableMarkup('General'),
+  field_types: [
+    'image',
+  ],
+)]
 class ImageWidget extends FileWidget {
 
   /**

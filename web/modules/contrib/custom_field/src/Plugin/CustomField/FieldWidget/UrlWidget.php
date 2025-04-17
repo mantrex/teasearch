@@ -7,22 +7,22 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the 'url' custom field widget.
- *
- * @FieldWidget(
- *   id = "url",
- *   label = @Translation("Url"),
- *   category = @Translation("Url"),
- *   data_types = {
- *     "uri",
- *   }
- * )
+ * Plugin implementation of the 'url' widget.
  */
+#[CustomFieldWidget(
+  id: 'url',
+  label: new TranslatableMarkup('Url'),
+  category: new TranslatableMarkup('Url'),
+  field_types: [
+    'uri',
+  ],
+)]
 class UrlWidget extends CustomFieldWidgetBase {
 
   /**

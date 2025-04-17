@@ -1,0 +1,11 @@
+uuid: 53eea65b-5050-4897-8f31-b3a42594cfc4
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.pubtypes
+id: taxonomy_term.pubtypes
+target_entity_type_id: taxonomy_term
+target_bundle: pubtypes
+default_langcode: site_default
+language_alterable: false

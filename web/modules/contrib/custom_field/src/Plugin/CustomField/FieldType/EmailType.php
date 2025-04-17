@@ -5,21 +5,21 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'email' custom field type.
- *
- * @CustomFieldType(
- *   id = "email",
- *   label = @Translation("E-mail"),
- *   description = @Translation("A field containing an e-mail value."),
- *   category = @Translation("General"),
- *   default_widget = "email",
- *   default_formatter = "email_mailto",
- * )
+ * Plugin implementation of the 'email' field type.
  */
+#[CustomFieldType(
+  id: 'email',
+  label: new TranslatableMarkup('E-mail'),
+  description: new TranslatableMarkup('A field containing an e-mail value.'),
+  category: new TranslatableMarkup('General'),
+  default_widget: 'email',
+  default_formatter: 'email_mailto',
+)]
 class EmailType extends CustomFieldTypeBase {
 
   public const EMAIL_MAX_LENGTH = 254;

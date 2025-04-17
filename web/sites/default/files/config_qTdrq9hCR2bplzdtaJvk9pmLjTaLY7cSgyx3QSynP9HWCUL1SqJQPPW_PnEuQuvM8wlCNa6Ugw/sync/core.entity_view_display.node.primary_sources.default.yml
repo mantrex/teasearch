@@ -1,0 +1,199 @@
+uuid: 65becde4-def6-49ce-bb5c-d7e5592c6f18
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.primary_sources.field_author
+    - field.field.node.primary_sources.field_author_original
+    - field.field.node.primary_sources.field_authors_reference
+    - field.field.node.primary_sources.field_century_label
+    - field.field.node.primary_sources.field_country
+    - field.field.node.primary_sources.field_date
+    - field.field.node.primary_sources.field_date_range
+    - field.field.node.primary_sources.field_description
+    - field.field.node.primary_sources.field_excerpts
+    - field.field.node.primary_sources.field_first_published_at
+    - field.field.node.primary_sources.field_links
+    - field.field.node.primary_sources.field_pdf_file
+    - field.field.node.primary_sources.field_pdf_image
+    - field.field.node.primary_sources.field_scientific_advisors
+    - field.field.node.primary_sources.field_sources_genre
+    - field.field.node.primary_sources.field_subjects
+    - field.field.node.primary_sources.field_title_original
+    - field.field.node.primary_sources.field_year_range
+    - node.type.primary_sources
+  module:
+    - custom_field
+    - datetime
+    - datetime_range
+    - file
+    - image
+    - link
+    - text
+    - user
+id: node.primary_sources.default
+targetEntityType: node
+bundle: primary_sources
+mode: default
+content:
+  field_author:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 102
+    region: content
+  field_author_original:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 103
+    region: content
+  field_authors_reference:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 120
+    region: content
+  field_century_label:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 118
+    region: content
+  field_country:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 105
+    region: content
+  field_date:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 106
+    region: content
+  field_date_range:
+    type: daterange_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+      from_to: both
+      separator: '-'
+    third_party_settings: {  }
+    weight: 116
+    region: content
+  field_description:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 111
+    region: content
+  field_excerpts:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 112
+    region: content
+  field_first_published_at:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 113
+    region: content
+  field_links:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 110
+    region: content
+  field_pdf_file:
+    type: file_default
+    label: above
+    settings:
+      use_description_as_link_text: true
+    third_party_settings: {  }
+    weight: 109
+    region: content
+  field_pdf_image:
+    type: image
+    label: above
+    settings:
+      image_link: ''
+      image_style: ''
+      image_loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: 108
+    region: content
+  field_scientific_advisors:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 121
+    region: content
+  field_sources_genre:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 117
+    region: content
+  field_subjects:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 112
+    region: content
+  field_title_original:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  field_year_range:
+    type: custom_formatter
+    label: above
+    settings:
+      fields: {  }
+    third_party_settings: {  }
+    weight: 119
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  langcode: true

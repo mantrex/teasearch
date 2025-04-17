@@ -2,21 +2,22 @@
 
 namespace Drupal\custom_field\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Plugin implementation of the 'custom_stacked' widget.
- *
- * @FieldWidget(
- *   id = "custom_stacked",
- *   label = @Translation("Stacked"),
- *   weight = 2,
- *   field_types = {
- *     "custom"
- *   }
- * )
  */
+#[FieldWidget(
+  id: 'custom_stacked',
+  label: new TranslatableMarkup('Stacked'),
+  field_types: [
+    'custom',
+  ],
+  weight: 2,
+)]
 class CustomStackedWidget extends CustomWidgetBase {
 
   /**

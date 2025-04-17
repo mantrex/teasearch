@@ -1,0 +1,19 @@
+uuid: c9297f7a-aa46-4ab2-a542-cacf5671296a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_key
+    - taxonomy.vocabulary.usage_rights
+id: taxonomy_term.usage_rights.field_key
+field_name: field_key
+entity_type: taxonomy_term
+bundle: usage_rights
+label: Key
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

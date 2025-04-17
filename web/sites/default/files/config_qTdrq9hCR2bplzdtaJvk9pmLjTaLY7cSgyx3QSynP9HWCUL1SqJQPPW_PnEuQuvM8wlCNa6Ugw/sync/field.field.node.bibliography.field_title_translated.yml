@@ -1,0 +1,19 @@
+uuid: 3c9522bd-850f-4189-a38d-516b034f5f1b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_title_translated
+    - node.type.bibliography
+id: node.bibliography.field_title_translated
+field_name: field_title_translated
+entity_type: node
+bundle: bibliography
+label: 'English translation of the title'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

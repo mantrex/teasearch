@@ -1,0 +1,19 @@
+uuid: ca92307e-71c1-4e63-948a-9bb3217aee16
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_author_original
+    - node.type.bibliography
+id: node.bibliography.field_author_original
+field_name: field_author_original
+entity_type: node
+bundle: bibliography
+label: "Original language author's name"
+description: 'Original language author’s name (title in original script (e.g., Chinese, Arabic)) '
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,18 @@
+uuid: f27c72ff-aa01-42a0-bc46-939e0e8a07ad
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.first_reference
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: false
+    bundle_settings:
+      untranslatable_fields_hide: '0'
+id: node.first_reference
+target_entity_type_id: node
+target_bundle: first_reference
+default_langcode: site_default
+language_alterable: false

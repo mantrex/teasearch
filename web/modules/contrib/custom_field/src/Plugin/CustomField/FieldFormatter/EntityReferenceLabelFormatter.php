@@ -4,21 +4,22 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Exception\UndefinedLinkTemplateException;
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
- * Plugin implementation of the 'entity reference label' formatter.
- *
- * @FieldFormatter(
- *   id = "entity_reference_label",
- *   label = @Translation("Label"),
- *   description = @Translation("Display the label of the referenced entity."),
- *   field_types = {
- *     "entity_reference",
- *   }
- * )
+ * Plugin implementation of the 'entity_reference_label' formatter.
  */
+#[FieldFormatter(
+  id: 'entity_reference_label',
+  label: new TranslatableMarkup('Label'),
+  description: new TranslatableMarkup('Display the label of the referenced entity.'),
+  field_types: [
+    'entity_reference',
+  ],
+)]
 class EntityReferenceLabelFormatter extends EntityReferenceFormatterBase {
 
   /**

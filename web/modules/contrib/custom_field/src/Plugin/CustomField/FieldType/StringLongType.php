@@ -4,22 +4,22 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Component\Utility\Random;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 
 /**
- * Plugin implementation of the 'string_long' custom field type.
- *
- * @CustomFieldType(
- *   id = "string_long",
- *   label = @Translation("Text (long)"),
- *   description = @Translation("A field containing a long string value."),
- *   category = @Translation("Text"),
- *   default_widget = "textarea",
- *   default_formatter = "text_default",
- * )
+ * Plugin implementation of the 'string_long' field type.
  */
+#[CustomFieldType(
+  id: 'string_long',
+  label: new TranslatableMarkup('Text (long)'),
+  description: new TranslatableMarkup('A field containing a long string value.'),
+  category: new TranslatableMarkup('Text'),
+  default_widget: 'textarea',
+  default_formatter: 'text_default',
+)]
 class StringLongType extends CustomFieldTypeBase {
 
   /**

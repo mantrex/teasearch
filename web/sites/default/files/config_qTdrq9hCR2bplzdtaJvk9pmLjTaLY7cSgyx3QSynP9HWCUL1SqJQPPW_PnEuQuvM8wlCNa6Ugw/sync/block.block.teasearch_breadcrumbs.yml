@@ -1,0 +1,22 @@
+uuid: 714784ca-84d8-40d5-8164-09966e4a7cc1
+langcode: it
+status: false
+dependencies:
+  module:
+    - system
+  theme:
+    - teasearch
+_core:
+  default_config_hash: NjcxOBrPOiK5-38t56DwFBDVY4yer7YSlbRWXFuHe7A
+id: teasearch_breadcrumbs
+theme: teasearch
+region: header
+weight: 0
+provider: null
+plugin: system_breadcrumb_block
+settings:
+  id: system_breadcrumb_block
+  label: Breadcrumb
+  label_display: '0'
+  provider: system
+visibility: {  }

@@ -10,22 +10,22 @@ use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\Field\FieldException;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataReferenceDefinition;
+use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 
 /**
- * Plugin implementation of the 'entity_reference' custom field type.
- *
- * @CustomFieldType(
- *   id = "entity_reference",
- *   label = @Translation("Entity reference"),
- *   description = @Translation("A field containing an entity reference."),
- *   category = @Translation("Reference"),
- *   default_widget = "entity_reference_autocomplete",
- *   default_formatter = "entity_reference_label",
- * )
+ * Plugin implementation of the 'entity_reference' field type.
  */
+#[CustomFieldType(
+  id: 'entity_reference',
+  label: new TranslatableMarkup('Entity reference'),
+  description: new TranslatableMarkup('A field containing an entity reference.'),
+  category: new TranslatableMarkup('Reference'),
+  default_widget: 'entity_reference_autocomplete',
+  default_formatter: 'entity_reference_label',
+)]
 class EntityReference extends CustomFieldTypeBase {
 
   /**

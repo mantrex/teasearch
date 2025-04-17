@@ -1,0 +1,26 @@
+uuid: f05f6f39-ee76-41ff-b877-27160d988483
+langcode: it
+status: true
+dependencies:
+  config:
+    - block_content.type.footerblk
+    - field.storage.block_content.body
+    - filter.format.basic_html
+  module:
+    - text
+id: block_content.footerblk.body
+field_name: body
+entity_type: block_content
+bundle: footerblk
+label: Body
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: false
+  required_summary: false
+  allowed_formats:
+    - basic_html
+field_type: text_with_summary

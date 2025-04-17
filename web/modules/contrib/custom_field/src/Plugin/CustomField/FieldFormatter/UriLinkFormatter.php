@@ -7,23 +7,24 @@ use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\TranslatableInterface;
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the 'link' formatter.
- *
- * @FieldFormatter(
- *   id = "uri_link",
- *   label = @Translation("Link"),
- *   field_types = {
- *     "uri",
- *   }
- * )
+ * Plugin implementation of the 'uri_link' formatter.
  */
+#[FieldFormatter(
+  id: 'uri_link',
+  label: new TranslatableMarkup('Link'),
+  field_types: [
+    'uri',
+  ],
+)]
 class UriLinkFormatter extends CustomFieldFormatterBase {
 
   /**

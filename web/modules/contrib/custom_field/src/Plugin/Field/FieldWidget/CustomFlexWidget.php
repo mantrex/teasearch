@@ -2,23 +2,24 @@
 
 namespace Drupal\custom_field\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
  * Plugin implementation of the 'custom_flex' widget.
- *
- * @FieldWidget(
- *   id = "custom_flex",
- *   label = @Translation("Flexbox"),
- *   weight = 0,
- *   field_types = {
- *     "custom"
- *   }
- * )
  */
+#[FieldWidget(
+  id: 'custom_flex',
+  label: new TranslatableMarkup('Flexbox'),
+  field_types: [
+    'custom',
+  ],
+  weight: 0,
+)]
 class CustomFlexWidget extends CustomWidgetBase {
 
   /**

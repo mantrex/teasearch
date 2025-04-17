@@ -1,0 +1,22 @@
+uuid: 3df29cdc-8356-430f-9151-ea28bf1dd464
+langcode: it
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - teasearch
+_core:
+  default_config_hash: a0Yyx1GeyKarZ4T_yXQBR_ZFKnXiFLtxAb6gWLd8nr0
+id: teasearch_content
+theme: teasearch
+region: content
+weight: 0
+provider: null
+plugin: system_main_block
+settings:
+  id: system_main_block
+  label: 'Main Page Content'
+  label_display: '0'
+  provider: system
+visibility: {  }

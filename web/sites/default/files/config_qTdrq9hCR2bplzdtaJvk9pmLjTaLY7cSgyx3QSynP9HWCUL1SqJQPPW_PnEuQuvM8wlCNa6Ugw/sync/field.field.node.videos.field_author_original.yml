@@ -1,0 +1,19 @@
+uuid: 4d064b0f-344a-4b4b-a15d-81c785639024
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_author_original
+    - node.type.videos
+id: node.videos.field_author_original
+field_name: field_author_original
+entity_type: node
+bundle: videos
+label: "Original language author's name"
+description: 'Original language author’s name (title in original script (e.g., Chinese, Arabic)) '
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

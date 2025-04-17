@@ -4,20 +4,21 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'telephone' custom field widget.
- *
- * @FieldWidget(
- *   id = "telephone",
- *   label = @Translation("Telephone"),
- *   category = @Translation("General"),
- *   data_types = {
- *     "telephone",
- *   }
- * )
+ * Plugin implementation of the 'telephone' widget.
  */
+#[CustomFieldWidget(
+  id: 'telephone',
+  label: new TranslatableMarkup('Telephone'),
+  category: new TranslatableMarkup('General'),
+  field_types: [
+    'telephone',
+  ],
+)]
 class TelephoneWidget extends TextWidget {
 
   /**

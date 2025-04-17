@@ -1,0 +1,19 @@
+uuid: f00e28db-bd39-4d7c-85e9-2ed4bf9243e6
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_key
+    - taxonomy.vocabulary.languages
+id: taxonomy_term.languages.field_key
+field_name: field_key
+entity_type: taxonomy_term
+bundle: languages
+label: Key
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

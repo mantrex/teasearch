@@ -1,0 +1,25 @@
+uuid: 8e034580-c47d-4931-8606-2b05e7364d29
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_authors_reference
+    - node.type.first_reference
+id: node.first_reference.field_authors_reference
+field_name: field_authors_reference
+entity_type: node
+bundle: first_reference
+label: Authors
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: views
+  handler_settings:
+    view:
+      view_name: getcontributors
+      display_name: entity_reference_1
+      arguments: {  }
+field_type: entity_reference

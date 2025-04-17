@@ -1,0 +1,28 @@
+uuid: f2d11007-8a43-486b-8fee-7801e10a621c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_description
+    - filter.format.basic_html
+    - filter.format.full_html
+    - filter.format.restricted_html
+    - node.type.images
+  module:
+    - text
+id: node.images.field_description
+field_name: field_description
+entity_type: node
+bundle: images
+label: Description
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - basic_html
+    - restricted_html
+    - full_html
+field_type: text_long

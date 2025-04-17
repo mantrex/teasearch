@@ -1,0 +1,23 @@
+uuid: 0ea82df1-d55a-4448-917f-cc39296cef53
+langcode: it
+status: true
+dependencies:
+  config:
+    - block_content.type.footerblk
+    - field.field.block_content.footerblk.body
+  module:
+    - text
+id: block_content.footerblk.default
+targetEntityType: block_content
+bundle: footerblk
+mode: default
+content:
+  body:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  langcode: true

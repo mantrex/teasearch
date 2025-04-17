@@ -1,0 +1,11 @@
+uuid: 21f16bc6-09f7-49e4-b071-8574736a6d9c
+langcode: en
+status: true
+dependencies:
+  module:
+    - user
+id: user.contributors
+label: Contributors
+description: ''
+targetEntityType: user
+cache: true

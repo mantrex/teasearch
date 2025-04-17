@@ -1,0 +1,47 @@
+uuid: 3605d5fb-ea13-4a69-a47a-6719ffe17b73
+langcode: en
+status: true
+dependencies:
+  module:
+    - custom_field
+    - node
+id: node.field_year_range
+field_name: field_year_range
+entity_type: node
+type: custom
+settings:
+  columns:
+    year_from:
+      name: year_from
+      type: integer
+      max_length: '255'
+      unsigned: 0
+      precision: '10'
+      scale: '2'
+      size: normal
+      datetime_type: datetime
+    year_to:
+      name: year_to
+      type: integer
+      max_length: '255'
+      unsigned: 0
+      precision: '10'
+      scale: '2'
+      size: normal
+      datetime_type: datetime
+    century_label:
+      name: century_label
+      type: string
+      max_length: '64'
+      unsigned: 0
+      precision: '10'
+      scale: '2'
+      size: normal
+      datetime_type: datetime
+module: custom_field
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

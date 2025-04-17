@@ -7,6 +7,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\custom_field\Attribute\CustomFieldFeedsType;
 
 /**
  * Provides the custom field feeds plugin manager.
@@ -32,6 +33,7 @@ class CustomFieldFeedsManager extends DefaultPluginManager implements CustomFiel
       $namespaces,
       $module_handler,
       'Drupal\custom_field\Plugin\CustomFieldFeedsTypeInterface',
+      CustomFieldFeedsType::class,
       'Drupal\custom_field\Annotation\CustomFieldFeedsType'
     );
 

@@ -5,6 +5,8 @@ namespace Drupal\custom_field_linkit\Plugin\CustomField\FieldWidget;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
 use Drupal\file\FileInterface;
@@ -12,18 +14,16 @@ use Drupal\linkit\Utility\LinkitHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the 'url' custom field widget.
- *
- * @FieldWidget(
- *   id = "linkit_url",
- *   label = @Translation("Linkit"),
- *   description = @Translation(""),
- *   category = @Translation("Url"),
- *   data_types = {
- *     "uri",
- *   }
- * )
+ * Plugin implementation of the 'linkit_url' widget.
  */
+#[CustomFieldWidget(
+  id: 'linkit_url',
+  label: new TranslatableMarkup('Linkit'),
+  category: new TranslatableMarkup('Url'),
+  field_types: [
+    'uri',
+  ],
+)]
 class LinkitUrlWidget extends CustomFieldWidgetBase {
 
   /**

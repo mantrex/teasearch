@@ -1,0 +1,20 @@
+uuid: 21b06f44-7b47-4e9b-9b62-5d45cdc0c964
+langcode: it
+status: true
+dependencies:
+  theme:
+    - teasearch
+_core:
+  default_config_hash: CdXfDmRgAvms7EQovxxWPdYi0GitxeRbVtScYK16ZH0
+id: teasearch_local_actions
+theme: teasearch
+region: content
+weight: -10
+provider: null
+plugin: local_actions_block
+settings:
+  id: local_actions_block
+  label: 'Primary admin actions'
+  label_display: '0'
+  provider: core
+visibility: {  }

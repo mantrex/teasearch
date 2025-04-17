@@ -9,22 +9,23 @@ use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
 use Drupal\views\Views;
 
 /**
- * Plugin implementation of the 'select' custom field widget.
- *
- * @FieldWidget(
- *   id = "viewfield_select",
- *   label = @Translation("Viewfield select"),
- *   category = @Translation("Viewfield"),
- *   data_types = {
- *     "viewfield",
- *   },
- * )
+ * Plugin implementation of the 'viewfield_select' widget.
  */
+#[CustomFieldWidget(
+  id: 'viewfield_select',
+  label: new TranslatableMarkup('Viewfield select'),
+  category: new TranslatableMarkup('Viewfield'),
+  field_types: [
+    'viewfield',
+  ],
+)]
 class ViewfieldSelectWidget extends CustomFieldWidgetBase {
 
   /**

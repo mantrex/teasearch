@@ -4,21 +4,21 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'color' custom field type.
- *
- * @CustomFieldType(
- *   id = "color",
- *   label = @Translation("Color"),
- *   description = @Translation("A field containing a hexadecimal color value."),
- *   category = @Translation("General"),
- *   default_widget = "color",
- *   default_formatter = "string",
- * )
+ * Plugin implementation of the 'color' field type.
  */
+#[CustomFieldType(
+  id: 'color',
+  label: new TranslatableMarkup('Color'),
+  description: new TranslatableMarkup('A field containing a hexadecimal color value.'),
+  category: new TranslatableMarkup('General'),
+  default_widget: 'color',
+  default_formatter: 'string',
+)]
 class ColorType extends CustomFieldTypeBase {
 
   /**

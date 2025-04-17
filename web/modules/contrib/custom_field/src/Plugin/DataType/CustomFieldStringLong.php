@@ -3,8 +3,11 @@
 namespace Drupal\custom_field\Plugin\DataType;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\TypedData\Attribute\DataType;
 use Drupal\Core\TypedData\Plugin\DataType\StringData;
 use Drupal\custom_field\Plugin\Field\FieldType\CustomItem;
+use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Render\FilteredMarkup;
 
@@ -14,13 +17,12 @@ use Drupal\filter\Render\FilteredMarkup;
  * The "custom_field_string_long" data type provides a mechanism to return the
  * processed value for "string_long" custom_field types that we can normalize
  * for jsonapi.
- *
- * @DataType(
- *   id = "custom_field_string_long",
- *   label = @Translation("String long"),
- *   definition_class = "\Drupal\custom_field\TypedData\CustomFieldDataDefinition"
- * )
  */
+#[DataType(
+  id: 'custom_field_string_long',
+  label: new TranslatableMarkup('String long'),
+  definition_class: CustomFieldDataDefinition::class,
+)]
 class CustomFieldStringLong extends StringData implements CacheableDependencyInterface, CustomFieldStringLongInterface {
 
   /**

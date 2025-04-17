@@ -1,0 +1,19 @@
+uuid: 75c95772-d725-495d-ad4e-2fc47412eb3b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_key
+    - taxonomy.vocabulary.centuries
+id: taxonomy_term.centuries.field_key
+field_name: field_key
+entity_type: taxonomy_term
+bundle: centuries
+label: Key
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

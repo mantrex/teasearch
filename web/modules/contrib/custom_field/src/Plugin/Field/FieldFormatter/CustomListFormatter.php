@@ -3,23 +3,23 @@
 namespace Drupal\custom_field\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Html;
-use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Field\Attribute\FieldFormatter;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Plugin implementation of the custom_list formatter.
- *
- * Renders the items as an item list.
- *
- * @FieldFormatter(
- *   id = "custom_list",
- *   label = @Translation("HTML list"),
- *   weight = 3,
- *   field_types = {
- *     "custom"
- *   }
- * )
  */
+#[FieldFormatter(
+  id: 'custom_list',
+  label: new TranslatableMarkup('HTML list'),
+  description: new TranslatableMarkup('Renders the items as an item list.'),
+  field_types: [
+    'custom',
+  ],
+  weight: 3,
+)]
 class CustomListFormatter extends BaseFormatter {
 
   /**
@@ -67,39 +67,36 @@ class CustomListFormatter extends BaseFormatter {
   /**
    * {@inheritdoc}
    */
-  public function viewValue(FieldItemInterface $item, string $langcode): array {
+  public function viewElements(FieldItemListInterface $items, $langcode): array {
+    if ($items->isEmpty()) {
+      return [];
+    }
+
     $field_name = $this->fieldDefinition->get('field_name');
     $class = Html::cleanCssIdentifier($field_name);
-    $output = [
-      '#theme' => [
-        'item_list',
-        'item_list__customfield',
-        'item_list__' . $field_name,
-      ],
-      '#items' => [],
-      '#list_type' => $this->getSetting('list_type'),
-      '#attributes' => [
-        'class' => [$class, $class . '--list'],
-      ],
-    ];
-    $values = $this->getFormattedValues($item, $langcode);
-
-    foreach ($values as $value) {
-      $output['#items'][] = [
-        '#theme' => 'custom_field_item',
-        '#field_name' => $field_name,
-        '#name' => $value['name'],
-        '#value' => $value['value']['#markup'],
-        '#label' => $value['label'],
-        '#label_display' => $value['label_display'],
-        '#type' => $value['type'],
-        '#wrappers' => $value['wrappers'],
-        '#entity_type' => $value['entity_type'],
-        '#lang_code' => $langcode,
+    $elements = [];
+    foreach ($items as $delta => $item) {
+      if (!$item->isEmpty()) {
+        $value = $this->viewValue($item, $langcode);
+        if (!empty($value['#items'])) {
+          $elements[$delta] = $this->viewValue($item, $langcode);
+        }
+      }
+    }
+    if (!empty($elements)) {
+      return [
+        [
+          '#theme' => 'item_list',
+          '#items' => $elements,
+          '#list_type' => $this->getSetting('list_type'),
+          '#attributes' => [
+            'class' => [$class, $class . '--list'],
+          ],
+        ],
       ];
     }
 
-    return $output;
+    return [];
   }
 
 }

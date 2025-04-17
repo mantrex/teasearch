@@ -1,0 +1,11 @@
+uuid: e225d7a7-a324-4d14-a489-adf871a79180
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.images
+id: node.images
+target_entity_type_id: node
+target_bundle: images
+default_langcode: site_default
+language_alterable: false

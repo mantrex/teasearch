@@ -2,15 +2,17 @@
 
 namespace Drupal\custom_field\Plugin\CustomField\FeedsType;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Attribute\CustomFieldFeedsType;
+
 /**
  * Plugin implementation of the 'color' feeds type.
- *
- * @CustomFieldFeedsType(
- *   id = "color",
- *   label = @Translation("Color"),
- *   mark_unique = TRUE,
- * )
  */
+#[CustomFieldFeedsType(
+  id: 'color',
+  label: new TranslatableMarkup('Color'),
+  mark_unique: TRUE,
+)]
 class ColorTarget extends BaseTarget {
 
   /**

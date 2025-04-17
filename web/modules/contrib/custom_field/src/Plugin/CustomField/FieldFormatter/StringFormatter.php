@@ -2,31 +2,32 @@
 
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
 
 /**
- * Plugin implementation of the 'string' custom field formatter.
+ * Plugin implementation of the 'string' formatter.
  *
  * Value renders as it is entered by the user.
- *
- * @FieldFormatter(
- *   id = "string",
- *   label = @Translation("Plain text"),
- *   field_types = {
- *     "string",
- *     "string_long",
- *     "uri",
- *     "email",
- *     "map",
- *     "map_string",
- *     "telephone",
- *     "uuid",
- *     "color",
- *   }
- * )
  */
+#[FieldFormatter(
+  id: 'string',
+  label: new TranslatableMarkup('Plain text'),
+  field_types: [
+    'color',
+    'email',
+    'map',
+    'map_string',
+    'string',
+    'string_long',
+    'telephone',
+    'uri',
+    'uuid',
+  ],
+)]
 class StringFormatter extends CustomFieldFormatterBase {
 
   /**

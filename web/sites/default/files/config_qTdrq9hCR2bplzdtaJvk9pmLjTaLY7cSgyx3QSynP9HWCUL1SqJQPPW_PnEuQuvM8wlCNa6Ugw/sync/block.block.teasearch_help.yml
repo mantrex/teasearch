@@ -1,0 +1,22 @@
+uuid: b1916ceb-e578-40c1-b673-88f196c2ffde
+langcode: it
+status: false
+dependencies:
+  module:
+    - help
+  theme:
+    - teasearch
+_core:
+  default_config_hash: jccFSSVqV0WCDb6NtML1VWAWTtDbZ-zn5YgTRMgMrIM
+id: teasearch_help
+theme: teasearch
+region: header
+weight: 0
+provider: null
+plugin: help_block
+settings:
+  id: help_block
+  label: Aiuto
+  label_display: '0'
+  provider: help
+visibility: {  }

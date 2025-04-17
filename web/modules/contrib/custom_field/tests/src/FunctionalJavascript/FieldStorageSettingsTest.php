@@ -248,7 +248,7 @@ class FieldStorageSettingsTest extends WebDriverTestBase {
       $this->assertSession()->buttonNotExists($button_id);
     }
     // Click the Add another button and verify the new element exists.
-    $page->findButton('Add another')->click();
+    $page->findButton('Add sub-field')->click();
     $this->assertSession()->waitForElementVisible('css', '#field-combined');
   }
 

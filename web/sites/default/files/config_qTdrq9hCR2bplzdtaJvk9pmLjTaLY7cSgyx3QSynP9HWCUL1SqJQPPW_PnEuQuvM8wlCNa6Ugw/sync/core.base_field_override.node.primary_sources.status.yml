@@ -1,0 +1,22 @@
+uuid: bf249065-dc56-4031-bbf9-b55f02005602
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.primary_sources
+id: node.primary_sources.status
+field_name: status
+entity_type: node
+bundle: primary_sources
+label: Published
+description: ''
+required: false
+translatable: true
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

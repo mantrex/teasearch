@@ -1,0 +1,21 @@
+uuid: 2ccf0883-56a7-435e-babe-f602f0430a33
+langcode: en
+status: true
+dependencies:
+  module:
+    - user
+id: user.field_city
+field_name: field_city
+entity_type: user
+type: string
+settings:
+  max_length: 255
+  case_sensitive: false
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

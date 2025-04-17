@@ -1,0 +1,11 @@
+uuid: b9dd00f7-3402-42fd-9a0b-b237fc66c340
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.centuries
+id: taxonomy_term.centuries
+target_entity_type_id: taxonomy_term
+target_bundle: centuries
+default_langcode: site_default
+language_alterable: false

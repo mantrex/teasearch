@@ -51,7 +51,7 @@ class TagManager extends DefaultPluginManager implements TagManagerInterface, Pl
   public function __construct(\Traversable $namespaces, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, CacheBackendInterface $cache_backend) {
     // Call the parent constructor with the necessary parameters.
     // Here, FALSE indicates that plugins are not in a subdirectory.
-    parent::__construct(FALSE, $namespaces, $module_handler, $cache_backend);
+    parent::__construct(FALSE, $namespaces, $module_handler);
 
     $this->moduleHandler = $module_handler;
     $this->themeHandler = $theme_handler;

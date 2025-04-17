@@ -9,8 +9,8 @@ libraries:
   - teasearch/login.css
 regions:
   header: Header
-  hero: Hero
   content: Content
+  hero: Hero
   footer: Footer
 
 core_version_requirement: ^11

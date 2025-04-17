@@ -1,0 +1,18 @@
+uuid: d8cc3bbc-10f9-4d4d-8efe-c60d524001f8
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.first_reference
+id: node.first_reference.changed
+field_name: changed
+entity_type: node
+bundle: first_reference
+label: Changed
+description: 'The time that the node was last edited.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: changed

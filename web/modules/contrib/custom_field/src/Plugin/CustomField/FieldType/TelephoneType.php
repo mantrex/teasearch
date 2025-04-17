@@ -4,21 +4,21 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
+use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
- * Plugin implementation of the 'telephone' custom field type.
- *
- * @CustomFieldType(
- *   id = "telephone",
- *   label = @Translation("Telephone number"),
- *   description = @Translation("This field stores a telephone number in the database."),
- *   category = @Translation("General"),
- *   default_widget = "telephone",
- *   default_formatter = "telephone_link",
- * )
+ * Plugin implementation of the 'telephone' field type.
  */
+#[CustomFieldType(
+  id: 'telephone',
+  label: new TranslatableMarkup('Telephone number'),
+  description: new TranslatableMarkup('This field stores a telephone number in the database.'),
+  category: new TranslatableMarkup('General'),
+  default_widget: 'telephone',
+  default_formatter: 'telephone_link',
+)]
 class TelephoneType extends CustomFieldTypeBase {
 
   /**

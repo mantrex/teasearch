@@ -8,23 +8,29 @@ use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataReferenceDefinition;
+use Drupal\custom_field\Attribute\CustomFieldType;
 use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 
 /**
- * Plugin implementation of the 'file' custom field type.
- *
- * @CustomFieldType(
- *   id = "file",
- *   label = @Translation("File"),
- *   description = @Translation("This field stores the ID of a file as an integer value."),
- *   category = @Translation("Reference"),
- *   default_widget = "file_generic",
- *   default_formatter = "file_default",
- *   constraints = {"ReferenceAccess" = {}, "FileValidation" = {}}
- * )
+ * Plugin implementation of the 'file' field type.
  */
+#[CustomFieldType(
+  id: 'file',
+  label: new TranslatableMarkup('File'),
+  description: [
+    new TranslatableMarkup('For uploading files'),
+    new TranslatableMarkup('Can be configured with options such as allowed file extensions and maximum upload size'),
+  ],
+  category: new TranslatableMarkup('File upload'),
+  default_widget: 'file_generic',
+  default_formatter: 'file_default',
+  constraints: [
+    'ReferenceAccess' => [],
+    'FileValidation' => [],
+  ],
+)]
 class FileType extends CustomFieldTypeBase {
 
   /**

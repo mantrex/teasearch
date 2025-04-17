@@ -1,23 +1,24 @@
 {
   "name": "drupal/custom_field",
   "type": "drupal-module",
-  "description": "Create simple, but flexible, multivalue fields without the hassle of entity references.",
+  "description": "Dynamic custom field types with extensive widget and formatter plugin support. A highly performant & scalable alternative to paragraphs and entity reference by storing data in a single table.",
   "keywords": ["Drupal"],
   "license": "GPL-2.0+",
   "homepage": "https://www.drupal.org/project/custom_field",
   "minimum-stability": "dev",
   "support": {
     "issues": "https://www.drupal.org/project/issues/custom_field",
-    "source": "http://cgit.drupalcode.org/custom_field"
+    "source": "https://git.drupalcode.org/project/custom_field",
+    "docs": "https://www.drupal.org/docs/extending-drupal/contributed-modules/contributed-module-documentation/custom-field"
   },
   "require": {
     "drupal/core": "^10.2 || ^11.0"
   },
   "require-dev": {
-    "drupal/feeds": "3.x-dev",
-    "drupal/linkit": "^6.1 || ^7.x-dev",
-    "drupal/graphql_compose": "^2.2",
-    "drupal/paragraphs": "^1.18",
-    "drupal/search_api": "^1.35"
+    "drupal/feeds": "^3",
+    "drupal/linkit": "^6.1 || ^7",
+    "drupal/graphql_compose": "^2",
+    "drupal/paragraphs": "^1",
+    "drupal/search_api": "^1"
   }
 }

@@ -1,0 +1,23 @@
+uuid: a2df2d6c-8896-4dc6-ae4b-a3100021189a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_pages
+    - node.type.bibliography
+id: node.bibliography.field_pages
+field_name: field_pages
+entity_type: node
+bundle: bibliography
+label: Pages
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: 1
+  max: 32000
+  prefix: ''
+  suffix: ''
+field_type: integer

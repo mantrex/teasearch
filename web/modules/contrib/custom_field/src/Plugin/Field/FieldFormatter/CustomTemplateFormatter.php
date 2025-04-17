@@ -2,25 +2,25 @@
 
 namespace Drupal\custom_field\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'custom_template' formatter.
- *
- * Render the custom field using a custom template with token replacement.
- *
- * @FieldFormatter(
- *   id = "custom_template",
- *   label = @Translation("Custom template"),
- *   weight = 4,
- *   field_types = {
- *     "custom"
- *   }
- * )
  */
+#[FieldFormatter(
+  id: 'custom_template',
+  label: new TranslatableMarkup('Custom template'),
+  description: new TranslatableMarkup('Render the custom field using a custom template with token replacement.'),
+  field_types: [
+    'custom',
+  ],
+  weight: 4,
+)]
 class CustomTemplateFormatter extends BaseFormatter {
 
   /**

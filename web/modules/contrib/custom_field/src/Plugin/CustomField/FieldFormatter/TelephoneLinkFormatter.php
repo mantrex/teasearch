@@ -2,22 +2,23 @@
 
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
 
 /**
  * Plugin implementation of the 'telephone_link' formatter.
- *
- * @FieldFormatter(
- *   id = "telephone_link",
- *   label = @Translation("Telephone link"),
- *   field_types = {
- *     "telephone",
- *   }
- * )
  */
+#[FieldFormatter(
+  id: 'telephone_link',
+  label: new TranslatableMarkup('Telephone link'),
+  field_types: [
+    'telephone',
+  ],
+)]
 class TelephoneLinkFormatter extends CustomFieldFormatterBase {
 
   /**

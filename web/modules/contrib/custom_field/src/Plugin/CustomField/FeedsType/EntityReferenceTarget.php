@@ -5,18 +5,19 @@ namespace Drupal\custom_field\Plugin\CustomField\FeedsType;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinitionInterface;
+use Drupal\custom_field\Attribute\CustomFieldFeedsType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'entity_reference' feeds type.
- *
- * @CustomFieldFeedsType(
- *   id = "entity_reference",
- *   label = @Translation("Entity reference"),
- *   mark_unique = TRUE,
- * )
  */
+#[CustomFieldFeedsType(
+  id: 'entity_reference',
+  label: new TranslatableMarkup('Entity reference'),
+  mark_unique: TRUE,
+)]
 class EntityReferenceTarget extends BaseTarget {
 
   /**

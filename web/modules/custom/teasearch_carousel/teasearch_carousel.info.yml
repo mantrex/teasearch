@@ -1,0 +1,5 @@
+name: Teasearch Carousel
+type: module
+description: Fornisce un endpoint JSON per il carousel
+core_version_requirement: ^11
+package: Custom

@@ -2,20 +2,21 @@
 
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
 
 /**
  * Plugin implementation of the 'text_default' formatter.
- *
- * @FieldFormatter(
- *   id = "text_default",
- *   label = @Translation("Default"),
- *   field_types = {
- *     "string_long",
- *   }
- * )
  */
+#[FieldFormatter(
+  id: 'text_default',
+  label: new TranslatableMarkup('Default'),
+  field_types: [
+    'string_long',
+  ],
+)]
 class TextDefaultFormatter extends CustomFieldFormatterBase {
 
   /**
