@@ -140,7 +140,7 @@ class MultilingualFormDisplayWidget extends WidgetBase {
     $this->thirdPartySettings = $third_party_settings;
     $this->fieldDefinition = $field_definition;
     $this->languageManager = $language_manager;
-    $this->continer = $container;
+    $this->container = $container;
     $this->account = $account;
     $this->translationManager = $translation_manager;
     $this->entityTypeManager = $entity_type_manager;

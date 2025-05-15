@@ -14,7 +14,7 @@ use Drupal\Core\TypedData\DataDefinition;
  *   label = @Translation("Multilingual Form Display"),
  *   module = "mfd",
  *   description = @Translation("This field exposed all other fields of an entity which set translatable."),
- *   category = @Translation("Multilingual"),
+ *   category = "multilingual",
  *   default_widget = "multilingual_form_display_widget",
  *   default_formatter = "multilingual_form_display_formatter",
  *   cardinality = 1,

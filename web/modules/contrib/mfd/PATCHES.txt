@@ -5,3 +5,7 @@ Compatibilità Drupal 11 (info.yml)
 Source: patches/mfd-info-core11.patch
 
 
+Rimuovi @Translation da category in MultilingualFormDisplayType
+Source: patches/mfd-fieldtype-category.patch
+
+

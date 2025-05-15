@@ -67,7 +67,8 @@
     },
     "patches": {
       "drupal/mfd": {
-        "Compatibilità Drupal 11 (info.yml)": "patches/mfd-info-core11.patch"
+        "Compatibilità Drupal 11 (info.yml)": "patches/mfd-info-core11.patch",
+        "Rimuovi @Translation da category in MultilingualFormDisplayType": "patches/mfd-fieldtype-category.patch"
       }
     },
     "drupal-scaffold": {
