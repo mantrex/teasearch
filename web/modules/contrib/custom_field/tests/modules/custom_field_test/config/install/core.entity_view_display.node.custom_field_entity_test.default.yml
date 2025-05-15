@@ -122,8 +122,8 @@ content:
             title: ''
             trim_length: 80
             url_plain: false
-            rel: false
-            target: false
+            rel: '0'
+            target: '0'
         boolean_test:
           format_type: boolean
           wrappers:
@@ -352,8 +352,8 @@ content:
             title: ''
             trim_length: 80
             url_plain: false
-            rel: false
-            target: false
+            rel: '0'
+            target: '0'
         boolean_test:
           format_type: boolean
           wrappers:
@@ -582,8 +582,8 @@ content:
             title: ''
             trim_length: 80
             url_plain: false
-            rel: false
-            target: false
+            rel: '0'
+            target: '0'
         boolean_test:
           format_type: boolean
           wrappers:

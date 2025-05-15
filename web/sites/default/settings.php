@@ -811,6 +811,22 @@ $settings['entity_update_backup'] = TRUE;
  */
 $settings['migrate_node_migrate_type_classic'] = FALSE;
 
+
+// Permetti a TwigSandboxPolicy di chiamare anche toUrl() e toLink() sugli oggetti.
+$settings['twig_sandbox_allowed_methods'] = [
+  // Quelli già previsti da Drupal:
+  'id',
+  'label',
+  'bundle',
+  'get',
+  '__toString',
+  'toString',
+  // I tuoi metodi aggiuntivi:
+  'toUrl',
+  'toLink',
+];
+
+
 /**
  * The default settings for migration sources.
  *
@@ -883,4 +899,4 @@ $databases['default']['default'] = array (
   'namespace' => 'Drupal\\mysql\\Driver\\Database\\mysql',
   'autoload' => 'core/modules/mysql/src/Driver/Database/mysql/',
 );
-$settings['config_sync_directory'] = 'sites/default/files/config_qTdrq9hCR2bplzdtaJvk9pmLjTaLY7cSgyx3QSynP9HWCUL1SqJQPPW_PnEuQuvM8wlCNa6Ugw/sync';
+

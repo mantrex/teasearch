@@ -1,0 +1,5 @@
+name: 'Teasearch Filter'
+type: module
+description: 'Fornisce filtro tassonomico e lista nodi per ogni content type'
+core_version_requirement: ^11
+package: Custom

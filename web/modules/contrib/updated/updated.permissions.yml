@@ -1,0 +1,3 @@
+administer node last updated date:
+  title: 'Configure the display of the node last updated date'
+  description: 'Set whether the updated date displays on a per content type or per node basis.'

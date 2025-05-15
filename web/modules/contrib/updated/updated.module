@@ -1,0 +1,169 @@
+<?php
+
+/**
+ * @file
+ * Contains updated.module.
+ */
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+use Drupal\updated\UpdatedHelper;
+
+/**
+ * Implements hook_help().
+ */
+function updated_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the Last Updated module.
+    case 'help.page.updated':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('The Last Updated module regulates whether to display the last updated date on a per-node basis. This provides a new checkbox on each node form to "Display updated," which, when unchecked, will suppress the display of updated only on that node. This assumes that the content type is set to display updated in admin/structure/types/manage/%node_type.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function updated_theme() {
+  return [
+    'field__node__changed__updated' => [
+      'base hook' => 'field',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function updated_entity_base_field_info(EntityTypeInterface $entity_type) {
+  $fields = [];
+  if ($entity_type->id() === 'node') {
+    $fields['display_updated'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Display updated date'))
+      ->setRevisionable(TRUE)
+      ->setTranslatable(TRUE)
+      ->setDisplayOptions('view', [
+        'region' => 'hidden',
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'weight' => 10,
+      ])
+      ->setDefaultValue(FALSE)
+      ->setDisplayConfigurable('form', TRUE);
+  }
+  return $fields;
+}
+
+/**
+ * Implements hook_form_BASE_ID_alter().
+ *
+ * Display the display_updated field on the node edit form.
+ */
+function updated_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // If the form is missing our field, bail.
+  if (!isset($form['display_updated'])) {
+    return;
+  }
+
+  // Add fieldset for "Page display options" if not already present.
+  if (!isset($form['page_display_options'])) {
+    $form['page_display_options'] = [
+      '#type' => 'details',
+      '#title' => t('Page display options'),
+      '#group' => 'advanced',
+      '#attributes' => [
+        'class' => ['node-form-page_display_options'],
+      ],
+      '#weight' => 100,
+      '#optional' => TRUE,
+    ];
+  }
+
+  $form['display_updated']['#group'] = 'page_display_options';
+
+  // Determine if current user has access to change display_updated value.
+  $account = \Drupal::currentUser();
+  $access_denied = $account->hasPermission(UpdatedHelper::DISPLAY_UPDATED_PERMISSION) ? FALSE : TRUE;
+
+  // Update form element if user lacks permission to change the field value.
+  if ($access_denied) {
+    $form['display_updated']['widget']['#disabled'] = $access_denied;
+    $form['display_updated']['widget']['value']['#description'] = UpdatedHelper::PERMISSION_DENIED_MESSAGE;
+  }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ *
+ * Add a default display_updated checkbox to content type Edit form.
+ */
+function updated_form_node_type_form_alter(&$form, FormStateInterface $form_state) {
+  // Add fieldset for "Page display options" if not already present.
+  if (!isset($form['page_display_options'])) {
+    $form['page_display_options'] = [
+      '#type' => 'details',
+      '#title' => t('Page display defaults'),
+      '#group' => 'additional_settings',
+    ];
+  }
+
+  $display_updated_default_value = UpdatedHelper::getDefaultDisplayUpdatedValue($form_state);
+  $form['display_updated'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Display updated date.'),
+    '#group' => 'page_display_options',
+    '#default_value' => $display_updated_default_value,
+    '#description' => t('This value can be overridden on a per-node basis.'),
+  ];
+
+  // Determine if current user has access to change display_updated value.
+  $account = \Drupal::currentUser();
+  $access_denied = $account->hasPermission(UpdatedHelper::DISPLAY_UPDATED_PERMISSION) ? FALSE : TRUE;
+
+  // Update form element if user lacks permission to change the field value.
+  if ($access_denied) {
+    $form['display_updated']['#disabled'] = $access_denied;
+    $form['display_updated']['#description'] = UpdatedHelper::PERMISSION_DENIED_MESSAGE;
+  }
+
+  // Set new field definition default value for the Node Type on submit.
+  $form['#display_updated_submit_param_1'] = 'display_updated';
+  $form['actions']['submit']['#submit'][] = 'updated_form_node_type_form_submit';
+}
+
+/**
+ * Submit handler for the node type form.
+ */
+function updated_form_node_type_form_submit(&$form, FormStateInterface $form_state) {
+  $field_name = $form['#display_updated_submit_param_1'];
+
+  $form_value = (bool) $form_state->getValue($field_name);
+  $current_default_value = UpdatedHelper::getDefaultDisplayUpdatedValue($form_state);
+
+  // If there is not a new value, we need take no further action.
+  if ($current_default_value == $form_value) {
+    return;
+  }
+
+  /** @var \Drupal\node\NodeTypeInterface $node_type */
+  $node_type = $form_state->getBuildInfo()['callback_object']->getEntity();
+
+  /** @var Drupal\Core\Entity\EntityFieldManager $entityFieldManager */
+  $entityFieldManager = \Drupal::service('entity_field.manager');
+
+  $fields = $entityFieldManager->getFieldDefinitions('node', $node_type->id());
+  /** @var Drupal\Core\Field\Entity\BaseFieldOverride $field_definition */
+  $field_definition = $fields[$field_name];
+  $field_definition->getConfig($node_type->id())->setDefaultValue($form_value)->save();
+
+  $entityFieldManager->clearCachedFieldDefinitions();
+}

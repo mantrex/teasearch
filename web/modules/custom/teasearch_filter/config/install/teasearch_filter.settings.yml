@@ -1,0 +1,22 @@
+content_types:
+  primary_sources:
+    filters:
+      categories:
+        type: taxonomy
+        vocabulary: categories
+        label: 'Categories'
+  first_reference:
+    filters:
+      subjects:
+        type: taxonomy
+        vocabulary: subjects
+        label: 'Subjects'
+  video:
+    filters:
+      categories:
+        type: taxonomy
+        vocabulary: video_categories
+        label: 'Video categories'
+      keywords:
+        type: free_text
+        label: 'Keywords'

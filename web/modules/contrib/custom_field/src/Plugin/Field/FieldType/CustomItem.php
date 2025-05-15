@@ -233,6 +233,13 @@ class CustomItem extends FieldItemBase {
             }
             break;
 
+          case 'decimal':
+            if (is_numeric($subfield_value)) {
+              $scale = $custom_item->getScale();
+              $current_field->{$name} = round($subfield_value, $scale);
+            }
+            break;
+
           case 'image':
             if (!empty($subfield_value)) {
               $width = $current_field->get($name . self::SEPARATOR . 'width')->getValue();

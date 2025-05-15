@@ -157,13 +157,13 @@ custom_field.formatter.*:
           type: boolean
           label: 'Show URL as plain text'
         rel:
-          type: boolean
+          type: string
           label: 'Add rel="nofollow" to links'
         scale:
           type: integer
           label: 'Scale'
         target:
-          type: boolean
+          type: string
           label: 'Open link in new window'
         thousand_separator:
           type: string

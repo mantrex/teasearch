@@ -5,7 +5,6 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\custom_field\Attribute\CustomFieldType;
-use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
@@ -19,7 +18,7 @@ use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
   default_widget: 'float',
   default_formatter: 'number_decimal',
 )]
-class FloatType extends CustomFieldTypeBase {
+class FloatType extends NumericTypeBase {
 
   /**
    * {@inheritdoc}

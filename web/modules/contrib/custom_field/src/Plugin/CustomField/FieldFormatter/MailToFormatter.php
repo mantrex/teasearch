@@ -2,10 +2,10 @@
 
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\Url;
 use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
 
 /**
@@ -24,10 +24,13 @@ class MailToFormatter extends CustomFieldFormatterBase {
    * {@inheritdoc}
    */
   public function formatValue(FieldItemInterface $item, $value) {
+    // Check if email is valid.
+    if (empty($value) || !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+      return NULL;
+    }
+    $email = Html::escape($value);
     return [
-      '#type' => 'link',
-      '#title' => $value,
-      '#url' => Url::fromUri('mailto:' . $value),
+      '#markup' => '<a href="mailto:' . $email . '">' . $email . '</a>',
     ];
   }
 

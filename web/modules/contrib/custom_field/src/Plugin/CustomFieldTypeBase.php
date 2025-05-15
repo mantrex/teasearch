@@ -308,40 +308,6 @@ abstract class CustomFieldTypeBase extends PluginBase implements CustomFieldType
   }
 
   /**
-   * Helper method to truncate a decimal number to a given number of decimals.
-   *
-   * @param float $decimal
-   *   Decimal number to truncate.
-   * @param int $num
-   *   Number of digits the output will have.
-   *
-   * @return float
-   *   Decimal number truncated.
-   */
-  protected static function truncateDecimal(float $decimal, int $num): float {
-    return floor($decimal * pow(10, $num)) / pow(10, $num);
-  }
-
-  /**
-   * Helper method to get the number of decimal digits out of a decimal number.
-   *
-   * @param int $decimal
-   *   The number to calculate the number of decimals digits from.
-   *
-   * @return int
-   *   The number of decimal digits.
-   */
-  protected static function getDecimalDigits(int $decimal): int {
-    $digits = 0;
-    while ($decimal - round($decimal)) {
-      $decimal *= 10;
-      $digits++;
-    }
-
-    return $digits;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public static function isApplicable(): bool {

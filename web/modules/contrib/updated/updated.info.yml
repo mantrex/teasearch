@@ -1,0 +1,13 @@
+name: 'Last Updated'
+type: module
+description: Regulate the display of the 'changed' field for node entities.
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:block
+  - drupal:node
+  - drupal:system
+
+# Information added by Drupal.org packaging script on 2024-05-30
+version: '2.0.0'
+project: 'updated'
+datestamp: 1717097862

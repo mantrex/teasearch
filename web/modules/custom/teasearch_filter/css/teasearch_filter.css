@@ -1,0 +1,24 @@
+.teasearch-wrapper {
+  display: flex;
+}
+
+.teasearch-sidebar {
+  width: 25%;
+  padding-right: 1em;
+}
+
+.teasearch-results {
+  width: 75%;
+}
+
+.teasearch-item {
+  margin-bottom: 1.5em;
+}
+
+.teasearch-item h2 {
+  margin: 0 0 0.5em;
+}
+
+.teasearch-item p {
+  margin: 0;
+}

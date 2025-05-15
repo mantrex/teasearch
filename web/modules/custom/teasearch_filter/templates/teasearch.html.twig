@@ -1,0 +1,37 @@
+{#
+/**
+ * @file
+ * Theme override for Teasearch filter page.
+ *
+ * Variables:
+ * - filter_form: Render array del form di filtro.
+ * - nodes: Array di nodi caricati.
+ */
+#}
+<div class="teasearch-wrapper">
+	<aside class="teasearch-sidebar">
+		{{ filter_form }}
+	</aside>
+	<section class="teasearch-results">
+		{% if nodes %}
+			{% for node in nodes %}
+				<article class="teasearch-item">
+					<h2>
+						<a href="{{ path('entity.node.canonical', {'node': node.nid.value}) }}">
+							{{ node.label }}
+						</a>
+					</h2>
+					{% if node.field_content.value %}
+						{% set teaser = node.field_content.value|striptags %}
+						<p>
+							{{ teaser|slice(0, 200) }}{{ teaser|length > 200 ? '…' }}
+						</p>
+					{% endif %}
+				</article>
+			{% endfor %}
+		{% else %}
+			<p>{{ 'No content found. Please select filters and click Search.'|t }}</p>
+		{% endif %}
+	</section>
+</div>
+

@@ -1,0 +1,30 @@
+teasearch_filter.settings:
+  type: config_object
+  label: 'Teasearch Filter Settings'
+  mapping:
+    content_types:
+      type: mapping
+      label: 'Content types'
+      mapping:
+        '*':
+          type: mapping
+          label: 'Single content type'
+          mapping:
+            filters:
+              type: mapping
+              label: 'Filters'
+              mapping:
+                '*':
+                  type: mapping
+                  label: 'Single filter'
+                  mapping:
+                    type:
+                      type: text
+                      label: 'Filter type'
+                    vocabulary:
+                      type: text
+                      label: 'Vocabulary (taxonomy only)'
+                    label:
+                      type: text
+                      label: 'Displayed label'
+                      translatable: true

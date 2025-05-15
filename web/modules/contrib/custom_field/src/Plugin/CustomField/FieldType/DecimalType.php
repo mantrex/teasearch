@@ -5,7 +5,6 @@ namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\custom_field\Attribute\CustomFieldType;
-use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
@@ -23,7 +22,7 @@ use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
   default_widget: "decimal",
   default_formatter: "number_decimal",
 )]
-class DecimalType extends CustomFieldTypeBase {
+class DecimalType extends NumericTypeBase {
 
   /**
    * {@inheritdoc}
@@ -58,23 +57,8 @@ class DecimalType extends CustomFieldTypeBase {
    * {@inheritdoc}
    */
   public function getConstraints(array $settings): array {
+    $constraints = parent::getConstraints($settings);
     $constraints['Regex']['pattern'] = '/^[+-]?((\d+(\.\d*)?)|(\.\d+))$/i';
-    if (isset($settings['min']) && $settings['min'] !== '') {
-      $min = $settings['min'];
-      $constraints['Range']['min'] = $min;
-      $constraints['Range']['minMessage'] = $this->t('%name: the value may be no less than %min.', [
-        '%name' => $settings['name'],
-        '%min' => $min,
-      ]);
-    }
-    if (isset($settings['max']) && $settings['max'] !== '') {
-      $max = $settings['max'];
-      $constraints['Range']['max'] = $max;
-      $constraints['Range']['maxMessage'] = $this->t('%name: the value may be no greater than %max.', [
-        '%name' => $settings['name'],
-        '%max' => $max,
-      ]);
-    }
 
     return $constraints;
   }
@@ -86,22 +70,30 @@ class DecimalType extends CustomFieldTypeBase {
     $widget_settings = $field->getWidgetSetting('settings');
     $precision = $field->getPrecision() ?: 10;
     $scale = $field->getScale() ?: 2;
+    $margin = $precision - $scale;
+    // Hack precision into valid value that can be stored.
+    if ($precision >= $margin) {
+      $precision = $margin + 2;
+    }
+
     $default_min = $field->isUnsigned() ? 0 : -pow(10, ($precision - $scale)) + 1;
+    $default_max = pow(10, ($precision - $scale)) - 1;
     $min = isset($widget_settings['min']) && is_numeric($widget_settings['min']) ? $widget_settings['min'] : $default_min;
-    $max = isset($widget_settings['max']) && is_numeric($widget_settings['max']) ? $widget_settings['max'] : pow(10, ($precision - $scale)) - 1;
+    $max = isset($widget_settings['max']) && is_numeric($widget_settings['max']) ? $widget_settings['max'] : $default_max;
 
     // Get the number of decimal digits for the $max.
-    $decimal_digits = static::getDecimalDigits($max);
+    $decimal_digits = self::getDecimalDigits($max);
     // Do the same for the min and keep the higher number of decimal
     // digits.
-    $decimal_digits = max(static::getDecimalDigits($min), $decimal_digits);
+    $decimal_digits = max(self::getDecimalDigits($min), $decimal_digits);
+
     // If $min = 1.234 and $max = 1.33 then $decimal_digits = 3.
     $scale = rand($decimal_digits, $scale);
-    // @see "Example #1 Calculate a random floating-point number" in
-    // http://php.net/manual/function.mt-getrandmax.php
+
+    // Generate random decimal and truncate to scale.
     $random_decimal = $min + mt_rand() / mt_getrandmax() * ($max - $min);
 
-    return static::truncateDecimal($random_decimal, $scale);
+    return self::truncateDecimal($random_decimal, $scale);
   }
 
 }

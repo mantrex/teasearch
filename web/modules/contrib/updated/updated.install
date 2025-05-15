@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * @file
+ * Installation functions for the Last Updated module.
+ */
+
+use Drupal\Core\Field\Entity\BaseFieldOverride;
+
+/**
+ * Implements hook_uninstall().
+ */
+function updated_uninstall() {
+  // Delete base field overrides for display_updated field.
+  // Watch https://www.drupal.org/project/drupal/issues/3043741 for an eventual
+  // remedy.
+  $node_type_names = node_type_get_names();
+  $entity_type_id = 'node';
+  $base_field_name = 'display_updated';
+
+  foreach (array_keys($node_type_names) as $node_type_id) {
+    $field_override = BaseFieldOverride::loadByName($entity_type_id, $node_type_id, $base_field_name);
+    if ($field_override) {
+      $field_override->delete();
+    }
+  }
+}

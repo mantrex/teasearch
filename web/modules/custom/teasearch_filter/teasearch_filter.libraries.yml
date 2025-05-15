@@ -1,0 +1,9 @@
+teasearch_filter_styles:
+  css:
+    theme:
+      modules/custom/teasearch_filter/css/teasearch_filter.css: {}
+teasearch_filter_details_state:
+  js:
+    js/details-state.js: {}
+  dependencies:
+    - core/drupal

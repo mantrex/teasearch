@@ -1,0 +1,16 @@
+block.settings.updated_date_block:
+  type: block_settings
+  label: 'Last Updated date block'
+  mapping:
+    date_prefix:
+      type: string
+      label: 'Date prefix'
+    date_format:
+      type: string
+      label: 'Date format'
+    custom_date_format:
+      type: string
+      label: 'Custom date format'
+    timezone:
+      type: string
+      label: 'Timezone'
