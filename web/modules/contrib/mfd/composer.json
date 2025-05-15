@@ -1,0 +1,16 @@
+{
+  "name": "drupal/mfd",
+  "type": "drupal-module",
+  "description": "Extends the entity form display to permit editing other language fields which are translatable all in one form",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://www.drupal.org/project/mfd",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/mfd",
+    "source": "http://cgit.drupalcode.org/mfd"
+  },
+  "require": {
+      "tribus-studio/versioncontrol": "^1"
+  }
+}

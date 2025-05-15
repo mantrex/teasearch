@@ -1,0 +1,14 @@
+name: Multilanguage Form Display
+type: module
+description: Extends the entity form display to permit editing other language fields which are translatable all in one form
+core_version_requirement: ^9.4 || ^10 || ^11
+package: Multilingual
+dependencies:
+  - drupal:content_translation
+  - drupal:language
+  - drupal:locale
+
+# Information added by Drupal.org packaging script on 2023-08-15
+version: '3.0.0'
+project: 'mfd'
+datestamp: 1692068050

@@ -1,0 +1,250 @@
+<?php
+
+/**
+ * @file
+ * Multi-language Form Display - show translatable fields on node forms.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\mfd\MfdFieldManager;
+use Tribus\VersionControl\VersionControl;
+use Drupal\Core\Link;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_help().
+ */
+function mfd_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+
+    case 'help.page.mfd':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Extends the node form to permit editing other fields which are translatable') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Some custom form validation logic.
+ */
+function mfd_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+
+  if ($form_id == 'language_content_settings_form') {
+    $form['#validate'][] = 'mfd_form_language_content_settings_form_validate';
+  }
+
+  // In the field management form, you cannot add a mfd field
+  // unless the entity type is translatable.
+  if ($form_id == 'field_ui_field_storage_add_form') {
+    $form['#validate'][] = 'mfd_form_field_management_form_validate';
+  }
+
+  // If you have a mfd field, cannot disable translation without removing it.
+  if ($form_id == 'node_type_edit_form') {
+    $form['#validate'][] = 'mfd_node_edit_form_validate';
+  }
+
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for 'field_config_edit_form'.
+ */
+function mfd_form_field_config_edit_form_alter(array &$form, FormStateInterface $form_state) {
+  $field = $form_state->getFormObject()->getEntity();
+
+  if ($field->getType() == "multilingual_form_display_field_type") {
+    unset($form['default_value']);
+  }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for node form.
+ */
+function mfd_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $current_user = \Drupal::currentUser();
+  if ($current_user->hasPermission('edit multilingual form')) {
+    foreach (array_keys($form['actions']) as $action) {
+      if ($action != 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
+        $form['actions'][$action]['#submit'][] = 'mfd_form_submit';
+      }
+    }
+  }
+
+  // Bugfix for ContentTranslationHandler's title handler.
+  // If we don't do this, the title of the node add form comes
+  // out as 'Create English translation of <blank>'.
+  $current_path = \Drupal::service('path.current')->getPath();
+  // Does this entity have a mfd field?
+  $mfd_field_manager = new MfdFieldManager();
+  $entity = $form_state->getFormObject()->getEntity();
+
+  if ($entity->isTranslatable() &&  $mfd_field_manager->hasMfdField($entity) && stristr($current_path, '/node/add/')) {
+    $form['#title'] = t('Create new %entity_type in multiple languages', ['%entity_type' => $entity->bundle()]);
+  }
+}
+
+/**
+ * Submit form.
+ */
+function mfd_form_submit(&$form, FormStateInterface $form_state) {
+  $form_values = $form_state->getValues();
+  $form_object = $form_state->getFormObject();
+
+  // If entity is not translatable, there is nothing for us to do.
+  $entity = $form_object->getEntity();
+  if (!$entity->isTranslatable()) {
+    return;
+  }
+  $entity->save();
+
+  // Does this entity have a mfd field?
+  $mfd_field_manager = new MfdFieldManager();
+
+  if ($mfd_field_manager->hasMfdField($entity)) {
+
+    $language_manager = \Drupal::languageManager();
+    $current_language = $language_manager->getCurrentLanguage()->getId();
+
+    $available_langcodes = array_flip(array_keys($language_manager->getLanguages()));
+    ksort($available_langcodes);
+
+    // Store the field translations.
+    foreach ($available_langcodes as $langcode => $value) {
+      if ($langcode !== $current_language) {
+        $translated_fields = [];
+
+        foreach ($entity->getFieldDefinitions() as $field_name => $definition) {
+          if ($definition->isTranslatable()) {
+            $field_name_unique = $field_name . '_' . $langcode;
+            if (isset($form_values[$field_name_unique])) {
+              $translated_fields[$field_name] = $form_values[$field_name_unique];
+            }
+          }
+        }
+
+        if (!$entity->hasTranslation($langcode)) {
+          continue;
+        }
+
+        $translation = $entity->getTranslation($langcode);
+        foreach ($translated_fields as $field => $field_value) {
+
+          if (!is_numeric(array_key_first($field_value))) {
+            $first_field_value = reset($field_value);
+            if (is_array($first_field_value) && is_numeric(array_key_first($first_field_value))) {
+              $translation->set($field, $first_field_value);
+            }
+          }
+          else {
+            $translation->set($field, $field_value);
+          }
+        }
+        $translation->save();
+      }
+    }
+    $save_message = new VersionControl();
+    $save_message->setMessage("Translation saved.");
+  }
+}
+
+/**
+ * Custom validation function for language_content_settings_form.
+ *
+ * We need to prevent the setting of any mfd field to translated.
+ */
+function mfd_form_language_content_settings_form_validate($form, &$form_state) {
+
+  $node_settings = $form_state->getValues()['settings']['node'];
+
+  foreach ($node_settings as $bundle => $settings) {
+
+    // Get the field definitions for entities of this bundle type.
+    $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions('node', $bundle);
+
+    // Find mfd fields (if any).
+    $mfd_fields = [];
+    foreach ($field_definitions as $field_definition) {
+
+      if ($field_definition->getType() == 'multilingual_form_display') {
+        $mfd_fields[$field_definition->getName()] = $field_definition->getLabel();
+      }
+    }
+
+    $input_fields = $settings['fields'];
+
+    if (!empty($mfd_fields)) {
+
+      foreach ($input_fields as $field_name => $field_value) {
+
+        if (array_key_exists($field_name, $mfd_fields) && $field_value == 1) {
+
+          $element = $form['settings']['node'][$bundle]['fields'][$field_name];
+          $form_state->setError($element, t('You cannot set field %field_name in node type %bundle to translatable since %field_name is a multi language display field.  Please un-check the box next to %field_name in bundle %bundle and re-submit the form.',
+           ['%field_name' => $mfd_fields[$field_name], '%bundle' => $bundle]));
+        }
+      }
+    }
+
+  }
+
+}
+
+/**
+ * Do not allow mfd field added to non-translatable entity.
+ */
+function mfd_form_field_management_form_validate($form, &$form_state) {
+
+  // Is the bundle we are adding the field to translatable?
+  if ($form_state->getStorage()['entity_type_id'] == 'node' && $form_state->getUserInput()['new_storage_type'] == 'multilingual_form_display') {
+
+    $bundle = $form_state->getStorage()['bundle'];
+    $entity = \Drupal::entityTypeManager()->getStorage('node')->create(
+        [
+          'type' => $bundle,
+          'title' => 'Translation testing',
+        ]);
+    if (!$entity->isTranslatable()) {
+
+      $link = Link::fromTextAndUrl('/admin/structure/types/manage/' . $bundle, Url::fromUri('internal:/admin/structure/types/manage/' . $bundle));
+      $form_state->setErrorByName('new_storage_type', t('Bundle %bundle is not translatable - you cannot add a Multilanguage Form Display Field to a non-translatable entity.  You need to enable translation for %bundle at %link',
+          [
+            '%link' => $link->toString(),
+            '%bundle' => $bundle,
+          ]));
+    }
+  }
+}
+
+/**
+ * You may not disable translation for any bundle with a mfd field present.
+ */
+function mfd_node_edit_form_validate($form, &$form_state) {
+
+  $bundle = $form_state->getValue('type');
+
+  $entity = \Drupal::entityTypeManager()->getStorage('node')->create(
+      [
+        'type' => $bundle,
+        'title' => 'Translation testing',
+      ]);
+  $mfd_manager = new MfdFieldManager();
+  if ($mfd_manager->hasMfdField($entity)) {
+
+    // Did you disable translation?
+    $translation_enabled = $form_state->getUserInput()['language_configuration']['content_translation'];
+    if (!$translation_enabled) {
+
+      $link = Link::fromTextAndUrl('/admin/structure/types/manage/' . $bundle . '/fields', Url::fromUri('internal:/admin/structure/types/manage/' . $bundle . '/fields'));
+
+      $form_state->setErrorByName('language_configuration', t('You cannot disable translation for a bundle with a Multi language display field enabled.  You must remove the Multi language field first in the manage fields link here: %link.', ['%link' => $link->toString()]));
+    }
+
+  }
+
+}

@@ -38,7 +38,8 @@
     "drupal/vani": "^11.0",
     "drush/drush": "*",
     "twbs/bootstrap": "^5.3",
-    "zodiacmedia/drupal-libraries-installer": "^1.6"
+    "zodiacmedia/drupal-libraries-installer": "^1.6",
+    "drupal/mfd": "^3.0"
   },
   "conflict": {
     "drupal/drupal": "*"
@@ -53,11 +54,22 @@
       "phpstan/extension-installer": true,
       "dealerdirect/phpcodesniffer-composer-installer": true,
       "php-http/discovery": true,
-      "zodiacmedia/drupal-libraries-installer": true
+      "zodiacmedia/drupal-libraries-installer": true,
+      "cweagans/composer-patches": true,
+      "mglaman/composer-drupal-lenient": true
     },
     "sort-packages": true
   },
   "extra": {
+    "composer-exit-on-patch-failure": true,
+    "drupal-lenient": {
+      "allow-all": true
+    },
+    "patches": {
+      "drupal/mfd": {
+        "Compatibilità Drupal 11 (info.yml)": "patches/mfd-info-core11.patch"
+      }
+    },
     "drupal-scaffold": {
       "locations": {
         "web-root": "web/"
@@ -125,5 +137,9 @@
         "      composer remove drupal/core-project-message"
       ]
     }
+  },
+  "require-dev": {
+    "cweagans/composer-patches": "^1.7",
+    "mglaman/composer-drupal-lenient": "^1.0"
   }
 }
