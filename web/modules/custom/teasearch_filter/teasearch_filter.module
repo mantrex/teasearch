@@ -23,14 +23,15 @@
 function teasearch_filter_theme($existing, $type, $theme, $path)
 {
   return [
-    // Usare lo stesso nome del tuo twig (senza .html.twig)
     'teasearch' => [
       'variables' => [
         'filter_form' => NULL,
-        'nodes'       => NULL,
+        'nodes' => NULL,
+        'filters' => NULL,
+        'grouped_filters' => NULL,
+        'content_type' => NULL,
       ],
       'template' => 'teasearch',
-      // non serve il 'path' se il file si trova in MODULE/templates/
     ],
   ];
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
@@ -26,13 +28,14 @@ class DateTimeDatelistWidget extends DateTimeWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'increment' => '15',
-        'date_order' => 'YMD',
-        'time_type' => '24',
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings'] = [
+      'increment' => '15',
+      'date_order' => 'YMD',
+      'time_type' => '24',
+    ] + $settings['settings'];
+
+    return $settings;
   }
 
   /**
@@ -143,13 +146,11 @@ class DateTimeDatelistWidget extends DateTimeWidgetBase {
     // Wrap all the select elements with a fieldset.
     $element['#theme_wrappers'][] = 'fieldset';
 
-    $date = [
+    return [
       '#type' => 'datelist',
       '#date_increment' => $increment,
       '#date_part_order' => $date_part_order,
-    ];
-
-    return $date + $element;
+    ] + $element;
   }
 
 }

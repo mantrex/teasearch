@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FeedsType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -18,10 +20,10 @@ class DecimalTarget extends BaseTarget {
   /**
    * {@inheritdoc}
    */
-  public function prepareValue($value, array $configuration, string $langcode): mixed {
+  public function prepareValue(mixed $value, array $configuration, string $langcode): mixed {
     $value = parent::prepareValue($value, $configuration, $langcode);
 
-    return is_numeric($value) ? $value : NULL;
+    return is_numeric($value) ? (float) $value : NULL;
   }
 
 }

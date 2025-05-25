@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin;
 
 use Drupal\Component\Plugin\Exception\PluginException;
@@ -17,6 +19,13 @@ class CustomFieldFeedsManager extends DefaultPluginManager implements CustomFiel
   use StringTranslationTrait;
 
   /**
+   * The custom field type manager.
+   *
+   * @var \Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface
+   */
+  protected CustomFieldTypeManagerInterface $customFieldTypeManager;
+
+  /**
    * Constructs a new CustomFieldFeedsManager object.
    *
    * @param \Traversable $namespaces
@@ -26,8 +35,10 @@ class CustomFieldFeedsManager extends DefaultPluginManager implements CustomFiel
    *   Cache backend instance to use.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
+   * @param \Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface $custom_field_type_manager
+   *   The custom field type manager.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, CustomFieldTypeManagerInterface $custom_field_type_manager) {
     parent::__construct(
       'Plugin/CustomField/FeedsType',
       $namespaces,
@@ -39,32 +50,22 @@ class CustomFieldFeedsManager extends DefaultPluginManager implements CustomFiel
 
     $this->alterInfo('custom_field_feeds_info');
     $this->setCacheBackend($cache_backend, 'custom_field_feeds_plugins');
+    $this->customFieldTypeManager = $custom_field_type_manager;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getFeedsTargets(array $settings): array {
+    $custom_items = $this->customFieldTypeManager->getCustomFieldItems($settings);
     $items = [];
-    $field_settings = $settings['field_settings'] ?? [];
 
-    foreach ($settings['columns'] as $name => $column) {
-      $settings = $field_settings[$name] ?? [];
-      $type = $column['type'];
-
+    foreach ($custom_items as $name => $custom_item) {
+      $type = $custom_item->getDataType();
       try {
-        $items[$name] = $this->createInstance($type, [
-          'name' => $column['name'],
-          'max_length' => (int) $column['max_length'],
-          'unsigned' => $column['unsigned'],
-          'precision' => (int) $column['precision'],
-          'scale' => (int) $column['scale'],
-          'size' => $column['size'] ?? 'normal',
-          'target_type' => $column['target_type'] ?? NULL,
-          'datetime_type' => $column['datetime_type'] ?? 'datetime',
-          'uri_scheme' => $column['uri_scheme'] ?? NULL,
-          'widget_settings' => $settings['widget_settings'] ?? [],
-        ]);
+        /** @var \Drupal\custom_field\Plugin\CustomFieldFeedsTypeInterface $instance */
+        $instance = $this->createInstance($type, $custom_item->getSettings());
+        $items[$name] = $instance;
       }
       catch (PluginException $e) {
         // Should we log the error?

@@ -59,7 +59,7 @@ class CustomFieldType extends Plugin {
    *   (optional) An array of column groups for the field type.
    * @param array $serialized_property_names
    *   (optional) An array of property names that should be serialized.
-   * @param string|null $deriver
+   * @param class-string|null $deriver
    *   (optional) The deriver class for the data type.
    * @param string|null $module
    *   The name of the module providing the field type plugin.

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Core\Entity\EntityInterface;
@@ -23,12 +25,13 @@ class EntityReferenceIdFormatter extends EntityReferenceFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
+  public function formatValue(FieldItemInterface $item, mixed $value): ?array {
 
     if (!$value instanceof EntityInterface) {
       return NULL;
     }
 
+    /** @var \Drupal\Core\Access\AccessResultInterface $access */
     $access = $this->checkAccess($value);
 
     if (!$access->isAllowed()) {

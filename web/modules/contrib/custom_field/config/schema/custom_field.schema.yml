@@ -147,6 +147,10 @@ custom_field.formatter.*:
         prefix_suffix:
           type: boolean
           label: 'Display prefix/suffix'
+        # The link formatter settings.
+        link_text:
+          type: string
+          label: 'Link text'
         title:
           type: string
           label: 'Title'
@@ -156,9 +160,33 @@ custom_field.formatter.*:
         url_plain:
           type: boolean
           label: 'Show URL as plain text'
+        url_only:
+          type: boolean
+          label: 'URL only'
         rel:
           type: string
           label: 'Add rel="nofollow" to links'
+        noopener:
+          type: string
+          label: 'Add rel="noopener" to links'
+        noreferrer:
+          type: string
+          label: 'Add rel="noreferrer" to links'
+        id:
+          type: string
+          label: 'ID'
+        class:
+          type: string
+          label: 'Class'
+        aria-label:
+          type: string
+          label: 'ARIA label'
+        accesskey:
+          type: string
+          label: 'Accesskey'
+        name:
+          type: string
+          label: 'Name'
         scale:
           type: integer
           label: 'Scale'
@@ -207,6 +235,9 @@ custom_field.formatter.*:
         hierarchy_reverse:
           type: boolean
           label: 'Reverse order'
+        time_format:
+          type: string
+          label: 'Time format'
 
 field.formatter.settings.custom_formatter:
   type: custom_field_formatter_base
@@ -269,17 +300,17 @@ custom_field.column:
     type:
       type: string
       label: 'Type'
-    max_length:
-      type: string
-      label: 'Max length'
-    unsigned:
+    length:
       type: integer
+      label: 'Length'
+    unsigned:
+      type: boolean
       label: 'Unsigned'
     precision:
-      type: string
+      type: integer
       label: 'Precision'
     scale:
-      type: string
+      type: integer
       label: 'Scale'
     size:
       type: string
@@ -545,6 +576,63 @@ custom_field.widget.*:
             level_labels:
               type: boolean
               label: 'Show level labels'
+            # Settings for time widget.
+            seconds_enabled:
+              type: boolean
+              label: 'Add seconds parameter to input widget'
+            seconds_step:
+              type: integer
+              label: 'Step to change seconds'
+            # Settings for link_default widget.
+            title:
+              type: integer
+              label: 'Allow link text'
+            enabled_attributes:
+              type: sequence
+              sequence:
+                type: boolean
+                label: 'Enabled'
+            widget_default_open:
+              type: string
+              label: 'Widget expand behavior'
+            placeholder_url:
+              type: string
+              label: 'Placeholder for URL'
+            placeholder_title:
+              type: label
+              label: 'Placeholder for link text'
+            # Settings for linkit.
+            linkit_profile:
+              type: string
+              label: 'Linkit profile'
+            linkit_auto_link_text:
+              type: boolean
+              label: 'Automatically populate link text from entity label'
+            # Settings for entity_reference_entity_browser.
+            entity_browser:
+              type: mapping
+              label: 'Entity browser entity reference widget'
+              mapping:
+                entity_browser:
+                  type: string
+                  label: 'Entity Browser'
+                field_widget_display:
+                  type: string
+                  label: 'Field widget display'
+                field_widget_edit:
+                  type: boolean
+                  label: 'Field widget edit'
+                field_widget_remove:
+                  type: boolean
+                  label: 'Field widget remove'
+                field_widget_replace:
+                  type: boolean
+                  label: 'Field widget replace'
+                open:
+                  type: boolean
+                  label: 'Open'
+                field_widget_display_settings:
+                  type: entity_browser.field_widget_display.[%parent.field_widget_display]
 
 custom_field.view_arguments.*:
   type: string

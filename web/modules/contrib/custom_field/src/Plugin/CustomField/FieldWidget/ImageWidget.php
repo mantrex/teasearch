@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomField\FieldType\ImageType;
@@ -30,12 +33,12 @@ class ImageWidget extends FileWidget {
    *
    * @var \Drupal\Core\Image\ImageFactory
    */
-  protected $imageFactory;
+  protected ImageFactory $imageFactory;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->imageFactory = $container->get('image.factory');
 
@@ -46,19 +49,20 @@ class ImageWidget extends FileWidget {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'file_extensions' => 'png gif jpg jpeg',
-        'alt_field' => 1,
-        'alt_field_required' => 1,
-        'title_field' => 0,
-        'title_field_required' => 0,
-        'progress_indicator' => 'throbber',
-        'max_resolution' => '',
-        'min_resolution' => '',
-        'preview_image_style' => ImageStyle::load('thumbnail') ? 'thumbnail' : '',
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings'] = [
+      'file_extensions' => 'png gif jpg jpeg',
+      'alt_field' => 1,
+      'alt_field_required' => 1,
+      'title_field' => 0,
+      'title_field_required' => 0,
+      'progress_indicator' => 'throbber',
+      'max_resolution' => '',
+      'min_resolution' => '',
+      'preview_image_style' => ImageStyle::load('thumbnail') ? 'thumbnail' : '',
+    ] + $settings['settings'];
+
+    return $settings;
   }
 
   /**
@@ -189,20 +193,20 @@ class ImageWidget extends FileWidget {
       $uri_scheme = $current_settings['columns'][$name]['uri_scheme'] ?? 'public';
     }
     else {
-      $uri_scheme = $item->getFieldDefinition()->getSetting('columns')[$name]['uri_scheme'];
+      $uri_scheme = $field->getSetting('uri_scheme');
     }
     $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
     $settings['uri_scheme'] = $uri_scheme;
     $is_config_form = $form_state->getBuildInfo()['base_form_id'] == 'field_config_form';
 
     // Add image validation.
-    $element['#upload_validators']['file_validate_is_image'] = [];
+    $element['#upload_validators']['FileIsImage'] = [];
 
     // Add upload resolution validation.
     if ($settings['max_resolution'] || $settings['min_resolution']) {
-      $element['#upload_validators']['file_validate_image_resolution'] = [
-        $settings['max_resolution'],
-        $settings['min_resolution'],
+      $element['#upload_validators']['FileImageDimensions'] = [
+        'maxDimensions' => $settings['max_resolution'],
+        'minDimensions' => $settings['min_resolution'],
       ];
     }
 
@@ -213,7 +217,7 @@ class ImageWidget extends FileWidget {
     // supported by the current image toolkit. Otherwise, validate against all
     // toolkit supported extensions.
     $extensions = !empty($extensions) ? array_intersect(explode(' ', $extensions), $supported_extensions) : $supported_extensions;
-    $element['#upload_validators']['file_validate_extensions'][0] = implode(' ', $extensions);
+    $element['#upload_validators']['FileExtension']['extensions'] = implode(' ', $extensions);
 
     // Add mobile device image capture acceptance.
     $element['#accept'] = 'image/*';
@@ -248,8 +252,18 @@ class ImageWidget extends FileWidget {
    * Expands the image_image type to include the alt and title fields.
    *
    * This method is assigned as a #process callback in formElement() method.
+   *
+   * @param array<string, mixed> $element
+   *   The form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   * @param array<string, mixed> $form
+   *   The form.
+   *
+   * @return array<string, mixed>
+   *   The processed element.
    */
-  public static function process($element, FormStateInterface $form_state, $form) {
+  public static function process($element, FormStateInterface $form_state, $form): array {
     $item = $element['#value'];
 
     $element['#theme'] = 'image_widget';
@@ -329,8 +343,13 @@ class ImageWidget extends FileWidget {
 
   /**
    * Element validate function for resolution fields.
+   *
+   * @param array<string, mixed> $element
+   *   The form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
    */
-  public static function validateResolution($element, FormStateInterface $form_state) {
+  public static function validateResolution(array $element, FormStateInterface $form_state): void {
     if (!empty($element['x']['#value']) || !empty($element['y']['#value'])) {
       foreach (['x', 'y'] as $dimension) {
         if (!$element[$dimension]['#value']) {
@@ -353,8 +372,13 @@ class ImageWidget extends FileWidget {
    *
    * This is separated in a validate function instead of a #required flag to
    * avoid being validated on the process callback.
+   *
+   * @param array<string, mixed> $element
+   *   The form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
    */
-  public static function validateRequiredFields($element, FormStateInterface $form_state) {
+  public static function validateRequiredFields(array $element, FormStateInterface $form_state): void {
     // Only do validation if the function is triggered from other places than
     // the image process form.
     $triggering_element = $form_state->getTriggeringElement();
@@ -368,15 +392,13 @@ class ImageWidget extends FileWidget {
    *
    * This method is assigned as a #value_callback in formElement() method.
    */
-  public static function value($element, $input, FormStateInterface $form_state) {
+  public static function value($element, $input, FormStateInterface $form_state): mixed {
     // Account for field config default values form initial state.
     if ($input == "") {
       return $element['#default_value'];
     }
     // We depend on the managed file element to handle uploads.
-    $return = ManagedFile::valueCallback($element, $input, $form_state);
-
-    return $return;
+    return ManagedFile::valueCallback($element, $input, $form_state);
   }
 
 }

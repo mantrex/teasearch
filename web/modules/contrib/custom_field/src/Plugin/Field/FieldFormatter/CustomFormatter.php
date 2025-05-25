@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\Attribute\FieldFormatter;

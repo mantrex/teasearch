@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FeedsType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -18,7 +20,7 @@ class StringLongTarget extends BaseTarget {
   /**
    * {@inheritdoc}
    */
-  public function prepareValue($value, array $configuration, string $langcode): ?string {
+  public function prepareValue(mixed $value, array $configuration, string $langcode): ?string {
     $value = parent::prepareValue($value, $configuration, $langcode);
 
     return !empty($value) ? $value : NULL;

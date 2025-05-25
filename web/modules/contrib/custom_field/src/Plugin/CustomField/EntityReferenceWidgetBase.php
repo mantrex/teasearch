@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -20,26 +25,26 @@ class EntityReferenceWidgetBase extends CustomFieldWidgetBase {
    *
    * @var \Drupal\Core\Session\AccountProxyInterface
    */
-  protected $currentUser;
+  protected AccountProxyInterface $currentUser;
 
   /**
    * The entity reference selection plugin manager.
    *
    * @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface
    */
-  protected $selectionPluginManager;
+  protected SelectionPluginManagerInterface $selectionPluginManager;
 
   /**
    * The entity type manager service.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->currentUser = $container->get('current_user');
     $instance->selectionPluginManager = $container->get('plugin.manager.entity_reference_selection');
@@ -52,11 +57,12 @@ class EntityReferenceWidgetBase extends CustomFieldWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'handler_settings' => [],
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings'] = [
+      'handler_settings' => [],
+    ] + $settings['settings'];
+
+    return $settings;
   }
 
   /**
@@ -65,7 +71,7 @@ class EntityReferenceWidgetBase extends CustomFieldWidgetBase {
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
     $field_name = $field->getName();
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
     $target_type = $field->getTargetType();
     if (!isset($settings['handler'])) {
       $settings['handler'] = 'default:' . $target_type;
@@ -78,11 +84,13 @@ class EntityReferenceWidgetBase extends CustomFieldWidgetBase {
       // entity type specific plugins (e.g. 'default:node', 'default:user',
       // ...).
       if (array_key_exists($selection_group_id, $selection_plugins[$selection_group_id])) {
-        $handlers_options[$selection_group_id] = Html::escape($selection_plugins[$selection_group_id][$selection_group_id]['label']);
+        $label = $selection_plugins[$selection_group_id][$selection_group_id]['label'];
+        $handlers_options[$selection_group_id] = Html::escape((string) $label);
       }
       elseif (array_key_exists($selection_group_id . ':' . $target_type, $selection_plugins[$selection_group_id])) {
         $selection_group_plugin = $selection_group_id . ':' . $target_type;
-        $handlers_options[$selection_group_plugin] = Html::escape($selection_plugins[$selection_group_id][$selection_group_plugin]['base_plugin_label'] ?? '');
+        $label = $selection_plugins[$selection_group_id][$selection_group_plugin]['base_plugin_label'] ?? '';
+        $handlers_options[$selection_group_plugin] = Html::escape((string) $label);
       }
     }
     $wrapper_id = 'reference-wrapper-' . $field_name;
@@ -169,9 +177,15 @@ class EntityReferenceWidgetBase extends CustomFieldWidgetBase {
    * The elements (i.e. 'handler_settings') are moved for easier processing by
    * the validation and submission handlers.
    *
+   * @param array<string, mixed> $element
+   *   The form element.
+   *
+   * @return array<string, mixed>
+   *   The modified form element.
+   *
    * @see _entity_reference_field_settings_process()
    */
-  public static function formProcessMergeParent($element) {
+  public static function formProcessMergeParent(array $element): array {
     $parents = $element['#parents'];
     array_pop($parents);
     $element['#parents'] = $parents;
@@ -180,8 +194,16 @@ class EntityReferenceWidgetBase extends CustomFieldWidgetBase {
 
   /**
    * Ajax callback for the handler settings form.
+   *
+   * @param array|array<string, mixed> $form
+   *   The form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return array<string, mixed>
+   *   The form element.
    */
-  public static function actionCallback(array &$form, FormStateInterface $form_state) {
+  public static function actionCallback(array &$form, FormStateInterface $form_state): array {
     $parents = $form_state->getTriggeringElement()['#array_parents'];
     $sliced_parents = array_slice($parents, 0, 5, TRUE);
 
@@ -191,16 +213,21 @@ class EntityReferenceWidgetBase extends CustomFieldWidgetBase {
   /**
    * Submit handler for the non-JS case.
    *
+   * @param array<string, mixed> $form
+   *   The form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
    * @see static::fieldSettingsForm()
    */
-  public static function settingsAjaxSubmit($form, FormStateInterface $form_state) {
+  public static function settingsAjaxSubmit(array $form, FormStateInterface $form_state): void {
     $form_state->setRebuild();
   }
 
   /**
    * Gets the selection handler for a given entity_reference field.
    *
-   * @param array $settings
+   * @param array<string, mixed> $settings
    *   An array of field settings.
    * @param string $target_type
    *   The target entity type.
@@ -210,7 +237,7 @@ class EntityReferenceWidgetBase extends CustomFieldWidgetBase {
    * @return mixed
    *   The selection handler.
    */
-  public function getSelectionHandler(array $settings, string $target_type, ?EntityInterface $entity = NULL) {
+  public function getSelectionHandler(array $settings, string $target_type, ?EntityInterface $entity = NULL): mixed {
     $options = $settings['handler_settings'] ?: [];
     $options += [
       'target_type' => $target_type,

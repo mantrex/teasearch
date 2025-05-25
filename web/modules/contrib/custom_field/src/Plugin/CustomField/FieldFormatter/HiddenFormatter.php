@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Core\Field\Attribute\FieldFormatter;
@@ -23,11 +25,13 @@ use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
     'entity_reference',
     'image',
     'integer',
+    'link',
     'map',
     'map_string',
     'string',
     'string_long',
     'telephone',
+    'time',
     'uri',
     'uuid',
     'viewfield',
@@ -38,7 +42,7 @@ class HiddenFormatter extends CustomFieldFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
+  public function formatValue(FieldItemInterface $item, mixed $value): mixed {
     return NULL;
   }
 

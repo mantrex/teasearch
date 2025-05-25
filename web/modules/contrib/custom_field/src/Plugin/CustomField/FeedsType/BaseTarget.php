@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FeedsType;
 
 use Drupal\custom_field\Plugin\CustomFieldFeedsTypeBase;
@@ -12,7 +14,7 @@ class BaseTarget extends CustomFieldFeedsTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function prepareValue($value, array $configuration, string $langcode): mixed {
+  public function prepareValue(mixed $value, array $configuration, string $langcode): mixed {
     return is_string($value) ? trim($value) : $value;
   }
 
@@ -26,7 +28,9 @@ class BaseTarget extends CustomFieldFeedsTypeBase {
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(int $delta, array $configuration) {}
+  public function buildConfigurationForm(int $delta, array $configuration): array {
+    return [];
+  }
 
   /**
    * {@inheritdoc}

@@ -2,7 +2,9 @@
 
 namespace Drupal\custom_field\Plugin\CustomField;
 
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\DataReferenceInterface;
 use Drupal\Core\TypedData\TypedData;
@@ -20,23 +22,23 @@ class EntityReferenceComputed extends TypedData implements DataReferenceInterfac
   /**
    * The entity object or null.
    *
-   * @var \Drupal\Core\Entity\EntityInterface|null
+   * @var \Drupal\Core\TypedData\TypedDataInterface|null
    */
-  protected $entity = NULL;
+  protected ?TypedDataInterface $entity = NULL;
 
   /**
    * The entity type.
    *
    * @var string
    */
-  protected $targetType;
+  protected mixed $targetType;
 
   /**
    * The field property name containing the value.
    *
    * @var string
    */
-  protected $targetId;
+  protected mixed $targetId;
 
   /**
    * The data value.
@@ -72,7 +74,7 @@ class EntityReferenceComputed extends TypedData implements DataReferenceInterfac
   /**
    * {@inheritdoc}
    */
-  public function getTarget() {
+  public function getTarget(): TypedDataInterface|ComplexDataInterface|null {
     if (!isset($this->entity) && $id = $this->parent->{$this->targetId}) {
       try {
         $entity = \Drupal::entityTypeManager()
@@ -80,7 +82,7 @@ class EntityReferenceComputed extends TypedData implements DataReferenceInterfac
           ->load($id);
         $this->entity = $entity?->getTypedData();
       }
-      catch (PluginNotFoundException $e) {
+      catch (PluginNotFoundException | InvalidPluginDefinitionException $e) {
         // Can't index an entity type that doesn't exist.
       }
     }

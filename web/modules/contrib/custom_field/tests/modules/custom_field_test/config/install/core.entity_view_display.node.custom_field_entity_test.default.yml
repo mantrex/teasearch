@@ -31,6 +31,7 @@ content:
           formatter_settings:
             label_display: above
             prefix_suffix: false
+            field_label: 'String test'
         string_long_test:
           format_type: text_default
           wrappers:
@@ -42,6 +43,7 @@ content:
             label_classes: ''
           formatter_settings:
             label_display: above
+            field_label: 'String long test'
         integer_test:
           format_type: number_integer
           wrappers:
@@ -55,6 +57,7 @@ content:
             label_display: above
             prefix_suffix: false
             thousand_separator: ','
+            field_label: 'Integer test'
         decimal_test:
           format_type: number_decimal
           wrappers:
@@ -70,6 +73,7 @@ content:
             prefix_suffix: false
             scale: 2
             thousand_separator: ','
+            field_label: 'Decimal test'
         float_test:
           format_type: number_decimal
           wrappers:
@@ -85,6 +89,7 @@ content:
             prefix_suffix: false
             scale: 2
             thousand_separator: ','
+            field_label: 'Float test'
         email_test:
           format_type: email_mailto
           wrappers:
@@ -96,6 +101,7 @@ content:
             label_classes: ''
           formatter_settings:
             label_display: above
+            field_label: 'Email test'
         telephone_test:
           format_type: telephone_link
           wrappers:
@@ -108,6 +114,7 @@ content:
           formatter_settings:
             label_display: above
             title: ''
+            field_label: 'Telephone test'
         uri_test:
           format_type: uri_link
           wrappers:
@@ -124,6 +131,7 @@ content:
             url_plain: false
             rel: '0'
             target: '0'
+            field_label: 'Uri test'
         boolean_test:
           format_type: boolean
           wrappers:
@@ -137,6 +145,7 @@ content:
             format: yes-no
             format_custom_true: ''
             format_custom_false: ''
+            field_label: 'Boolean test'
         uuid_test:
           format_type: string
           wrappers:
@@ -149,6 +158,7 @@ content:
           formatter_settings:
             label_display: above
             prefix_suffix: false
+            field_label: 'Uuid test'
         color_test:
           format_type: string
           wrappers:
@@ -161,6 +171,7 @@ content:
           formatter_settings:
             label_display: above
             prefix_suffix: false
+            field_label: 'Color test'
         map_test:
           format_type: string
           wrappers:
@@ -173,6 +184,7 @@ content:
           formatter_settings:
             label_display: above
             prefix_suffix: false
+            field_label: 'Map test'
         map_string_test:
           format_type: string
           wrappers:
@@ -185,6 +197,7 @@ content:
           formatter_settings:
             label_display: above
             prefix_suffix: false
+            field_label: 'Map string test'
         datetime_test:
           format_type: datetime_default
           wrappers:
@@ -198,6 +211,7 @@ content:
             label_display: above
             timezone_override: ''
             format_type: medium
+            field_label: 'Datetime test'
         entity_reference_test:
           format_type: entity_reference_label
           wrappers:
@@ -210,6 +224,7 @@ content:
           formatter_settings:
             label_display: above
             link: true
+            field_label: 'Entity reference test'
         file_test:
           format_type: file_default
           wrappers:
@@ -221,6 +236,7 @@ content:
             label_classes: ''
           formatter_settings:
             label_display: above
+            field_label: 'File test'
         image_test:
           format_type: image
           wrappers:
@@ -236,6 +252,7 @@ content:
             image_loading:
               attribute: lazy
             label_display: above
+            field_label: 'Image test'
         viewfield_test:
           format_type: viewfield_default
           wrappers:
@@ -248,6 +265,20 @@ content:
           formatter_settings:
             always_build_output: false
             label_display: above
+            field_label: 'Viewfield test'
+        time_test:
+          format_type: time
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            field_label: 'Time test'
+            time_format: 'h:i a'
     third_party_settings: {  }
     weight: 101
     region: content
@@ -268,10 +299,12 @@ content:
           formatter_settings:
             label_display: above
             prefix_suffix: false
+            field_label: 'String test'
         string_long_test:
           format_type: text_default
           formatter_settings:
             label_display: above
+            field_label: 'String long test'
         integer_test:
           format_type: number_integer
           wrappers:
@@ -285,6 +318,7 @@ content:
             label_display: above
             prefix_suffix: false
             thousand_separator: ','
+            field_label: 'Integer test'
         decimal_test:
           format_type: number_decimal
           wrappers:
@@ -300,6 +334,7 @@ content:
             prefix_suffix: false
             scale: 2
             thousand_separator: ','
+            field_label: 'Decimal test'
         float_test:
           format_type: number_decimal
           wrappers:
@@ -315,6 +350,7 @@ content:
             prefix_suffix: false
             scale: 2
             thousand_separator: ','
+            field_label: 'Float test'
         email_test:
           format_type: email_mailto
           wrappers:
@@ -326,6 +362,7 @@ content:
             label_classes: ''
           formatter_settings:
             label_display: above
+            field_label: 'Email test'
         telephone_test:
           format_type: telephone_link
           wrappers:
@@ -338,6 +375,7 @@ content:
           formatter_settings:
             label_display: above
             title: ''
+            field_label: 'Telephone test'
         uri_test:
           format_type: uri_link
           wrappers:
@@ -354,6 +392,7 @@ content:
             url_plain: false
             rel: '0'
             target: '0'
+            field_label: 'Uri test'
         boolean_test:
           format_type: boolean
           wrappers:
@@ -367,6 +406,7 @@ content:
             format: yes-no
             format_custom_true: ''
             format_custom_false: ''
+            field_label: 'Boolean test'
         uuid_test:
           format_type: string
           wrappers:
@@ -379,6 +419,7 @@ content:
           formatter_settings:
             label_display: above
             prefix_suffix: false
+            field_label: 'Uuid test'
         color_test:
           format_type: string
           wrappers:
@@ -391,6 +432,7 @@ content:
           formatter_settings:
             label_display: above
             prefix_suffix: false
+            field_label: 'Color test'
         map_test:
           format_type: string
           wrappers:
@@ -403,6 +445,7 @@ content:
           formatter_settings:
             label_display: above
             prefix_suffix: false
+            field_label: 'Map test'
         map_string_test:
           format_type: string
           wrappers:
@@ -415,12 +458,14 @@ content:
           formatter_settings:
             label_display: above
             prefix_suffix: false
+            field_label: 'Map string test'
         datetime_test:
           format_type: datetime_default
           formatter_settings:
             label_display: above
             timezone_override: ''
             format_type: medium
+            field_label: 'Datetime test'
         entity_reference_test:
           format_type: entity_reference_label
           wrappers:
@@ -433,6 +478,7 @@ content:
           formatter_settings:
             label_display: above
             link: true
+            field_label: 'Entity reference test'
         file_test:
           format_type: file_default
           wrappers:
@@ -444,6 +490,7 @@ content:
             label_classes: ''
           formatter_settings:
             label_display: above
+            field_label: 'File test'
         image_test:
           format_type: image
           wrappers:
@@ -459,6 +506,7 @@ content:
             image_loading:
               attribute: lazy
             label_display: above
+            field_label: 'Image test'
         viewfield_test:
           format_type: viewfield_default
           wrappers:
@@ -471,6 +519,20 @@ content:
           formatter_settings:
             always_build_output: false
             label_display: above
+            field_label: 'Viewfield test'
+        time_test:
+          format_type: time
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            field_label: 'Time test'
+            time_format: 'h:i a'
     third_party_settings: {  }
     weight: 101
     region: content
@@ -491,6 +553,7 @@ content:
           formatter_settings:
             label_display: above
             prefix_suffix: false
+            field_label: 'String test'
         string_long_test:
           format_type: text_default
           wrappers:
@@ -502,6 +565,7 @@ content:
             label_classes: ''
           formatter_settings:
             label_display: above
+            field_label: 'String long test'
         integer_test:
           format_type: number_integer
           wrappers:
@@ -515,6 +579,7 @@ content:
             label_display: above
             prefix_suffix: false
             thousand_separator: ','
+            field_label: 'Integer test'
         decimal_test:
           format_type: number_decimal
           wrappers:
@@ -530,6 +595,7 @@ content:
             prefix_suffix: false
             scale: 2
             thousand_separator: ','
+            field_label: 'Decimal test'
         float_test:
           format_type: number_decimal
           wrappers:
@@ -545,6 +611,7 @@ content:
             prefix_suffix: false
             scale: 2
             thousand_separator: ','
+            field_label: 'Float test'
         email_test:
           format_type: email_mailto
           wrappers:
@@ -556,6 +623,7 @@ content:
             label_classes: ''
           formatter_settings:
             label_display: above
+            field_label: 'Email test'
         telephone_test:
           format_type: telephone_link
           wrappers:
@@ -568,6 +636,7 @@ content:
           formatter_settings:
             label_display: above
             title: ''
+            field_label: 'Telephone test'
         uri_test:
           format_type: uri_link
           wrappers:
@@ -584,6 +653,7 @@ content:
             url_plain: false
             rel: '0'
             target: '0'
+            field_label: 'Uri test'
         boolean_test:
           format_type: boolean
           wrappers:
@@ -597,6 +667,7 @@ content:
             format: yes-no
             format_custom_true: ''
             format_custom_false: ''
+            field_label: 'Boolean test'
         uuid_test:
           format_type: string
           wrappers:
@@ -609,6 +680,7 @@ content:
           formatter_settings:
             label_display: above
             prefix_suffix: false
+            field_label: 'Uuid test'
         color_test:
           format_type: string
           wrappers:
@@ -621,6 +693,7 @@ content:
           formatter_settings:
             label_display: above
             prefix_suffix: false
+            field_label: 'Color test'
         map_test:
           format_type: string
           wrappers:
@@ -633,6 +706,7 @@ content:
           formatter_settings:
             label_display: above
             prefix_suffix: false
+            field_label: 'Map test'
         map_string_test:
           format_type: string
           wrappers:
@@ -645,6 +719,7 @@ content:
           formatter_settings:
             label_display: above
             prefix_suffix: false
+            field_label: 'Map string test'
         datetime_test:
           format_type: datetime_default
           wrappers:
@@ -658,6 +733,7 @@ content:
             label_display: above
             timezone_override: ''
             format_type: medium
+            field_label: 'Datetime test'
         entity_reference_test:
           format_type: entity_reference_label
           wrappers:
@@ -670,6 +746,7 @@ content:
           formatter_settings:
             label_display: above
             link: true
+            field_label: 'Entity reference test'
         file_test:
           format_type: file_default
           wrappers:
@@ -681,6 +758,7 @@ content:
             label_classes: ''
           formatter_settings:
             label_display: above
+            field_label: 'File test'
         image_test:
           format_type: image
           wrappers:
@@ -696,6 +774,7 @@ content:
             image_loading:
               attribute: lazy
             label_display: above
+            field_label: 'Image test'
         viewfield_test:
           format_type: viewfield_default
           wrappers:
@@ -708,6 +787,20 @@ content:
           formatter_settings:
             always_build_output: false
             label_display: above
+            field_label: 'Viewfield test'
+        time_test:
+          format_type: time
+          wrappers:
+            field_wrapper_tag: ''
+            field_wrapper_classes: ''
+            field_tag: ''
+            field_classes: ''
+            label_tag: ''
+            label_classes: ''
+          formatter_settings:
+            label_display: above
+            field_label: 'Time test'
+            time_format: 'h:i a'
     third_party_settings: {  }
     weight: 101
     region: content

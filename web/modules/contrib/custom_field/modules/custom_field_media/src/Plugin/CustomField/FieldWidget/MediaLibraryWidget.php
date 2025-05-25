@@ -1,13 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field_media\Plugin\CustomField\FieldWidget;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Ajax\OpenModalDialogCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Entity\RevisionableInterface;
+use Drupal\Core\Field\FieldConfigInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -19,9 +24,9 @@ use Drupal\custom_field\Plugin\CustomField\EntityReferenceWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\field_ui\FieldUI;
 use Drupal\media\Entity\Media;
+use Drupal\media\MediaInterface;
 use Drupal\media_library\MediaLibraryState;
 use Drupal\media_library\MediaLibraryUiBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'media_library_widget' widget.
@@ -38,23 +43,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCallbackInterface {
 
   /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
-    $instance->moduleHandler = $container->get('module_handler');
-
-    return $instance;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public static function isApplicable(CustomFieldTypeInterface $custom_item): bool {
@@ -65,11 +53,10 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'media_types' => [],
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings']['media_types'] = [];
+
+    return $settings;
   }
 
   /**
@@ -129,7 +116,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
    * The tabledrag functionality needs a specific weight field, but we don't
    * want to store this extra weight field in our settings.
    *
-   * @param array $element
+   * @param array<string, mixed> $element
    *   An associative array containing the properties of the element.
    * @param mixed $input
    *   The incoming input to populate the form element. If this is FALSE,
@@ -140,7 +127,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
    * @return mixed
    *   The value to assign to the element.
    */
-  public static function setMediaTypesValue(array &$element, $input, FormStateInterface $form_state) {
+  public static function setMediaTypesValue(array &$element, $input, FormStateInterface $form_state): mixed {
     if ($input === FALSE || $input === NULL || $form_state->isRebuilding()) {
       return $element['#default_value'] ?? [];
     }
@@ -172,7 +159,8 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
     // Create an ID suffix from the parents to make sure each widget is unique.
     $id_suffix = $parents ? '-' . implode('-', $parents) : '';
     $field_widget_id = implode(':', array_filter([$field_name . $delta . '_' . $sub_field_name, $id_suffix]));
-    $wrapper_id = $field_name . $delta . '_' . $sub_field_name . '-media-library-wrapper' . $id_suffix;
+    $wrapper_id = $this->getUniqueElementId($form, $field_name, $delta, $field->getName());
+    $name_key = str_replace('-', '_', $wrapper_id);
     $limit_validation_errors = [array_merge($parents, [$sub_field_name])];
     $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
     $item = $items[$delta];
@@ -279,7 +267,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
         ],
         'remove_button' => [
           '#type' => 'submit',
-          '#name' => $field_name . $delta . '-' . $sub_field_name . '-media-library-remove-button' . $id_suffix,
+          '#name' => $name_key . '_media_remove',
           '#value' => $this->t('Remove'),
           '#media_id' => $referenced_entity->id(),
           '#attributes' => [
@@ -325,7 +313,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
     if (!$entity->isNew()) {
       $opener_parameters['entity_id'] = (string) $entity->id();
 
-      if ($entity->getEntityType()->isRevisionable()) {
+      if ($entity instanceof RevisionableInterface && $entity->getEntityType()->isRevisionable()) {
         $opener_parameters['revision_id'] = (string) $entity->getRevisionId();
       }
     }
@@ -336,7 +324,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
     $element['open_button'] = [
       '#type' => 'button',
       '#value' => $this->t('Add media'),
-      '#name' => $field_name . $delta . '-' . $sub_field_name . '-media-library-open-button' . $id_suffix,
+      '#name' => $name_key . '_media_open',
       '#attributes' => [
         'class' => [
           'js-media-library-open-button',
@@ -390,7 +378,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
     $element['media_library_update_widget'] = [
       '#type' => 'submit',
       '#value' => $this->t('Update widget'),
-      '#name' => $field_name . $delta . '-' . $sub_field_name . '-media-library-update' . $id_suffix,
+      '#name' => $name_key . '_media_update_widget',
       '#ajax' => [
         'callback' => [static::class, 'updateWidget'],
         'wrapper' => $wrapper_id,
@@ -419,14 +407,14 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
   /**
    * Validates whether the widget is required and contains values.
    *
-   * @param array $element
+   * @param array<string, mixed> $element
    *   The form element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
-   * @param array $form
+   * @param array<string, mixed> $form
    *   The form array.
    */
-  public static function validateRequired(array $element, FormStateInterface $form_state, array $form) {
+  public static function validateRequired(array $element, FormStateInterface $form_state, array $form): void {
     // If a remove button triggered submit, this validation isn't needed.
     if (in_array([static::class, 'removeItem'], $form_state->getSubmitHandlers(), TRUE)) {
       return;
@@ -455,13 +443,16 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
   /**
    * Gets the enabled media type IDs sorted by weight.
    *
-   * @param array $settings
+   * @param array<string, mixed> $settings
    *   The widget settings.
    *
-   * @return string[]
+   * @return array|null
    *   The media type IDs sorted by weight.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  protected function getAllowedMediaTypeIdsSorted(array $settings) {
+  protected function getAllowedMediaTypeIdsSorted(array $settings): ?array {
     // Get the media type IDs sorted by the user in the settings form.
     $sorted_media_type_ids = $settings['media_types'] ?? [];
 
@@ -512,7 +503,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  protected function getNoMediaTypesAvailableMessage(FieldDefinitionInterface $field_definition) {
+  protected function getNoMediaTypesAvailableMessage(FieldDefinitionInterface $field_definition): MarkupInterface {
     $entity_type_id = $field_definition->getTargetEntityTypeId();
 
     $default_message = $this->t('There are no allowed media types configured for this field. Contact the site administrator.');
@@ -532,12 +523,14 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
     // Add a link to the message to configure the field if the Field UI module
     // is enabled.
     $route_parameters = FieldUI::getRouteBundleParameter($this->entityTypeManager->getDefinition($entity_type_id), $field_definition->getTargetBundle());
-    $route_parameters['field_config'] = $field_definition->id();
-    $url = Url::fromRoute('entity.field_config.' . $entity_type_id . '_field_edit_form', $route_parameters);
-    if ($url->access($this->currentUser)) {
-      return $this->t('There are no allowed media types configured for this field. <a href=":url">Edit the field settings</a> to select the allowed media types.', [
-        ':url' => $url->toString(),
-      ]);
+    if ($field_definition instanceof FieldConfigInterface) {
+      $route_parameters['field_config'] = $field_definition->id();
+      $url = Url::fromRoute('entity.field_config.' . $entity_type_id . '_field_edit_form', $route_parameters);
+      if ($url->access($this->currentUser)) {
+        return $this->t('There are no allowed media types configured for this field. <a href=":url">Edit the field settings</a> to select the allowed media types.', [
+          ':url' => $url->toString(),
+        ]);
+      }
     }
 
     // If the user for some reason doesn't have access to the Field UI, fall
@@ -548,22 +541,22 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return ['preRenderWidget'];
   }
 
   /**
    * Prepares the widget's render element for rendering.
    *
-   * @param array $element
+   * @param array<string, mixed> $element
    *   The element to transform.
    *
-   * @return array
+   * @return array<string, mixed>
    *   The transformed element.
    *
    * @see ::formElement()
    */
-  public function preRenderWidget(array $element) {
+  public function preRenderWidget(array $element): array {
     if (isset($element['open_button'])) {
       $element['#field_suffix']['open_button'] = $element['open_button'];
       unset($element['open_button']);
@@ -584,12 +577,12 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
   /**
    * Submit callback for remove buttons.
    *
-   * @param array $form
+   * @param array<string, mixed> $form
    *   The form array.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    */
-  public static function removeItem(array $form, FormStateInterface $form_state) {
+  public static function removeItem(array $form, FormStateInterface $form_state): void {
     // During the form rebuild, formElement() will create field item widget
     // elements using re-indexed deltas, so clear out FormState::$input to
     // avoid a mismatch between old and new deltas. The rebuilt elements will
@@ -598,7 +591,9 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
     // @see Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget::extractFormValues
     $triggering_element = $form_state->getTriggeringElement();
     $parents = array_slice($triggering_element['#parents'], 0, -2);
-    NestedArray::setValue($form_state->getUserInput(), $parents, NULL);
+    $user_input = $form_state->getUserInput();
+    NestedArray::setValue($user_input, $parents, NULL);
+    $form_state->setUserInput($user_input);
 
     // Get the parents required to find the top-level widget element.
     if (count($triggering_element['#array_parents']) < 4) {
@@ -611,7 +606,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
   /**
    * AJAX callback to open the library modal.
    *
-   * @param array $form
+   * @param array<string, mixed> $form
    *   The form array.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
@@ -619,7 +614,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   An AJAX response to open the media library.
    */
-  public static function openMediaLibrary(array $form, FormStateInterface $form_state) {
+  public static function openMediaLibrary(array $form, FormStateInterface $form_state): AjaxResponse {
     $triggering_element = $form_state->getTriggeringElement();
     $library_ui = \Drupal::service('media_library.ui_builder')->buildUi($triggering_element['#media_library_state']);
     $dialog_options = MediaLibraryUiBuilder::dialogOptions();
@@ -633,12 +628,12 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
    * Making an invalid selection from the view should not be possible, but we
    * still validate in case other selection methods (ex: upload) are valid.
    *
-   * @param array $form
+   * @param array<string, mixed> $form
    *   The form array.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    */
-  public static function validateItems(array $form, FormStateInterface $form_state) {
+  public static function validateItems(array $form, FormStateInterface $form_state): void {
     $button = $form_state->getTriggeringElement();
     $element = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
     $media = static::getNewMediaItem($element, $form_state);
@@ -662,12 +657,12 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
   /**
    * Updates the field state and flags the form for rebuild.
    *
-   * @param array $form
+   * @param array<string, mixed> $form
    *   The form array.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    */
-  public static function addItems(array $form, FormStateInterface $form_state) {
+  public static function addItems(array $form, FormStateInterface $form_state): void {
     // During the form rebuild, formElement() will create field item widget
     // elements using re-indexed deltas, so clear out FormState::$input to
     // avoid a mismatch between old and new deltas. The rebuilt elements will
@@ -677,7 +672,8 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
     $button = $form_state->getTriggeringElement();
     $parents = array_slice($button['#parents'], 0, -1);
     $parents[] = 'selection';
-    NestedArray::setValue($form_state->getUserInput(), $parents, NULL);
+    $user_input = $form_state->getUserInput();
+    NestedArray::setValue($user_input, $parents, NULL);
 
     $element = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
 
@@ -691,18 +687,18 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
   /**
    * Gets newly selected media items.
    *
-   * @param array $element
+   * @param array<string, mixed> $element
    *   The wrapping element for this widget.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return \Drupal\media\MediaInterface
+   * @return \Drupal\media\MediaInterface|null
    *   The selected media item.
    */
-  protected static function getNewMediaItem(array $element, FormStateInterface $form_state) {
+  protected static function getNewMediaItem(array $element, FormStateInterface $form_state): ?MediaInterface {
     // Get the new media IDs passed to our hidden button. We need to use the
     // actual user input, since when #limit_validation_errors is used, any
-    // non validated user input is not added to the form state.
+    // non-validated user input is not added to the form state.
     // @see FormValidator::handleErrorsWithLimitedValidation()
     $values = $form_state->getUserInput();
     $path = $element['#parents'];
@@ -711,7 +707,6 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
     if (!empty($value['media_library_selection'])) {
       $id = $value['media_library_selection'];
       if (is_numeric($id)) {
-        /** @var \Drupal\media\MediaInterface[] $media */
         return Media::load($id);
       }
     }
@@ -721,7 +716,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
   /**
    * AJAX callback to update the widget when the selection changes.
    *
-   * @param array $form
+   * @param array<string, mixed> $form
    *   The form array.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
@@ -729,7 +724,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   An AJAX response to update the selection.
    */
-  public static function updateWidget(array $form, FormStateInterface $form_state) {
+  public static function updateWidget(array $form, FormStateInterface $form_state): AjaxResponse {
     $triggering_element = $form_state->getTriggeringElement();
     $wrapper_id = $triggering_element['#ajax']['wrapper'];
 
@@ -764,7 +759,7 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
     // 'data-disabled-focus' attribute and we also don't want to set the focus
     // here.
     // @see Drupal.behaviors.MediaLibraryWidgetDisableButton
-    elseif (!$is_remove_button && !isset($element['open_button']['#attributes']['data-disabled-focus'])) {
+    elseif (!isset($element['open_button']['#attributes']['data-disabled-focus'])) {
       $response->addCommand(new InvokeCommand("#$wrapper_id .js-media-library-open-button", 'focus'));
     }
 

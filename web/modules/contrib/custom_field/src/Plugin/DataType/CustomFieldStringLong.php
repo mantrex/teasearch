@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\DataType;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\Attribute\DataType;
-use Drupal\Core\TypedData\Plugin\DataType\StringData;
-use Drupal\custom_field\Plugin\Field\FieldType\CustomItem;
 use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Render\FilteredMarkup;
@@ -23,14 +24,14 @@ use Drupal\filter\Render\FilteredMarkup;
   label: new TranslatableMarkup('String long'),
   definition_class: CustomFieldDataDefinition::class,
 )]
-class CustomFieldStringLong extends StringData implements CacheableDependencyInterface, CustomFieldStringLongInterface {
+class CustomFieldStringLong extends CustomFieldDataTypeBase implements CacheableDependencyInterface, CustomFieldStringLongInterface {
 
   /**
    * Cached processed text.
    *
    * @var \Drupal\filter\FilterProcessResult|null
    */
-  protected $processed = NULL;
+  protected ?FilterProcessResult $processed = NULL;
 
   /**
    * {@inheritdoc}
@@ -54,7 +55,7 @@ class CustomFieldStringLong extends StringData implements CacheableDependencyInt
       '#langcode' => $item->getLangcode(),
     ];
     // Capture the cacheability metadata associated with the processed text.
-    $processed_text = $this->getRenderer()->renderPlain($build);
+    $processed_text = $this->getRenderer()->renderInIsolation($build);
     $this->processed = FilterProcessResult::createFromRenderArray($build)->setProcessedText((string) $processed_text);
 
     return FilteredMarkup::create($this->processed->getProcessedText());
@@ -66,38 +67,32 @@ class CustomFieldStringLong extends StringData implements CacheableDependencyInt
    * @return mixed|null
    *   The specified format from widget setting, otherwise NULL.
    */
-  protected function getFormat() {
+  protected function getFormat(): mixed {
     $parent = $this->getParent();
-    $format = NULL;
-    if ($parent instanceof CustomItem) {
-      $field_settings = $parent->getFieldDefinition()->getSetting('field_settings')[$this->name];
-      $settings = $field_settings ? $field_settings['widget_settings']['settings'] : [];
-      $format = $settings['formatted'] ? $settings['default_format'] : NULL;
-    }
-    return $format;
+    $field_settings = $parent->getFieldDefinition()->getSetting('field_settings')[$this->name];
+    $settings = $field_settings ? $field_settings['widget_settings']['settings'] : [];
+
+    return $settings['formatted'] ? $settings['default_format'] : NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCacheContexts() {
-    $this->getValue();
+  public function getCacheContexts(): array {
     return $this->processed->getCacheContexts();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCacheTags() {
-    $this->getValue();
+  public function getCacheTags(): array {
     return $this->processed->getCacheTags();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCacheMaxAge() {
-    $this->getValue();
+  public function getCacheMaxAge(): int {
     return $this->processed->getCacheMaxAge();
   }
 
@@ -107,8 +102,15 @@ class CustomFieldStringLong extends StringData implements CacheableDependencyInt
    * @return \Drupal\Core\Render\RendererInterface
    *   The renderer service.
    */
-  protected function getRenderer() {
+  protected function getRenderer(): RendererInterface {
     return \Drupal::service('renderer');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCastedValue() {
+    return $this->getString();
   }
 
 }

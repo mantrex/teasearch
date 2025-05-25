@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FeedsType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -18,11 +20,11 @@ class UriTarget extends BaseTarget {
   /**
    * {@inheritdoc}
    */
-  public function prepareValue($value, array $configuration, string $langcode): ?string {
+  public function prepareValue(mixed $value, array $configuration, string $langcode): ?string {
     $value = trim((string) $value);
 
     // Support linking to nothing.
-    if (in_array($value, ['<nolink>', '<none>'], TRUE)) {
+    if (in_array($value, ['<nolink>', '<none>', '<button>'], TRUE)) {
       $value = 'route:' . $value;
     }
 
@@ -32,7 +34,7 @@ class UriTarget extends BaseTarget {
       //   https://www.drupal.org/node/2421941
       // - '<front>' -> '/'
       // - '<front>#foo' -> '/#foo'
-      if (strpos($value, '<front>') === 0) {
+      if (str_starts_with($value, '<front>')) {
         $value = '/' . substr($value, strlen('<front>'));
       }
       // Prepend only with 'internal:' if the uri starts with '/', '?' or '#'.

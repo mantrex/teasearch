@@ -23,6 +23,10 @@ class CustomFieldViewfield extends GraphQLComposeSchemaTypeBase {
   public function getTypes(): array {
     $types = [];
 
+    if (!$this->moduleHandler->moduleExists('graphql_compose_views')) {
+      return $types;
+    }
+
     $args = [
       'page' => [
         'type' => Type::int(),

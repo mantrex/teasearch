@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
@@ -23,9 +25,12 @@ use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 class MapKeyValueWidget extends MapWidgetBase {
 
   /**
-   * {@inheritdoc}
+   * Default new item.
+   *
+   * @return string[]
+   *   The default value for new items.
    */
-  protected static function newItem(): string|array {
+  protected static function newItem(): array {
     return [
       'key' => '',
       'value' => '',
@@ -36,12 +41,13 @@ class MapKeyValueWidget extends MapWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'key_label' => 'Key',
-        'value_label' => 'Value',
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings'] = [
+      'key_label' => 'Key',
+      'value_label' => 'Value',
+    ] + $settings['settings'];
+
+    return $settings;
   }
 
   /**
@@ -49,7 +55,7 @@ class MapKeyValueWidget extends MapWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
 
     $element['settings']['key_label'] = [
       '#type' => 'textfield',
@@ -77,7 +83,7 @@ class MapKeyValueWidget extends MapWidgetBase {
   public function widget(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
     $element['#element_validate'] = [[static::class, 'validateArrayValues']];
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
     $field_name = $items->getFieldDefinition()->getName();
     $custom_field_name = $field->getName();
     $is_config_form = $form_state->getBuildInfo()['base_form_id'] == 'field_config_form';
@@ -163,7 +169,7 @@ class MapKeyValueWidget extends MapWidgetBase {
   /**
    * The #element_validate callback for map field array values.
    *
-   * @param array $element
+   * @param array<string, mixed> $element
    *   An associative array containing the properties and children of the
    *   generic form element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state

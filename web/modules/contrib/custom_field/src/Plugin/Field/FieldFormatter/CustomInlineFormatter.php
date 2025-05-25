@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Xss;
@@ -89,6 +91,9 @@ class CustomInlineFormatter extends BaseFormatter {
 
   /**
    * {@inheritdoc}
+   *
+   * @return array<int, mixed>
+   *   The render array of the field and subfields.
    */
   public function viewValue(FieldItemInterface $item, string $langcode): array {
     $field_name = $this->fieldDefinition->getName();
@@ -145,7 +150,7 @@ class CustomInlineFormatter extends BaseFormatter {
       // Add the item_separator after each item except the last one.
       if ($index < count($valid_items) - 1) {
         $output[] = [
-          '#markup' => Xss::filterAdmin($this->getSetting('item_separator')),
+          '#markup' => Xss::filterAdmin((string) $this->getSetting('item_separator')),
         ];
       }
     }

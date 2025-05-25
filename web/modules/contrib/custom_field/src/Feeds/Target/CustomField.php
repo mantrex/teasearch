@@ -63,7 +63,7 @@ class CustomField extends FieldTargetBase implements ConfigurableTargetInterface
   /**
    * {@inheritdoc}
    */
-  public function defaultConfiguration() {
+  public function defaultConfiguration(): array {
     $configuration = parent::defaultConfiguration() + ['timezone' => 'UTC'];
     $targets = $this->feedsManager->getFeedsTargets($this->settings);
     foreach ($targets as $name => $target) {
@@ -79,24 +79,24 @@ class CustomField extends FieldTargetBase implements ConfigurableTargetInterface
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     $form = parent::buildConfigurationForm($form, $form_state);
     $targets = $this->feedsManager->getFeedsTargets($this->settings);
     $delta = 0;
     // Hack to find out the target delta.
     foreach ($form_state->getValues() as $key => $value) {
-      if (strpos($key, 'target-settings-') === 0) {
+      if (str_starts_with($key, 'target-settings-')) {
         [, , $delta] = explode('-', $key);
         break;
       }
     }
     foreach ($targets as $name => $target) {
       $configuration = $this->configuration[$name] ?? [];
-      $build_configuration_form = $target->buildConfigurationForm($delta, $configuration);
+      $build_configuration_form = $target->buildConfigurationForm((int) $delta, $configuration);
       if (!empty($build_configuration_form)) {
-        $form[$name] = [
+        $form[(string) $name] = [
           '#type' => 'details',
-          '#title' => $this->t('@name', ['@name' => $name]),
+          '#title' => $this->t('@name', ['@name' => (string) $name]),
           '#tree' => TRUE,
         ] + $build_configuration_form;
       }
@@ -108,7 +108,8 @@ class CustomField extends FieldTargetBase implements ConfigurableTargetInterface
   /**
    * {@inheritdoc}
    */
-  public function getSummary() {
+  public function getSummary(): array {
+    /** @var string[] $summary */
     $summary = parent::getSummary();
 
     $field_name = $this->getTargetDefinition()->getLabel();
@@ -136,7 +137,7 @@ class CustomField extends FieldTargetBase implements ConfigurableTargetInterface
   /**
    * {@inheritdoc}
    */
-  protected static function prepareTarget(FieldDefinitionInterface $field_definition) {
+  protected static function prepareTarget(FieldDefinitionInterface $field_definition): FieldTargetDefinition {
     $definition = FieldTargetDefinition::createFromFieldDefinition($field_definition);
     /** @var \Drupal\custom_field\Plugin\CustomFieldFeedsManagerInterface $feeds_manager */
     $feeds_manager = \Drupal::service('plugin.manager.custom_field_feeds');
@@ -144,7 +145,9 @@ class CustomField extends FieldTargetBase implements ConfigurableTargetInterface
     $targets = $feeds_manager->getFeedsTargets($settings);
     foreach ($targets as $name => $target) {
       $definition->addProperty($name);
-      $mark_unique = $target->getPluginDefinition()['mark_unique'] ?? FALSE;
+      /** @var array $plugin_definition */
+      $plugin_definition = $target->getPluginDefinition();
+      $mark_unique = $plugin_definition['mark_unique'] ?? FALSE;
       if ($mark_unique) {
         $definition->markPropertyUnique($name);
       }
@@ -154,6 +157,9 @@ class CustomField extends FieldTargetBase implements ConfigurableTargetInterface
 
   /**
    * {@inheritdoc}
+   *
+   * @return array<string, mixed>
+   *   The array of values.
    */
   protected function prepareValue($delta, array &$values) {
     $langcode = $this->getLangcode();

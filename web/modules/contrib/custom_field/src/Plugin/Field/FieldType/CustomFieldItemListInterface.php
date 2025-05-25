@@ -12,7 +12,7 @@ interface CustomFieldItemListInterface extends FieldItemListInterface {
   /**
    * Gets the entities referenced by this field, preserving field item deltas.
    *
-   * @return string[]
+   * @return array<int, array<string, \Drupal\Core\Entity\EntityInterface>>
    *   An array of target types list of entity objects keyed by field item
    *   deltas.
    */

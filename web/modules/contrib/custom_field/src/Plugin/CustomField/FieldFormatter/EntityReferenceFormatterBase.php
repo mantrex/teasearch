@@ -1,8 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -16,19 +21,19 @@ class EntityReferenceFormatterBase extends CustomFieldFormatterBase {
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * The entity repository.
    *
    * @var \Drupal\Core\Entity\EntityRepositoryInterface
    */
-  protected $entityRepository;
+  protected EntityRepositoryInterface $entityRepository;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->entityTypeManager = $container->get('entity_type.manager');
     $instance->entityRepository = $container->get('entity.repository');
@@ -49,7 +54,7 @@ class EntityReferenceFormatterBase extends CustomFieldFormatterBase {
    * @return bool|\Drupal\Core\Access\AccessResultInterface
    *   A cacheable access result.
    */
-  protected function checkAccess(EntityInterface $entity) {
+  protected function checkAccess(EntityInterface $entity): bool|AccessResultInterface {
     return $entity->access('view', NULL, TRUE);
   }
 

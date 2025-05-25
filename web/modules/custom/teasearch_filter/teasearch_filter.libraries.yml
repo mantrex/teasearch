@@ -1,9 +1,13 @@
 teasearch_filter_styles:
+  version: 1.x
   css:
     theme:
-      modules/custom/teasearch_filter/css/teasearch_filter.css: {}
+      css/teasearch_filter.css: {}
+
 teasearch_filter_details_state:
+  version: 1.x
   js:
     js/details-state.js: {}
   dependencies:
     - core/drupal
+    - core/once

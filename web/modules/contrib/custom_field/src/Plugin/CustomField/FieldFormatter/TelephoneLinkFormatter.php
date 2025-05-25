@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Core\Field\Attribute\FieldFormatter;
@@ -47,7 +49,7 @@ class TelephoneLinkFormatter extends CustomFieldFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
+  public function formatValue(FieldItemInterface $item, mixed $value): array {
     // If the telephone number is 5 or less digits, parse_url() will think
     // it's a port number rather than a phone number which causes the link
     // formatter to throw an InvalidArgumentException. Avoid this by inserting
@@ -58,9 +60,9 @@ class TelephoneLinkFormatter extends CustomFieldFormatterBase {
     // number greater than 65535 will cause parse_url() to return FALSE so
     // we need the work around on any 5 digit (or less) number.
     // First we strip whitespace so we're counting actual digits.
-    $phone_number = preg_replace('/\s+/', '', $value);
+    $phone_number = (string) preg_replace('/\s+/', '', $value);
     if (strlen($phone_number) <= 5) {
-      $phone_number = substr_replace($phone_number, '-', 1, 0);
+      $phone_number = (string) substr_replace($phone_number, '-', 1, 0);
     }
 
     return [

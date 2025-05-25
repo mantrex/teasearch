@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -60,7 +62,7 @@ class FloatType extends NumericTypeBase {
     $max = isset($widget_settings['max']) && is_numeric($widget_settings['max']) ? $widget_settings['max'] : pow(10, ($precision - $scale)) - 1;
     $random_decimal = $min + mt_rand() / mt_getrandmax() * ($max - $min);
 
-    return static::truncateDecimal($random_decimal, $scale);
+    return static::truncateDecimal((float) $random_decimal, $scale);
   }
 
 }

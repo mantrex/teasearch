@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FeedsType;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Datetime\TimeZoneFormHelper;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -24,12 +27,12 @@ class DatetimeTarget extends BaseTarget {
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  protected $configFactory;
+  protected ConfigFactoryInterface $configFactory;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->configFactory = $container->get('config.factory');
 
@@ -48,7 +51,7 @@ class DatetimeTarget extends BaseTarget {
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(int $delta, array $configuration) {
+  public function buildConfigurationForm(int $delta, array $configuration): array {
     $form['timezone'] = [
       '#type' => 'select',
       '#title' => $this->t('Timezone handling'),
@@ -76,7 +79,7 @@ class DatetimeTarget extends BaseTarget {
   /**
    * {@inheritdoc}
    */
-  public function prepareValue($value, array $configuration, string $langcode): ?string {
+  public function prepareValue(mixed $value, array $configuration, string $langcode): ?string {
     $datetime_type = $this->configuration['datetime_type'];
     $date = $this->convertDate((string) $value, $configuration['timezone']);
 
@@ -93,10 +96,10 @@ class DatetimeTarget extends BaseTarget {
   /**
    * Returns the timezone options.
    *
-   * @return array
+   * @return array<string, mixed>
    *   A map of timezone options.
    */
-  public function getTimezoneOptions() {
+  public function getTimezoneOptions(): array {
     return [
       '__SITE__' => $this->t('Site default'),
     ] + TimeZoneFormHelper::getOptionsList();
@@ -114,7 +117,7 @@ class DatetimeTarget extends BaseTarget {
    *   A datetime object or null, if there is no value or if the date value
    *   has errors.
    */
-  protected function convertDate(string $value, string $timezone): mixed {
+  protected function convertDate(string $value, string $timezone): ?DrupalDateTime {
     $value = trim($value);
 
     // This is a year value.
@@ -123,7 +126,7 @@ class DatetimeTarget extends BaseTarget {
     }
 
     if (is_numeric($value)) {
-      $date = DrupalDateTime::createFromTimestamp($value, $this->getTimezoneConfiguration($timezone));
+      $date = DrupalDateTime::createFromTimestamp((int) $value, $this->getTimezoneConfiguration($timezone));
     }
 
     elseif (strtotime($value)) {
@@ -146,7 +149,7 @@ class DatetimeTarget extends BaseTarget {
    * @return array|mixed|null
    *   The timezone configuration.
    */
-  public function getTimezoneConfiguration(string $timezone) {
+  public function getTimezoneConfiguration(string $timezone): mixed {
     $default_timezone = $this->configFactory->get('system.date')->get('timezone.default');
     return ($timezone == '__SITE__') ?
       $default_timezone : $timezone;

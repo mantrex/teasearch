@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FeedsType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -10,7 +12,7 @@ use Drupal\custom_field\Attribute\CustomFieldFeedsType;
  */
 #[CustomFieldFeedsType(
   id: 'email',
-  label: new TranslatableMarkup('E-mail'),
+  label: new TranslatableMarkup('Email'),
   mark_unique: TRUE,
 )]
 class EmailTarget extends BaseTarget {
@@ -18,7 +20,7 @@ class EmailTarget extends BaseTarget {
   /**
    * {@inheritdoc}
    */
-  public function prepareValue($value, array $configuration, string $langcode): ?string {
+  public function prepareValue(mixed $value, array $configuration, string $langcode): ?string {
     $name = $this->configuration['name'];
     $value = is_string($value) ? trim($value) : $value;
     if (empty($value) || !filter_var($value, FILTER_VALIDATE_EMAIL)) {
@@ -43,12 +45,12 @@ class EmailTarget extends BaseTarget {
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(int $delta, array $configuration) {
+  public function buildConfigurationForm(int $delta, array $configuration): array {
     $form['defuse'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Defuse e-mail addresses'),
+      '#title' => $this->t('Defuse email addresses'),
       '#default_value' => $configuration['defuse'],
-      '#description' => $this->t('This appends _test to all imported e-mail addresses to ensure they cannot be used as recipients.'),
+      '#description' => $this->t('This appends _test to all imported email addresses to ensure they cannot be used as recipients.'),
     ];
 
     return $form;

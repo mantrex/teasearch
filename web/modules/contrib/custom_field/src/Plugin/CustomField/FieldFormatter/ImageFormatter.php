@@ -1,16 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Core\Url;
 use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
+use Drupal\image\ImageStyleStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -30,33 +36,33 @@ class ImageFormatter extends EntityReferenceFormatterBase {
    *
    * @var \Drupal\image\ImageStyleStorageInterface
    */
-  protected $imageStyleStorage;
+  protected ImageStyleStorageInterface $imageStyleStorage;
 
   /**
    * The current user.
    *
    * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $currentUser;
+  protected AccountInterface $currentUser;
 
   /**
    * The file url generator.
    *
    * @var \Drupal\Core\File\FileUrlGeneratorInterface
    */
-  protected $fileUrlGenerator;
+  protected FileUrlGeneratorInterface $fileUrlGenerator;
 
   /**
    * The typed data manager.
    *
    * @var \Drupal\Core\TypedData\TypedDataManagerInterface
    */
-  protected $typedDataManager;
+  protected TypedDataManagerInterface $typedDataManager;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->imageStyleStorage = $container->get('entity_type.manager')->getStorage('image_style');
     $instance->currentUser = $container->get('current_user');
@@ -140,12 +146,12 @@ class ImageFormatter extends EntityReferenceFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
-
+  public function formatValue(FieldItemInterface $item, mixed $value): ?array {
     if (!$value instanceof FileInterface) {
       return NULL;
     }
 
+    /** @var \Drupal\Core\Access\AccessResultInterface $access */
     $access = $this->checkAccess($value);
     if (!$access->isAllowed()) {
       return NULL;
@@ -209,7 +215,6 @@ class ImageFormatter extends EntityReferenceFormatterBase {
   public function calculateFormatterDependencies(array $settings): array {
     $dependencies = parent::calculateFormatterDependencies($settings);
     $style_id = $settings['image_style'];
-    /** @var \Drupal\image\ImageStyleInterface $style */
     if ($style_id && $style = ImageStyle::load($style_id)) {
       // If this formatter uses a valid image style to display the image, add
       // the image style configuration entity as dependency of this formatter.
@@ -226,7 +231,6 @@ class ImageFormatter extends EntityReferenceFormatterBase {
     $style_id = $settings['image_style'];
     $changed = FALSE;
     $changed_settings = [];
-    /** @var \Drupal\image\ImageStyleInterface $style */
     if ($style_id && $style = ImageStyle::load($style_id)) {
       if (!empty($dependencies[$style->getConfigDependencyKey()][$style->getConfigDependencyName()])) {
         $replacement_id = $this->imageStyleStorage->getReplacementId($style_id);

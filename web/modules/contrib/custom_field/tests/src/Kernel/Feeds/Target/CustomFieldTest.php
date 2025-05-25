@@ -16,7 +16,7 @@ class CustomFieldTest extends FeedsKernelTestBase {
   /**
    * Modules to enable.
    *
-   * @var array
+   * @var String[]
    */
   protected static $modules = [
     'field',
@@ -142,8 +142,10 @@ class CustomFieldTest extends FeedsKernelTestBase {
 
   /**
    * Basic test loading a CSV file.
+   *
+   * @throws \Exception
    */
-  public function test() {
+  public function test(): void {
     // Import CSV file.
     $feed = $this->createFeed($this->feedType->id(), [
       'source' => $this->resourcesPath() . '/csv/content.csv',
@@ -160,6 +162,7 @@ class CustomFieldTest extends FeedsKernelTestBase {
         'email_test' => 'test@example.com',
         'telephone_test' => '+1234567890',
         'uri_test' => 'http://www.example.com',
+        'link_test' => 'http://www.example.com',
         'boolean_test' => '1',
         'color_test' => '#FFA500',
         'map_test' => [
@@ -178,6 +181,7 @@ class CustomFieldTest extends FeedsKernelTestBase {
           'value3',
         ],
         'datetime_test' => '2023-01-01T00:00:00',
+        'time_test' => '24205',
       ],
       2 => [
         'string_test' => 'String 2',
@@ -188,11 +192,13 @@ class CustomFieldTest extends FeedsKernelTestBase {
         'email_test' => NULL,
         'telephone_test' => '-9876543210',
         'uri_test' => 'internal:/',
+        'link_test' => 'internal:/',
         'boolean_test' => '1',
         'color_test' => NULL,
         'map_test' => NULL,
         'map_string_test' => NULL,
         'datetime_test' => '2009-09-03T00:12:00',
+        'time_test' => '45000',
       ],
       3 => [
         'string_test' => 'String 3',
@@ -203,11 +209,13 @@ class CustomFieldTest extends FeedsKernelTestBase {
         'email_test' => NULL,
         'telephone_test' => NULL,
         'uri_test' => 'route:<nolink>',
+        'link_test' => 'route:<nolink>',
         'boolean_test' => '1',
         'color_test' => '#FFFFFF',
         'map_test' => NULL,
         'map_string_test' => NULL,
         'datetime_test' => '2018-02-09T00:00:00',
+        'time_test' => '34220',
       ],
     ];
     foreach ($expected_values as $nid => $data) {
@@ -226,6 +234,7 @@ class CustomFieldTest extends FeedsKernelTestBase {
       'decimal_test',
       'email_test',
       'uri_test',
+      'link_test',
       'telephone_test',
     ];
     $unique_count = count($unique_types);

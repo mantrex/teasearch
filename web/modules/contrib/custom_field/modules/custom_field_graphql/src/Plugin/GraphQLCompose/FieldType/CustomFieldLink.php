@@ -6,24 +6,24 @@ namespace Drupal\custom_field_graphql\Plugin\GraphQLCompose\FieldType;
 
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
-use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql_compose\Plugin\GraphQL\DataProducer\FieldProducerItemInterface;
 use Drupal\graphql_compose\Plugin\GraphQL\DataProducer\FieldProducerTrait;
 use Drupal\graphql_compose\Plugin\GraphQLCompose\GraphQLComposeFieldTypeBase;
-use Drupal\link\LinkItemInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use function Symfony\Component\String\u;
 
 /**
  * {@inheritdoc}
  *
  * @GraphQLComposeFieldType(
  *   id = "custom_field_link",
- *   type_sdl = "Link"
+ *   type_sdl = "CustomFieldLink"
  * )
  */
 class CustomFieldLink extends GraphQLComposeFieldTypeBase implements FieldProducerItemInterface {
@@ -50,16 +50,34 @@ class CustomFieldLink extends GraphQLComposeFieldTypeBase implements FieldProduc
    * {@inheritdoc}
    */
   public function resolveFieldItem(FieldItemInterface $item, FieldContext $context) {
+    $property = $context->getContextValue('property_name');
+    $data_type = $context->getContextValue('data_type');
+    $url = Url::fromUri($item->{$property});
+    $attributes = [];
+    if ($data_type === 'link') {
+      $link_title = $item->{$property . '__title'};
+      $options = $item->{$property . '__options'};
+      if (is_array($options) && isset($options['attributes'])) {
+        foreach ($options['attributes'] as $attribute => $value) {
+          // Some attribute names like "aria-label" need to be converted to what
+          // the schema expects.
+          $key = u($attribute)->camel()->toString();
+          $attributes[$key] = $value;
+        }
+      }
+    }
+    if (empty($link_title)) {
+      $link_title = $this->getTitle($url);
+    }
 
-    $url = Url::fromUri($item->uri);
-    $link_title = $this->getTitle($url);
     $link = $url->toString(TRUE);
     $context->addCacheableDependency($link);
 
     return [
-      'title' => $link_title ?: $link->getGeneratedUrl(),
+      'title' => $link_title ?: NULL,
       'url' => $link->getGeneratedUrl(),
       'internal' => !$url->isExternal(),
+      'attributes' => new Attribute($attributes),
     ];
   }
 
@@ -100,41 +118,11 @@ class CustomFieldLink extends GraphQLComposeFieldTypeBase implements FieldProduc
           if (!$access->isAllowed()) {
             return NULL;
           }
-          $link_title = $link_entity->label();
+          $link_title = (string) $link_entity->label();
         }
       }
     }
     return $link_title;
-  }
-
-  /**
-   * Get the URL from a LinkItemInterface.
-   *
-   * @param \Drupal\link\LinkItemInterface $item
-   *   The link item.
-   *
-   * @return \Drupal\Core\Url
-   *   The URL.
-   */
-  protected function getUrlFromLink(LinkItemInterface $item): Url {
-    return $item->getUrl();
-  }
-
-  /**
-   * Get the URL from a FieldItemInterface.
-   *
-   * @param \Drupal\Core\Field\FieldItemInterface $item
-   *   The field item.
-   *
-   * @return \Drupal\Core\Url
-   *   The URL.
-   */
-  protected function getUrlFromOther(FieldItemInterface $item): Url {
-    $path = $item->uri ?? NULL;
-
-    return UrlHelper::isExternal($path)
-      ? Url::fromUri($path)
-      : Url::fromUserInput($path);
   }
 
 }

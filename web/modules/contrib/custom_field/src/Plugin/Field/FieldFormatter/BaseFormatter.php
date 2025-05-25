@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Plugin\Exception\PluginException;
@@ -7,11 +9,20 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TranslatableInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\custom_field\Plugin\CustomFieldFormatterInterface;
+use Drupal\custom_field\Plugin\CustomFieldFormatterManagerInterface;
+use Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface;
+use Drupal\custom_field\TagManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -24,49 +35,49 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
    *
    * @var \Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface
    */
-  protected $customFieldManager;
+  protected CustomFieldTypeManagerInterface $customFieldManager;
 
   /**
    * The custom field formatter manager.
    *
    * @var \Drupal\custom_field\Plugin\CustomFieldFormatterManagerInterface
    */
-  protected $customFieldFormatterManager;
+  protected CustomFieldFormatterManagerInterface $customFieldFormatterManager;
 
   /**
    * The entity type manager service.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * The entity repository.
    *
    * @var \Drupal\Core\Entity\EntityRepositoryInterface
    */
-  protected $entityRepository;
+  protected EntityRepositoryInterface $entityRepository;
 
   /**
    * The module handler service.
    *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface $moduleHandler;
 
   /**
    * The tag manager service.
    *
    * @var \Drupal\custom_field\TagManagerInterface
    */
-  protected $tagManager;
+  protected TagManagerInterface $tagManager;
 
   /**
    * The renderer service.
    *
    * @var \Drupal\Core\Render\RendererInterface
    */
-  protected $renderer;
+  protected RendererInterface $renderer;
 
   /**
    * {@inheritdoc}
@@ -94,30 +105,6 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
   }
 
   /**
-   * Helper function to create options for plugin manager getInstance() method.
-   *
-   * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $custom_item
-   *   The custom field definition.
-   * @param string $format_type
-   *   The format type.
-   * @param array $formatter_settings
-   *   The formatter settings.
-   *
-   * @return array
-   *   The array of options.
-   */
-  protected function createOptionsForInstance($custom_item, string $format_type, array $formatter_settings): array {
-    return [
-      'custom_field_definition' => $custom_item,
-      'configuration' => [
-        'type' => $format_type,
-        'settings' => $formatter_settings,
-      ],
-      'view_mode' => $this->viewMode,
-    ];
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state): array {
@@ -140,10 +127,11 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
       if (isset($settings['format_type']) && isset($formatter_options[$settings['format_type']])) {
         $default_format = $settings['format_type'];
       }
-      $value_keys = $this->customFieldFormatterManager->getFormatterValueKeys($form_state, $field_name, $name);
-      $format_type = NestedArray::getValue($form_state->getValues(), $value_keys) ?? $default_format;
+      $values = $form_state->getValues();
+      $value_keys = $this->customFieldFormatterManager->getFormatterValueKeys($form_state, $field_name, (string) $name);
+      $format_type = NestedArray::getValue($values, $value_keys) ?? $default_format;
 
-      $visibility_path = $this->customFieldFormatterManager->getInputPathForStatesApi($form_state, $field_name, $name);
+      $visibility_path = $this->customFieldFormatterManager->getInputPathForStatesApi($form_state, $field_name, (string) $name);
       $root_visibility_path = $visibility_path;
       // Strip the last [formatter_settings] to get root path.
       if (str_ends_with($visibility_path, '[formatter_settings]')) {
@@ -177,11 +165,11 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
           '#suffix' => '</div>',
         ];
         $formatter = [];
-        $options = $this->createOptionsForInstance($custom_item, $format_type, $formatter_settings);
+        $options = $this->customFieldFormatterManager->createOptionsForInstance($custom_item, $format_type, $formatter_settings, $this->viewMode);
 
         // Get the formatter settings form.
-        /** @var \Drupal\custom_field\Plugin\CustomFieldFormatterInterface $format */
-        if ($format = $this->customFieldFormatterManager->getInstance($options)) {
+        $format = $this->customFieldFormatterManager->getInstance($options);
+        if (!is_null($format)) {
           $formatter = $format->settingsForm($form, $form_state);
         }
         $form['fields'][$name]['formatter_settings'] += $formatter;
@@ -304,7 +292,14 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
       if (isset($settings[$id]['format_type']) && isset($formatter_options[$settings[$id]['format_type']])) {
         $format_type = $settings[$id]['format_type'];
       }
-      $definition = $this->customFieldFormatterManager->getDefinition($format_type);
+      try {
+        $definition = $this->customFieldFormatterManager->getDefinition($format_type);
+      }
+      catch (\Exception $exception) {
+        // Silent fail, for now.
+        continue;
+      }
+
       $field_label = $custom_field->getLabel();
       $format_label = $definition['label'];
       $formatted_summary = new FormattableMarkup(
@@ -323,8 +318,16 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
    * Ajax callback for changing format type.
    *
    * Selects and returns the fieldset with the names in it.
+   *
+   * @param array<string, mixed> $form
+   *   The form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   The updated form element.
    */
-  public function actionCallback(array $form, FormStateInterface $form_state) {
+  public function actionCallback(array $form, FormStateInterface $form_state): AjaxResponse {
     $trigger = $form_state->getTriggeringElement();
     $wrapper_id = $trigger['#ajax']['wrapper'];
 
@@ -343,9 +346,18 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
   }
 
   /**
-   * {@inheritdoc}
+   * Builds a renderable array for a field value.
+   *
+   * @param \Drupal\Core\Field\FieldItemListInterface<\Drupal\custom_field\Plugin\Field\FieldType\CustomItem> $items
+   *   The field values to be rendered.
+   * @param string $langcode
+   *   The language that should be used to render the field.
+   *
+   * @return array<int, mixed>
+   *   A renderable array for $items, as an array of child elements keyed by
+   *   consecutive numeric indexes starting from 0.
    */
-  public function viewElements(FieldItemListInterface $items, $langcode) {
+  public function viewElements(FieldItemListInterface $items, $langcode): array {
     $elements = [];
 
     foreach ($items as $delta => $item) {
@@ -357,8 +369,11 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
 
   /**
    * {@inheritdoc}
+   *
+   * @param \Drupal\Core\Field\FieldItemListInterface<\Drupal\custom_field\Plugin\Field\FieldType\CustomItem>[] $entities_items
+   *   An array with the field values from the multiple entities being rendered.
    */
-  public function prepareView(array $entities_items) {
+  public function prepareView(array $entities_items): void {
     $ids = [];
     $custom_items = $this->getCustomFieldItems();
     foreach ($entities_items as $items) {
@@ -374,7 +389,12 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
     }
     if ($ids) {
       foreach ($ids as $target_type => $entity_ids) {
-        $target_entities[$target_type] = $this->entityTypeManager->getStorage($target_type)->loadMultiple($entity_ids);
+        try {
+          $target_entities[$target_type] = $this->entityTypeManager->getStorage($target_type)->loadMultiple($entity_ids);
+        }
+        catch (\Exception $exception) {
+          // Silent fail, for now.
+        }
       }
     }
     foreach ($entities_items as $items) {
@@ -396,7 +416,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
    * {@inheritdoc}
    */
   public function viewValue(FieldItemInterface $item, string $langcode): array {
-    $field_name = $this->fieldDefinition->get('field_name');
+    $field_name = $this->fieldDefinition->getName();
     $output = [
       '#theme' => 'custom_field',
       '#field_name' => $field_name,
@@ -443,20 +463,20 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
    * @param string $langcode
    *   The language code.
    *
-   * @return array
+   * @return array<string, mixed>
    *   An array of formatted values.
    */
   protected function getFormattedValues(FieldItemInterface $item, string $langcode): array {
     $settings = $this->getSetting('fields');
     $values = [];
-    $properties = $item->getProperties();
     $entity_type = $this->fieldDefinition->getTargetEntityTypeId();
     foreach ($this->getCustomFieldItems() as $name => $custom_item) {
       $value = $custom_item->value($item);
+      $data_type = $custom_item->getDataType();
       if ($value === '' || $value === NULL) {
         continue;
       }
-      if ($custom_item->getDataType() === 'viewfield') {
+      if ($data_type === 'viewfield') {
         $value = [
           'target_id' => $value,
           'display_id' => $item->{$name . '__display'},
@@ -464,15 +484,29 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
           'items_to_display' => $item->{$name . '__items'},
         ];
       }
-      elseif (method_exists($properties[$name], 'getEntity')) {
-        $entity = $properties[$name]->getEntity();
-
-        // Set the entity in the correct language for display.
+      elseif ($data_type === 'uri') {
+        $value = [
+          'uri' => $value,
+        ];
+      }
+      elseif ($data_type === 'link') {
+        $value = [
+          'uri' => $value,
+          'title' => $item->{$name . '__title'},
+          'options' => $item->{$name . '__options'},
+        ];
+      }
+      elseif (in_array($data_type, ['entity_reference', 'file'])) {
+        $entity = $item->{$name . '__entity'};
+        if (!$entity instanceof EntityInterface) {
+          continue;
+        }
         if ($entity instanceof TranslatableInterface) {
           $entity = $this->entityRepository->getTranslationFromContext($entity, $langcode);
         }
         $value = $entity;
       }
+
       $default_wrappers = [
         'field_wrapper_tag' => '',
         'field_wrapper_classes' => '',
@@ -496,14 +530,15 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
         $format_type = $formatter_settings['format_type'];
       }
 
-      $options = $this->createOptionsForInstance($custom_item, $format_type, $formatter_settings['formatter_settings'] ?? []);
+      $options = $this->customFieldFormatterManager->createOptionsForInstance($custom_item, $format_type, $formatter_settings['formatter_settings'], $this->viewMode);
+      /** @var \Drupal\custom_field\Plugin\CustomFieldFormatterInterface $plugin */
       $plugin = $this->customFieldFormatterManager->getInstance($options);
       $value = $plugin->formatValue($item, $value);
       if ($value === '' || $value === NULL) {
         continue;
       }
 
-      $formatter_settings['formatter_settings'] += $plugin->defaultSettings();
+      $formatter_settings['formatter_settings'] += $plugin::defaultSettings();
       $field_label = $formatter_settings['formatter_settings']['field_label'] ?? NULL;
 
       $markup = [
@@ -530,7 +565,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
    * Copied from Drupal\field_ui\Form\EntityViewDisplayEditForm (can't call
    * directly since it's protected)
    *
-   * @return array
+   * @return array<string, \Drupal\Core\StringTranslation\TranslatableMarkup|string>
    *   An array of visibility options.
    */
   protected function fieldLabelOptions(): array {
@@ -544,6 +579,18 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
 
   /**
    * {@inheritdoc}
+   *
+   * @return array<string, string[]>
+   *   An array of dependencies grouped by type (config, content, module,
+   *   theme). For example:
+   *   @code
+   *   [
+   *     'config' => ['user.role.anonymous', 'user.role.authenticated'],
+   *     'content' => ['node:article:f0a189e6-55fb-47fb-8005-5bef81c44d6d'],
+   *     'module' => ['node', 'user'],
+   *     'theme' => ['claro'],
+   *   ];
+   *   @endcode
    */
   public function calculateDependencies(): array {
     $dependencies = parent::calculateDependencies();
@@ -555,8 +602,8 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
           continue;
         }
         try {
-          /** @var \Drupal\custom_field\Plugin\CustomFieldFormatterInterface $plugin */
           $plugin = $this->customFieldFormatterManager->createInstance($field['format_type']);
+          assert($plugin instanceof CustomFieldFormatterInterface);
           $plugin_dependencies = $plugin->calculateFormatterDependencies($formatter_settings);
           $dependencies = \array_merge_recursive($dependencies, $plugin_dependencies);
         }
@@ -571,8 +618,12 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
 
   /**
    * {@inheritdoc}
+   *
+   * @param array<string, string[]> $dependencies
+   *   An array of dependencies that will be deleted keyed by dependency type.
+   *   Dependency types are 'config', 'content', 'module' and 'theme'.
    */
-  public function onDependencyRemoval(array $dependencies) {
+  public function onDependencyRemoval(array $dependencies): bool {
     $changed = parent::onDependencyRemoval($dependencies);
     $settings_changed = FALSE;
     $fields = $this->getSetting('fields');
@@ -580,23 +631,28 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
       if (!isset($field['formatter_settings'])) {
         continue;
       }
-      $plugin = $this->customFieldFormatterManager->createInstance($field['format_type']);
-      if (method_exists($plugin, 'onFormatterDependencyRemoval')) {
-        $changed_settings = $plugin->onFormatterDependencyRemoval($dependencies, $field['formatter_settings']);
-        if (!empty($changed_settings)) {
-          $fields[$name]['formatter_settings'] = $changed_settings;
-          $settings_changed = TRUE;
+
+      try {
+        $plugin = $this->customFieldFormatterManager->createInstance($field['format_type']);
+        if ($plugin instanceof CustomFieldFormatterInterface) {
+          $changed_settings = $plugin->onFormatterDependencyRemoval($dependencies, $field['formatter_settings']);
+          if (!empty($changed_settings)) {
+            $fields[$name]['formatter_settings'] = $changed_settings;
+            $settings_changed = TRUE;
+          }
         }
+      }
+      catch (\Exception $exception) {
+        // Silent fail, for now.
       }
     }
 
     if ($settings_changed) {
       $this->setSetting('fields', $fields);
     }
-
     $changed |= $settings_changed;
 
-    return $changed;
+    return (bool) $changed;
   }
 
 }

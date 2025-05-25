@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField;
 
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
@@ -19,12 +22,12 @@ class DateTimeWidgetBase extends CustomFieldWidgetBase {
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->entityTypeManager = $container->get('entity_type.manager');
 
@@ -77,13 +80,15 @@ class DateTimeWidgetBase extends CustomFieldWidgetBase {
    *
    * @return \Drupal\Core\Datetime\DrupalDateTime
    *   A date object for use as a default value in a field widget.
+   *
+   * @throws \DateInvalidTimeZoneException
    */
-  protected function createDefaultValue($date, string $timezone, string $datetime_type) {
+  protected function createDefaultValue(DrupalDateTime $date, string $timezone, string $datetime_type): DrupalDateTime {
     // The date was created and verified during field_load(), so it is safe to
     // use without further inspection.
-    $year = $date->format('Y');
-    $month = $date->format('m');
-    $day = $date->format('d');
+    $year = (int) $date->format('Y');
+    $month = (int) $date->format('m');
+    $day = (int) $date->format('d');
     $date->setTimezone(new \DateTimeZone($timezone));
     if ($datetime_type === CustomFieldTypeInterface::DATETIME_TYPE_DATE) {
       $date->setDefaultDateTime();
@@ -105,7 +110,7 @@ class DateTimeWidgetBase extends CustomFieldWidgetBase {
    * @return \Drupal\Core\Datetime\DrupalDateTime|null
    *   Return a date object or null.
    */
-  private function getDate(string $value, string $datetime_type) {
+  private function getDate(string $value, string $datetime_type): ?DrupalDateTime {
     $storage_format = $datetime_type === CustomFieldTypeInterface::DATETIME_TYPE_DATE ? CustomFieldTypeInterface::DATE_STORAGE_FORMAT : CustomFieldTypeInterface::DATETIME_STORAGE_FORMAT;
     $date_object = NULL;
     try {

@@ -3,7 +3,7 @@
 namespace Drupal\Tests\custom_field\FunctionalJavascript;
 
 /**
- * Test cases for the default widget plugin.
+ * Test cases for the 'custom_stacked' widget plugin.
  *
  * Any tests specific to the stacked widget should go in here.
  *

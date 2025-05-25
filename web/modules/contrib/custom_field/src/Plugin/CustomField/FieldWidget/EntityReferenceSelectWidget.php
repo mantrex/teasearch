@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
@@ -21,18 +23,6 @@ use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
   ],
 )]
 class EntityReferenceSelectWidget extends EntityReferenceOptionsWidgetBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'handler_settings' => [],
-        'empty_option' => '- Select -',
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
-  }
 
   /**
    * {@inheritdoc}

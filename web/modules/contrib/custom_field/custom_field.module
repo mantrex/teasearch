@@ -16,17 +16,17 @@ use Drupal\custom_field\TagManagerInterface;
 /**
  * Implements hook_help().
  */
-function custom_field_help($route_name, RouteMatchInterface $route_match) {
+function custom_field_help(string $route_name, RouteMatchInterface $route_match): string {
   switch ($route_name) {
-    // Main module help for the flexfield module.
     case 'help.page.custom_field':
-      $output = '';
-      $output .= '<h3>' . t('About') . '</h3>';
+      $output = '<h3>' . t('About') . '</h3>';
       $output .= '<p>' . t('Create simple, but flexible, multivalue fields without the hassle of entity references.') . '</p>';
       return $output;
 
     default:
   }
+
+  return '';
 }
 
 /**
@@ -135,7 +135,7 @@ function template_preprocess_custom_field_item(array &$variables): void {
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
  */
-function custom_field_form_field_config_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+function custom_field_form_field_config_edit_form_alter(array &$form, FormStateInterface $form_state, string $form_id): void {
   if (($field_config = $form_state->get('field_config')) && $field_config->get('field_type') == 'custom') {
     array_unshift(
       $form['actions']['submit']['#submit'],
@@ -147,7 +147,7 @@ function custom_field_form_field_config_edit_form_alter(&$form, FormStateInterfa
 /**
  * Implements hook_field_type_category_info_alter().
  */
-function custom_field_field_type_category_info_alter(&$definitions) {
+function custom_field_field_type_category_info_alter(array &$definitions): void {
   // The `custom` field type belongs in the `general` category, so the libraries
   // need to be attached using an alter hook.
   $definitions[FieldTypeCategoryManagerInterface::FALLBACK_CATEGORY]['libraries'][] = 'custom_field/drupal.custom-icon';
@@ -156,7 +156,7 @@ function custom_field_field_type_category_info_alter(&$definitions) {
 /**
  * Implements hook_field_widget_complete_form_alter().
  */
-function custom_field_field_widget_complete_form_alter(&$element, FormStateInterface $form_state, $context) {
+function custom_field_field_widget_complete_form_alter(array &$element, FormStateInterface $form_state, array $context): void {
   $items = $context['items'];
   if ($items instanceof CustomFieldItemListInterface) {
     $add_more_label = $items->getItemDefinition()->getSetting('add_more_label') ?? '';

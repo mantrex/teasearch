@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field_viewfield\Plugin\CustomField\FieldType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -103,18 +105,6 @@ class ViewfieldType extends EntityReference {
         }
       }
     }
-
-    return $dependencies;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function calculateStorageDependencies(array $settings): array {
-    $dependencies = [];
-    $entity_type_manager = \Drupal::entityTypeManager();
-    $target_entity_type = $entity_type_manager->getDefinition($settings['target_type']);
-    $dependencies['module'][] = $target_entity_type->getProvider();
 
     return $dependencies;
   }

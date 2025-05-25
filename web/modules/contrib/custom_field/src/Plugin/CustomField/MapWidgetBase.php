@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField;
 
 use Drupal\Component\Utility\NestedArray;
@@ -18,7 +20,7 @@ class MapWidgetBase extends CustomFieldWidgetBase {
   /**
    * Default new item.
    *
-   * @return string|int|array
+   * @return string|int|array<string|int, mixed>
    *   The default value for new items.
    */
   protected static function newItem(): string|int|array {
@@ -29,11 +31,12 @@ class MapWidgetBase extends CustomFieldWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'table_empty' => '',
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings'] = [
+      'table_empty' => '',
+    ] + $settings['settings'];
+
+    return $settings;
   }
 
   /**
@@ -51,7 +54,7 @@ class MapWidgetBase extends CustomFieldWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
     $element['settings']['table_empty'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Empty text'),
@@ -95,7 +98,7 @@ class MapWidgetBase extends CustomFieldWidgetBase {
    *
    * Selects and returns the fieldset with the names in it.
    */
-  public function actionCallback(array &$form, FormStateInterface $form_state) {
+  public function actionCallback(array &$form, FormStateInterface $form_state): AjaxResponse {
     // Get the triggering element's wrapper ID.
     $trigger = $form_state->getTriggeringElement();
     $wrapper_id = $trigger['#ajax']['wrapper'];

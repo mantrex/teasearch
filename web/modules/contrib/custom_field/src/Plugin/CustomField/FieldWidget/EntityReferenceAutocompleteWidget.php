@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
@@ -27,15 +29,15 @@ class EntityReferenceAutocompleteWidget extends EntityReferenceWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'match_operator' => 'CONTAINS',
-        'match_limit' => 10,
-        'size' => 60,
-        'placeholder' => '',
-        'handler_settings' => [],
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings'] = [
+      'match_operator' => 'CONTAINS',
+      'match_limit' => 10,
+      'size' => 60,
+      'placeholder' => '',
+    ] + $settings['settings'];
+
+    return $settings;
   }
 
   /**
@@ -43,7 +45,7 @@ class EntityReferenceAutocompleteWidget extends EntityReferenceWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
 
     $element['settings']['match_operator'] = [
       '#type' => 'radios',
@@ -81,7 +83,7 @@ class EntityReferenceAutocompleteWidget extends EntityReferenceWidgetBase {
    */
   public function widget(FieldItemListInterface $items, int $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
     $entity = $items->getEntity();
     $target_type = $field->getTargetType();
     if (!isset($settings['handler'])) {
@@ -197,13 +199,13 @@ class EntityReferenceAutocompleteWidget extends EntityReferenceWidgetBase {
   /**
    * Returns the options for the match operator.
    *
-   * @return array
+   * @return String[]
    *   List of options.
    */
-  protected function getMatchOperatorOptions() {
+  protected function getMatchOperatorOptions(): array {
     return [
-      'STARTS_WITH' => $this->t('Starts with'),
-      'CONTAINS' => $this->t('Contains'),
+      'STARTS_WITH' => (string) $this->t('Starts with'),
+      'CONTAINS' => (string) $this->t('Contains'),
     ];
   }
 

@@ -9,7 +9,7 @@ use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Url;
-use Drupal\custom_field\Plugin\DataType\CustomFieldUri;
+use Drupal\custom_field\Plugin\DataType\CustomFieldLink;
 use Drupal\serialization\Normalizer\PrimitiveDataNormalizer;
 
 /**
@@ -46,12 +46,17 @@ class UriNormalizer extends PrimitiveDataNormalizer {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\Entity\EntityMalformedException
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   public function normalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|null {
-    assert($object instanceof CustomFieldUri);
+    assert($object instanceof CustomFieldLink);
     if ($value = $object->getValue()) {
       $url = $this->getUrl($value);
       $entity = NULL;
+      $title = $object->getTitle();
+      $field_type = $object->getDataDefinition()->getSetting('field_type');
 
       if ($url->isRouted() && preg_match('/^entity\.(\w+)\.canonical$/', $url->getRouteName(), $matches)) {
         // Check access to the canonical entity route.
@@ -82,11 +87,19 @@ class UriNormalizer extends PrimitiveDataNormalizer {
           return NULL;
         }
         $url = $entity->toUrl();
+        if (empty($title)) {
+          $title = $entity->label();
+        }
       }
-      return [
+      $return = [
         'uri' => (string) $value,
         'url' => $url->isExternal() ? $url->toString() : $url->toString(TRUE)->getGeneratedUrl(),
+        'title' => $title,
       ];
+      if ($field_type === 'link') {
+        $return['options'] = $object->getOptions();
+      }
+      return $return;
     }
 
     return NULL;
@@ -116,7 +129,7 @@ class UriNormalizer extends PrimitiveDataNormalizer {
    */
   public function getSupportedTypes(?string $format): array {
     return [
-      CustomFieldUri::class => TRUE,
+      CustomFieldLink::class => TRUE,
     ];
   }
 

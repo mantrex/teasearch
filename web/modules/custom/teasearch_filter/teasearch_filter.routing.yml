@@ -1,5 +1,5 @@
 teasearch_filter.search:
-  path: '/teasearch/{content_type}'
+  path: '/category/{content_type}'
   defaults:
     _controller: '\Drupal\teasearch_filter\Controller\SearchController::search'
     _title: 'Content search'

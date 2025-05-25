@@ -2,7 +2,12 @@
 
 namespace Drupal\custom_field\Plugin\Field\FieldType;
 
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Core\Entity\RevisionableInterface;
+use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Field\FieldItemList;
+use Drupal\Core\TypedData\Exception\MissingDataException;
 use Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface;
 
 /**
@@ -54,8 +59,12 @@ class CustomItemList extends FieldItemList implements CustomFieldItemListInterfa
   /**
    * Gets all files referenced by this field.
    *
-   * @return array|\Drupal\Core\Entity\EntityInterface[]
+   * @return \Drupal\file\FileInterface[]
    *   An array of all file objects.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   public function referencedFiles(): array {
     if ($this->isEmpty()) {
@@ -77,8 +86,7 @@ class CustomItemList extends FieldItemList implements CustomFieldItemListInterfa
       }
     }
     if (!empty($ids)) {
-      $files = \Drupal::entityTypeManager()->getStorage('file')->loadMultiple($ids);
-      return $files;
+      return \Drupal::entityTypeManager()->getStorage('file')->loadMultiple($ids);
     }
 
     return [];
@@ -87,48 +95,50 @@ class CustomItemList extends FieldItemList implements CustomFieldItemListInterfa
   /**
    * {@inheritdoc}
    */
-  public function postSave($update) {
+  public function postSave($update): bool {
     $entity = $this->getEntity();
+
+    $files = $this->referencedFiles();
 
     if (!$update) {
       // Add a new usage for newly uploaded files.
-      /** @var \Drupal\File\FileInterface $file */
-      foreach ($this->referencedFiles() as $file) {
-        \Drupal::service('file.usage')->add($file, 'custom_field', $entity->getEntityTypeId(), $entity->id());
+      foreach ($files as $file) {
+        \Drupal::service('file.usage')->add($file, 'custom_field', $entity->getEntityTypeId(), (string) $entity->id());
       }
     }
     else {
       // Get current target file entities and file IDs.
-      $files = $this->referencedFiles();
       $ids = [];
 
-      /** @var \Drupal\file\FileInterface $file */
       foreach ($files as $file) {
         $ids[] = $file->id();
       }
 
       // On new revisions, all files are considered to be a new usage and no
       // deletion of previous file usages are necessary.
-      if (!empty($entity->original) && $entity->getRevisionId() != $entity->original->getRevisionId()) {
+      if ($entity instanceof RevisionableInterface && !empty($entity->original) && $entity->getRevisionId() != $entity->original->getRevisionId()) {
         foreach ($files as $file) {
-          \Drupal::service('file.usage')->add($file, 'custom_field', $entity->getEntityTypeId(), $entity->id());
+          \Drupal::service('file.usage')->add($file, 'custom_field', $entity->getEntityTypeId(), (string) $entity->id());
         }
-        return;
+        return FALSE;
       }
 
       // Get the file IDs attached to the field before this update.
       $field_name = $this->getFieldDefinition()->getName();
       $original_ids = [];
-      $langcode = $this->getLangcode();
-      $original = $entity->original;
-      if ($original->hasTranslation($langcode)) {
-        $original_items = $original->getTranslation($langcode)->{$field_name};
-        $settings = $this->getSettings();
-        $custom_fields = $this->getCustomFieldManager()->getCustomFieldItems($settings);
-        foreach ($original_items as $item) {
-          foreach ($custom_fields as $custom_field) {
-            if (in_array($custom_field->getPluginId(), ['file', 'image'])) {
-              $original_ids[] = $item->{$custom_field->getName()};
+      if (!empty($entity->original)) {
+        $original = $entity->original;
+        $langcode = $this->getLangcode();
+        if ($original->hasTranslation($langcode)) {
+          $original_items = $original->getTranslation($langcode)->{$field_name};
+          $settings = $this->getSettings();
+          $custom_fields = $this->getCustomFieldManager()
+            ->getCustomFieldItems($settings);
+          foreach ($original_items as $item) {
+            foreach ($custom_fields as $custom_field) {
+              if (in_array($custom_field->getPluginId(), ['file', 'image'])) {
+                $original_ids[] = $item->{$custom_field->getName()};
+              }
             }
           }
         }
@@ -137,44 +147,52 @@ class CustomItemList extends FieldItemList implements CustomFieldItemListInterfa
       // Decrement file usage by 1 for files that were removed from the field.
       $removed_ids = array_filter(array_diff($original_ids, $ids));
       $removed_files = \Drupal::entityTypeManager()->getStorage('file')->loadMultiple($removed_ids);
-      foreach ($removed_files as $file) {
-        \Drupal::service('file.usage')->delete($file, 'custom_field', $entity->getEntityTypeId(), $entity->id());
+      foreach ($removed_files as $removed_file) {
+        \Drupal::service('file.usage')->delete($removed_file, 'custom_field', $entity->getEntityTypeId(), (string) $entity->id());
       }
 
       // Add new usage entries for newly added files.
       foreach ($files as $file) {
         if (!in_array($file->id(), $original_ids)) {
-          \Drupal::service('file.usage')->add($file, 'custom_field', $entity->getEntityTypeId(), $entity->id());
+          \Drupal::service('file.usage')->add($file, 'custom_field', $entity->getEntityTypeId(), (string) $entity->id());
         }
       }
     }
+
+    return FALSE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function delete() {
+  public function delete(): void {
     parent::delete();
     $entity = $this->getEntity();
 
     // If a translation is deleted only decrement the file usage by one. If the
     // default translation is deleted remove all file usages within this entity.
-    $count = $entity->isDefaultTranslation() ? 0 : 1;
-    foreach ($this->referencedFiles() as $file) {
-      \Drupal::service('file.usage')->delete($file, 'custom_field', $entity->getEntityTypeId(), $entity->id(), $count);
+    $count = $entity instanceof TranslatableInterface && $entity->isDefaultTranslation() ? 0 : 1;
+    try {
+      foreach ($this->referencedFiles() as $file) {
+        \Drupal::service('file.usage')
+          ->delete($file, 'custom_field', $entity->getEntityTypeId(), (string) $entity->id(), $count);
+      }
+    }
+    catch (InvalidPluginDefinitionException | PluginNotFoundException | MissingDataException $e) {
+      // Do nothing.
     }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function deleteRevision() {
+  public function deleteRevision(): void {
     parent::deleteRevision();
     $entity = $this->getEntity();
 
     // Decrement the file usage by 1.
     foreach ($this->referencedFiles() as $file) {
-      \Drupal::service('file.usage')->delete($file, 'custom_field', $entity->getEntityTypeId(), $entity->id());
+      \Drupal::service('file.usage')->delete($file, 'custom_field', $entity->getEntityTypeId(), (string) $entity->id());
     }
   }
 

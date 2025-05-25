@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Core\Field\Attribute\FieldFormatter;
@@ -55,8 +57,7 @@ class MapTableFormatter extends CustomFieldFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
-
+  public function formatValue(FieldItemInterface $item, mixed $value): ?array {
     if (!is_array($value) || empty($value)) {
       return NULL;
     }
@@ -71,8 +72,8 @@ class MapTableFormatter extends CustomFieldFormatterBase {
     return [
       '#type' => 'table',
       '#header' => [
-        'key' => $this->getSetting('key_label'),
-        'value' => $this->getSetting('value_label'),
+        'key' => (string) $this->getSetting('key_label'),
+        'value' => (string) $this->getSetting('value_label'),
       ],
       '#rows' => $rows,
     ];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
@@ -102,7 +104,7 @@ class MapTextWidget extends MapWidgetBase {
   /**
    * The #element_validate callback for map field array values.
    *
-   * @param array $element
+   * @param array<string, mixed> $element
    *   An associative array containing the properties and children of the
    *   generic form element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state

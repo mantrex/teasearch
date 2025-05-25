@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Html;
@@ -72,7 +74,7 @@ class CustomListFormatter extends BaseFormatter {
       return [];
     }
 
-    $field_name = $this->fieldDefinition->get('field_name');
+    $field_name = $this->fieldDefinition->getName();
     $class = Html::cleanCssIdentifier($field_name);
     $elements = [];
     foreach ($items as $delta => $item) {

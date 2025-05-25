@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Component\Utility\Random;
@@ -41,7 +43,7 @@ class ImageType extends FileType {
   /**
    * The default file extensions for generateSampleValue().
    *
-   * @var
+   * @var string
    */
   const DEFAULT_FILE_EXTENSIONS = 'png gif jpg jpeg';
 
@@ -87,6 +89,8 @@ class ImageType extends FileType {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public static function propertyDefinitions(array $settings): array {
     ['name' => $name, 'target_type' => $target_type] = $settings;
@@ -145,7 +149,7 @@ class ImageType extends FileType {
     $file_extensions = $settings['file_extensions'] ?? self::DEFAULT_FILE_EXTENSIONS;
     static $images = [];
 
-    $settings['uri_scheme'] = $field->getConfiguration()['uri_scheme'];
+    $settings['uri_scheme'] = $field->getSetting('uri_scheme');
     $min_resolution = empty($settings['min_resolution']) ? '100x100' : $settings['min_resolution'];
     $max_resolution = empty($settings['max_resolution']) ? '600x600' : $settings['max_resolution'];
     $extensions = array_intersect(explode(' ', $file_extensions), ['png', 'gif', 'jpg', 'jpeg']);
@@ -165,7 +169,7 @@ class ImageType extends FileType {
     if (!isset($images[$extension][$min_resolution][$max_resolution]) || count($images[$extension][$min_resolution][$max_resolution]) <= 5) {
       /** @var \Drupal\Core\File\FileSystemInterface $file_system */
       $file_system = \Drupal::service('file_system');
-      $tmp_file = $file_system->tempnam('temporary://', 'generateImage_');
+      $tmp_file = (string) $file_system->tempnam('temporary://', 'generateImage_');
       $destination = $tmp_file . '.' . $extension;
       try {
         $file_system->move($tmp_file, $destination);
@@ -173,7 +177,7 @@ class ImageType extends FileType {
       catch (FileException $e) {
         // Ignore failed move.
       }
-      if ($path = $random->image($file_system->realpath($destination), $min_resolution, $max_resolution)) {
+      if ($path = $random->image((string) $file_system->realpath($destination), $min_resolution, $max_resolution)) {
         $image = File::create();
         $image->setFileUri($path);
         $image->setOwnerId(\Drupal::currentUser()->id());
@@ -196,7 +200,9 @@ class ImageType extends FileType {
       $file = $images[$extension][$min_resolution][$max_resolution][$image_index];
     }
 
-    [$width, $height] = getimagesize($file->getFileUri());
+    /** @var int[] $image_info */
+    $image_info = getimagesize($file->getFileUri());
+    [$width, $height] = $image_info;
 
     $value = [
       'target_id' => $file->id(),
@@ -216,7 +222,6 @@ class ImageType extends FileType {
     $dependencies = parent::calculateDependencies($item, $default_value);
     $widget_settings = $item->getWidgetSetting('settings') ?? [];
     $style_id = $widget_settings['preview_image_style'] ?? NULL;
-    /** @var \Drupal\image\ImageStyleInterface $style */
     if ($style_id && $style = ImageStyle::load($style_id)) {
       // If this widget uses a valid image style to display the preview of the
       // uploaded image, add that image style configuration entity as dependency
@@ -235,7 +240,6 @@ class ImageType extends FileType {
     $changed = FALSE;
     $changed_settings = [];
     $style_id = $widget_settings['preview_image_style'] ?? NULL;
-    /** @var \Drupal\image\ImageStyleInterface $style */
     if ($style_id && $style = ImageStyle::load($style_id)) {
       if (!empty($dependencies[$style->getConfigDependencyKey()][$style->getConfigDependencyName()])) {
         /** @var \Drupal\image\ImageStyleStorageInterface $storage */

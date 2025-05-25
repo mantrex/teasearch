@@ -8,6 +8,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\views\Attribute\ViewsFilter;
 use Drupal\views\Plugin\views\filter\Date as NumericDate;
+use Drupal\views\Plugin\views\query\Sql;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -66,7 +67,7 @@ class CustomFieldDate extends NumericDate implements ContainerFactoryPluginInter
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack used to determine the current time.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, DateFormatterInterface $date_formatter, RequestStack $request_stack) {
+  final public function __construct(array $configuration, $plugin_id, $plugin_definition, DateFormatterInterface $date_formatter, RequestStack $request_stack) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->dateFormatter = $date_formatter;
     $this->requestStack = $request_stack;
@@ -83,7 +84,7 @@ class CustomFieldDate extends NumericDate implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     return new static(
       $configuration,
       $plugin_id,
@@ -96,7 +97,7 @@ class CustomFieldDate extends NumericDate implements ContainerFactoryPluginInter
   /**
    * Override parent method, which deals with dates as integers.
    */
-  protected function opBetween($field) {
+  protected function opBetween($field): void {
     $timezone = $this->getTimezone();
     $origin_offset = $this->getOffset($this->value['min'], $timezone);
 
@@ -113,14 +114,25 @@ class CustomFieldDate extends NumericDate implements ContainerFactoryPluginInter
 
     // This is safe because we are manually scrubbing the values.
     $operator = strtoupper($this->operator);
+    // The parent class defines $field as an object for some reason but
+    // getDateField() expects a string.
+    // @phpstan-ignore argument.type
     $field = $this->query->getDateFormat($this->query->getDateField($field, TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
-    $this->query->addWhereExpression($this->options['group'], "$field $operator $a AND $b");
+    if ($this->query instanceof Sql) {
+      $this->query->addWhereExpression($this->options['group'], "$field $operator $a AND $b");
+    }
   }
 
   /**
    * Override parent method, which deals with dates as integers.
+   *
+   * @param string $field
+   *   The field.
+   *
+   * @throws \DateInvalidTimeZoneException
+   * @throws \DateMalformedStringException
    */
-  protected function opSimple($field) {
+  protected function opSimple($field): void {
     $timezone = $this->getTimezone();
     $origin_offset = $this->getOffset($this->value['value'], $timezone);
 
@@ -130,7 +142,9 @@ class CustomFieldDate extends NumericDate implements ContainerFactoryPluginInter
 
     // This is safe because we are manually scrubbing the value.
     $field = $this->query->getDateFormat($this->query->getDateField($field, TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
-    $this->query->addWhereExpression($this->options['group'], "$field $this->operator $value");
+    if ($this->query instanceof Sql) {
+      $this->query->addWhereExpression($this->options['group'], "$field $this->operator $value");
+    }
   }
 
   /**
@@ -143,7 +157,7 @@ class CustomFieldDate extends NumericDate implements ContainerFactoryPluginInter
    * @return string
    *   The time zone name.
    */
-  protected function getTimezone() {
+  protected function getTimezone(): string {
     return $this->dateFormat === CustomFieldTypeInterface::DATE_STORAGE_FORMAT
       ? CustomFieldTypeInterface::STORAGE_TIMEZONE
       : date_default_timezone_get();
@@ -161,8 +175,11 @@ class CustomFieldDate extends NumericDate implements ContainerFactoryPluginInter
    *
    * @return int
    *   The computed offset in seconds.
+   *
+   * @throws \DateInvalidTimeZoneException
+   * @throws \DateMalformedStringException
    */
-  protected function getOffset($time, $timezone) {
+  protected function getOffset(string $time, string $timezone): int {
     // Date-only fields do not have a time zone or offset from UTC associated
     // with them. For relative (i.e. 'offset') comparisons, we need to compute
     // the user's offset from UTC for use in the query.

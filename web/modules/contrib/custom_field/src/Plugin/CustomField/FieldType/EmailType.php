@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Component\Utility\Random;
@@ -14,8 +16,8 @@ use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
  */
 #[CustomFieldType(
   id: 'email',
-  label: new TranslatableMarkup('E-mail'),
-  description: new TranslatableMarkup('A field containing an e-mail value.'),
+  label: new TranslatableMarkup('Email'),
+  description: new TranslatableMarkup('A field containing an email value.'),
   category: new TranslatableMarkup('General'),
   default_widget: 'email',
   default_formatter: 'email_mailto',

@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Exception\UndefinedLinkTemplateException;
 use Drupal\Core\Field\Attribute\FieldFormatter;
@@ -47,12 +50,13 @@ class EntityReferenceLabelFormatter extends EntityReferenceFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
+  public function formatValue(FieldItemInterface $item, mixed $value): ?array {
 
     if (!$value instanceof EntityInterface) {
       return NULL;
     }
 
+    /** @var \Drupal\Core\Access\AccessResultInterface $access */
     $access = $this->checkAccess($value);
     if (!$access->isAllowed()) {
       return NULL;
@@ -100,7 +104,7 @@ class EntityReferenceLabelFormatter extends EntityReferenceFormatterBase {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity) {
+  protected function checkAccess(EntityInterface $entity): bool|AccessResultInterface {
     return $entity->access('view label', NULL, TRUE);
   }
 

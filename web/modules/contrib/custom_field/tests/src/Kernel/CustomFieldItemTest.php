@@ -9,7 +9,6 @@ use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
-use Drupal\node\Entity\NodeType;
 
 /**
  * Tests the custom field type.
@@ -19,9 +18,7 @@ use Drupal\node\Entity\NodeType;
 class CustomFieldItemTest extends FieldKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'custom_field',
@@ -41,14 +38,14 @@ class CustomFieldItemTest extends FieldKernelTestBase {
   /**
    * A field storage to use in this test class.
    *
-   * @var \Drupal\field\Entity\FieldStorageConfig
+   * @var \Drupal\field\FieldStorageConfigInterface
    */
   protected $fieldStorage;
 
   /**
    * The field used in this test class.
    *
-   * @var \Drupal\field\Entity\FieldConfig
+   * @var \Drupal\Core\Field\FieldDefinitionInterface
    */
   protected $field;
 
@@ -131,12 +128,6 @@ class CustomFieldItemTest extends FieldKernelTestBase {
     $this->installSchema('node', ['node_access']);
     $this->installSchema('file', ['file_usage']);
 
-    // Create the article content type for entity reference support.
-    $node_type = NodeType::create([
-      'type' => 'article',
-    ]);
-    $node_type->save();
-
     // Get the services required for testing.
     $this->customFieldTypeManager = $this->container->get('plugin.manager.custom_field_type');
     $this->customFieldWidgetManager = $this->container->get('plugin.manager.custom_field_widget');
@@ -145,8 +136,7 @@ class CustomFieldItemTest extends FieldKernelTestBase {
     $this->entityType = 'node';
     $this->bundle = 'custom_field_entity_test';
     $this->fieldName = 'field_test';
-    $this->fields = $this->entityFieldManager
-      ->getFieldDefinitions('node', 'custom_field_entity_test');
+    $this->fields = $this->entityFieldManager->getFieldDefinitions('node', 'custom_field_entity_test');
     $this->field = $this->fields[$this->fieldName];
     $this->fieldStorage = FieldStorageConfig::loadByName($this->entityType, $this->fieldName);
   }
@@ -154,7 +144,7 @@ class CustomFieldItemTest extends FieldKernelTestBase {
   /**
    * Tests using entity fields of the custom field type.
    */
-  public function testCustomFieldItem() {
+  public function testCustomFieldItem(): void {
     $random = new Random();
     $expected = [
       'uuid' => [
@@ -327,6 +317,16 @@ class CustomFieldItemTest extends FieldKernelTestBase {
           'class' => 'Drupal\custom_field\Plugin\CustomField\FieldFormatter\ImageFormatter',
         ],
       ],
+      'link' => [
+        'widget' => [
+          'id' => 'link_default',
+          'class' => 'Drupal\custom_field\Plugin\CustomField\FieldWidget\LinkWidget',
+        ],
+        'formatter' => [
+          'id' => 'link',
+          'class' => 'Drupal\custom_field\Plugin\CustomField\FieldFormatter\LinkFormatter',
+        ],
+      ],
       'viewfield' => [
         'widget' => [
           'id' => 'viewfield_select',
@@ -337,19 +337,28 @@ class CustomFieldItemTest extends FieldKernelTestBase {
           'class' => 'Drupal\custom_field_viewfield\Plugin\CustomField\FieldFormatter\ViewfieldDefaultFormatter',
         ],
       ],
+      'time' => [
+        'widget' => [
+          'id' => 'time_widget',
+          'class' => 'Drupal\custom_field\Plugin\CustomField\FieldWidget\TimeWidget',
+        ],
+        'formatter' => [
+          'id' => 'time',
+          'class' => 'Drupal\custom_field\Plugin\CustomField\FieldFormatter\TimeFormatter',
+        ],
+      ],
     ];
 
     // Perform assertions to verify that the storage was added successfully.
     $this->assertNotNull($this->fieldStorage, 'The field storage configuration exists.');
-    $columns = $this->fieldStorage->getSetting('columns');
-    foreach ($columns as $column) {
-      $type = $column['type'];
-      /** @var \Drupal\custom_field\Plugin\CustomFieldTypeInterface $plugin */
-      $field_type = $this->customFieldTypeManager->createInstance($type);
-      $plugin = $field_type->getPluginDefinition();
+    $settings = $this->field->getSettings();
+    $custom_items = $this->customFieldTypeManager->getCustomFieldItems($settings);
+    foreach ($custom_items as $custom_item) {
+      $default_widget = $custom_item->getDefaultWidget();
+      $default_formatter = $custom_item->getDefaultFormatter();
+      $type = $custom_item->getDataType();
 
       // Assert the expected default widget id for the field type plugin.
-      $default_widget = $plugin['default_widget'] ?? NULL;
       $this->assertEquals($default_widget, $expected[$type]['widget']['id'], 'The default widget id is equal to the expected widget id.');
 
       // Assert the expected default widget class for the field type plugin.
@@ -358,7 +367,6 @@ class CustomFieldItemTest extends FieldKernelTestBase {
       $this->assertEquals(get_class($widget_plugin), $expected[$type]['widget']['class'], 'The default widget class is equal to the expected widget class.');
 
       // Assert the expected default formatter id for the field type plugin.
-      $default_formatter = $plugin['default_formatter'] ?? NULL;
       $this->assertEquals($default_formatter, $expected[$type]['formatter']['id'], 'The default formatter is equal to the expected formatter.');
 
       // Assert the expected default formatter class for the field type plugin.
@@ -377,6 +385,7 @@ class CustomFieldItemTest extends FieldKernelTestBase {
     $email = 'test@example.com';
     $telephone = '+0123456789';
     $uri_external = 'https://www.drupal.com';
+    $link_title = 'Drupal';
     $boolean = '1';
     $color = '#000000';
     $datetime = '2014-01-01T20:00:00';
@@ -391,6 +400,7 @@ class CustomFieldItemTest extends FieldKernelTestBase {
       ],
     ];
     $map_string = ['text1', 'text2', 'text3', 'text4'];
+    $time = 37980;
     // Test string constraints.
     $entity->{$this->fieldName}->string_test = $this->randomString(256);
     $violations = $entity->validate();
@@ -414,6 +424,7 @@ class CustomFieldItemTest extends FieldKernelTestBase {
     $entity->{$this->fieldName}->decimal_test = '20-40';
     $this->assertCount(1, $violations, 'Wrong decimal value causes validation error');
     $decimal = 31.30;
+    $link_title_field = 'link_test__title';
     $entity->{$this->fieldName}->decimal_test = $decimal;
     $entity->{$this->fieldName}->float_test = $float;
     $entity->{$this->fieldName}->email_test = $email;
@@ -425,6 +436,9 @@ class CustomFieldItemTest extends FieldKernelTestBase {
     $entity->{$this->fieldName}->map_test = $map;
     $entity->{$this->fieldName}->map_string_test = $map_string;
     $entity->{$this->fieldName}->datetime_test = $datetime;
+    $entity->{$this->fieldName}->time_test = $time;
+    $entity->{$this->fieldName}->link_test = $uri_external;
+    $entity->{$this->fieldName}->{$link_title_field} = $link_title;
     $entity->save();
 
     // Verify entity has been created properly.
@@ -459,6 +473,12 @@ class CustomFieldItemTest extends FieldKernelTestBase {
     $this->assertEquals($datetime, $entity->{$this->fieldName}->datetime_test);
     $this->assertEquals($datetime, $entity->{$this->fieldName}[0]->datetime_test);
     $this->assertEquals(CustomFieldTypeInterface::STORAGE_TIMEZONE, $entity->{$this->fieldName}[0]->getProperties()['datetime_test']->getDateTime()->getTimeZone()->getName());
+    $this->assertEquals($time, $entity->{$this->fieldName}->time_test);
+    $this->assertEquals($time, $entity->{$this->fieldName}[0]->time_test);
+    $this->assertEquals($uri_external, $entity->{$this->fieldName}->link_test);
+    $this->assertEquals($uri_external, $entity->{$this->fieldName}[0]->link_test);
+    $this->assertEquals($link_title, $entity->{$this->fieldName}->{$link_title_field});
+    $this->assertEquals($link_title, $entity->{$this->fieldName}[0]->{$link_title_field});
 
     // Verify changing the field values.
     $new_string = $this->randomString(255);
@@ -469,6 +489,7 @@ class CustomFieldItemTest extends FieldKernelTestBase {
     $new_email = 'test2@example.com';
     $new_telephone = '+41' . rand(1000000, 9999999);
     $new_uri_external = 'https://www.drupal.org';
+    $new_link_title = 'Drupal secure';
     $new_boolean = 0;
     $new_color = '#FFFFFF';
     $new_datetime = '2016-11-04T00:21:00';
@@ -487,6 +508,7 @@ class CustomFieldItemTest extends FieldKernelTestBase {
       ],
     ];
     $new_map_string = ['new text1', 'new text2', 'new text3'];
+    $new_time = 56160;
     $entity->{$this->fieldName}->string_test = $new_string;
     $this->assertEquals($new_string, $entity->{$this->fieldName}->string_test);
     $entity->{$this->fieldName}->integer_test = $new_integer;
@@ -514,6 +536,12 @@ class CustomFieldItemTest extends FieldKernelTestBase {
     $entity->{$this->fieldName}->datetime_test = $new_datetime;
     $this->assertEquals($new_datetime, $entity->{$this->fieldName}[0]->datetime_test);
     $this->assertEquals(CustomFieldTypeInterface::STORAGE_TIMEZONE, $entity->{$this->fieldName}[0]->getProperties()['datetime_test']->getDateTime()->getTimeZone()->getName());
+    $entity->{$this->fieldName}->time_test = $new_time;
+    $this->assertEquals($new_time, $entity->{$this->fieldName}[0]->time_test);
+    $entity->{$this->fieldName}->link_test = $new_uri_external;
+    $this->assertEquals($new_uri_external, $entity->{$this->fieldName}[0]->link_test);
+    $entity->{$this->fieldName}->{$link_title_field} = $new_link_title;
+    $this->assertEquals($new_link_title, $entity->{$this->fieldName}[0]->{$link_title_field});
 
     // Read changed entity and assert changed values.
     $this->entityValidateAndSave($entity);
@@ -532,6 +560,9 @@ class CustomFieldItemTest extends FieldKernelTestBase {
     $this->assertEquals($new_map_string, $entity->{$this->fieldName}[0]->map_string_test);
     $this->assertEquals($new_datetime, $entity->{$this->fieldName}[0]->datetime_test);
     $this->assertEquals(CustomFieldTypeInterface::STORAGE_TIMEZONE, $entity->{$this->fieldName}[0]->getProperties()['datetime_test']->getDateTime()->getTimeZone()->getName());
+    $this->assertEquals($new_time, $entity->{$this->fieldName}[0]->time_test);
+    $this->assertEquals($new_uri_external, $entity->{$this->fieldName}[0]->link_test);
+    $this->assertEquals($new_link_title, $entity->{$this->fieldName}[0]->{$link_title_field});
 
     // Test sample item generation.
     $entity = Node::create([
@@ -544,8 +575,10 @@ class CustomFieldItemTest extends FieldKernelTestBase {
 
   /**
    * Tests using the datetime_type of 'date'.
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  public function testDateOnly() {
+  public function testDateOnly(): void {
     $columns = $this->fieldStorage->getSetting('columns');
     $columns['datetime_test']['datetime_type'] = 'date';
     $this->fieldStorage->setSetting('columns', $columns);

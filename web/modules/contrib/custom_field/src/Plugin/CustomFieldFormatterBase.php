@@ -14,25 +14,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 abstract class CustomFieldFormatterBase extends PluginSettingsBase implements CustomFieldFormatterInterface, ContainerFactoryPluginInterface {
 
   /**
-   * The formatter settings.
-   *
-   * @var array
-   */
-  protected $settings;
-
-  /**
    * The custom field definition.
    *
-   * @var \Drupal\custom_field\Plugin\CustomFieldTypeInterface
+   * @var \Drupal\custom_field\Plugin\CustomFieldTypeInterface|null
    */
-  protected $customFieldDefinition;
+  protected ?CustomFieldTypeInterface $customFieldDefinition;
 
   /**
    * The view mode.
    *
    * @var string
    */
-  protected $viewMode;
+  protected string $viewMode;
 
   /**
    * Constructs a CustomFieldFormatterBase object.
@@ -61,8 +54,15 @@ abstract class CustomFieldFormatterBase extends PluginSettingsBase implements Cu
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     return new static($plugin_id, $plugin_definition, $configuration['custom_field_definition'] ?? NULL, $configuration['settings'] ?? [], $configuration['view_mode'] ?? '', $configuration['third_party_settings'] ?? []);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings(): array {
+    return [];
   }
 
   /**
@@ -82,7 +82,7 @@ abstract class CustomFieldFormatterBase extends PluginSettingsBase implements Cu
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
+  public function formatValue(FieldItemInterface $item, mixed $value): mixed {
     return $value;
   }
 

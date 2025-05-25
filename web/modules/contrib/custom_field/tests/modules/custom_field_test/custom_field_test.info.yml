@@ -5,12 +5,13 @@ package: Testing
 dependencies:
   - custom_field:custom_field
   - custom_field:custom_field_viewfield
-test_dependencies:
+  - drupal:file
+  - drupal:image
   - drupal:node
-  - drupal:field
+  - drupal:path
   - drupal:views
 
-# Information added by Drupal.org packaging script on 2025-04-14
-version: '3.1.7'
+# Information added by Drupal.org packaging script on 2025-05-20
+version: '3.1.8'
 project: 'custom_field'
-datestamp: 1744672988
+datestamp: 1747782102

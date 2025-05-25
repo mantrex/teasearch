@@ -23,25 +23,24 @@ class UrlPlainFormatter extends EntityReferenceFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
+  public function formatValue(FieldItemInterface $item, mixed $value): ?array {
 
     if (!$value instanceof FileInterface) {
       return NULL;
     }
 
+    /** @var \Drupal\Core\Access\AccessResultInterface $access */
     $access = $this->checkAccess($value);
     if (!$access->isAllowed()) {
       return NULL;
     }
 
-    $build = [
+    return [
       '#markup' => $value->createFileUrl(),
       '#cache' => [
         'tags' => $value->getCacheTags(),
       ],
     ];
-
-    return $build;
   }
 
 }

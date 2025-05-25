@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Core\Field\Attribute\FieldFormatter;
@@ -22,7 +24,7 @@ class TextDefaultFormatter extends CustomFieldFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
+  public function formatValue(FieldItemInterface $item, mixed $value): mixed {
     $formatted = $this->getFieldWidgetSetting('formatted') ?? FALSE;
     if ($formatted) {
       // The ProcessedText element already handles cache context & tag bubbling.

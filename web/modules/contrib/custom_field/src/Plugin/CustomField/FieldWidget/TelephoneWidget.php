@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
+use Drupal\custom_field\Plugin\CustomField\FieldType\TelephoneType;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
@@ -25,17 +28,10 @@ class TelephoneWidget extends TextWidget {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'size' => 60,
-        'placeholder' => '',
-        'maxlength' => '',
-        'maxlength_js' => FALSE,
-        'prefix' => '',
-        'suffix' => '',
-        'pattern' => NULL,
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings']['pattern'] = '';
+
+    return $settings;
   }
 
   /**
@@ -43,8 +39,9 @@ class TelephoneWidget extends TextWidget {
    */
   public function widget(FieldItemListInterface $items, int $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings');
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
     $element['#type'] = 'tel';
+    $element['#maxlength'] = TelephoneType::MAX_LENGTH;
     if (!empty($settings['pattern'])) {
       $format = $this->getTelephoneFormats()[$settings['pattern']];
       $element['#attributes']['pattern'] = $format['pattern'];
@@ -59,13 +56,13 @@ class TelephoneWidget extends TextWidget {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
 
     $element['settings']['pattern'] = [
       '#type' => 'select',
       '#title' => $this->t('Telephone format'),
       '#options' => $this->getTelephoneFormatOptions(),
-      '#default_value' => $settings['pattern'] ?? NULL,
+      '#default_value' => $settings['pattern'],
       '#empty_option' => $this->t('- Select -'),
       '#description' => $this->t('A regex pattern to enforce input to a particular telephone format.'),
     ];
@@ -76,7 +73,7 @@ class TelephoneWidget extends TextWidget {
   /**
    * Helper function to get telephone formats for various countries.
    *
-   * @return array[]
+   * @return array<string, array{label: string, format: string, regex: string, pattern: string}>
    *   An array of common telephone formats.
    */
   protected function getTelephoneFormats(): array {
@@ -165,19 +162,16 @@ class TelephoneWidget extends TextWidget {
   /**
    * Helper function to return telephone format options.
    *
-   * @return array
+   * @return array<string, mixed>
    *   An array of telephone format options.
    */
   protected function getTelephoneFormatOptions(): array {
-    $options = [];
-    foreach ($this->getTelephoneFormats() as $country => $option) {
-      $options[$country] = $this->t('@label: @format', [
+    return array_map(function ($option) {
+      return $this->t('@label: @format', [
         '@label' => $option['label'],
         '@format' => $option['format'],
       ]);
-    }
-
-    return $options;
+    }, $this->getTelephoneFormats());
   }
 
 }

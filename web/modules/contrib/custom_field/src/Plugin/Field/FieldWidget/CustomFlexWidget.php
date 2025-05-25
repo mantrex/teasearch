@@ -73,14 +73,12 @@ class CustomFlexWidget extends CustomWidgetBase {
       if (isset($columns[$name])) {
         $elements['columns'][$name]['#default_value'] = $columns[$name];
         $elements['columns'][$name]['#wrapper_attributes']['class'][] = 'custom-field-col-' . $columns[$name];
-      }
-
-      $is_disabled = in_array($plugin_id, ['color_boxes', 'map_key_value']);
-
-      if ($is_disabled) {
-        $elements['columns'][$name]['#default_value'] = 12;
-        $elements['columns'][$name]['#attributes'] = ['disabled' => TRUE];
-        $elements['columns'][$name]['#description'] = $this->t('This widget type as configured requires full width.');
+        $is_disabled = in_array($plugin_id, ['color_boxes', 'map_key_value']);
+        if ($is_disabled) {
+          $elements['columns'][$name]['#default_value'] = 12;
+          $elements['columns'][$name]['#attributes'] = ['disabled' => TRUE];
+          $elements['columns'][$name]['#description'] = $this->t('This widget type as configured requires full width.');
+        }
       }
     }
 
@@ -117,6 +115,8 @@ class CustomFlexWidget extends CustomWidgetBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state): array {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
@@ -135,7 +135,7 @@ class CustomFlexWidget extends CustomWidgetBase {
     if (!empty($form_state->get('current_settings'))) {
       $current_settings = $form_state->get('current_settings');
       $field_settings = $current_settings['field_settings'];
-      $custom_items = $this->customFieldManager->getCustomFieldItems($current_settings);
+      $custom_items = $this->customFieldTypeManager->getCustomFieldItems($current_settings);
     }
     else {
       $field_settings = $this->getFieldSetting('field_settings');
@@ -152,7 +152,10 @@ class CustomFlexWidget extends CustomWidgetBase {
       $widget_settings = $custom_item->getWidgetSetting('settings');
       $element[$name] = $widget_plugin->widget($items, $delta, $element, $form, $form_state, $custom_item);
       $attributes = $this->getAttributesKey($custom_item, $widget_settings, $type);
-      $column_class = isset($columns[$name]) ? 'custom-field-col custom-field-col-' . $columns[$name] : 'custom-field-col';
+      $column_class = "custom-field-$name custom-field-col";
+      if (isset($columns[$name])) {
+        $column_class .= " custom-field-col-$columns[$name]";
+      }
 
       if (isset($element[$name]['#type']) && $element[$name]['#type'] === 'managed_file') {
         $element[$name]['#column_class'] = $column_class;
@@ -189,12 +192,12 @@ class CustomFlexWidget extends CustomWidgetBase {
   /**
    * Closure function to pass arguments to managedFileAfterBuild().
    *
-   * @param array $element
+   * @param array<string, mixed> $element
    *   The form element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    *
-   * @return array
+   * @return array<string, mixed>
    *   The element array.
    */
   public function callManagedFileAfterBuild(array $element, FormStateInterface $form_state): array {
@@ -205,12 +208,12 @@ class CustomFlexWidget extends CustomWidgetBase {
   /**
    * Closure function to pass arguments to dateAfterBuild().
    *
-   * @param array $element
+   * @param array<string, mixed> $element
    *   The form element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    *
-   * @return array
+   * @return array<string, mixed>
    *   The element array.
    */
   public function callDateAfterBuild(array $element, FormStateInterface $form_state): array {
@@ -221,14 +224,14 @@ class CustomFlexWidget extends CustomWidgetBase {
   /**
    * After build function to add class to file outer ajax wrapper div.
    *
-   * @param array $element
+   * @param array<string, mixed> $element
    *   The form element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    * @param string $column
    *   The column class.
    *
-   * @return array
+   * @return array<string, mixed>
    *   The modified form element.
    */
   public static function managedFileAfterBuild(array $element, FormStateInterface $form_state, string $column): array {
@@ -250,14 +253,14 @@ class CustomFlexWidget extends CustomWidgetBase {
   /**
    * After build function to add class to date outer wrapper div.
    *
-   * @param array $element
+   * @param array<string, mixed> $element
    *   The form element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    * @param string $column
    *   The column class.
    *
-   * @return array
+   * @return array<string, mixed>
    *   The modified form element.
    */
   public static function dateAfterBuild(array $element, FormStateInterface $form_state, string $column): array {
@@ -273,7 +276,7 @@ class CustomFlexWidget extends CustomWidgetBase {
    *
    * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $custom_item
    *   The custom field item.
-   * @param array $widget_settings
+   * @param array<string, mixed> $widget_settings
    *   The widget settings for the custom field item.
    * @param string $type
    *   The widget type.
@@ -281,7 +284,7 @@ class CustomFlexWidget extends CustomWidgetBase {
    * @return string
    *   The attribute key string.
    */
-  protected function getAttributesKey(CustomFieldTypeInterface $custom_item, array $widget_settings, string $type) {
+  protected function getAttributesKey(CustomFieldTypeInterface $custom_item, array $widget_settings, string $type): string {
     $attribute_types = [
       'media_library_widget',
       'viewfield_select',
@@ -289,6 +292,10 @@ class CustomFlexWidget extends CustomWidgetBase {
       'radios',
       'datetime_datelist',
       'datetime_default',
+      'url',
+      'link_default',
+      'linkit_url',
+      'linkit',
     ];
 
     if (in_array($type, $attribute_types)) {
@@ -314,8 +321,14 @@ class CustomFlexWidget extends CustomWidgetBase {
 
   /**
    * The options for columns.
+   *
+   * @param string|null $option
+   *   The option key.
+   *
+   * @return array<string|int, TranslatableMarkup>|string
+   *   The options or option.
    */
-  public function columnOptions($option = NULL) {
+  public function columnOptions(?string $option = NULL): array|string {
     $options = [
       'auto' => $this->t('Auto'),
       1 => $this->t('1 column'),
@@ -331,6 +344,8 @@ class CustomFlexWidget extends CustomWidgetBase {
       11 => $this->t('11 columns'),
       12 => $this->t('12 columns'),
     ];
+    // @todo Better move this logic out of this function, so this function can
+    // have single return type.
     if (!is_null($option)) {
       return $options[$option] ?? '';
     }
@@ -340,13 +355,21 @@ class CustomFlexWidget extends CustomWidgetBase {
 
   /**
    * The options for breakpoints.
+   *
+   * @param string|null $option
+   *   The option key.
+   *
+   * @return array<string, TranslatableMarkup>|string
+   *   The options or option.
    */
-  public function breakpointOptions($option = NULL) {
+  public function breakpointOptions(?string $option = NULL): array|string {
     $options = [
       '' => $this->t("Don't stack"),
       'medium' => $this->t('Medium (less than 769px)'),
       'small' => $this->t('Small (less than 601px)'),
     ];
+    // @todo Better move this logic out of this function, so this function can
+    // have single return type.
     if (!is_null($option)) {
       return $options[$option] ?? '';
     }

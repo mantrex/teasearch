@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldItemInterface;
@@ -17,8 +19,8 @@ interface BaseFormatterInterface {
    * @param string $langcode
    *   The language code.
    *
-   * @return array
-   *   The textual output generated.
+   * @return array<string|int, mixed>
+   *   The render array of the field and subfields.
    */
   public function viewValue(FieldItemInterface $item, string $langcode): array;
 

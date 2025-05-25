@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Component\Utility\Random;
@@ -30,7 +32,7 @@ class StringType extends CustomFieldTypeBase {
 
     $columns[$name] = [
       'type' => 'varchar',
-      'length' => $settings['max_length'] ?? 255,
+      'length' => $settings['length'] ?? self::MAX_LENGTH,
     ];
 
     return $columns;
@@ -54,12 +56,12 @@ class StringType extends CustomFieldTypeBase {
    */
   public function getConstraints(array $settings): array {
     $constraints = [];
-    if ($max_length = $settings['max_length']) {
+    if (isset($settings['length'])) {
       $constraints['Length'] = [
-        'max' => $max_length,
+        'max' => $settings['length'],
         'maxMessage' => $this->t('%name: may not be longer than @max characters.', [
           '%name' => $settings['name'],
-          '@max' => $max_length,
+          '@max' => $settings['length'],
         ]),
       ];
     }
@@ -73,10 +75,11 @@ class StringType extends CustomFieldTypeBase {
   public static function generateSampleValue(CustomFieldTypeInterface $field, string $target_entity_type): string {
     $widget_settings = $field->getWidgetSetting('settings');
     if (!empty($widget_settings['allowed_values'])) {
-      return static::getRandomOptions($widget_settings['allowed_values']);
+      return (string) static::getRandomOptions($widget_settings['allowed_values']);
     }
     $random = new Random();
-    $max_length = isset($widget_settings['maxlength']) && is_numeric($widget_settings['maxlength']) ? $widget_settings['maxlength'] : $field->getMaxLength();
+    $default_max = $field->getMaxLength();
+    $max_length = isset($widget_settings['maxlength']) && is_numeric($widget_settings['maxlength']) ? (int) $widget_settings['maxlength'] : $default_max;
 
     // When the maximum length is less than 15 generate a random word using the
     // maximum length.
@@ -86,7 +89,7 @@ class StringType extends CustomFieldTypeBase {
 
     // The minimum length is either 10% of the maximum length, or 15 characters
     // long, whichever is greater.
-    $min_length = max(ceil($max_length * 0.10), 15);
+    $min_length = (int) max(ceil($max_length * 0.10), 15);
 
     // Reduce the max length to allow us to add a period.
     $max_length -= 1;
@@ -106,7 +109,7 @@ class StringType extends CustomFieldTypeBase {
 
     if (mb_strlen($string) > $max_length) {
       $string = substr($string, 0, $length);
-      $string = substr($string, 0, strrpos($string, ' '));
+      $string = substr($string, 0, (int) strrpos($string, ' '));
     }
 
     $string = rtrim($string, ' .');

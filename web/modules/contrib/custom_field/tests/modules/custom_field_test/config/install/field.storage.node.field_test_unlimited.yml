@@ -14,171 +14,79 @@ settings:
     string_test:
       name: string_test
       type: string
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
-      size: normal
-      datetime_type: datetime
+      length: 255
     string_long_test:
       name: string_long_test
       type: string_long
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
-      size: normal
-      datetime_type: datetime
     integer_test:
       name: integer_test
       type: integer
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
+      unsigned: false
       size: normal
-      datetime_type: datetime
     decimal_test:
       name: decimal_test
       type: decimal
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
-      size: normal
-      datetime_type: datetime
+      unsigned: false
+      precision: 10
+      scale: 2
     float_test:
       name: float_test
       type: float
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
+      unsigned: false
       size: normal
-      datetime_type: datetime
     email_test:
       name: email_test
       type: email
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
-      size: normal
-      datetime_type: datetime
     telephone_test:
       name: telephone_test
       type: telephone
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
-      size: normal
-      datetime_type: datetime
+      length: 256
     uri_test:
       name: uri_test
       type: uri
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
-      size: normal
-      datetime_type: datetime
     boolean_test:
       name: boolean_test
       type: boolean
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
-      size: normal
-      datetime_type: datetime
     uuid_test:
       name: uuid_test
       type: uuid
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
-      size: normal
-      datetime_type: datetime
     color_test:
       name: color_test
       type: color
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
-      size: normal
-      datetime_type: datetime
     map_test:
       name: map_test
       type: map
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
-      size: normal
-      datetime_type: datetime
     map_string_test:
       name: map_string_test
       type: map_string
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
-      size: normal
-      datetime_type: datetime
     datetime_test:
       name: datetime_test
       type: datetime
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
-      size: normal
       datetime_type: datetime
     entity_reference_test:
       name: entity_reference_test
       type: entity_reference
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
-      size: normal
-      datetime_type: datetime
       target_type: node
     file_test:
       name: file_test
       type: file
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
-      size: normal
-      datetime_type: datetime
       target_type: file
       uri_scheme: public
     image_test:
       name: image_test
       type: image
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
-      size: normal
-      datetime_type: datetime
       target_type: file
       uri_scheme: public
     viewfield_test:
       name: viewfield_test
       type: viewfield
-      max_length: '255'
-      unsigned: 0
-      precision: '10'
-      scale: '2'
-      size: normal
-      datetime_type: datetime
       target_type: view
+    time_test:
+      name: time_test
+      type: time
+    link_test:
+      name: link_test
+      type: link
 module: custom_field
 locked: false
 cardinality: -1

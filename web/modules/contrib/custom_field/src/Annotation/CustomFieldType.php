@@ -20,7 +20,7 @@ class CustomFieldType extends FieldType {
    * @var bool
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $check_empty = FALSE;
+  public bool $check_empty = FALSE;
 
   /**
    * Flag to restrict this type from empty row checking.
@@ -28,6 +28,6 @@ class CustomFieldType extends FieldType {
    * @var bool
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $never_check_empty = FALSE;
+  public bool $never_check_empty = FALSE;
 
 }

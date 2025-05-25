@@ -1,14 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\file\FileInterface;
+use Drupal\image\ImageStyleStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -28,26 +33,26 @@ class ImageUrlFormatter extends EntityReferenceFormatterBase {
    *
    * @var \Drupal\image\ImageStyleStorageInterface
    */
-  protected $imageStyleStorage;
+  protected ImageStyleStorageInterface $imageStyleStorage;
 
   /**
    * The current user.
    *
    * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $currentUser;
+  protected AccountInterface $currentUser;
 
   /**
    * The file url generator.
    *
    * @var \Drupal\Core\File\FileUrlGeneratorInterface
    */
-  protected $fileUrlGenerator;
+  protected FileUrlGeneratorInterface $fileUrlGenerator;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->imageStyleStorage = $container->get('entity_type.manager')->getStorage('image_style');
     $instance->currentUser = $container->get('current_user');
@@ -92,12 +97,12 @@ class ImageUrlFormatter extends EntityReferenceFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
-
+  public function formatValue(FieldItemInterface $item, mixed $value): ?array {
     if (!$value instanceof FileInterface) {
       return NULL;
     }
 
+    /** @var \Drupal\Core\Access\AccessResultInterface $access */
     $access = $this->checkAccess($value);
     if (!$access->isAllowed()) {
       return NULL;

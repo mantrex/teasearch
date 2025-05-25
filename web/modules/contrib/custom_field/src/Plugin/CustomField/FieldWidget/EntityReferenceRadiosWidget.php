@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
@@ -26,12 +28,10 @@ class EntityReferenceRadiosWidget extends EntityReferenceOptionsWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'handler_settings' => [],
-        'empty_option' => 'N/A',
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings']['empty_option'] = 'N/A';
+
+    return $settings;
   }
 
   /**

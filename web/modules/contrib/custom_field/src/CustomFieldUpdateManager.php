@@ -11,11 +11,14 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Field\FieldConfigInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
+use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field\FieldStorageConfigInterface;
 
 /**
  * Provides the CustomFieldUpdateManager service.
@@ -29,63 +32,63 @@ class CustomFieldUpdateManager implements CustomFieldUpdateManagerInterface {
    *
    * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
    */
-  protected $entityDefinitionUpdateManager;
+  protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager;
 
   /**
    * The entity type manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * The entity type bundle info.
    *
    * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
    */
-  protected $entityTypeBundleInfo;
+  protected EntityTypeBundleInfoInterface $entityTypeBundleInfo;
 
   /**
    * The database connection.
    *
    * @var \Drupal\Core\Database\Connection
    */
-  protected $database;
+  protected Connection $database;
 
   /**
    * The plugin manager for custom field types.
    *
    * @var \Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface
    */
-  protected $customFieldTypeManager;
+  protected CustomFieldTypeManagerInterface $customFieldTypeManager;
 
   /**
    * The installed entity definition repository.
    *
    * @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface
    */
-  protected $lastInstalledSchemaRepository;
+  protected EntityLastInstalledSchemaRepositoryInterface $lastInstalledSchemaRepository;
 
   /**
    * The Key-Value Factory service.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface
+   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface|\Drupal\Core\KeyValueStore\KeyValueFactoryInterface
    */
-  protected $keyValue;
+  protected KeyValueStoreInterface|KeyValueFactoryInterface $keyValue;
 
   /**
    * The config factory.
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  protected $configFactory;
+  protected ConfigFactoryInterface $configFactory;
 
   /**
    * The module handler service.
    *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface $moduleHandler;
 
   /**
    * Constructs a new CustomFieldUpdateManager object.
@@ -184,8 +187,8 @@ class CustomFieldUpdateManager implements CustomFieldUpdateManagerInterface {
       case 'string':
       case 'telephone':
         $max = $data_type === 'telephone' ? 256 : 255;
-        if (isset($options['max_length']) && (!is_numeric($options['max_length']) || $options['max_length'] > $max)) {
-          throw new \InvalidArgumentException(sprintf("Field '%s' requires a numeric 'max_length' <= %s characters.",
+        if (isset($options['length']) && (!is_numeric($options['length']) || $options['length'] > $max)) {
+          throw new \InvalidArgumentException(sprintf("Field '%s' requires a numeric 'length' <= %s characters.",
             $new_property,
             $max,
           ));
@@ -218,17 +221,17 @@ class CustomFieldUpdateManager implements CustomFieldUpdateManagerInterface {
         }
         if ($data_type === 'decimal') {
           if (isset($options['precision'])) {
-            if (!is_numeric($options['precision']) || $options['precision'] > 65) {
-              throw new \InvalidArgumentException(sprintf("Field '%s' requires a numeric 'precision' value <= 65.",
+            $precision = (int) $options['precision'];
+            if ($precision < 10 || $precision > 32) {
+              throw new \InvalidArgumentException(sprintf("Field '%s' requires a numeric 'precision' value between 10 and 32.",
                 $new_property,
               ));
             }
-            // Cast to integer.
-            $options['precision'] = (int) $options['precision'];
+            $options['precision'] = $precision;
           }
           if (isset($options['scale'])) {
-            if (!is_numeric($options['scale']) || $options['scale'] > 30) {
-              throw new \InvalidArgumentException(sprintf("Field '%s' requires a numeric 'scale' value <= 30.",
+            if (!is_numeric($options['scale']) || $options['scale'] > 10) {
+              throw new \InvalidArgumentException(sprintf("Field '%s' requires a numeric 'scale' value <= 10.",
                 $new_property,
               ));
             }
@@ -267,19 +270,21 @@ class CustomFieldUpdateManager implements CustomFieldUpdateManagerInterface {
       case 'image':
       case 'file':
         $target_type = 'file';
+        $options['target_type'] = 'file';
         $uri_scheme = $this->configFactory->get('system.file')->get('default_scheme');
         break;
 
       case 'viewfield':
         $target_type = 'view';
-        if (!$this->moduleHandler->moduleExists('views')) {
-          throw new \InvalidArgumentException(sprintf("Field '%s' requires the views module to be enabled.",
+        $options['target_type'] = $target_type;
+        if (!$this->moduleHandler->moduleExists('custom_field_viewfield')) {
+          throw new \InvalidArgumentException(sprintf("Field '%s' requires the 'custom_field_viewfield' module to be enabled.",
             $new_property,
           ));
         }
         break;
     }
-    /** @var \Drupal\custom_field\Plugin\CustomFieldTypeInterface $instance */
+    /** @var \Drupal\custom_field\Plugin\CustomFieldTypeInterface $plugin */
     $plugin = $this->customFieldTypeManager->createInstance($data_type);
     $options['name'] = $new_property;
     $custom_field_schema = $plugin->schema($options);
@@ -343,35 +348,44 @@ class CustomFieldUpdateManager implements CustomFieldUpdateManagerInterface {
 
     // Tell Drupal we have handled column changes.
     $new_field_storage_definition = $this->entityDefinitionUpdateManager->getFieldStorageDefinition($field_name, $entity_type_id);
-    $new_field_storage_definition->setSetting('column_changes_handled', TRUE);
-    $this->entityDefinitionUpdateManager->updateFieldStorageDefinition($new_field_storage_definition);
+    if ($new_field_storage_definition instanceof FieldStorageConfigInterface) {
+      $new_field_storage_definition->setSetting('column_changes_handled', TRUE);
+      $this->entityDefinitionUpdateManager->updateFieldStorageDefinition($new_field_storage_definition);
 
-    // Update cached entity definitions for entity types.
-    if ($table_mapping->allowsSharedTableStorage($new_field_storage_definition)) {
-      $definitions = $this->lastInstalledSchemaRepository->getLastInstalledFieldStorageDefinitions($entity_type_id);
-      $definitions[$field_name] = $new_field_storage_definition;
-      $this->lastInstalledSchemaRepository->setLastInstalledFieldStorageDefinitions($entity_type_id, $definitions);
+      // Update cached entity definitions for entity types.
+      if ($table_mapping->allowsSharedTableStorage($new_field_storage_definition)) {
+        $definitions = $this->lastInstalledSchemaRepository->getLastInstalledFieldStorageDefinitions($entity_type_id);
+        $definitions[$field_name] = $new_field_storage_definition;
+        $this->lastInstalledSchemaRepository->setLastInstalledFieldStorageDefinitions($entity_type_id, $definitions);
+      }
     }
 
     // Update config.
     $field_storage_config = FieldStorageConfig::loadByName($entity_type_id, $field_name);
     $columns = $field_storage_config->getSetting('columns');
 
-    $columns[$new_property] = [
+    // These settings exist across all data types.
+    $column_config = [
       'type' => $data_type,
       'name' => $new_property,
-      'max_length' => $spec['length'] ?? NULL,
-      'unsigned' => $spec['unsigned'] ?? FALSE,
+    ];
+
+    // Add the conditional settings based on schema match from data type.
+    $optional_config = array_filter([
+      'length' => $spec['length'] ?? NULL,
+      'unsigned' => $spec['unsigned'] ?? NULL,
       'precision' => $spec['precision'] ?? NULL,
       'scale' => $spec['scale'] ?? NULL,
       'size' => $spec['size'] ?? NULL,
-      'datetime_type' => $date_time_type,
-      'target_type' => $target_type,
-      'uri_scheme' => $uri_scheme,
-    ];
+      'datetime_type' => $date_time_type ?: NULL,
+      'target_type' => $target_type ?: NULL,
+      'uri_scheme' => $uri_scheme ?: NULL,
+    ], fn($value) => $value !== NULL);
+
+    $column_config = array_merge($column_config, $optional_config);
+    $columns[$new_property] = $column_config;
 
     $field_storage_config->setSetting('columns', $columns);
-
     $field_storage_config->save();
 
     if (!empty($existing_data)) {
@@ -408,6 +422,7 @@ class CustomFieldUpdateManager implements CustomFieldUpdateManagerInterface {
     $schema = $this->database->schema();
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
     $storage = $this->entityTypeManager->getStorage($entity_type_id);
+    assert($storage instanceof SqlContentEntityStorage);
     /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
     $table_mapping = $storage->getTableMapping([
       $field_name => $field_storage_definition,
@@ -460,7 +475,9 @@ class CustomFieldUpdateManager implements CustomFieldUpdateManagerInterface {
       $this->keyValue->set($schema_key, $field_schema_data);
 
       // Tell Drupal we have handled column changes.
-      $field_storage_definition->setSetting('column_changes_handled', TRUE);
+      if ($field_storage_definition instanceof FieldStorageConfigInterface) {
+        $field_storage_definition->setSetting('column_changes_handled', TRUE);
+      }
       $this->entityDefinitionUpdateManager->updateFieldStorageDefinition($field_storage_definition);
     }
 
@@ -478,6 +495,7 @@ class CustomFieldUpdateManager implements CustomFieldUpdateManagerInterface {
     foreach ($bundles as $bundle) {
       // Update the field config for each bundle.
       if ($field_config = FieldConfig::loadByName($entity_type_id, $bundle, $field_name)) {
+        assert($field_config instanceof FieldConfigInterface);
         $settings = $field_config->getSettings();
         foreach ($settings as $setting_type => $setting) {
           if (is_array($setting) && isset($setting[$property])) {

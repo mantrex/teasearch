@@ -7,16 +7,18 @@
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Markup;
-use Drupal\custom_field\Plugin\Field\FieldType\CustomItem;
+use Drupal\custom_field\Plugin\CustomField\FieldType\DateTimeType;
 
 /**
  * Implements hook_token_info().
  */
-function custom_field_token_info() {
+function custom_field_token_info(): array {
   $info = [];
   $module_handler = \Drupal::moduleHandler();
   if (!$module_handler->moduleExists('token')) {
@@ -143,15 +145,15 @@ function custom_field_token_info() {
           ];
           $info['tokens'][$subfield_token_name]['height'] = [
             'name' => t('Height'),
-            'description' => t("The height of the image in pixels."),
+            'description' => t('The height of the image in pixels.'),
           ];
           $info['tokens'][$subfield_token_name]['width'] = [
             'name' => t('Width'),
-            'description' => t("The width of the image in pixels."),
+            'description' => t('The width of the image in pixels.'),
           ];
           $info['tokens'][$subfield_token_name]['entity'] = [
             'name' => t('File'),
-            'description' => t("The referenced entity"),
+            'description' => t('The referenced entity'),
             'type' => 'file',
             'nested' => TRUE,
           ];
@@ -170,7 +172,7 @@ function custom_field_token_info() {
         if ($type === 'file') {
           $info['tokens'][$subfield_token_name]['entity'] = [
             'name' => t('File'),
-            'description' => t("The referenced entity"),
+            'description' => t('The referenced entity'),
             'type' => 'file',
             'nested' => TRUE,
           ];
@@ -207,7 +209,7 @@ function custom_field_token_info() {
 /**
  * Implements hook_tokens().
  */
-function custom_field_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
+function custom_field_tokens(string $type, array $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata): array {
   $replacements = [];
   $module_handler = \Drupal::moduleHandler();
   if (!$module_handler->moduleExists('token')) {
@@ -302,7 +304,7 @@ function custom_field_tokens($type, $tokens, array $data, array $options, Bubble
           $field_output['#pre_render'][] = '\Drupal\token\TokenFieldRender::preRender';
         }
         $field_output['#token_options'] = $options;
-        $replacements[$original] = \Drupal::service('renderer')->renderPlain($field_output);
+        $replacements[$original] = \Drupal::service('renderer')->renderInIsolation($field_output);
       }
       // Handle [entity:field_name:value] and [entity:field_name:0:value]
       // tokens.
@@ -391,17 +393,17 @@ function custom_field_tokens($type, $tokens, array $data, array $options, Bubble
 /**
  * Helper function to get computed property values.
  *
- * @param \Drupal\custom_field\Plugin\Field\FieldType\CustomItem $item
+ * @param \Drupal\Core\Field\FieldItemInterface $item
  *   The field item.
  * @param string $property_name
  *   The main property name.
  * @param string $sub_property_name
  *   The appended string that builds the computed property.
  *
- * @return mixed|void|null
+ * @return mixed|null
  *   The value or NULL if the property doesn't exist.
  */
-function _custom_field_get_computed_value(CustomItem $item, string $property_name, string $sub_property_name) {
+function _custom_field_get_computed_value(FieldItemInterface $item, string $property_name, string $sub_property_name): mixed {
   $property_string = "{$property_name}__{$sub_property_name}";
   return $item->{$property_string} ?? NULL;
 }
@@ -409,7 +411,7 @@ function _custom_field_get_computed_value(CustomItem $item, string $property_nam
 /**
  * Finds the value corresponding to a specific key in a structured array.
  *
- * @param array $array
+ * @param array<string|int|float, mixed> $array
  *   The array to search in.
  * @param mixed $value
  *   The key to search for. Can be a string, int, or float.
@@ -434,18 +436,21 @@ function _custom_field_find_value_by_key(array $array, mixed $value): mixed {
  *   The property name (e.g., "string", "image").
  * @param mixed $properties
  *   The property values or nested properties.
- * @param \Drupal\custom_field\Plugin\Field\FieldType\CustomItem $item
+ * @param \Drupal\Core\Field\FieldItemInterface $item
  *   The field item for the current delta.
  * @param string $langcode
  *   The language code.
- * @param array $options
+ * @param array<string, mixed> $options
  *   The array of tokens options.
  * @param \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata
  *   The cache metadata.
  * @param array &$replacements
  *   The array to store token replacements.
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
  */
-function _custom_field_process_property(string $property, mixed $properties, CustomItem $item, string $langcode, array $options, BubbleableMetadata $bubbleable_metadata, array &$replacements): void {
+function _custom_field_process_property(string $property, mixed $properties, FieldItemInterface $item, string $langcode, array $options, BubbleableMetadata $bubbleable_metadata, array &$replacements): void {
   $module_handler = \Drupal::moduleHandler();
   if (!$module_handler->moduleExists('token')) {
     return;
@@ -565,6 +570,7 @@ function _custom_field_process_property(string $property, mixed $properties, Cus
         // Datetime replacements.
         elseif ($data_type === 'datetime' && $sub_property === 'formatted') {
           if (is_array($property_value)) {
+            assert($custom_item instanceof DateTimeType);
             $timestamp = $custom_item->getTimestamp($item);
             $replacements += \Drupal::token()->generate('date', $property_value, ['date' => $timestamp], $options, $bubbleable_metadata);
           }
@@ -593,8 +599,11 @@ function _custom_field_process_property(string $property, mixed $properties, Cus
  *
  * @return \Drupal\Core\Entity\Display\EntityViewDisplayInterface|null
  *   The view display or null.
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
  */
-function _custom_field_get_token_view_display(EntityInterface $entity) {
+function _custom_field_get_token_view_display(EntityInterface $entity): ?EntityViewDisplayInterface {
   $view_mode_name = $entity->getEntityTypeId() . '.' . $entity->bundle() . '.token';
   /** @var  \Drupal\Core\Entity\Display\EntityViewDisplayInterface|null $view_display */
   $view_display = \Drupal::entityTypeManager()->getStorage('entity_view_display')->load($view_mode_name);
@@ -613,11 +622,11 @@ function _custom_field_get_token_view_display(EntityInterface $entity) {
  * @param string $field_name
  *   The name of the field.
  *
- * @return array
+ * @return array<string|int, mixed>
  *   An array containing the most used label(s) for the field, or an array with
  *   the field name if no label is found.
  *
- * @todo Resync this method with views_entity_field_label().
+ * @todo Re-sync this method with views_entity_field_label().
  *
  * @see views_entity_field_label()
  */

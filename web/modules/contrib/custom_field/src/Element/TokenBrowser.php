@@ -49,17 +49,17 @@ class TokenBrowser extends FormElementBase {
   /**
    * Processes the Token Browser element.
    *
-   * @param array $element
+   * @param array<string, mixed> $element
    *   The form element to process.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.
    *
-   * @return array
+   * @return array<string, mixed>
    *   The processed element.
    */
-  public static function processTokenBrowser(array &$element, FormStateInterface $form_state, array &$complete_form) {
+  public static function processTokenBrowser(array &$element, FormStateInterface $form_state, array &$complete_form): array {
     $wrapper_id = $element['#ajax_wrapper'] ?? 'token-browser-wrapper';
     $range = range(1, $element['#recursion_limit_max']);
 
@@ -104,7 +104,7 @@ class TokenBrowser extends FormElementBase {
   /**
    * AJAX callback to update the token browser.
    */
-  public static function ajaxCallback(array &$form, FormStateInterface $form_state) {
+  public static function ajaxCallback(array &$form, FormStateInterface $form_state): AjaxResponse {
     $trigger = $form_state->getTriggeringElement();
     $wrapper_id = $trigger['#ajax']['wrapper'];
     $parents = array_slice($trigger['#array_parents'], 0, -1, TRUE);

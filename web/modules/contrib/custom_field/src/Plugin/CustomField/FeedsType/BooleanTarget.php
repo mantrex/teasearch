@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FeedsType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -17,7 +19,7 @@ class BooleanTarget extends BaseTarget {
   /**
    * {@inheritdoc}
    */
-  public function prepareValue($value, array $configuration, string $langcode): ?bool {
+  public function prepareValue(mixed $value, array $configuration, string $langcode): ?bool {
     if (is_bool($value)) {
       return $value;
     }

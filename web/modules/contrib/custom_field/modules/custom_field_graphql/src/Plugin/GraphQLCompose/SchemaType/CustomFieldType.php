@@ -7,6 +7,7 @@ namespace Drupal\custom_field_graphql\Plugin\GraphQLCompose\SchemaType;
 use Drupal\custom_field_graphql\Plugin\GraphQLCompose\FieldType\CustomFieldItem;
 use Drupal\graphql_compose\Plugin\GraphQLCompose\GraphQLComposeSchemaTypeBase;
 use GraphQL\Type\Definition\ObjectType;
+use function Symfony\Component\String\u;
 
 /**
  * {@inheritdoc}
@@ -28,10 +29,20 @@ class CustomFieldType extends GraphQLComposeSchemaTypeBase {
 
     array_walk_recursive($fields, function ($field) use (&$types) {
       if ($field instanceof CustomFieldItem) {
+        $field_definition = $field->getFieldDefinition();
+        $entity_type_id = $field_definition->getTargetEntityTypeId();
+        $bundle = $field_definition->getTargetBundle();
+        $field_name = $field_definition->getName();
         $columns = $field->getFieldDefinition()->getSetting('columns');
         $subfields = [];
         foreach ($columns as $name => $column) {
-          $subfields[$name] = [
+          $subfield_settings = $this->configFactory->get('graphql_compose.settings')->get("field_config.$entity_type_id.$bundle.$field_name.subfields.$name");
+          $enabled = $subfield_settings['enabled'] ?? FALSE;
+          if (!$enabled) {
+            continue;
+          }
+          $name_sdl = $subfield_settings['name_sdl'] ?? u($name)->camel()->toString();
+          $subfields[$name_sdl] = [
             'type' => static::type($field->getSubfieldTypeSdl($name)),
             'description' => (string) $this->t('The @field value of the custom field', ['@field' => $name]),
           ];

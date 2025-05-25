@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -23,7 +25,7 @@ class DateTimeTimeAgoFormatter extends TimestampAgoFormatter {
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
+  public function formatValue(FieldItemInterface $item, mixed $value): ?array {
     $datetime_type = $this->customFieldDefinition->getDatetimeType();
 
     /** @var \Drupal\Core\Datetime\DrupalDateTime $date */

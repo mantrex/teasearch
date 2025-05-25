@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
@@ -22,7 +24,7 @@ interface CustomFieldFeedsTypeInterface extends PluginInspectionInterface {
    * @return mixed
    *   Prepares the value for feeds import.
    */
-  public function prepareValue($value, array $configuration, string $langcode): mixed;
+  public function prepareValue(mixed $value, array $configuration, string $langcode): mixed;
 
   /**
    * Returns a default configuration array for the custom field.
@@ -43,7 +45,7 @@ interface CustomFieldFeedsTypeInterface extends PluginInspectionInterface {
    * @return mixed
    *   The configuration form array.
    */
-  public function buildConfigurationForm(int $delta, array $configuration);
+  public function buildConfigurationForm(int $delta, array $configuration): mixed;
 
   /**
    * Returns a summary array for custom fields.

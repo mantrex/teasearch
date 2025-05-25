@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Html;
@@ -44,7 +46,7 @@ class CustomTableFormatter extends BaseFormatter {
     $elements = [];
     $settings = $this->getSettings();
     if (!$items->isEmpty()) {
-      $component = Html::cleanCssIdentifier($this->fieldDefinition->get('field_name'));
+      $component = Html::cleanCssIdentifier($this->fieldDefinition->getName());
       $custom_items = $this->getCustomFieldItems();
       $header = [];
       foreach ($custom_items as $name => $custom_item) {
@@ -96,7 +98,7 @@ class CustomTableFormatter extends BaseFormatter {
           }
           $elements[0]['#rows'][$delta]['data'][$name] = [
             'data' => $output,
-            'class' => [$component . '__' . Html::cleanCssIdentifier($name)],
+            'class' => [$component . '__' . Html::cleanCssIdentifier((string) $name)],
           ];
         }
       }

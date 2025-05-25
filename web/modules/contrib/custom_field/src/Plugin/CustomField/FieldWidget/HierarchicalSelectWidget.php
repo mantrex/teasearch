@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\InvokeCommand;
@@ -32,12 +36,13 @@ class HierarchicalSelectWidget extends EntityReferenceWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'force_deepest_level' => FALSE,
-        'level_labels' => TRUE,
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings'] = [
+      'force_deepest_level' => FALSE,
+      'level_labels' => TRUE,
+    ] + $settings['settings'];
+
+    return $settings;
   }
 
   /**
@@ -80,58 +85,64 @@ class HierarchicalSelectWidget extends EntityReferenceWidgetBase {
     $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
     /** @var \Drupal\taxonomy\TermStorageInterface $term_storage */
     $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
+    /** @var \Drupal\Core\Field\FieldItemInterface $item */
     $item = $items[$delta];
     $langcode = $item->getEntity()->language()->getId();
     $field_name = $item->getFieldDefinition()->getName();
     $name = $field->getName();
     $parents = $form['#parents'] ?? [];
-    // Create an ID suffix from the parents to make sure each widget is unique.
-    $id_suffix = $parents ? '-' . implode('-', $parents) : '';
-    $wrapper = $field_name . '-' . $delta . '-' . $name . '-' . $id_suffix;
+    $wrapper = $this->getUniqueElementId($form, $field_name, $delta, $name);
     $translations_enabled = $this->moduleHandler->moduleExists('content_translation');
     $target_type = $field->getTargetType();
 
     // Account for parents structure from paragraphs field if applicable.
     $value_keys = array_merge($parents, [$field_name, $delta, $name]);
-    $field_value = NestedArray::getValue($form_state->getValues(), $value_keys);
+    $values = $form_state->getValues();
+    $field_value = NestedArray::getValue($values, $value_keys);
 
     // If there are no processed values, use the input.
     if (empty($field_value)) {
-      $field_value = NestedArray::getValue($form_state->getUserInput(), $value_keys);
+      $user_input = $form_state->getUserInput();
+      $field_value = NestedArray::getValue($user_input, $value_keys);
     }
     if (!empty($field_value)) {
       $levels = $field_value['levels'] ?? [];
     }
     // Use the saved values.
     else {
-      $levels = !empty($item->{$name}) ? $this->getPathToRoot($item->{$name}) : [];
+      $levels = !empty($item->{$name}) ? $this->getPathToRoot((int) $item->{$name}) : [];
     }
 
-    /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface $handler */
     $handler = $this->getSelectionHandler($settings, $target_type);
-    if ($handler->pluginId === 'views') {
+    $base_options = [];
+    $views_enabled = $this->moduleHandler->moduleExists('views');
+    if ($views_enabled && $handler::class === 'Drupal\views\Plugin\EntityReferenceSelection\ViewsSelection') {
       $configuration = $handler->configuration;
       // Return early if the view hasn't been selected.
       if (empty($configuration['view']['view_name'])) {
         return $element;
       }
-      /** @var \Drupal\views\Entity\View $view */
-      $view = $this->entityTypeManager->getStorage('view')->load($configuration['view']['view_name']);
-      $limit = 0;
-      if ($display = $view->getDisplay($configuration['view']['display_name'])) {
-        // If the views display has a limit set, use it.
-        if (isset($display['display_options']['pager']['options']['items_per_page'])) {
-          $limit = $display['display_options']['pager']['options']['items_per_page'];
+      try {
+        /** @var \Drupal\views\Entity\View $view */
+        $view = $this->entityTypeManager->getStorage('view')->load($configuration['view']['view_name']);
+        $limit = 0;
+        if ($display = $view->getDisplay($configuration['view']['display_name'])) {
+          // If the views display has a limit set, use it.
+          if (isset($display['display_options']['pager']['options']['items_per_page'])) {
+            $limit = $display['display_options']['pager']['options']['items_per_page'];
+          }
+        }
+        $views_options = $handler->getReferenceableEntities(NULL, 'CONTAINS', $limit);
+        foreach ($views_options as $category => $terms) {
+          /** @var \Drupal\taxonomy\Entity\Vocabulary $vocabulary */
+          $vocabulary = $this->entityTypeManager->getStorage('taxonomy_vocabulary')->load($category);
+          foreach ($terms as $id => $term) {
+            $base_options[(string) $vocabulary->label()][$id] = $term;
+          }
         }
       }
-      $views_options = $handler->getReferenceableEntities(NULL, 'CONTAINS', $limit);
-      $base_options = [];
-      foreach ($views_options as $category => $terms) {
-        /** @var \Drupal\taxonomy\Entity\Vocabulary $vocabulary */
-        $vocabulary = $this->entityTypeManager->getStorage('taxonomy_vocabulary')->load($category);
-        foreach ($terms as $id => $term) {
-          $base_options[$vocabulary->label()][$id] = $term;
-        }
+      catch (InvalidPluginDefinitionException | PluginNotFoundException $e) {
+        return $element;
       }
     }
     else {
@@ -218,7 +229,9 @@ class HierarchicalSelectWidget extends EntityReferenceWidgetBase {
     /** @var \Drupal\taxonomy\TermStorageInterface $term_storage */
     $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
     $parents = array_slice($element['#parents'], 0, -1);
-    $levels = NestedArray::getValue($form_state->getValues(), $parents);
+    $values = $form_state->getValues();
+    $user_input = $form_state->getUserInput();
+    $levels = NestedArray::getValue($values, $parents);
     $error_name = implode('][', $element['#parents']);
     $errors = $form_state->getErrors();
     // Clear the errors to prevent stale values that don't exist in options.
@@ -247,8 +260,8 @@ class HierarchicalSelectWidget extends EntityReferenceWidgetBase {
       }
     }
     // Update values and input.
-    NestedArray::setValue($form_state->getValues(), $parents, $levels);
-    NestedArray::setValue($form_state->getUserInput(), $parents, $levels);
+    NestedArray::setValue($values, $parents, $levels);
+    NestedArray::setValue($user_input, $parents, $levels);
   }
 
   /**
@@ -269,7 +282,7 @@ class HierarchicalSelectWidget extends EntityReferenceWidgetBase {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The Ajax response.
    */
-  public function ajaxLoadNextLevel(array &$form, FormStateInterface $form_state) {
+  public function ajaxLoadNextLevel(array &$form, FormStateInterface $form_state): AjaxResponse {
     $trigger = $form_state->getTriggeringElement();
     $wrapper_id = $trigger['#ajax']['wrapper'];
     $form_state_keys = array_slice($trigger['#array_parents'], 0, -1);
@@ -297,19 +310,25 @@ class HierarchicalSelectWidget extends EntityReferenceWidgetBase {
   /**
    * Gets the path from a term to the root of the taxonomy tree.
    *
-   * @param int $tid
+   * @param int|null $tid
    *   The term ID.
    *
    * @return array
    *   An array containing the term IDs from root to the given term.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  protected function getPathToRoot(int $tid) {
+  protected function getPathToRoot(?int $tid): array {
+    if (!$tid) {
+      return [];
+    }
     /** @var \Drupal\taxonomy\TermInterface $term */
     $term = $this->entityTypeManager->getStorage('taxonomy_term')->load($tid);
     if ($term) {
       $parent_tid = $term->get('parent')->target_id;
       if ($parent_tid != 0) {
-        return array_merge($this->getPathToRoot($parent_tid), [$tid]);
+        return array_merge($this->getPathToRoot((int) $parent_tid), [$tid]);
       }
     }
     return [$tid];
@@ -339,19 +358,27 @@ class HierarchicalSelectWidget extends EntityReferenceWidgetBase {
     foreach ($target_bundles as $target_bundle) {
       /** @var \Drupal\taxonomy\Entity\Vocabulary $vocabulary */
       if ($vocabulary = $this->entityTypeManager->getStorage('taxonomy_vocabulary')->load($target_bundle)) {
-        /** @var \Drupal\taxonomy\TermInterface[] $terms */
-        if ($terms = $term_storage->loadTree($vocabulary->id(), 0, 1, $translations_enabled)) {
+        /** @var \Drupal\taxonomy\TermInterface[]|object[] $terms */
+        if ($terms = $term_storage->loadTree((string) $vocabulary->id(), 0, 1, $translations_enabled)) {
           foreach ($terms as $term) {
             if ($translations_enabled && ($term instanceof TranslatableInterface) && $term->hasTranslation($langcode)) {
               $term = $term->getTranslation($langcode);
+              $tid = $term->id();
+              $published = method_exists($term, 'isPublished') && $term->isPublished();
+              $label = $term->label();
             }
-            $tid = $translations_enabled ? $term->id() : $term->tid;
-            $published = $translations_enabled ? $term->isPublished() : $term->status;
-            $label = $translations_enabled ? $term->label() : $term->name;
+            else {
+              // @phpstan-ignore property.notFound
+              $tid = $term->tid;
+              // @phpstan-ignore property.notFound
+              $published = $term->status;
+              // @phpstan-ignore property.notFound
+              $label = $term->name;
+            }
             if (!$has_admin_access && !$published) {
               continue;
             }
-            $options[$vocabulary->label()][$tid] = $label;
+            $options[(string) $vocabulary->label()][$tid] = $label;
           }
         }
       }
@@ -373,8 +400,11 @@ class HierarchicalSelectWidget extends EntityReferenceWidgetBase {
    * @param bool $translations_enabled
    *   The 'content_translation' module is enabled.
    *
-   * @return array
+   * @return array<int|string, string>
    *   The options.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   protected function getOptionsForLevel($parent, string $langcode, bool $translations_enabled): array {
     /** @var \Drupal\taxonomy\TermStorageInterface $term_storage */
@@ -382,14 +412,22 @@ class HierarchicalSelectWidget extends EntityReferenceWidgetBase {
     $has_admin_access = $this->currentUser->hasPermission('administer taxonomy');
     $vocabulary = $parent->bundle();
     $options = [];
-    if ($terms = $term_storage->loadTree($vocabulary, $parent->id(), 1, $translations_enabled)) {
+    if ($terms = $term_storage->loadTree($vocabulary, (int) $parent->id(), 1, $translations_enabled)) {
       foreach ($terms as $term) {
         if ($translations_enabled && ($term instanceof TranslatableInterface) && $term->hasTranslation($langcode)) {
           $term = $term->getTranslation($langcode);
+          $tid = $term->id();
+          $published = method_exists($term, 'isPublished') && $term->isPublished();
+          $label = $term->label();
         }
-        $tid = $translations_enabled ? $term->id() : $term->tid;
-        $published = $translations_enabled ? $term->isPublished() : $term->status;
-        $label = $translations_enabled ? $term->label() : $term->name;
+        else {
+          // @phpstan-ignore property.notFound
+          $tid = $term->tid;
+          // @phpstan-ignore property.notFound
+          $published = (bool) $term->status;
+          // @phpstan-ignore property.notFound
+          $label = $term->name;
+        }
         if (!$has_admin_access && !$published) {
           continue;
         }
@@ -403,7 +441,7 @@ class HierarchicalSelectWidget extends EntityReferenceWidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function massageFormValue(mixed $value, array $column): mixed {
+  public function massageFormValue(mixed $value, array $column): ?array {
     $levels = $value['levels'] ? array_filter($value['levels']) : [];
     if (empty($levels)) {
       return NULL;

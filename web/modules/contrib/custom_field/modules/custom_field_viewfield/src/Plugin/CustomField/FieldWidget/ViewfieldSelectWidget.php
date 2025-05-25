@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field_viewfield\Plugin\CustomField\FieldWidget;
 
 use Drupal\Component\Utility\NestedArray;
@@ -14,6 +16,7 @@ use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
 use Drupal\views\Views;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'viewfield_select' widget.
@@ -29,21 +32,42 @@ use Drupal\views\Views;
 class ViewfieldSelectWidget extends CustomFieldWidgetBase {
 
   /**
+   * The token entity mapper service.
+   *
+   * @var \Drupal\token\TokenEntityMapperInterface|null
+   */
+  protected mixed $tokenEntityMapper;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
+    $instance->tokenEntityMapper = $container->get(
+      'token.entity_mapper',
+      ContainerInterface::NULL_ON_INVALID_REFERENCE
+    );
+
+    return $instance;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'empty_option' => '- None -',
-        'force_default' => 0,
-        'allowed_views' => [],
-        'items_to_display' => NULL,
-        'token_browser' => [
-          'recursion_limit' => 3,
-          'global_types' => FALSE,
-        ],
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings'] = [
+      'empty_option' => '- None -',
+      'force_default' => 0,
+      'allowed_views' => [],
+      'items_to_display' => NULL,
+      'token_browser' => [
+        'recursion_limit' => 3,
+        'global_types' => FALSE,
+      ],
+    ] + $settings['settings'];
+
+    return $settings;
   }
 
   /**
@@ -99,15 +123,15 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
     ];
     $element['settings']['token_browser']['recursion_limit'] = [
       '#type' => 'select',
-      '#title' => t('Recursion limit'),
-      '#description' => t('The depth of the token browser tree.'),
+      '#title' => $this->t('Recursion limit'),
+      '#description' => $this->t('The depth of the token browser tree.'),
       '#options' => array_combine($range, $range),
       '#default_value' => $settings['token_browser']['recursion_limit'] ?? 3,
     ];
     $element['settings']['token_browser']['global_types'] = [
       '#type' => 'checkbox',
-      '#title' => t('Global types'),
-      '#description' => t("Enable 'global' context tokens like [current-user:*] or [site:*]."),
+      '#title' => $this->t('Global types'),
+      '#description' => $this->t("Enable 'global' context tokens like [current-user:*] or [site:*]."),
       '#default_value' => $settings['token_browser']['global_types'] ?? FALSE,
     ];
 
@@ -123,10 +147,8 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
    *   The form element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
-   * @param array $complete_form
-   *   The complete form.
    */
-  public function validateAllowedViews(array &$element, FormStateInterface &$form_state, array &$complete_form): void {
+  public function validateAllowedViews(array &$element, FormStateInterface $form_state): void {
     $any_enabled = FALSE;
     $views = $form_state->getValue($element['#parents']);
     // Iterate for each view's displays to check for enabled.
@@ -151,17 +173,21 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
    * This function is assigned as an #element_validate callback in
    * fieldSettingsForm().
    */
-  public static function fieldSettingsFormValidate(array &$element, FormStateInterface $form_state, array &$form) {
+  public static function fieldSettingsFormValidate(array &$element, FormStateInterface $form_state, array &$form): void {
     $parents = $element['#array_parents'];
-    $subfield = array_slice($parents, 0, -1, TRUE);
-    $settings = $form_state->getValue($subfield)['widget_settings']['settings'];
+    $subfield_path = array_slice($parents, 0, -1, TRUE);
+    $settings = $form_state->getValue([...$subfield_path, 'widget_settings', 'settings']);
 
     if ($settings['force_default']) {
       $default_value = $form_state->getValue('default_value_input');
-      $field_name = $form_state->getFormObject()->getEntity()->getName();
-      $subfield_name = end($subfield);
+      /** @var \Drupal\field_ui\Form\FieldConfigEditForm $form_object */
+      $form_object = $form_state->getFormObject();
+      /** @var \Drupal\Core\Field\FieldConfigInterface $field_definition */
+      $field_definition = $form_object->getEntity();
+      $field_name = $field_definition->getName();
+      $subfield_name = (string) end($subfield_path);
       if (empty($default_value[$field_name][0][$subfield_name]['display_id'])) {
-        $form_element = NestedArray::getValue($form, $subfield)['widget_settings']['settings'];
+        $form_element = NestedArray::getValue($form, [...$subfield_path, 'widget_settings', 'settings']);
         // Set an error on the default value checkbox.
         $form_state->setErrorByName('set_default_value', t('%title requires a default value.', [
           '%title' => $form_element['force_default']['#title'],
@@ -174,7 +200,8 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
           $subfield_name,
           'target_id',
         ];
-        $target_id_element = NestedArray::getValue($form_state->getCompleteForm(), $target_form_keys);
+        $complete_form = $form_state->getCompleteForm();
+        $target_id_element = NestedArray::getValue($complete_form, $target_form_keys);
         if ($target_id_element) {
           $form_state->setError($target_id_element, t('The field %view requires a default view.', [
             '%view' => $target_id_element['#title'],
@@ -196,6 +223,7 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
     $item = $items[$delta];
     $entity_type_id = $item->getEntity()->getEntityTypeId();
     $is_required = $item->getFieldDefinition()->isRequired() && $settings['required'];
+    $values = $form_state->getValues();
     if ($this->isDefaultValueWidget($form_state) && !$settings['force_default']) {
       $is_required = FALSE;
     }
@@ -205,9 +233,7 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
       $element['#access'] = FALSE;
     }
     $parents = $form['#parents'] ?? [];
-    // Create an ID suffix from the parents to make sure each widget is unique.
-    $id_suffix = $parents ? '-' . implode('-', $parents) : '';
-    $wrapper = $field_name . '-' . $delta . '-' . $name . '-' . $id_suffix;
+    $wrapper = $this->getUniqueElementId($form, $field_name, $delta, $name);
 
     // Account for parents structure from paragraphs field if applicable.
     $value_keys = array_merge($parents, [$field_name, $delta, $name]);
@@ -217,12 +243,13 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
     $base = array_shift($path_parts);
     $visibility_path = $base . '[' . implode('][', $path_parts) . ']';
 
-    $field_value = NestedArray::getValue($form_state->getValues(), $value_keys);
+    $field_value = NestedArray::getValue($values, $value_keys);
     // If there are no processed values, use the input.
     if (empty($field_value)) {
-      $field_value = NestedArray::getValue($form_state->getUserInput(), $value_keys);
+      $user_input = $form_state->getUserInput();
+      $field_value = NestedArray::getValue($user_input, $value_keys);
     }
-    if (!empty($field_value)) {
+    if (!empty($field_value) && isset($field_value['target_id'])) {
       $target_id = $field_value['target_id'];
       $default_display_id = $field_value['display_id'];
       $default_arguments = $field_value['view_options']['arguments'];
@@ -280,8 +307,12 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
       $element['display_id']['#value'] = NULL;
       unset($element['display_id']['#options']);
     }
-    // Otherwise, require it.
+
     else {
+      // Set value for display_id back to NULL when options change.
+      if (!empty($default_display_id) && !array_key_exists($default_display_id, $display_id_options)) {
+        $element['display_id']['#value'] = NULL;
+      }
       $element['display_id']['#required'] = TRUE;
     }
 
@@ -312,8 +343,7 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
       '#max' => 100,
     ];
     if ($token_module_installed) {
-      $token_mapper = \Drupal::service('token.entity_mapper');
-      $token_type = $token_mapper->getTokenTypeForEntityType($entity_type_id);
+      $token_type = $this->tokenEntityMapper->getTokenTypeForEntityType($entity_type_id);
       $element['view_options']['token_help'] = [
         '#theme' => 'token_tree_link',
         '#token_types' => [$token_type],
@@ -331,7 +361,7 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
    *
    * @param bool $filter
    *   Flag to filter the output using the 'allowed_views' setting.
-   * @param array $allowed_views_setting
+   * @param array<string, mixed> $allowed_views_setting
    *   (optional) An array of 'allowed_views' from settings to filter by.
    *
    * @return array
@@ -368,7 +398,7 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
    *   (optional) Flag to filter the output using the 'allowed_display_types'
    *   setting.
    *
-   * @return array
+   * @return array<\Drupal\Component\Render\MarkupInterface|string>
    *   The array of options.
    */
   public function getDisplayOptions(string $entity_id, bool $filter = TRUE): array {
@@ -390,10 +420,10 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
   /**
    * Get allowed views for widget options.
    *
-   * @param array $allowed_views
+   * @param array<string, mixed> $allowed_views
    *   An array of views to filter by.
    *
-   * @return array
+   * @return array<string, mixed>
    *   A filtered array of views based on enabled displays.
    */
   public function getAllowedViewsOptions(array $allowed_views): array {
@@ -436,7 +466,7 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The Ajax response.
    */
-  public function ajaxGetDisplayOptions(array &$form, FormStateInterface $form_state) {
+  public function ajaxGetDisplayOptions(array &$form, FormStateInterface $form_state): AjaxResponse {
     $trigger = $form_state->getTriggeringElement();
     $wrapper_id = $trigger['#ajax']['wrapper'];
     $form_state_keys = array_slice($trigger['#array_parents'], 0, -1);
@@ -444,11 +474,11 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
     // Get the updated element from the form structure.
     $updated_element = NestedArray::getValue($form, $form_state_keys)['display_id'];
     $sliced_parents = array_slice($trigger['#parents'], 0, -1, TRUE);
+    $user_input = $form_state->getUserInput();
 
-    NestedArray::unsetValue($form_state->getUserInput(), [
-      ...$sliced_parents,
-      'display_id',
-    ]);
+    NestedArray::setValue($user_input, [...$sliced_parents, 'display_id'], NULL);
+    $form_state->setValueForElement($updated_element, NULL);
+    $form_state->setUserInput($user_input);
 
     $response = new AjaxResponse();
     // Add a ReplaceCommand to replace the content inside the widget's wrapper.

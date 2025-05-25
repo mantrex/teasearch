@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldFilteredMarkup;
@@ -27,16 +29,17 @@ class TextWidget extends CustomFieldWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'size' => 60,
-        'placeholder' => '',
-        'maxlength' => '',
-        'maxlength_js' => FALSE,
-        'prefix' => '',
-        'suffix' => '',
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings'] = [
+      'size' => 60,
+      'placeholder' => '',
+      'maxlength' => '',
+      'maxlength_js' => FALSE,
+      'prefix' => '',
+      'suffix' => '',
+    ] + $settings['settings'];
+
+    return $settings;
   }
 
   /**
@@ -44,10 +47,14 @@ class TextWidget extends CustomFieldWidgetBase {
    */
   public function widget(FieldItemListInterface $items, int $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings');
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    $default_maxlength = $field->getMaxLength();
+    if (is_numeric($settings['maxlength']) && $settings['maxlength'] < $field->getMaxLength()) {
+      $default_maxlength = $settings['maxlength'];
+    }
 
     // Add our widget type and additional properties and return.
-    if (isset($settings['maxlength'])) {
+    if (is_numeric($settings['maxlength'])) {
       $element['#attributes']['data-maxlength'] = $settings['maxlength'];
     }
     if (isset($settings['maxlength_js']) && $settings['maxlength_js']) {
@@ -64,7 +71,7 @@ class TextWidget extends CustomFieldWidgetBase {
 
     return [
       '#type' => 'textfield',
-      '#maxlength' => $settings['maxlength'] ?? $field->getMaxLength(),
+      '#maxlength' => $default_maxlength,
       '#placeholder' => $settings['placeholder'] ?? NULL,
       '#size' => $settings['size'] ?? NULL,
     ] + $element;
@@ -75,7 +82,7 @@ class TextWidget extends CustomFieldWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
     $default_maxlength = $field->getMaxLength();
     if (is_numeric($settings['maxlength']) && $settings['maxlength'] < $field->getMaxLength()) {
       $default_maxlength = $settings['maxlength'];
@@ -98,16 +105,18 @@ class TextWidget extends CustomFieldWidgetBase {
       '#title' => $this->t('Max length'),
       '#description' => $this->t('The maximum amount of characters in the field'),
       '#default_value' => $default_maxlength,
-      '#value' => $default_maxlength,
       '#min' => 1,
       '#max' => $field->getMaxLength(),
       '#required' => TRUE,
     ];
-    $element['settings']['maxlength_js'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Show max length character count'),
-      '#default_value' => $settings['maxlength_js'],
-    ];
+    // Add additional setting if maxlength module is enabled.
+    if ($this->moduleHandler->moduleExists('maxlength')) {
+      $element['settings']['maxlength_js'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Show max length character count'),
+        '#default_value' => $settings['maxlength_js'],
+      ];
+    }
 
     $element['settings']['prefix'] = [
       '#type' => 'textfield',

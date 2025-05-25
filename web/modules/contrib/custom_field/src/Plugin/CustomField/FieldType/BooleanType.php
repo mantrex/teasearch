@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;

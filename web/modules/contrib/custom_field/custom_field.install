@@ -5,6 +5,7 @@
  * Install, update and uninstall functions for the Custom Field module.
  */
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\field\Entity\FieldConfig;
 
 /**
@@ -12,7 +13,7 @@ use Drupal\field\Entity\FieldConfig;
  *
  * @see https://www.drupal.org/project/custom_field/issues/3379711
  */
-function custom_field_update_8001() {
+function custom_field_update_8001(): TranslatableMarkup {
   $entity_type_manager = \Drupal::entityTypeManager();
   $entity_type_manager->clearCachedDefinitions();
   $entity_type_ids = [];
@@ -23,7 +24,7 @@ function custom_field_update_8001() {
     $entity_type_ids[] = $entity_type_id;
   }
 
-  return t("Installed/Updated the entity type(s): @entity_type_ids", [
+  return t('Installed/Updated the entity type(s): @entity_type_ids', [
     '@entity_type_ids' => implode(', ', $entity_type_ids),
   ]);
 }
@@ -31,7 +32,7 @@ function custom_field_update_8001() {
 /**
  * Update entity field definitions for new 'datetime_type' setting.
  */
-function custom_field_update_8002() {
+function custom_field_update_8002(): TranslatableMarkup {
   $entity_type_manager = \Drupal::entityTypeManager();
   $entity_type_manager->clearCachedDefinitions();
   $entity_type_ids = [];
@@ -42,7 +43,7 @@ function custom_field_update_8002() {
     $entity_type_ids[] = $entity_type_id;
   }
 
-  return t("Installed/Updated the entity type(s): @entity_type_ids", [
+  return t('Installed/Updated the entity type(s): @entity_type_ids', [
     '@entity_type_ids' => implode(', ', $entity_type_ids),
   ]);
 }
@@ -50,7 +51,7 @@ function custom_field_update_8002() {
 /**
  * Deprecate and replace the 'CustomField' widget with 'Flexbox'.
  */
-function custom_field_update_8003() {
+function custom_field_update_8003(): TranslatableMarkup {
   $entity_type_manager = \Drupal::entityTypeManager();
   $entity_field_manager = \Drupal::service('entity_field.manager');
 
@@ -89,18 +90,18 @@ function custom_field_update_8003() {
   // Clear the Drupal cache to apply the changes.
   $entity_type_manager->clearCachedDefinitions();
   if (!empty($updated)) {
-    return t("Updated the display components to the <em>Flexbox</em> display for the following field(s). You should visit the <em>Manage form display</em> page for further configuration. : @fields", [
+    return t('Updated the display components to the <em>Flexbox</em> display for the following field(s). You should visit the <em>Manage form display</em> page for further configuration. : @fields', [
       '@fields' => implode(', ', $updated),
     ]);
   }
 
-  return t("No existing display components were impacted by this update.");
+  return t('No existing display components were impacted by this update.');
 }
 
 /**
  * Update entity field definitions for new 'image' field.
  */
-function custom_field_update_8004() {
+function custom_field_update_8004(): void {
   $entity_type_manager = \Drupal::entityTypeManager();
   $entity_type_manager->clearCachedDefinitions();
   $change_summary = \Drupal::service('entity.definition_update_manager')->getChangeSummary();
@@ -108,4 +109,79 @@ function custom_field_update_8004() {
     $entity_type = $entity_type_manager->getDefinition($entity_type_id);
     \Drupal::entityDefinitionUpdateManager()->installEntityType($entity_type);
   }
+}
+
+/**
+ * Update field storage schema for all 'custom' fields.
+ */
+function custom_field_update_8005(): void {
+  $entity_type_manager = \Drupal::entityTypeManager();
+  // Clear cached definitions to ensure we work with the latest data.
+  $entity_type_manager->clearCachedDefinitions();
+
+  // Load all field storage configurations for the 'custom' field type.
+  /** @var \Drupal\field\FieldStorageConfigInterface[] $field_storage_configs */
+  $field_storage_configs = $entity_type_manager
+    ->getStorage('field_storage_config')
+    ->loadByProperties(['type' => 'custom']);
+
+  foreach ($field_storage_configs as $field_storage_config) {
+    $columns = $field_storage_config->getSetting('columns');
+    foreach ($columns as $name => $column) {
+      $true_column = [
+        'name' => $column['name'],
+        'type' => $column['type'],
+      ];
+      $type = $column['type'];
+
+      switch ($type) {
+        case 'string':
+        case 'telephone':
+          $default_max = $type === 'telephone' ? 256 : 255;
+          $true_column['length'] = $column['max_length'] ?? $default_max;
+          break;
+
+        case 'integer':
+        case 'decimal':
+        case 'float':
+          $true_column['unsigned'] = $column['unsigned'] ? (bool) $column['unsigned'] : FALSE;
+
+          // Size field for supported types.
+          if (in_array($type, ['integer', 'float'])) {
+            $true_column['size'] = $column['size'] ?? 'normal';
+          }
+
+          // Decimal only.
+          if ($type === 'decimal') {
+            $true_column['precision'] = $column['precision'] ? (int) $column['precision'] : 10;
+            $true_column['scale'] = $column['scale'] ? (int) $column['scale'] : 2;
+          }
+          break;
+
+        case 'entity_reference':
+          $true_column['target_type'] = $column['target_type'];
+          break;
+
+        case 'file':
+        case 'image':
+          $true_column['target_type'] = 'file';
+          $true_column['uri_scheme'] = $column['uri_scheme'] ?? 'public';
+          break;
+
+        case 'viewfield':
+          $true_column['target_type'] = 'view';
+          break;
+
+        case 'datetime':
+          $true_column['datetime_type'] = $column['datetime_type'] ?? 'datetime';
+          break;
+      }
+      $columns[$name] = $true_column;
+    }
+    // Update the settings.
+    $field_storage_config->setSetting('columns', $columns);
+    $field_storage_config->save();
+    \Drupal::entityDefinitionUpdateManager()->updateFieldStorageDefinition($field_storage_config);
+  }
+
 }

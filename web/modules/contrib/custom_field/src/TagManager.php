@@ -3,6 +3,7 @@
 namespace Drupal\custom_field;
 
 use Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface;
+use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -27,7 +28,12 @@ class TagManager extends DefaultPluginManager implements TagManagerInterface, Pl
   protected $themeHandler;
 
   /**
-   * {@inheritdoc}
+   * A set of defaults to be referenced by $this->processDefinition().
+   *
+   * Allows for additional processing of plugins when necessary or helpful for
+   * development purposes.
+   *
+   * @var string[]
    */
   protected $defaults = [
     'label' => '',
@@ -61,8 +67,8 @@ class TagManager extends DefaultPluginManager implements TagManagerInterface, Pl
   /**
    * {@inheritdoc}
    */
-  protected function getDiscovery() {
-    if (!isset($this->discovery)) {
+  protected function getDiscovery(): DiscoveryInterface|ContainerDerivativeDiscoveryDecorator {
+    if (!$this->discovery) {
       $this->discovery = new YamlDiscovery('custom_field_tags', $this->moduleHandler->getModuleDirectories());
       $this->discovery = new ContainerDerivativeDiscoveryDecorator($this->discovery);
     }
@@ -74,14 +80,14 @@ class TagManager extends DefaultPluginManager implements TagManagerInterface, Pl
    */
   public function getTagOptions(array $tags = []): array {
     $options = [
-      TagManagerInterface::NO_MARKUP_VALUE => $this->t('None (No wrapping HTML)'),
+      TagManagerInterface::NO_MARKUP_VALUE => (string) $this->t('None (No wrapping HTML)'),
     ];
     $definitions = $this->getDefinitions();
     if (!empty($tags)) {
       $definitions = array_intersect_key($definitions, array_flip($tags));
     }
     foreach ($definitions as $id => $definition) {
-      $options[$definition['group']][$id] = $this->t('@label (@tag)', [
+      $options[$definition['group']][(string) $id] = (string) $this->t('@label (@tag)', [
         '@label' => $definition['label'],
         '@tag' => $id,
       ]);

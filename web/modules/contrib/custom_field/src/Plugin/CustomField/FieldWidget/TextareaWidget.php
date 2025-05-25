@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
@@ -8,7 +10,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
-use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
  * Plugin implementation of the 'textarea' widget.
@@ -28,26 +29,27 @@ class TextareaWidget extends CustomFieldWidgetBase {
    *
    * @var \Drupal\custom_field\Plugin\CustomFieldTypeInterface
    */
-  protected $field;
+  protected CustomFieldTypeInterface $field;
 
   /**
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'rows' => 5,
-        'placeholder' => '',
-        'maxlength' => '',
-        'maxlength_js' => FALSE,
-        'formatted' => FALSE,
-        'default_format' => filter_fallback_format(),
-        'format' => [
-          'guidelines' => TRUE,
-          'help' => TRUE,
-        ],
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings'] = [
+      'rows' => 5,
+      'placeholder' => '',
+      'maxlength' => '',
+      'maxlength_js' => FALSE,
+      'formatted' => FALSE,
+      'default_format' => '',
+      'format' => [
+        'guidelines' => TRUE,
+        'help' => TRUE,
+      ],
+    ] + $settings['settings'];
+
+    return $settings;
   }
 
   /**
@@ -55,11 +57,11 @@ class TextareaWidget extends CustomFieldWidgetBase {
    */
   public function widget(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
     // Add our widget type and additional properties and return.
     $type = isset($settings['formatted']) && $settings['formatted'] ? 'text_format' : 'textarea';
 
-    if (isset($settings['formatted']) && $settings['formatted'] && $settings['default_format']) {
+    if (isset($settings['formatted']) && $settings['formatted'] && !empty($settings['default_format'])) {
       $this->field = $field;
       $element['#format'] = $settings['default_format'];
       $element['#allowed_formats'] = [$settings['default_format']];
@@ -88,7 +90,7 @@ class TextareaWidget extends CustomFieldWidgetBase {
     $element = parent::widgetSettingsForm($form_state, $field);
     $formats = filter_formats();
     $format_options = [];
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
 
     foreach ($formats as $key => $format) {
       $format_options[$key] = $format->get('name');
@@ -150,24 +152,15 @@ class TextareaWidget extends CustomFieldWidgetBase {
       '#default_value' => is_numeric($settings['maxlength']) ? $settings['maxlength'] : NULL,
       '#min' => 1,
     ];
-    $element['settings']['maxlength_js'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Show max length character count'),
-      '#default_value' => $settings['maxlength_js'],
-    ];
-    return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function errorElement(array $element, ConstraintViolationInterface $violation, array $form, FormStateInterface $form_state) {
-    if ($violation->arrayPropertyPath == ['format'] && isset($element['format']['#access']) && !$element['format']['#access']) {
-      // Ignore validation errors for formats if formats may not be changed,
-      // such as when existing formats become invalid.
-      // See \Drupal\filter\Element\TextFormat::processFormat().
-      return FALSE;
+    // Add additional setting if maxlength module is enabled.
+    if ($this->moduleHandler->moduleExists('maxlength')) {
+      $element['settings']['maxlength_js'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Show max length character count'),
+        '#default_value' => $settings['maxlength_js'],
+      ];
     }
+
     return $element;
   }
 
@@ -189,12 +182,12 @@ class TextareaWidget extends CustomFieldWidgetBase {
   /**
    * Closure function to pass arguments to unsetFilters().
    *
-   * @param array $element
+   * @param array<string, mixed> $element
    *   The form element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    *
-   * @return array
+   * @return array<string, mixed>
    *   The field settings.
    */
   public function callUnsetFilters(array $element, FormStateInterface $form_state): array {
@@ -205,14 +198,14 @@ class TextareaWidget extends CustomFieldWidgetBase {
   /**
    * Helper function to modify filter settings output.
    *
-   * @param array $element
+   * @param array<string, mixed> $element
    *   The form element.
    * @param \Drupal\Core\Form\FormStateInterface $formState
    *   The form state.
-   * @param array $settings
+   * @param array<string, mixed> $settings
    *   The field settings.
    *
-   * @return array
+   * @return array<string, mixed>
    *   The modified form element.
    */
   public static function unsetFilters(array $element, FormStateInterface $formState, array $settings): array {

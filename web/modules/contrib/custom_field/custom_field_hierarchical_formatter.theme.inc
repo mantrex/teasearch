@@ -16,11 +16,13 @@ use Drupal\Core\Render\Markup;
  *   An associative array with preprocess variables for this theme.
  *   by theme_preprocess.
  */
-function template_preprocess_custom_field_hierarchical_formatter(array &$variables) {
+function template_preprocess_custom_field_hierarchical_formatter(array &$variables): void {
   $terms = [];
   $variables['terms_objects'] = $variables['terms'];
 
-  /** @var \Drupal\taxonomy\TermInterface|[] $item */
+  /** @var \Drupal\taxonomy\TermInterface|\Drupal\taxonomy\TermInterface[] $item */
+  // @todo Using instanceof TermInterface checks, before using functions on $item
+  // or $value instead of declaring it as TermInterface.
   foreach ($variables['terms'] as $item) {
     if (is_array($item)) {
       $group = [];
@@ -58,7 +60,7 @@ function template_preprocess_custom_field_hierarchical_formatter(array &$variabl
         '#attributes' => [
           'class' => [
             Html::cleanCssIdentifier('taxonomy-term'),
-            Html::cleanCssIdentifier("count {$count}"),
+            Html::cleanCssIdentifier("count $count"),
           ],
         ],
       ];

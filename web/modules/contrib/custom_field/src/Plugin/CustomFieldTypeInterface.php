@@ -53,7 +53,7 @@ interface CustomFieldTypeInterface extends PluginInspectionInterface {
   /**
    * Defines the widget settings for this plugin.
    *
-   * @return array
+   * @return array<string, mixed>
    *   A list of default settings, keyed by the setting name.
    */
   public static function defaultWidgetSettings(): array;
@@ -152,10 +152,37 @@ interface CustomFieldTypeInterface extends PluginInspectionInterface {
   /**
    * The target_type value from the custom field item.
    *
-   * @return string
+   * @return string|null
    *   The target_type value of the column.
    */
-  public function getTargetType(): string;
+  public function getTargetType(): ?string;
+
+  /**
+   * Returns the array of field settings.
+   *
+   * @return array<string, mixed>
+   *   The array of settings.
+   */
+  public function getSettings(): array;
+
+  /**
+   * Returns the value of a field setting.
+   *
+   * @param string $setting
+   *   The setting name.
+   *
+   * @return mixed
+   *   The setting value.
+   */
+  public function getSetting(string $setting): mixed;
+
+  /**
+   * Returns the array of widget settings.
+   *
+   * @return array<string, mixed>
+   *   The array of widget settings.
+   */
+  public function getWidgetSettings(): array;
 
   /**
    * Gets a widget setting by name.
@@ -169,12 +196,12 @@ interface CustomFieldTypeInterface extends PluginInspectionInterface {
   public function getWidgetSetting(string $name): mixed;
 
   /**
-   * Gets a fields configuration.
+   * Returns the plugin id for the widget assigned to the field.
    *
-   * @return array
-   *   The configuration array.
+   * @return string
+   *   The widget plugin id assigned to the field type.
    */
-  public function getConfiguration(): array;
+  public function getWidgetPluginId(): string;
 
   /**
    * Should the field item be included in the empty check?
@@ -187,10 +214,10 @@ interface CustomFieldTypeInterface extends PluginInspectionInterface {
   /**
    * Returns an array of schema properties.
    *
-   * @param array $settings
+   * @param array<string, mixed> $settings
    *   Optional settings passed to the schema() function.
    *
-   * @return array
+   * @return array<string, mixed>
    *   An array of schema properties for the field type.
    */
   public static function schema(array $settings): array;
@@ -198,7 +225,7 @@ interface CustomFieldTypeInterface extends PluginInspectionInterface {
   /**
    * Returns an array of property definitions.
    *
-   * @param array $settings
+   * @param array<string, mixed> $settings
    *   Optional settings passed to the propertyDefinitions() function.
    *
    * @return mixed
@@ -222,10 +249,10 @@ interface CustomFieldTypeInterface extends PluginInspectionInterface {
   /**
    * Returns an array of constraints.
    *
-   * @param array $settings
+   * @param array<string, mixed> $settings
    *   An array of settings passed to the getConstraints() function.
    *
-   * @return array
+   * @return array<string, mixed>
    *   Array of constraints.
    */
   public function getConstraints(array $settings): array;
@@ -235,35 +262,24 @@ interface CustomFieldTypeInterface extends PluginInspectionInterface {
    *
    * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $item
    *   The custom field type interface.
-   * @param array $default_value
+   * @param array<string, mixed> $default_value
    *   A default value array for the field.
    *
-   * @return array
+   * @return array<string, mixed>
    *   An array of dependencies.
    */
   public static function calculateDependencies(CustomFieldTypeInterface $item, array $default_value): array;
-
-  /**
-   * Returns an array of calculated storage dependencies.
-   *
-   * @param array $settings
-   *   An array of settings for the stored column.
-   *
-   * @return array
-   *   An array of storage dependencies.
-   */
-  public static function calculateStorageDependencies(array $settings): array;
 
   /**
    * Returns an array of widget settings to change when dependency is removed.
    *
    * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $item
    *   The custom field type interface.
-   * @param array $dependencies
+   * @param array<string, mixed> $dependencies
    *   An array of dependencies that will be deleted keyed by dependency type.
    *   Dependency types are, for example, entity, module and theme.
    *
-   * @return array
+   * @return array<string, mixed>
    *   An array of settings that changed.
    */
   public static function onDependencyRemoval(CustomFieldTypeInterface $item, array $dependencies): array;
@@ -285,7 +301,7 @@ interface CustomFieldTypeInterface extends PluginInspectionInterface {
    * @return bool
    *   TRUE if the link is external, FALSE otherwise.
    */
-  public function isExternal(FieldItemInterface $item);
+  public function isExternal(FieldItemInterface $item): bool;
 
   /**
    * Returns if the field type can be added.

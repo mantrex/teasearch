@@ -1,0 +1,11 @@
+# List of words excluded from cspell validation for the project Custom Field.
+# Mostly contains custom names: variables, modules, users, etc...
+
+# Allowed words until better suggestions are provided or added to dictionary.
+autocollapse
+customfield
+nonroot
+syndicatable
+
+# User names: contributors, maintainers, users (mostly in README.md files).
+apmsooner

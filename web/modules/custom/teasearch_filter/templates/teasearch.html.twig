@@ -6,32 +6,103 @@
  * Variables:
  * - filter_form: Render array del form di filtro.
  * - nodes: Array di nodi caricati.
+ * - filters: Configurazione filtri raw.
+ * - grouped_filters: Filtri preparati per il template.
+ * - content_type: Tipo di contenuto corrente.
  */
 #}
+
 <div class="teasearch-wrapper">
 	<aside class="teasearch-sidebar">
-		{{ filter_form }}
+		{% if grouped_filters %}
+			<div class="teasearch-filters-custom">
+				<form method="get" class="teasearch-filter-form">
+					<input type="hidden" name="content_type" value="{{ content_type }}">
+
+					{% for field_name, filter in grouped_filters %}
+						<details class="teasearch-filter-group" data-name="{{ field_name }}" {{ filter.is_open ? 'open' : '' }}>
+							<summary class="teasearch-filter-title">
+								{{ filter.label|t }}
+								{% if filter.selected|length > 0 %}
+									<span class="filter-count">({{ filter.selected|length }})</span>
+								{% endif %}
+							</summary>
+
+							<div class="teasearch-filter-content">
+								{% if filter.type == 'taxonomy' %}
+									{% for tid, option in filter.options %}
+										<div class="form-check">
+											<input class="form-check-input" type="checkbox" name="{{ field_name }}" value="{{ tid }}" id="{{ field_name }}_{{ tid }}" {{ option.selected ? 'checked' : '' }}>
+											<label class="form-check-label" for="{{ field_name }}_{{ tid }}">
+												{{ option.label }}
+												({{ option.count }})
+											</label>
+										</div>
+									{% endfor %}
+								{% else %}
+									<div class="form-group">
+										<input type="text" name="{{ field_name }}" class="form-control" value="{{ filter.selected is iterable ? filter.selected|join(',') : filter.selected|default('') }}" placeholder="{{ 'Enter keywords...'|t }}">
+										<small class="form-text text-muted">
+											{{ 'Enter one or more comma-separated keywords.'|t }}
+										</small>
+									</div>
+								{% endif %}
+							</div>
+						</details>
+					{% endfor %}
+
+					<div class="teasearch-actions">
+						<button type="submit" class="btn btn-primary">
+							{{ 'Search'|t }}
+						</button>
+						<a href="{{ url('teasearch_filter.search', {'content_type': content_type}) }}" class="btn btn-secondary">
+							{{ 'Clear All'|t }}
+						</a>
+					</div>
+				</form>
+			</div>
+		{% else %}
+			{# Fallback al form originale #}
+			{{ filter_form }}
+		{% endif %}
 	</aside>
+
 	<section class="teasearch-results">
 		{% if nodes %}
+			<div class="results-header">
+				<h3>{{ 'Results'|t }}
+					({{ nodes|length }})</h3>
+			</div>
+
 			{% for node in nodes %}
-				<article class="teasearch-item">
-					<h2>
-						<a href="{{ path('entity.node.canonical', {'node': node.nid.value}) }}">
-							{{ node.label }}
-						</a>
-					</h2>
-					{% if node.field_content.value %}
-						{% set teaser = node.field_content.value|striptags %}
-						<p>
-							{{ teaser|slice(0, 200) }}{{ teaser|length > 200 ? '…' }}
-						</p>
-					{% endif %}
+				<article class="teasearch-item card mb-3">
+					<div class="card-body">
+						<h2 class="card-title h4">
+							<a href="{{ path('entity.node.canonical', {'node': node.nid.value}) }}">
+								{{ node.label }}
+							</a>
+						</h2>
+
+						{% if node.field_content.value %}
+							{% set teaser = node.field_content.value|striptags %}
+							<p class="card-text">
+								{{ teaser|slice(0, 200) }}{{ teaser|length > 200 ? '…' }}
+							</p>
+						{% endif %}
+
+						{% if node.created.value %}
+							<small class="text-muted">
+								{{ node.created.value|format_date('medium') }}
+							</small>
+						{% endif %}
+					</div>
 				</article>
 			{% endfor %}
 		{% else %}
-			<p>{{ 'No content found. Please select filters and click Search.'|t }}</p>
+			<div class="alert alert-info">
+				<h4>{{ 'No content found'|t }}</h4>
+				<p>{{ 'Please select filters and click Search to find content.'|t }}</p>
+			</div>
 		{% endif %}
 	</section>
 </div>
-

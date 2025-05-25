@@ -1,13 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FeedsType;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\custom_field\Attribute\CustomFieldFeedsType;
+use Drupal\feeds\EntityFinderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -25,26 +30,26 @@ class EntityReferenceTarget extends BaseTarget {
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * The entity field manager.
    *
    * @var \Drupal\Core\Entity\EntityFieldManagerInterface
    */
-  protected $entityFieldManager;
+  protected EntityFieldManagerInterface $entityFieldManager;
 
   /**
    * The Feeds entity finder service.
    *
    * @var \Drupal\feeds\EntityFinderInterface
    */
-  protected $entityFinder;
+  protected EntityFinderInterface $entityFinder;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->entityTypeManager = $container->get('entity_type.manager');
     $instance->entityFieldManager = $container->get('entity_field.manager');
@@ -71,8 +76,10 @@ class EntityReferenceTarget extends BaseTarget {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function buildConfigurationForm(int $delta, array $configuration) {
+  public function buildConfigurationForm(int $delta, array $configuration): array {
     $target_type = $this->configuration['target_type'];
     // Only reference content entities. Configuration entities will need
     // custom targets.
@@ -180,7 +187,7 @@ class EntityReferenceTarget extends BaseTarget {
   /**
    * {@inheritdoc}
    */
-  public function prepareValue($value, array $configuration, string $langcode): ?string {
+  public function prepareValue(mixed $value, array $configuration, string $langcode): mixed {
     $name = $this->configuration['name'];
     if (strlen(trim($value)) === 0) {
       return NULL;
@@ -199,17 +206,17 @@ class EntityReferenceTarget extends BaseTarget {
    *
    * @param string $field
    *   The subfield to search in.
-   * @param array $configuration
+   * @param array<string, mixed> $configuration
    *   The feeds configuration array for the custom field.
    * @param int|string $search
    *   The value to lookup.
    * @param string $langcode
    *   The feeds language code.
    *
-   * @return int[]
+   * @return array
    *   A list of entity ID's.
    */
-  protected function findEntities(string $field, array $configuration, int|string $search, string $langcode) {
+  protected function findEntities(string $field, array $configuration, int|string $search, string $langcode): array {
     $target_type = $this->configuration['target_type'];
     if ($field == 'feeds_item') {
       $field = 'feeds_item.' . $configuration['feeds_item'];
@@ -221,7 +228,7 @@ class EntityReferenceTarget extends BaseTarget {
     }
 
     if ($configuration['autocreate'] && $field === $this->getLabelKey()) {
-      return [$this->createEntity($search, $configuration, $langcode)];
+      return [$this->createEntity((string) $search, $configuration, $langcode)];
     }
 
     return [];
@@ -239,8 +246,12 @@ class EntityReferenceTarget extends BaseTarget {
    *
    * @return int|string|false
    *   The ID of the new entity or false if the given label is empty.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  protected function createEntity($label, array $configuration, string $feeds_langcode) {
+  protected function createEntity($label, array $configuration, string $feeds_langcode): bool|int|string {
     if (!is_string($label) || !strlen(trim($label))) {
       return FALSE;
     }
@@ -270,10 +281,12 @@ class EntityReferenceTarget extends BaseTarget {
    *
    * @return string
    *   The bundle key of the entity type.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   protected function getBundleKey(): string {
-    $target_type = $this->configuration['target_type'];
-    return $this->entityTypeManager->getDefinition($target_type)->getKey('bundle');
+    $target_type = (string) $this->configuration['target_type'];
+    return (string) $this->entityTypeManager->getDefinition($target_type)->getKey('bundle');
   }
 
   /**
@@ -281,10 +294,12 @@ class EntityReferenceTarget extends BaseTarget {
    *
    * @return string
    *   The label key of the entity type.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   protected function getLabelKey(): string {
-    $target_type = $this->configuration['target_type'];
-    return $this->entityTypeManager->getDefinition($target_type)->getKey('label');
+    $target_type = (string) $this->configuration['target_type'];
+    return (string) $this->entityTypeManager->getDefinition($target_type)->getKey('label');
   }
 
   /**
@@ -292,12 +307,14 @@ class EntityReferenceTarget extends BaseTarget {
    *
    * @return string|null
    *   The langcode key of the entity type.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   protected function getLangcodeKey(): ?string {
-    $target_type = $this->configuration['target_type'];
+    $target_type = (string) $this->configuration['target_type'];
     $entity_type = $this->entityTypeManager->getDefinition($target_type);
     if ($entity_type->hasKey('langcode')) {
-      return $entity_type->getKey('langcode');
+      return (string) $entity_type->getKey('langcode');
     }
 
     return NULL;
@@ -321,18 +338,10 @@ class EntityReferenceTarget extends BaseTarget {
       return FALSE;
     }
 
-    switch ($field->getType()) {
-      case 'integer':
-      case 'string':
-      case 'text_long':
-      case 'path':
-      case 'uuid':
-      case 'feeds_item':
-        return TRUE;
-
-      default:
-        return FALSE;
-    }
+    return match ($field->getType()) {
+      'integer', 'string', 'text_long', 'path', 'uuid', 'feeds_item' => TRUE,
+      default => FALSE,
+    };
   }
 
   /**
@@ -348,12 +357,10 @@ class EntityReferenceTarget extends BaseTarget {
       $this,
       'filterFieldTypes',
     ]);
-    $options = [];
-    foreach ($field_definitions as $id => $definition) {
-      $options[$id] = Html::escape($definition->getLabel());
-    }
 
-    return $options;
+    return array_map(function ($definition) {
+      return Html::escape((string) $definition->getLabel());
+    }, $field_definitions);
   }
 
   /**
@@ -372,12 +379,12 @@ class EntityReferenceTarget extends BaseTarget {
   /**
    * Returns options for feeds_item configuration.
    *
-   * @return array
+   * @return array<string, string>
    *   Array of feeds item options.
    */
-  public function getFeedsItemOptions() {
+  public function getFeedsItemOptions(): array {
     return [
-      'guid' => $this->t('Item GUID'),
+      'guid' => (string) $this->t('Item GUID'),
     ];
   }
 

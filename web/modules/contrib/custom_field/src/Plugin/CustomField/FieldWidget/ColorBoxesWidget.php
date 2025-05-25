@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Component\Utility\Html;
@@ -15,7 +17,7 @@ use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 #[CustomFieldWidget(
   id: 'color_boxes',
   label: new TranslatableMarkup('Color boxes'),
-  category: new TranslatableMarkup('General'),
+  category: new TranslatableMarkup('Color'),
   field_types: [
     'color',
   ],
@@ -26,35 +28,36 @@ class ColorBoxesWidget extends ColorWidget {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'default_colors' => [
-          '#ac725e',
-          '#d06b64',
-          '#f83a22',
-          '#fa573c',
-          '#ff7537',
-          '#ffad46',
-          '#42d692',
-          '#16a765',
-          '#7bd148',
-          '#b3dc6c',
-          '#fbe983',
-          '#92e1c0',
-          '#9fe1e7',
-          '#9fc6e7',
-          '#4986e7',
-          '#9a9cff',
-          '#b99aff',
-          '#c2c2c2',
-          '#cabdbf',
-          '#cca6ac',
-          '#f691b2',
-          '#cd74e6',
-          '#a47ae2',
-        ],
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings'] = [
+      'default_colors' => [
+        '#ac725e',
+        '#d06b64',
+        '#f83a22',
+        '#fa573c',
+        '#ff7537',
+        '#ffad46',
+        '#42d692',
+        '#16a765',
+        '#7bd148',
+        '#b3dc6c',
+        '#fbe983',
+        '#92e1c0',
+        '#9fe1e7',
+        '#9fc6e7',
+        '#4986e7',
+        '#9a9cff',
+        '#b99aff',
+        '#c2c2c2',
+        '#cabdbf',
+        '#cca6ac',
+        '#f691b2',
+        '#cd74e6',
+        '#a47ae2',
+      ],
+    ] + $settings['settings'];
+
+    return $settings;
   }
 
   /**
@@ -62,7 +65,7 @@ class ColorBoxesWidget extends ColorWidget {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
     $colors = is_array($settings['default_colors']) ? implode(',', $settings['default_colors']) : $settings['default_colors'];
 
     $element['settings']['default_colors'] = [
@@ -84,7 +87,7 @@ class ColorBoxesWidget extends ColorWidget {
    */
   public function widget(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings');
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
     $element['#uid'] = Html::getUniqueId('color-field-' . $field->getName());
 
     // Ensure the default value is the required format.
@@ -108,7 +111,8 @@ class ColorBoxesWidget extends ColorWidget {
     $settings[$element['#uid']] = [
       'required' => $settings['required'],
     ];
-    $default_colors = $settings['default_colors'];
+
+    $default_colors = is_array($settings['default_colors']) ? implode(',', $settings['default_colors']) : $settings['default_colors'];
     preg_match_all("/#[0-9A-F]{6}/i", $default_colors, $default_colors, PREG_SET_ORDER);
 
     foreach ($default_colors as $color) {
@@ -130,7 +134,7 @@ class ColorBoxesWidget extends ColorWidget {
   /**
    * Use element validator to make sure that hex values are in correct format.
    *
-   * @param mixed[] $element
+   * @param array<string, mixed> $element
    *   The Default colors element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.

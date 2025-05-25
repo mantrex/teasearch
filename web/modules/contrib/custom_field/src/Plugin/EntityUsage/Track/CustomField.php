@@ -22,13 +22,22 @@ class CustomField extends EntityUsageTrackBase implements EntityUsageTrackMultip
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   public function getTargetEntities(FieldItemInterface $item): array {
-    return $this->doGetTargetEntities($item->getParent(), $item);
+    /** @var \Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface> $parent */
+    $parent = $item->getParent();
+    return $this->doGetTargetEntities($parent, $item);
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @param \Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface> $field
+   *   The field item list.
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   public function getTargetEntitiesFromField(FieldItemListInterface $field): array {
     return $this->doGetTargetEntities($field);
@@ -37,7 +46,7 @@ class CustomField extends EntityUsageTrackBase implements EntityUsageTrackMultip
   /**
    * Retrieve the target entity(ies) from a field.
    *
-   * @param \Drupal\Core\Field\FieldItemListInterface $field
+   * @param \Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface> $field
    *   The field to get the target entity(ies) from.
    * @param \Drupal\Core\Field\FieldItemInterface|null $field_item
    *   (optional) The field item to get the target entity(ies) from.
@@ -46,6 +55,8 @@ class CustomField extends EntityUsageTrackBase implements EntityUsageTrackMultip
    *   An indexed array of strings where each target entity type and ID are
    *   concatenated with a "|" character. Will return an empty array if no
    *   target entity could be retrieved from the received field item value.
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   private function doGetTargetEntities(FieldItemListInterface $field, ?FieldItemInterface $field_item = NULL): array {
     $entity_ids = [];
@@ -77,12 +88,13 @@ class CustomField extends EntityUsageTrackBase implements EntityUsageTrackMultip
       return [];
     }
     foreach ($iterable as $item) {
-      /** @var \Drupal\custom_field\Plugin\Field\FieldType\CustomItem $item */
-      foreach ($reference_subfields as $name => $subfield) {
-        $target_type = $subfield['target_type'];
-        $target_id = $item->get($name)->getValue();
-        if (!empty($target_id)) {
-          $entity_ids[$target_type][] = $target_id;
+      if ($item instanceof FieldItemInterface) {
+        foreach ($reference_subfields as $name => $subfield) {
+          $target_type = $subfield['target_type'];
+          $target_id = $item->get($name)->getValue();
+          if (!empty($target_id)) {
+            $entity_ids[$target_type][] = $target_id;
+          }
         }
       }
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\custom_field_graphql\Plugin\GraphQLCompose\FieldType;
 
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\graphql\GraphQL\Execution\FieldContext;
 use Drupal\graphql_compose\Plugin\GraphQL\DataProducer\FieldProducerItemInterface;
@@ -27,7 +28,7 @@ class CustomFieldEntityReference extends GraphQLComposeFieldTypeBase implements 
    *
    * @var \Drupal\Core\Entity\EntityRepositoryInterface
    */
-  protected $entityRepository;
+  protected EntityRepositoryInterface $entityRepository;
 
   /**
    * {@inheritdoc}
@@ -42,11 +43,13 @@ class CustomFieldEntityReference extends GraphQLComposeFieldTypeBase implements 
    * {@inheritdoc}
    */
   public function resolveFieldItem(FieldItemInterface $item, FieldContext $context) {
-    if (!$item->entity) {
+    $property = $context->getContextValue('property_name');
+    $entity = $item->{$property . '__entity'};
+    if (!$entity) {
       return NULL;
     }
 
-    $translated_entity = $this->entityRepository->getTranslationFromContext($item->entity);
+    $translated_entity = $this->entityRepository->getTranslationFromContext($entity);
     $context->addCacheableDependency($translated_entity);
 
     return $translated_entity;

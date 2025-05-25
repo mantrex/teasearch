@@ -2,18 +2,19 @@
 
 namespace Drupal\custom_field\Plugin;
 
+use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Defines an interface for custom field Type plugins.
  */
-interface CustomFieldWidgetInterface {
+interface CustomFieldWidgetInterface extends PluginInspectionInterface {
 
   /**
    * Defines the widget settings for this plugin.
    *
-   * @return array
+   * @return array{label: string, translatable: bool, settings: array<string, mixed>}
    *   A list of default settings, keyed by the setting name.
    */
   public static function defaultSettings(): array;
@@ -26,7 +27,7 @@ interface CustomFieldWidgetInterface {
    * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $field
    *   The custom field type object.
    *
-   * @return array
+   * @return array<string, mixed>
    *   The form definition for the widget settings.
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array;
@@ -36,11 +37,11 @@ interface CustomFieldWidgetInterface {
    *
    * Called from the Custom field widget plugin formElement method.
    *
-   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   * @param \Drupal\Core\Field\FieldItemListInterface<\Drupal\custom_field\Plugin\Field\FieldType\CustomItem> $items
    *   Array of default values for this field.
    * @param int $delta
    *   The order of this item in the array of sub-elements (0, 1, 2, etc.).
-   * @param array $element
+   * @param array<string, mixed> $element
    *   A form element array containing basic properties for the widget:
    *   - #field_parents: The 'parents' space for the field in the form. Most
    *       widgets can simply overlook this property. This identifies the
@@ -56,7 +57,7 @@ interface CustomFieldWidgetInterface {
    *     required.
    *   - #delta: The order of this item in the array of sub-elements; see $delta
    *     above.
-   * @param array $form
+   * @param array<string, mixed> $form
    *   The form structure where widgets are being attached to. This might be a
    *   full form structure, or a sub-element of a larger form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
@@ -64,7 +65,7 @@ interface CustomFieldWidgetInterface {
    * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $field
    *   The custom field type object.
    *
-   * @return array
+   * @return array<string, mixed>
    *   The form elements for a single widget for this field.
    *
    * @see \Drupal\Core\Field\WidgetInterface::formElement()
@@ -76,7 +77,7 @@ interface CustomFieldWidgetInterface {
    *
    * @param mixed $value
    *   The submitted form value produced by the widget.
-   * @param array $column
+   * @param array<string, mixed> $column
    *   The storage column for extra properties.
    *
    * @return mixed
@@ -87,7 +88,7 @@ interface CustomFieldWidgetInterface {
   /**
    * Helper function to return array of widget settings.
    *
-   * @return array
+   * @return array<string, mixed>
    *   The array of settings.
    */
   public function getWidgetSettings(): array;
@@ -96,7 +97,7 @@ interface CustomFieldWidgetInterface {
    * Returns if the widget can be used for the provided field.
    *
    * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $custom_item
-   *   The custom field type.
+   *   The custom field item.
    *
    * @return bool
    *   TRUE if the widget can be used, FALSE otherwise.
@@ -106,7 +107,7 @@ interface CustomFieldWidgetInterface {
   /**
    * Returns an array of dependencies for the widget.
    *
-   * @param array $settings
+   * @param array<string, mixed> $settings
    *   An array of widget settings.
    *
    * @return array

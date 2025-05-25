@@ -1,9 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
+use Drupal\Component\Datetime\DateTimePlus;
+use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Datetime\TimeZoneFormHelper;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
@@ -20,26 +26,26 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * The date formatter service.
    *
    * @var \Drupal\Core\Datetime\DateFormatterInterface
    */
-  protected $dateFormatter;
+  protected DateFormatterInterface $dateFormatter;
 
   /**
    * The date format entity storage.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $dateFormatStorage;
+  protected EntityStorageInterface $dateFormatStorage;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->entityTypeManager = $container->get('entity_type.manager');
     $instance->dateFormatter = $container->get('date.formatter');
@@ -75,7 +81,7 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
+  public function formatValue(FieldItemInterface $item, mixed $value): ?array {
     $datetime_type = $this->customFieldDefinition->getDatetimeType();
 
     /** @var \Drupal\Core\Datetime\DrupalDateTime $date */
@@ -99,7 +105,7 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
    * @return \Drupal\Core\Datetime\DrupalDateTime|null
    *   Return a date object or null.
    */
-  protected function getDate(string $value, string $datetime_type) {
+  protected function getDate(string $value, string $datetime_type): ?DrupalDateTime {
     $storage_format = $datetime_type === CustomFieldTypeInterface::DATETIME_TYPE_DATE ? CustomFieldTypeInterface::DATE_STORAGE_FORMAT : CustomFieldTypeInterface::DATETIME_STORAGE_FORMAT;
     $date_object = NULL;
     try {
@@ -127,13 +133,13 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
   /**
    * Creates a formatted date value as a string.
    *
-   * @param object $date
-   *   A date object.
+   * @param \Drupal\Component\Datetime\DateTimePlus $date
+   *   A DrupalDateTime object.
    *
    * @return string
    *   A formatted date string using the chosen format.
    */
-  abstract protected function formatDate(object $date): string;
+  abstract protected function formatDate(DateTimePlus $date): string;
 
   /**
    * Sets the proper time zone on a DrupalDateTime object for the current user.
@@ -142,12 +148,12 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
    * zone applied to it.  This method will apply the time zone for the current
    * user, based on system and user settings.
    *
-   * @param \Drupal\Core\Datetime\DrupalDateTime $date
+   * @param \Drupal\Component\Datetime\DateTimePlus $date
    *   A DrupalDateTime object.
    * @param string $datetime_type
    *   The date type.
    */
-  protected function setTimeZone(DrupalDateTime $date, string $datetime_type) {
+  protected function setTimeZone(DateTimePlus $date, string $datetime_type): void {
     if ($datetime_type === CustomFieldTypeInterface::DATETIME_TYPE_DATE) {
       // A date without time has no timezone conversion.
       $timezone = CustomFieldTypeInterface::STORAGE_TIMEZONE;
@@ -155,7 +161,7 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
     else {
       $timezone = date_default_timezone_get();
     }
-    $date->setTimeZone(timezone_open($timezone));
+    $date->setTimezone(timezone_open($timezone));
   }
 
   /**
@@ -166,13 +172,13 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
    * @param string $datetime_type
    *   The date type.
    *
-   * @return array
+   * @return array<string, mixed>
    *   A render array.
    */
   protected function buildDate(DrupalDateTime $date, string $datetime_type): array {
     $this->setTimeZone($date, $datetime_type);
 
-    $build = [
+    return [
       '#markup' => $this->formatDate($date),
       '#cache' => [
         'contexts' => [
@@ -180,8 +186,6 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
         ],
       ],
     ];
-
-    return $build;
   }
 
   /**
@@ -192,7 +196,7 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
    * @param string $datetime_type
    *   The date type.
    *
-   * @return array
+   * @return array<string, mixed>
    *   A render array.
    */
   protected function buildDateWithIsoAttribute(DrupalDateTime $date, string $datetime_type): array {
@@ -201,7 +205,7 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
 
     $this->setTimeZone($date, $datetime_type);
 
-    $build = [
+    return [
       '#theme' => 'time',
       '#text' => $this->formatDate($date),
       '#attributes' => [
@@ -213,8 +217,6 @@ abstract class DateTimeFormatterBase extends CustomFieldFormatterBase {
         ],
       ],
     ];
-
-    return $build;
   }
 
 }

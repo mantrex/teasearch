@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
@@ -44,9 +46,9 @@ class EntityReference extends CustomFieldTypeBase {
         $target_type
       ));
     }
-    /** @var \Drupal\Core\TypedData\DataDefinitionInterface $properties */
+    /** @var array<\Drupal\Core\TypedData\DataDefinitionInterface> $properties */
     $properties = static::propertyDefinitions($settings);
-    if ($target_type_info->entityClassImplements(FieldableEntityInterface::class) && $properties[$name]->getSetting('data_type') === 'integer') {
+    if ($target_type_info->entityClassImplements(FieldableEntityInterface::class) && $properties[(string) $name]->getSetting('data_type') === 'integer') {
       $columns[$name] = [
         'type' => 'int',
         'description' => 'The ID of the target entity.',
@@ -116,8 +118,8 @@ class EntityReference extends CustomFieldTypeBase {
    */
   public static function calculateDependencies(CustomFieldTypeInterface $item, array $default_value): array {
     $entity_type_manager = \Drupal::entityTypeManager();
-    $configuration = $item->getConfiguration();
-    $target_entity_type = $entity_type_manager->getDefinition($configuration['target_type']);
+    $target_entity_type_id = $item->getTargetType();
+    $target_entity_type = $entity_type_manager->getDefinition($target_entity_type_id);
     $widget_settings = $item->getWidgetSetting('settings') ?? [];
     $target_bundles = $widget_settings['handler_settings']['target_bundles'] ?? [];
     $dependencies = [];
@@ -126,7 +128,7 @@ class EntityReference extends CustomFieldTypeBase {
     if (!empty($default_value)) {
       foreach ($default_value as $value) {
         if (isset($value[$field_name])) {
-          $entity = $entity_type_manager->getStorage($configuration['target_type'])->load($value[$field_name]);
+          $entity = $entity_type_manager->getStorage($target_entity_type_id)->load($value[$field_name]);
           if ($entity) {
             $dependencies[$entity->getConfigDependencyKey()][] = $entity->getConfigDependencyName();
           }
@@ -152,23 +154,11 @@ class EntityReference extends CustomFieldTypeBase {
   /**
    * {@inheritdoc}
    */
-  public static function calculateStorageDependencies(array $settings): array {
-    $entity_type_manager = \Drupal::entityTypeManager();
-    $dependencies = [];
-    $target_entity_type = $entity_type_manager->getDefinition($settings['target_type']);
-    $dependencies['module'][] = $target_entity_type->getProvider();
-
-    return $dependencies;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function onDependencyRemoval(CustomFieldTypeInterface $item, array $dependencies): array {
     $entity_type_manager = \Drupal::entityTypeManager();
     $bundles_changed = FALSE;
-    $configuration = $item->getConfiguration();
-    $target_entity_type = $entity_type_manager->getDefinition($configuration['target_type']);
+    $target_entity_type_id = $item->getTargetType();
+    $target_entity_type = $entity_type_manager->getDefinition($target_entity_type_id);
     $widget_settings = $item->getWidgetSetting('settings') ?? [];
     $handler_settings = $widget_settings['handler_settings'] ?? [];
     $changed_settings = [];
@@ -204,6 +194,10 @@ class EntityReference extends CustomFieldTypeBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public static function generateSampleValue(CustomFieldTypeInterface $field, string $target_entity_type): mixed {
     $widget_settings = $field->getWidgetSetting('settings');
@@ -235,6 +229,7 @@ class EntityReference extends CustomFieldTypeBase {
       'direction' => 'DESC',
     ];
 
+    /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface $selection_handler */
     $selection_handler = $manager->getInstance($options);
 
     // Select a random number of references between the last 50 referenceable
@@ -285,7 +280,7 @@ class EntityReference extends CustomFieldTypeBase {
    * @return string|null
    *   Either the bundle string, or NULL if there is no bundle.
    */
-  protected static function getRandomBundle(EntityTypeInterface $entity_type, array $selection_settings) {
+  protected static function getRandomBundle(EntityTypeInterface $entity_type, array $selection_settings): ?string {
     if ($entity_type->getKey('bundle')) {
       if (!empty($selection_settings['target_bundles'])) {
         $bundle_ids = $selection_settings['target_bundles'];
@@ -293,8 +288,10 @@ class EntityReference extends CustomFieldTypeBase {
       else {
         $bundle_ids = \Drupal::service('entity_type.bundle.info')->getBundleInfo($entity_type->id());
       }
-      return array_rand($bundle_ids);
+      return (string) array_rand($bundle_ids);
     }
+
+    return NULL;
   }
 
 }

@@ -1,15 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\DataType;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\Attribute\DataType;
 use Drupal\Core\TypedData\DataDefinitionInterface;
-use Drupal\Core\TypedData\PrimitiveInterface;
-use Drupal\Core\TypedData\TypedData;
-use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\custom_field\Plugin\Field\FieldType\CustomItem;
 use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 
@@ -21,47 +21,42 @@ use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
   label: new TranslatableMarkup('Viewfield'),
   definition_class: CustomFieldDataDefinition::class,
 )]
-class CustomFieldViewfield extends TypedData implements PrimitiveInterface {
-
-  /**
-   * The data value.
-   *
-   * @var mixed
-   */
-  protected $value;
+class CustomFieldViewfield extends CustomFieldDataTypeBase {
 
   /**
    * The entity object or null.
    *
    * @var \Drupal\Core\Entity\EntityInterface|null
    */
-  protected $entity = NULL;
+  protected ?EntityInterface $entity = NULL;
 
   /**
    * The views display id.
    *
    * @var string
    */
-  protected $displayId;
+  protected mixed $displayId;
 
   /**
    * The view arguments.
    *
    * @var string
    */
-  protected $arguments;
+  protected mixed $arguments;
 
   /**
    * The items_to_display value.
    *
    * @var int
    */
-  protected $itemsToDisplay;
+  protected mixed $itemsToDisplay;
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
-  public function __construct(DataDefinitionInterface $definition, $name = NULL, ?TypedDataInterface $parent = NULL) {
+  public function __construct(DataDefinitionInterface $definition, $name = NULL, ?FieldItemInterface $parent = NULL) {
     parent::__construct($definition, $name, $parent);
     $this->value = $parent->{$this->getName()};
     $this->displayId = $parent->get($this->getName() . '__display')->getValue();
@@ -71,8 +66,10 @@ class CustomFieldViewfield extends TypedData implements PrimitiveInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
-  public function setValue($value, $notify = TRUE) {
+  public function setValue($value, $notify = TRUE): void {
     $display_id = $value['display_id'] ?? NULL;
     $arguments = $value['arguments'] ?? NULL;
     $items_to_display = $value['items_to_display'] ?? NULL;
@@ -106,8 +103,11 @@ class CustomFieldViewfield extends TypedData implements PrimitiveInterface {
    *
    * @return \Drupal\Core\Entity\EntityInterface|null
    *   The entity object or null.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function getEntity() {
+  public function getEntity(): ?EntityInterface {
     if (empty($this->entity) && !empty($this->value)) {
       $target_type = $this->getDataDefinition()->getSetting('target_type');
       $storage = \Drupal::entityTypeManager()->getStorage($target_type);
@@ -122,6 +122,8 @@ class CustomFieldViewfield extends TypedData implements PrimitiveInterface {
    *
    * @param string $display_id
    *   The display id value to set.
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   protected function setDisplayId(string $display_id): void {
     $this->getParent()->set($this->getName() . CustomItem::SEPARATOR . 'display', $display_id);
@@ -133,6 +135,8 @@ class CustomFieldViewfield extends TypedData implements PrimitiveInterface {
    *
    * @param string $arguments
    *   The arguments value to set.
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   protected function setArguments(string $arguments): void {
     $this->getParent()->set($this->getName() . CustomItem::SEPARATOR . 'arguments', $arguments);
@@ -144,6 +148,8 @@ class CustomFieldViewfield extends TypedData implements PrimitiveInterface {
    *
    * @param int $items
    *   The items to display value to set.
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   protected function setItemsToDisplay(int $items): void {
     $this->getParent()->set($this->getName() . CustomItem::SEPARATOR . 'items', $items);

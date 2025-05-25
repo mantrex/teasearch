@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -51,16 +53,18 @@ class IntegerType extends NumericTypeBase {
   /**
    * {@inheritdoc}
    */
-  public static function generateSampleValue(CustomFieldTypeInterface $field, string $target_entity_type): string|int {
+  public static function generateSampleValue(CustomFieldTypeInterface $field, string $target_entity_type): int {
     $widget_settings = $field->getWidgetSetting('settings');
     if (!empty($widget_settings['allowed_values'])) {
-      return self::getRandomOptions($widget_settings['allowed_values']);
+      return (int) self::getRandomOptions($widget_settings['allowed_values']);
     }
-    $default_min = $field->isUnsigned() ? 0 : -1000;
-    $min = isset($widget_settings['min']) && is_numeric($widget_settings['min']) ? $widget_settings['min'] : $default_min;
-    $max = isset($widget_settings['max']) && is_numeric($widget_settings['max']) ? $widget_settings['max'] : 1000;
+    $default_min = static::getDefaultMinValue($field->getSettings());
+    $default_max = static::getDefaultMaxValue($field->getSettings());
 
-    return mt_rand($min, $max);
+    $min = isset($widget_settings['min']) && is_numeric($widget_settings['min']) ? $widget_settings['min'] : $default_min;
+    $max = isset($widget_settings['max']) && is_numeric($widget_settings['max']) ? $widget_settings['max'] : $default_max;
+
+    return mt_rand((int) $min, (int) $max);
   }
 
 }

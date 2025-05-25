@@ -4,7 +4,9 @@ namespace Drupal\Tests\custom_field\Kernel;
 
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\field\Entity\FieldConfig;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\node\NodeInterface;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -21,9 +23,7 @@ class CustomFieldUpdateManagerTest extends KernelTestBase {
   use NodeCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
@@ -47,41 +47,6 @@ class CustomFieldUpdateManagerTest extends KernelTestBase {
   protected $customFieldUpdateManager;
 
   /**
-   * The CustomFieldTypeManager service.
-   *
-   * @var \Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface
-   */
-  protected $customFieldTypeManager;
-
-  /**
-   * The entity definition update manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
-   */
-  protected $entityDefinitionUpdateManager;
-
-  /**
-   * The entity type manager service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The entity type bundle info.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
-   */
-  protected $entityTypeBundleInfo;
-
-  /**
-   * The database connection service.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $database;
-
-  /**
    * The current user object.
    *
    * @var \Drupal\user\Entity\User|false
@@ -96,7 +61,30 @@ class CustomFieldUpdateManagerTest extends KernelTestBase {
   protected $customFieldGenerator;
 
   /**
+   * The entity type.
+   *
+   * @var string
+   */
+  protected string $entityTypeId = 'node';
+
+  /**
+   * The bundle type.
+   *
+   * @var string
+   */
+  protected string $bundle = 'custom_field_entity_test';
+
+  /**
+   * The field name.
+   *
+   * @var string
+   */
+  protected string $fieldName = 'field_test';
+
+  /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   protected function setUp(): void {
     parent::setUp();
@@ -107,163 +95,179 @@ class CustomFieldUpdateManagerTest extends KernelTestBase {
     $this->installSchema('file', ['file_usage']);
     $this->installConfig(['custom_field', 'custom_field_test']);
 
-    $bundle = 'custom_field_entity_test';
     // Create and log in a test user with necessary permissions.
-    $permissions = [
-      'create ' . $bundle . ' content',
-      'edit own ' . $bundle . ' content',
-      // Add more permissions if needed.
-    ];
-    $this->currentUser = $this->createUser($permissions, 'test_user');
+    $this->createUser([
+      'create ' . $this->bundle . ' content',
+      'edit own ' . $this->bundle . ' content',
+    ], 'test_user');
 
     // Get the services required for testing.
     $this->customFieldUpdateManager = $this->container->get('custom_field.update_manager');
-    $this->customFieldTypeManager = $this->container->get('plugin.manager.custom_field_type');
-    $this->entityDefinitionUpdateManager = $this->container->get('entity.definition_update_manager');
-    $this->entityTypeManager = $this->container->get('entity_type.manager');
-    $this->entityTypeBundleInfo = $this->container->get('entity_type.bundle.info');
-    $this->database = $this->container->get('database');
     $this->customFieldGenerator = $this->container->get('custom_field.generate_data');
   }
 
   /**
-   * Test the addColumn method.
+   * Sets up field storage and creates a test node.
+   *
+   * @return \Drupal\node\NodeInterface
+   *   The created node.
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  public function testAddColumn(): void {
-    // Define the entity type and field names from the provided configuration.
-    $entityTypeId = 'node';
-    $bundle = 'custom_field_entity_test';
-    $fieldName = 'field_test';
+  protected function setUpFieldAndNode(): NodeInterface {
+    $fieldStorageConfig = FieldStorageConfig::loadByName($this->entityTypeId, $this->fieldName);
+    $columns = $this->filterColumns($fieldStorageConfig->getSetting('columns'));
+    $fieldStorageConfig->setSetting('columns', $columns)->save();
 
-    // Define the new property (column) name and data type.
-    $newProperty = 'new_property';
-    $dataType = 'string';
-    $options = ['length' => 'test', 'not null' => FALSE, 'default' => NULL];
+    $fieldConfig = FieldConfig::loadByName($this->entityTypeId, $this->bundle, $this->fieldName);
+    $settings = $fieldConfig->getSettings();
+    $targetEntityType = $fieldConfig->getTargetEntityTypeId();
 
-    // Create a new node entity.
-    $fieldStorageConfig = FieldStorageConfig::loadByName($entityTypeId, $fieldName);
-    $columns = $fieldStorageConfig->getSetting('columns');
     $node = $this->createNode([
-      'type' => $bundle,
+      'type' => $this->bundle,
       'title' => 'Test Node',
-      $fieldName => $this->customFieldGenerator->generateFieldData($columns),
+      $this->fieldName => $this->customFieldGenerator->generateFieldData($settings, $targetEntityType),
       'langcode' => 'en',
     ]);
     $node->save();
 
-    // Verify entity has been created properly.
+    return $node;
+  }
+
+  /**
+   * Filters out columns that have extra properties.
+   *
+   * @param array $columns
+   *   The array of columns to filter.
+   *
+   * @return array
+   *   The filtered columns.
+   */
+  protected function filterColumns(array $columns): array {
+    $irrelevantColumns = [
+      'image_test',
+      'viewfield_test',
+      'link_test',
+      'uri_test',
+    ];
+    return array_diff_key($columns, array_flip($irrelevantColumns));
+  }
+
+  /**
+   * Asserts that a node and its field are correctly set up.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   The node to verify.
+   */
+  protected function assertNodeAndField(NodeInterface $node): void {
+    $this->assertInstanceOf(FieldItemListInterface::class, $node->{$this->fieldName});
+    $this->assertInstanceOf(FieldItemInterface::class, $node->{$this->fieldName}[0]);
+  }
+
+  /**
+   * Test the addColumn method.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   */
+  public function testAddColumn(): void {
+    $node = $this->setUpFieldAndNode();
+    $this->assertNodeAndField($node);
     $id = $node->id();
-    $node = Node::load($id);
-    $this->assertInstanceOf(FieldItemListInterface::class, $node->{$fieldName});
-    $this->assertInstanceOf(FieldItemInterface::class, $node->{$fieldName}[0]);
+
+    $newProperty = 'new_property';
+    $dataType = 'string';
+    $options = ['length' => 255, 'not null' => FALSE, 'default' => NULL];
 
     // Call the addColumn method.
-    $this->customFieldUpdateManager->addColumn($entityTypeId, $fieldName, $newProperty, $dataType, $options);
+    $this->customFieldUpdateManager->addColumn($this->entityTypeId, $this->fieldName, $newProperty, $dataType, $options);
 
     // Perform assertions to verify that the column was added successfully.
-    $fieldStorageConfig = FieldStorageConfig::loadByName($entityTypeId, $fieldName);
-    $this->assertNotNull($fieldStorageConfig, 'The field storage configuration exists.');
-    $this->assertEquals('custom', $fieldStorageConfig->getType(), 'The field storage type is "custom".');
+    $storage = FieldStorageConfig::loadByName($this->entityTypeId, $this->fieldName);
+    $this->assertNotNull($storage, 'The field storage configuration exists.');
+    $this->assertEquals('custom', $storage->getType(), 'The field storage type is "custom".');
 
     // Verify new column has been added to the field storage configuration.
-    $columns = $fieldStorageConfig->getSetting('columns');
+    $columns = $storage->getSetting('columns');
     $this->assertArrayHasKey($newProperty, $columns, 'The new property is added to the columns settings.');
     $this->assertEquals($dataType, $columns[$newProperty]['type'], 'The new property has the correct data type.');
 
     // Verify no data loss resulted in adding the column.
     $node->save();
     $node = Node::load($id);
-    $field_value = $node->get($fieldName)->getValue();
+    $field_value = $node->get($this->fieldName)->getValue();
     // If restoreData() is commented out, this should fail. Why is it not?
     $this->assertNotEmpty($field_value, 'The field value is not empty.');
 
     // Call the addColumn method with a non-existent field.
-    $nonExistentField = 'non_existent_field';
+    $no_exist = 'non_existent_field';
     try {
-      $this->customFieldUpdateManager->addColumn($entityTypeId, $nonExistentField, $newProperty, $dataType, $options);
+      $this->customFieldUpdateManager->addColumn($this->entityTypeId, $no_exist, $newProperty, $dataType, $options);
       $this->fail('An exception should have been thrown for a non-existent field.');
     }
     catch (\Exception $e) {
       // Assert that the exception message contains the field name.
-      $this->assertStringContainsString($nonExistentField, $e->getMessage(), 'Exception message contains the non-existent field name.');
+      $this->assertStringContainsString($no_exist, $e->getMessage(), 'Exception message contains the non-existent field name.');
     }
     // Assert that the column was not added.
-    $fieldStorageConfig = FieldStorageConfig::loadByName($entityTypeId, 'non_existent_field');
-    $this->assertNull($fieldStorageConfig, 'The field storage configuration does not exist.');
+    $storage = FieldStorageConfig::loadByName($this->entityTypeId, 'non_existent_field');
+    $this->assertNull($storage, 'The field storage configuration does not exist.');
   }
 
   /**
    * Test the removeColumn method.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws \Drupal\Core\Entity\Sql\SqlContentEntityStorageException
    */
   public function testRemoveColumn(): void {
-    // Define the entity type and field names from the provided configuration.
-    $entityTypeId = 'node';
-    $fieldName = 'field_test';
-    $bundle = 'custom_field_entity_test';
-
-    // Perform assertions to verify that the column was added successfully.
-    $fieldStorageConfig = FieldStorageConfig::loadByName($entityTypeId, $fieldName);
-    $this->assertNotNull($fieldStorageConfig, 'The field storage configuration exists.');
-    $this->assertEquals('custom', $fieldStorageConfig->getType(), 'The field storage type is "custom".');
-    // Create a node.
-    $columns = $fieldStorageConfig->getSetting('columns');
-    // Some types have extra columns that alter test.
-    unset($columns['image_test']);
-    unset($columns['viewfield_test']);
-    $fieldStorageConfig->setSetting('columns', $columns)->save();
-    $node = $this->createNode([
-      'type' => $bundle,
-      'title' => 'Test Node',
-      $fieldName => $this->customFieldGenerator->generateFieldData($columns),
-      'langcode' => 'en',
-    ]);
-    $node->save();
-
-    // Verify entity has been created properly.
+    $node = $this->setUpFieldAndNode();
+    $this->assertNodeAndField($node);
     $id = $node->id();
-    $node = Node::load($id);
-    $this->assertInstanceOf(FieldItemListInterface::class, $node->{$fieldName});
-    $this->assertInstanceOf(FieldItemInterface::class, $node->{$fieldName}[0]);
+
+    $storage = FieldStorageConfig::loadByName($this->entityTypeId, $this->fieldName);
 
     // Iterate through each column in the field settings and remove it.
-    $fieldSettings = $fieldStorageConfig->getSetting('columns');
+    $columns = $storage->getSetting('columns');
     // Remove last item from array to test not removing all columns.
-    $last = [array_key_last($fieldSettings) => array_pop($fieldSettings)];
-    $lastColumn = key($last);
-    foreach ($fieldSettings as $columnName => $columnSettings) {
+    $last = [array_key_last($columns) => array_pop($columns)];
+    $last_column = key($last);
+    foreach ($columns as $column_name => $columnSettings) {
       // Call the removeColumn method.
-      $this->customFieldUpdateManager->removeColumn($entityTypeId, $fieldName, $columnName);
+      $this->customFieldUpdateManager->removeColumn($this->entityTypeId, $this->fieldName, $column_name);
       // Perform assertions to verify that the column was removed successfully.
-      $fieldStorageConfig = FieldStorageConfig::loadByName($entityTypeId, $fieldName);
-      $this->assertNotNull($fieldStorageConfig, 'The field storage configuration still exists.');
-      $columns = $fieldStorageConfig->getSetting('columns');
-      $this->assertArrayNotHasKey($columnName, $columns, 'The column "' . $columnName . '" is removed from the columns settings.');
+      $storage = FieldStorageConfig::loadByName($this->entityTypeId, $this->fieldName);
+      $columns = $storage->getSetting('columns');
+      $this->assertArrayNotHasKey($column_name, $columns, 'The column "' . $column_name . '" is removed from the columns settings.');
     }
 
     // Verify no data loss resulted in removing the column.
     $node->save();
     $node = Node::load($id);
-    $field_value = $node->get($fieldName)->getValue();
+    $field_value = $node->get($this->fieldName)->getValue();
     // If restoreData() is commented out, this should fail. Why is it not?
     $this->assertNotEmpty($field_value, 'The field value is not empty.');
 
-    // Reload fieldSettings and verify the new count.
-    $fieldSettings = $fieldStorageConfig->getSetting('columns');
-    $this->assertCount(1, $fieldSettings, 'The field settings count is 1.');
+    // Reload columns and verify the new count.
+    $columns = $storage->getSetting('columns');
+    $this->assertCount(1, $columns, 'The column count is 1.');
 
     // Try to remove the last column.
     try {
-      $this->customFieldUpdateManager->removeColumn($entityTypeId, $fieldName, $lastColumn);
+      $this->customFieldUpdateManager->removeColumn($this->entityTypeId, $this->fieldName, $last_column);
       $this->fail('An exception should have been thrown for removing the only field.');
     }
     catch (\Exception $e) {
       // Assert that the exception message contains the field name.
-      $this->assertStringContainsString($lastColumn, $e->getMessage(), 'Exception message contains the last field name.');
+      $this->assertStringContainsString($last_column, $e->getMessage(), 'Exception message contains the last field name.');
     }
 
     // Verify the last remaining item still exists.
-    $columns = $fieldStorageConfig->getSetting('columns');
-    $this->assertArrayHasKey($lastColumn, $columns, 'The column "' . $lastColumn . '" still exists in the columns settings.');
+    $columns = $storage->getSetting('columns');
+    $this->assertArrayHasKey($last_column, $columns, 'The column "' . $last_column . '" still exists in the columns settings.');
   }
 
 }

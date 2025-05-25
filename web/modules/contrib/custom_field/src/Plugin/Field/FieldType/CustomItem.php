@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\Field\FieldType;
 
+use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
@@ -37,19 +42,22 @@ class CustomItem extends FieldItemBase {
   /**
    * The custom field separator for extended properties.
    *
-   * @var
+   * @var string
    */
-  const SEPARATOR = '__';
+  public const SEPARATOR = '__';
 
   /**
    * {@inheritdoc}
    */
-  public static function mainPropertyName() {
+  public static function mainPropertyName(): ?string {
     return NULL;
   }
 
   /**
    * {@inheritdoc}
+   *
+   * @return array<string, mixed>
+   *   A list of default settings, keyed by the setting name.
    */
   public static function defaultStorageSettings(): array {
     // Need to have at least one item by default because the table is created
@@ -59,14 +67,7 @@ class CustomItem extends FieldItemBase {
       'columns' => [
         'value' => [
           'name' => 'value',
-          'max_length' => 255,
           'type' => 'string',
-          'unsigned' => FALSE,
-          'scale' => 2,
-          'precision' => 10,
-          'size' => 'normal',
-          'datetime_type' => CustomFieldTypeInterface::DATETIME_TYPE_DATETIME,
-          'uri_scheme' => \Drupal::config('system.file')->get('default_scheme'),
         ],
       ],
     ] + parent::defaultStorageSettings();
@@ -81,8 +82,10 @@ class CustomItem extends FieldItemBase {
     $columns = [];
     foreach ($field_definition->getSetting('columns') as $item) {
       $plugin = $plugin_service->createInstance($item['type']);
-      $field_schema = $plugin->schema($item);
-      $columns += $field_schema;
+      if (method_exists($plugin, 'schema')) {
+        $field_schema = $plugin->schema($item);
+        $columns += $field_schema;
+      }
     }
 
     $schema['columns'] = $columns;
@@ -99,10 +102,17 @@ class CustomItem extends FieldItemBase {
     $properties = [];
 
     foreach ($field_definition->getSetting('columns') as $item) {
-      $plugin = $plugin_service->createInstance($item['type']);
-      $definitions = $plugin->propertyDefinitions($item);
-      if (is_array($definitions)) {
-        $properties += $definitions;
+      try {
+        $plugin = $plugin_service->createInstance($item['type']);
+        if (method_exists($plugin, 'propertyDefinitions')) {
+          $definitions = $plugin->propertyDefinitions($item);
+          if (is_array($definitions)) {
+            $properties += $definitions;
+          }
+        }
+      }
+      catch (PluginException $e) {
+        continue;
       }
     }
 
@@ -111,16 +121,18 @@ class CustomItem extends FieldItemBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @return array<string, mixed>
+   *   An associative array of values.
    */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition): array {
-    $settings = $field_definition->getSettings();
     $field_manager = \Drupal::service('plugin.manager.custom_field_type');
-    $custom_items = $field_manager->getCustomFieldItems($settings);
+    /** @var \Drupal\custom_field\Plugin\CustomFieldTypeInterface[] $custom_items */
+    $custom_items = $field_manager->getCustomFieldItems($field_definition->getSettings());
     $target_entity_type = $field_definition->getTargetEntityTypeId();
     $values = [];
     foreach ($custom_items as $name => $custom_item) {
-      assert($custom_item instanceof CustomFieldTypeInterface);
-      $values[$name] = $custom_item->generateSampleValue($custom_item, $target_entity_type);
+      $values[(string) $name] = $custom_item->generateSampleValue($custom_item, $target_entity_type);
     }
 
     return $values;
@@ -132,24 +144,23 @@ class CustomItem extends FieldItemBase {
   public function getConstraints(): array {
     $constraints = parent::getConstraints();
     $constraint_manager = \Drupal::typedDataManager()->getValidationConstraintManager();
+    $settings = $this->getSettings();
     /** @var \Drupal\custom_field\Plugin\CustomFieldTypeManager $plugin_service */
     $plugin_service = \Drupal::service('plugin.manager.custom_field_type');
     $field_constraints = [];
-    $field_settings = $this->getSetting('field_settings');
-    foreach ($this->getSetting('columns') as $id => $item) {
-      $plugin = $plugin_service->createInstance($item['type']);
-      if (method_exists($plugin, 'getConstraints')) {
-        $widget_settings = $field_settings[$id]['widget_settings']['settings'] ?? [];
-        $settings = $item;
-        if (isset($widget_settings['min'])) {
-          $settings['min'] = $widget_settings['min'];
-        }
-        if (isset($widget_settings['max'])) {
-          $settings['max'] = $widget_settings['max'];
-        }
-        $field_constraints[$item['name']] = $plugin->getConstraints($settings);
+    $custom_items = $plugin_service->getCustomFieldItems($settings);
+    foreach ($custom_items as $name => $custom_item) {
+      $widget_settings = $custom_item->getWidgetSetting('settings') ?? [];
+      $constraint_settings = $custom_item->getSettings();
+      if (isset($widget_settings['min'])) {
+        $constraint_settings['min'] = $widget_settings['min'];
       }
+      if (isset($widget_settings['max'])) {
+        $constraint_settings['max'] = $widget_settings['max'];
+      }
+      $field_constraints[$name] = $custom_item->getConstraints($constraint_settings);
     }
+
     $constraints[] = $constraint_manager->create('ComplexData', $field_constraints);
 
     return $constraints;
@@ -158,7 +169,7 @@ class CustomItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public function preSave() {
+  public function preSave(): void {
     parent::preSave();
     $field_definition = $this->getFieldDefinition();
     $field_name = $field_definition->getName();
@@ -177,7 +188,7 @@ class CustomItem extends FieldItemBase {
 
     // Get the fields from the original or current entity based on whether it
     // has translations.
-    /** @var \Drupal\custom_field\Plugin\Field\FieldType\CustomFieldItemListInterface[] $originalFields */
+    /** @var \Drupal\custom_field\Plugin\Field\FieldType\CustomFieldItemListInterface<\Drupal\custom_field\Plugin\Field\FieldType\CustomItem>[] $original_fields */
     $original_fields = $original_entity->get($field_name);
     foreach ($original_fields as $delta => $original_field) {
       $current_field = $entity->get($field_name)->get($delta);
@@ -186,7 +197,7 @@ class CustomItem extends FieldItemBase {
         $is_subfield_translatable = $custom_item->getWidgetSetting('translatable') ?? FALSE;
 
         // The synchronization logic only applies if the entity supports
-        // translations and we're not in the default language.
+        // translations, and we're not in the default language.
         if ($has_translations && !$is_default_translation && !$is_subfield_translatable) {
           // Fetch the value from the default language for this delta.
           $default_value = $original_field->{$name};
@@ -194,7 +205,6 @@ class CustomItem extends FieldItemBase {
             $current_field->{$name} = $default_value;
             // Set extra default language properties for image.
             if ($field_type === 'image') {
-              $current_field->{$name} = $default_value;
               $alt = $original_field->{$name . self::SEPARATOR . 'alt'};
               $title = $original_field->{$name . self::SEPARATOR . 'title'};
               $width = $original_field->{$name . self::SEPARATOR . 'width'};
@@ -203,6 +213,12 @@ class CustomItem extends FieldItemBase {
               $current_field->{$name . self::SEPARATOR . 'title'} = $title;
               $current_field->{$name . self::SEPARATOR . 'width'} = $width;
               $current_field->{$name . self::SEPARATOR . 'height'} = $height;
+            }
+            if ($field_type === 'link') {
+              $title = $original_field->{$name . self::SEPARATOR . 'title'};
+              $options = $original_field->{$name . self::SEPARATOR . 'options'};
+              $current_field->{$name . self::SEPARATOR . 'title'} = $title;
+              $current_field->{$name . self::SEPARATOR . 'options'} = $options;
             }
           }
         }
@@ -236,7 +252,13 @@ class CustomItem extends FieldItemBase {
           case 'decimal':
             if (is_numeric($subfield_value)) {
               $scale = $custom_item->getScale();
-              $current_field->{$name} = round($subfield_value, $scale);
+              $current_field->{$name} = round((float) $subfield_value, $scale);
+            }
+            break;
+
+          case 'time':
+            if ($subfield_value == '86401') {
+              $current_field->{$name} = NULL;
             }
             break;
 
@@ -245,6 +267,7 @@ class CustomItem extends FieldItemBase {
               $width = $current_field->get($name . self::SEPARATOR . 'width')->getValue();
               $height = $current_field->get($name . self::SEPARATOR . 'height')->getValue();
               if (empty($width) || empty($height)) {
+                /** @var \Drupal\file\FileInterface $file */
                 $file = \Drupal::entityTypeManager()
                   ->getStorage('file')
                   ->load($subfield_value);
@@ -265,11 +288,22 @@ class CustomItem extends FieldItemBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @param array<string, mixed> $form
+   *   The form where the settings form is being included in.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state of the (entire) configuration form.
+   * @param bool $has_data
+   *   TRUE if the field already has data, FALSE if not.
+   *
+   * @return array<string, mixed>
+   *   The form definition for the field settings.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function storageSettingsForm(array &$form, FormStateInterface $form_state, $has_data): array {
     assert($form_state instanceof SubformStateInterface);
     $form_state = $form_state->getCompleteFormState();
-    $default_settings = self::defaultStorageSettings()['columns']['value'];
     $wrapper_id = 'custom-field-storage-wrapper';
     $parents = ['field_storage', 'subform', 'settings'];
     $storage = $form_state->getStorage();
@@ -287,6 +321,9 @@ class CustomItem extends FieldItemBase {
       $field_settings = $form_state->getValue(['settings', 'field_settings']) ?? $current_settings['field_settings'];
       $current_columns = $current_settings['columns'];
       $columns = $settings['items'];
+      $user_input = $form_state->getUserInput();
+      $input = NestedArray::getValue($user_input, [...$parents, 'items']);
+      $reset_input = FALSE;
       foreach ($settings['items'] as $name => $item) {
         unset($item['remove']);
         if ($name != $item['name']) {
@@ -310,6 +347,11 @@ class CustomItem extends FieldItemBase {
             if (isset($field_settings[$name])) {
               unset($field_settings[$name]);
             }
+            if (in_array($item['type'], ['string', 'telephone'])) {
+              $input[$name]['length'] = NULL;
+              $settings['items'][$name]['length'] = NULL;
+              $reset_input = TRUE;
+            }
             if ($item['type'] === 'entity_reference') {
               $settings['items'][$name]['target_type'] = NULL;
               // Force the selection of target type.
@@ -328,6 +370,10 @@ class CustomItem extends FieldItemBase {
         'columns' => $columns,
         'field_settings' => $field_settings,
       ]);
+      if ($reset_input) {
+        $user_input = $form_state->getUserInput();
+        NestedArray::setValue($user_input, [...$parents, 'items'], $input);
+      }
     }
     else {
       $settings['items'] = $settings['columns'];
@@ -434,107 +480,84 @@ class CustomItem extends FieldItemBase {
         '#empty_option' => $this->t('- Select -'),
         '#disabled' => $has_data,
       ];
-      $element['items'][$i]['max_length'] = [
-        '#type' => 'number',
-        '#title' => $this->t('Maximum length'),
-        '#default_value' => !empty($item['max_length']) ? $item['max_length'] : $default_settings['max_length'],
-        '#required' => TRUE,
-        '#description' => $this->t('The maximum length of the field in characters.'),
-        '#min' => 1,
-        '#max' => $type === 'telephone' ? 256 : 255,
-        '#disabled' => $has_data,
-        '#states' => [
-          'visible' => [
-            ':input[name*="[items][' . $i . '][type]"]' => [
-              ['value' => 'string'],
-              ['value' => 'telephone'],
-            ],
+      // Length field for supported types.
+      if (in_array($type, ['string', 'telephone'])) {
+        $default_max = $type === 'telephone' ? 256 : 255;
+        $element['items'][$i]['length'] = [
+          '#type' => 'number',
+          '#title' => $this->t('Length'),
+          '#default_value' => !empty($item['length']) ? $item['length'] : $default_max,
+          '#required' => TRUE,
+          '#description' => $this->t('The maximum length of the field in characters.'),
+          '#min' => 1,
+          '#max' => $default_max,
+          '#disabled' => $has_data,
+        ];
+      }
+      // Size field for supported types.
+      if (in_array($type, ['integer', 'float'])) {
+        $element['items'][$i]['size'] = [
+          '#type' => 'select',
+          '#title' => $this->t('Size'),
+          '#default_value' => $item['size'] ?? 'normal',
+          '#disabled' => $has_data,
+          '#options' => [
+            'tiny' => $this->t('Tiny'),
+            'small' => $this->t('Small'),
+            'medium' => $this->t('Medium'),
+            'big' => $this->t('Big'),
+            'normal' => $this->t('Normal'),
           ],
-        ],
-      ];
-      $element['items'][$i]['size'] = [
-        '#type' => 'select',
-        '#title' => $this->t('Size'),
-        '#default_value' => $item['size'] ?? $default_settings['size'],
-        '#disabled' => $has_data,
-        '#options' => [
-          'tiny' => $this->t('Tiny'),
-          'small' => $this->t('Small'),
-          'medium' => $this->t('Medium'),
-          'big' => $this->t('Big'),
-          'normal' => $this->t('Normal'),
-        ],
-        '#states' => [
-          'visible' => [
-            ':input[name*="[items][' . $i . '][type]"]' => [
-              ['value' => 'integer'],
-              ['value' => 'float'],
-            ],
+        ];
+      }
+      // Unsigned field for supported types.
+      if (in_array($type, ['integer', 'float', 'decimal'])) {
+        $element['items'][$i]['unsigned'] = [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Unsigned'),
+          '#default_value' => $item['unsigned'] ?? FALSE,
+          '#disabled' => $has_data,
+        ];
+      }
+      // Decimal field extra settings.
+      if ($type === 'decimal') {
+        $element['items'][$i]['precision'] = [
+          '#type' => 'number',
+          '#title' => $this->t('Precision'),
+          '#min' => 10,
+          '#max' => 32,
+          '#default_value' => $item['precision'] ?? 10,
+          '#description' => $this->t('The total number of digits to store in the database, including those to the right of the decimal.'),
+          '#disabled' => $has_data,
+          '#required' => TRUE,
+        ];
+        $element['items'][$i]['scale'] = [
+          '#type' => 'number',
+          '#title' => $this->t('Scale'),
+          '#description' => $this->t('The number of digits to the right of the decimal.'),
+          '#default_value' => $item['scale'] ?? 2,
+          '#disabled' => $has_data,
+          '#min' => 0,
+          '#max' => 10,
+          '#required' => TRUE,
+        ];
+      }
+      // Datetime field extra settings.
+      if ($type === 'datetime') {
+        $element['items'][$i]['datetime_type'] = [
+          '#type' => 'select',
+          '#title' => $this->t('Date type'),
+          '#description' => $this->t('Choose the type of date to create.'),
+          '#default_value' => $item['datetime_type'] ?? CustomFieldTypeInterface::DATETIME_TYPE_DATETIME,
+          '#disabled' => $has_data,
+          '#options' => [
+            CustomFieldTypeInterface::DATETIME_TYPE_DATETIME => $this->t('Date and time'),
+            CustomFieldTypeInterface::DATETIME_TYPE_DATE => $this->t('Date only'),
           ],
-        ],
-      ];
-      $element['items'][$i]['unsigned'] = [
-        '#type' => 'checkbox',
-        '#title' => $this->t('Unsigned'),
-        '#default_value' => $item['unsigned'] ?? $default_settings['unsigned'],
-        '#disabled' => $has_data,
-        '#states' => [
-          'visible' => [
-            ':input[name*="[items][' . $i . '][type]"]' => [
-              ['value' => 'integer'],
-              ['value' => 'float'],
-              ['value' => 'decimal'],
-            ],
-          ],
-        ],
-      ];
-      $element['items'][$i]['precision'] = [
-        '#type' => 'number',
-        '#title' => $this->t('Precision'),
-        '#min' => 10,
-        '#max' => 32,
-        '#default_value' => $item['precision'] ?? $default_settings['precision'],
-        '#description' => $this->t('The total number of digits to store in the database, including those to the right of the decimal.'),
-        '#disabled' => $has_data,
-        '#required' => TRUE,
-        '#states' => [
-          'visible' => [
-            ':input[name*="[items][' . $i . '][type]"]' => ['value' => 'decimal'],
-          ],
-        ],
-      ];
-      $element['items'][$i]['scale'] = [
-        '#type' => 'number',
-        '#title' => $this->t('Scale'),
-        '#description' => $this->t('The number of digits to the right of the decimal.'),
-        '#default_value' => $item['scale'] ?? $default_settings['scale'],
-        '#disabled' => $has_data,
-        '#min' => 0,
-        '#max' => 10,
-        '#required' => TRUE,
-        '#states' => [
-          'visible' => [
-            ':input[name*="[items][' . $i . '][type]"]' => ['value' => 'decimal'],
-          ],
-        ],
-      ];
-      $element['items'][$i]['datetime_type'] = [
-        '#type' => 'select',
-        '#title' => $this->t('Date type'),
-        '#description' => $this->t('Choose the type of date to create.'),
-        '#default_value' => $item['datetime_type'] ?? $default_settings['datetime_type'],
-        '#disabled' => $has_data,
-        '#options' => [
-          CustomFieldTypeInterface::DATETIME_TYPE_DATETIME => $this->t('Date and time'),
-          CustomFieldTypeInterface::DATETIME_TYPE_DATE => $this->t('Date only'),
-        ],
-        '#required' => TRUE,
-        '#states' => [
-          'visible' => [
-            ':input[name*="[items][' . $i . '][type]"]' => ['value' => 'datetime'],
-          ],
-        ],
-      ];
+          '#required' => TRUE,
+        ];
+      }
+      // Entity reference field extra settings.
       if ($type === 'entity_reference') {
         // Only allow the field to target entity types that have an ID key. This
         // is enforced in ::propertyDefinitions().
@@ -557,6 +580,7 @@ class CustomItem extends FieldItemBase {
           $element['items'][$i]['target_type']['#options'][$group_name] = array_filter($group, $filter, ARRAY_FILTER_USE_KEY);
         }
       }
+      // File & Image field extra settings.
       if ($type === 'file' || $type === 'image') {
         $element['#attached']['library'][] = 'file/drupal.file';
         $scheme_options = \Drupal::service('stream_wrapper_manager')->getNames(StreamWrapperInterface::WRITE_VISIBLE);
@@ -564,7 +588,7 @@ class CustomItem extends FieldItemBase {
           '#type' => 'radios',
           '#title' => $this->t('Upload destination'),
           '#options' => $scheme_options,
-          '#default_value' => $item['uri_scheme'] ?? $default_settings['uri_scheme'],
+          '#default_value' => $item['uri_scheme'] ?? \Drupal::config('system.file')->get('default_scheme'),
           '#description' => $this->t('Select where the final files should be stored. Private file storage has significantly more overhead than public files, but allows restricted access to files within this field.'),
           '#disabled' => $has_data,
         ];
@@ -573,6 +597,7 @@ class CustomItem extends FieldItemBase {
           '#value' => 'file',
         ];
       }
+      // Viewfield extra settings.
       elseif ($type === 'viewfield') {
         $element['items'][$i]['target_type'] = [
           '#type' => 'value',
@@ -631,23 +656,30 @@ class CustomItem extends FieldItemBase {
    * This handler is added in custom_field.module since it has to be placed
    * directly on the submit button (which we don't have access to in our
    * ::storageSettingsForm() method above).
+   *
+   * @param array<string, mixed> $form
+   *   The form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
    */
-  public static function submitStorageConfigEditForm(array &$form, FormStateInterface $form_state) {
+  public static function submitStorageConfigEditForm(array &$form, FormStateInterface $form_state): void {
     // Rekey our column settings and overwrite the values in form_state so that
     // we have clean settings saved to the db.
     $columns = [];
     $parents = ['field_storage', 'subform', 'settings'];
     $item_parents = ['field_storage', 'subform', 'settings', 'items'];
-    /** @var \Drupal\Field\FieldConfigInterface $field_config */
+    /** @var \Drupal\Core\Field\FieldConfigInterface $field_config */
     $field_config = $form_state->get('field_config');
 
     if ($field_name = $form_state->getValue([...$parents, 'clone'])) {
       [$entity_type, $bundle_name, $field_name] = explode('.', $field_name);
-      // Grab the columns from the field storage config.
-      $columns = FieldStorageConfig::loadByName($entity_type, $field_name)->getSetting('columns');
-      // Grab the field settings too as a starting point.
+      $source_storage = FieldStorageConfig::loadByName($entity_type, $field_name);
       $source_field_config = FieldConfig::loadByName($entity_type, $bundle_name, $field_name);
-      $field_config->setSettings($source_field_config->getSettings());
+      // Grab the columns from the field storage config.
+      $columns = $source_storage->getSetting('columns');
+      $field_settings = $source_field_config->getSettings();
+      $field_config->setSettings($field_settings);
+      $form_state->setValue(['settings'], $field_settings);
     }
     else {
       $items = $form_state->getValue($item_parents) ?? [];
@@ -656,8 +688,8 @@ class CustomItem extends FieldItemBase {
         unset($columns[$item['name']]['remove']);
       }
     }
-    $form_state->setValue(['field_storage', 'subform', 'settings', 'columns'], $columns);
-    $form_state->setValue(['field_storage', 'subform', 'settings', 'items'], NULL);
+    $form_state->setValue([...$parents, 'columns'], $columns);
+    $form_state->setValue([...$parents, 'items'], NULL);
 
     // Reset the field storage config property - it will be recalculated when
     // accessed via the property definitions getter.
@@ -670,9 +702,19 @@ class CustomItem extends FieldItemBase {
   }
 
   /**
-   * Check for duplicate names on our columns settings.
+   * Checks if machine name already exists for field.
+   *
+   * @param string $value
+   *   The value to compare.
+   * @param array<string, mixed> $form
+   *   The form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return bool
+   *   Returns TRUE if field exists, otherwise FALSE.
    */
-  public function machineNameExists($value, array $form, FormStateInterface $form_state): bool {
+  public function machineNameExists(string $value, array $form, FormStateInterface $form_state): bool {
     $count = 0;
     $parents = ['field_storage', 'subform', 'settings', 'items'];
     $settings = $form_state->getValue($parents) ?? [];
@@ -696,7 +738,7 @@ class CustomItem extends FieldItemBase {
     foreach ($custom_items as $name => $custom_item) {
       $definition = $custom_item->getPluginDefinition();
       $check = $custom_item->checkEmpty();
-      $no_check = array_key_exists('never_check_empty', $definition) && $definition['never_check_empty'];
+      $no_check = is_array($definition) && array_key_exists('never_check_empty', $definition) && $definition['never_check_empty'];
       $item_value = $this->get($name)->getValue();
       if ($item_value === '' || ($item_value === NULL && !$no_check)) {
         $emptyCounter++;
@@ -714,8 +756,16 @@ class CustomItem extends FieldItemBase {
    * Callback for both ajax-enabled buttons in storage form.
    *
    * Selects and returns the fieldset with the names in it.
+   *
+   * @param array<string, mixed> $form
+   *   The form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   The ajax response.
    */
-  public function actionCallback(array &$form, FormStateInterface $form_state) {
+  public function actionCallback(array &$form, FormStateInterface $form_state): AjaxResponse {
     $trigger = $form_state->getTriggeringElement();
     if (isset($trigger['#delta'])) {
       $field = $trigger['#delta'];
@@ -736,6 +786,11 @@ class CustomItem extends FieldItemBase {
    * Submit handler for the "Add another" button.
    *
    * Triggers form state notice to add item and causes a form rebuild.
+   *
+   * @param array<string, mixed> $form
+   *   The form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
    */
   public static function addSubmit(array &$form, FormStateInterface $form_state): void {
     $storage = $form_state->getValue('field_storage');
@@ -753,6 +808,11 @@ class CustomItem extends FieldItemBase {
    * Submit handler for the "Remove" button.
    *
    * Triggers form state notice to remove item and causes a form rebuild.
+   *
+   * @param array<string, mixed> $form
+   *   The form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
    */
   public static function removeSubmit(array &$form, FormStateInterface $form_state): void {
     $remove = $form_state->getTriggeringElement()['#delta'];
@@ -774,7 +834,7 @@ class CustomItem extends FieldItemBase {
    * @param string $entity_type_id
    *   The entity type to match for exclusion.
    *
-   * @return array
+   * @return array<string, mixed>
    *   An array of existing field configurations.
    */
   protected function getExistingCustomFieldStorageOptions(string $entity_type_id): array {
@@ -789,7 +849,7 @@ class CustomItem extends FieldItemBase {
             continue;
           }
           foreach ($info['bundles'] as $bundle) {
-            $group = $bundleInfo[$bundle]['label'] . ' (' . $entity_type . ')' ?? '';
+            $group = $bundleInfo[$bundle]['label'] . ' (' . $entity_type . ')';
             if ($info = FieldConfig::loadByName($entity_type, $bundle, $field_name)) {
               $sources[$group][$entity_type . '.' . $bundle . '.' . $info->getName()] = $info->getLabel();
             }
@@ -801,27 +861,10 @@ class CustomItem extends FieldItemBase {
   }
 
   /**
-   * Default widget settings.
-   *
-   * @param string $label
-   *   Column name to convert to label.
-   *
-   * @return array
-   *   An array of default widget settings.
-   */
-  public static function defaultWidgetSettings(string $label): array {
-    return [
-      'label' => ucfirst(str_replace(['-', '_'], ' ', $label)),
-      'settings' => [
-        'description' => '',
-        'description_display' => 'after',
-        'required' => FALSE,
-      ],
-    ];
-  }
-
-  /**
    * {@inheritdoc}
+   *
+   * @return array<string, mixed>
+   *   The default field settings.
    */
   public static function defaultFieldSettings(): array {
     return [
@@ -832,6 +875,16 @@ class CustomItem extends FieldItemBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @param array<string, mixed> $form
+   *   The form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return array<string, mixed>
+   *   The field settings form.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function fieldSettingsForm(array $form, FormStateInterface $form_state): array {
     /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetManager $widget_manager */
@@ -840,14 +893,13 @@ class CustomItem extends FieldItemBase {
     $is_cloning = FALSE;
 
     if ($form_state->isRebuilding()) {
-      $storage = $form_state->getValue('field_storage');
-      $is_cloning = !empty($storage['subform']['settings']['clone']);
+      $is_cloning = !empty($form_state->getValue(['field_storage', 'subform', 'settings', 'clone']));
     }
 
     $element['add_more_label'] = [
       '#type' => 'textfield',
-      '#title' => t('Add another button label'),
-      '#description' => t('The add button label for multiple items. Leave empty for default button text.'),
+      '#title' => $this->t('Add another button label'),
+      '#description' => $this->t('The add button label for multiple items. Leave empty for default button text.'),
       '#weight' => -100,
       '#default_value' => $this->getSetting('add_more_label'),
       '#attributes' => [
@@ -896,7 +948,6 @@ class CustomItem extends FieldItemBase {
       if ($plugin_id === 'uuid') {
         continue;
       }
-      $definition = $custom_item->getPluginDefinition();
       $weight = $current_settings['field_settings'][$name]['weight'] ?? 0;
 
       $element['field_settings'][$name] = [
@@ -911,7 +962,7 @@ class CustomItem extends FieldItemBase {
         '#markup' => '<span></span>',
       ];
 
-      $options = static::getCustomFieldWidgetOptions($custom_item);
+      $options = self::getCustomFieldWidgetOptions($custom_item);
       $widget_type = $current_settings['field_settings'][$name]['type'] ?? NULL;
       if (!empty($widget_type) && in_array($widget_type, $widget_manager->getWidgetsForField($plugin_id))) {
         $type = $widget_type;
@@ -949,7 +1000,7 @@ class CustomItem extends FieldItemBase {
         '#default_value' => $current_settings['field_settings'][$name]['check_empty'] ?? FALSE,
       ];
 
-      if (!empty($definition['never_check_empty'])) {
+      if ($custom_item->getSetting('never_check_empty')) {
         $element['field_settings'][$name]['check_empty']['#default_value'] = FALSE;
         $element['field_settings'][$name]['check_empty']['#disabled'] = TRUE;
         $element['field_settings'][$name]['check_empty']['#description'] = $this->t("<em>This custom field type can't be empty checked.</em>");
@@ -973,8 +1024,16 @@ class CustomItem extends FieldItemBase {
    * Callback for widget type select.
    *
    * Selects and returns the fieldset with the names in it.
+   *
+   * @param array<string, mixed> $form
+   *   The form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   The ajax response.
    */
-  public function widgetSelectionCallback(array &$form, FormStateInterface $form_state) {
+  public function widgetSelectionCallback(array &$form, FormStateInterface $form_state): AjaxResponse {
     $parents = $form_state->getTriggeringElement()['#parents'];
     array_pop($parents);
     $last_key = array_key_last($parents);
@@ -982,13 +1041,14 @@ class CustomItem extends FieldItemBase {
     $response = new AjaxResponse();
     $response->addCommand(new ReplaceCommand('#custom-field-settings-wrapper', $form['settings']['field_settings']));
     $response->addCommand(new InvokeCommand('input[name="' . $input . '"]', 'focus'));
+
     return $response;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function calculateDependencies(FieldDefinitionInterface $field_definition) {
+  public static function calculateDependencies(FieldDefinitionInterface $field_definition): array {
     $dependencies = parent::calculateDependencies($field_definition);
     /** @var \Drupal\custom_field\Plugin\CustomFieldTypeManager $plugin_service */
     $plugin_service = \Drupal::service('plugin.manager.custom_field_type');
@@ -996,8 +1056,7 @@ class CustomItem extends FieldItemBase {
     $default_value = $field_definition->getDefaultValueLiteral();
 
     foreach ($custom_items as $custom_item) {
-      $plugin = $plugin_service->createInstance($custom_item->getPluginId());
-      $plugin_dependencies = $plugin->calculateDependencies($custom_item, $default_value);
+      $plugin_dependencies = $custom_item->calculateDependencies($custom_item, $default_value);
       $dependencies = array_merge_recursive($dependencies, $plugin_dependencies);
     }
 
@@ -1007,16 +1066,24 @@ class CustomItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function calculateStorageDependencies(FieldStorageDefinitionInterface $field_definition) {
+  public static function calculateStorageDependencies(FieldStorageDefinitionInterface $field_definition): array {
     $dependencies = parent::calculateStorageDependencies($field_definition);
+    $entity_type_manager = \Drupal::entityTypeManager();
     /** @var \Drupal\custom_field\Plugin\CustomFieldTypeManager $plugin_service */
     $plugin_service = \Drupal::service('plugin.manager.custom_field_type');
-    $columns = $field_definition->getSetting('columns');
-    foreach ($columns as $column) {
-      /** @var \Drupal\custom_field\Plugin\CustomFieldTypeInterface $plugin */
-      $plugin = $plugin_service->createInstance($column['type']);
-      $plugin_dependencies = $plugin->calculateStorageDependencies($column);
-      $dependencies = array_merge_recursive($dependencies, $plugin_dependencies);
+    $custom_items = $plugin_service->getCustomFieldItems($field_definition->getSettings());
+    foreach ($custom_items as $custom_item) {
+      if ($custom_item->getTargetType() !== NULL) {
+        $target_entity_type_id = $custom_item->getTargetType();
+        try {
+          $target_entity_type = $entity_type_manager->getDefinition($target_entity_type_id);
+          $plugin_dependencies['module'][] = $target_entity_type->getProvider();
+          $dependencies = array_merge_recursive($dependencies, $plugin_dependencies);
+        }
+        catch (PluginNotFoundException $e) {
+          // Plugin not found.
+        }
+      }
     }
 
     return $dependencies;
@@ -1025,7 +1092,7 @@ class CustomItem extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function onDependencyRemoval(FieldDefinitionInterface $field_definition, array $dependencies) {
+  public static function onDependencyRemoval(FieldDefinitionInterface $field_definition, array $dependencies): bool {
     $changed = parent::onDependencyRemoval($field_definition, $dependencies);
     $settings = $field_definition->getSettings();
     $columns = $settings['columns'];
@@ -1055,27 +1122,25 @@ class CustomItem extends FieldItemBase {
         }
       }
     }
-    if ($changed) {
+    if ($changed && $field_definition instanceof FieldConfig) {
       $field_definition->setDefaultValue($default_value);
     }
 
     foreach ($custom_items as $name => $custom_item) {
-      /** @var \Drupal\custom_field\Plugin\CustomFieldTypeInterface $plugin */
-      $plugin = $plugin_service->createInstance($custom_item->getPluginId());
-      $widget_settings = $plugin->onDependencyRemoval($custom_item, $dependencies);
+      $widget_settings = $custom_item->onDependencyRemoval($custom_item, $dependencies);
       if (!empty($widget_settings)) {
         $field_settings[$name]['widget_settings']['settings'] = $widget_settings;
         $settings_changed = TRUE;
       }
     }
 
-    if ($settings_changed) {
+    if ($settings_changed && $field_definition instanceof FieldConfig) {
       $field_definition->setSetting('field_settings', $field_settings);
     }
 
     $changed |= $settings_changed;
 
-    return $changed;
+    return (bool) $changed;
   }
 
   /**
@@ -1084,7 +1149,7 @@ class CustomItem extends FieldItemBase {
    * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $custom_item
    *   The Custom field type interface.
    *
-   * @return array
+   * @return array<string, mixed>
    *   The array of widget options.
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
@@ -1109,9 +1174,9 @@ class CustomItem extends FieldItemBase {
     // Sort the widgets by category and then by name.
     uasort($definitions, function ($a, $b) {
       if ($a['category'] != $b['category']) {
-        return strnatcasecmp($a['category'], $b['category']);
+        return strnatcasecmp((string) $a['category'], (string) $b['category']);
       }
-      return strnatcasecmp($a['label'], $b['label']);
+      return strnatcasecmp((string) $a['label'], (string) $b['label']);
     });
     foreach ($definitions as $id => $definition) {
       $category = $definition['category'];

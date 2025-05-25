@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
@@ -30,7 +32,7 @@ class IntegerWidget extends NumberWidgetBase {
     $settings = $field->getWidgetSetting('settings');
 
     $min_setting = $settings['min'] ?? NULL;
-    // Make sure we force positive numbers when unsiqned.
+    // Make sure we force positive numbers when unsigned.
     if ($field->isUnsigned() && (!is_numeric($min_setting) || $min_setting < 0)) {
       $element['#min'] = 0;
     }
@@ -43,7 +45,7 @@ class IntegerWidget extends NumberWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
 
     // Prevent min negative numbers when storage is unsigned.
     if ($field->isUnsigned()) {

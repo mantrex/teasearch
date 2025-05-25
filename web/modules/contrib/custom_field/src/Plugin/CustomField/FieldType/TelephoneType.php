@@ -1,11 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\TypedData\DataDefinition;
 use Drupal\custom_field\Attribute\CustomFieldType;
-use Drupal\custom_field\Plugin\CustomFieldTypeBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
@@ -19,52 +19,14 @@ use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
   default_widget: 'telephone',
   default_formatter: 'telephone_link',
 )]
-class TelephoneType extends CustomFieldTypeBase {
+class TelephoneType extends StringType {
 
   /**
-   * {@inheritdoc}
+   * The default max length for telephone fields.
+   *
+   * @var int
    */
-  public static function schema(array $settings): array {
-    ['name' => $name] = $settings;
-
-    $columns[$name] = [
-      'type' => 'varchar',
-      'length' => $settings['max_length'] ?? 256,
-    ];
-
-    return $columns;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function propertyDefinitions(array $settings): array {
-    ['name' => $name] = $settings;
-
-    $properties[$name] = DataDefinition::create('string')
-      ->setLabel(new TranslatableMarkup('@name', ['@name' => $name]))
-      ->setRequired(FALSE);
-
-    return $properties;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConstraints(array $settings): array {
-    $constraints = [];
-    if ($max_length = $settings['max_length']) {
-      $constraints['Length'] = [
-        'max' => $max_length,
-        'maxMessage' => $this->t('%name: may not be longer than @max characters.', [
-          '%name' => $settings['name'],
-          '@max' => $max_length,
-        ]),
-      ];
-    }
-
-    return $constraints;
-  }
+  const MAX_LENGTH = 256;
 
   /**
    * {@inheritdoc}

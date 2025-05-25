@@ -63,9 +63,14 @@ class CustomFieldViewfield extends GraphQLComposeFieldTypeBase implements FieldP
     }
 
     $view = Views::getView($view_id);
+
+    if (!$view) {
+      return NULL;
+    }
+
     $view->setDisplay($display_id);
 
-    if (!$view || !$view->access($display_id)) {
+    if (!$view->access($display_id)) {
       return NULL;
     }
 
@@ -109,7 +114,7 @@ class CustomFieldViewfield extends GraphQLComposeFieldTypeBase implements FieldP
         if (strpos($argument_string, '"', $pos) === $pos) {
           if (($quote = strpos($argument_string, '"', ++$pos)) !== FALSE) {
             // Skip pairs of quotes.
-            while (!(($ql = strspn($argument_string, '"', $quote)) & 1)) {
+            while (!(($ql = strspn($argument_string, '"', (int) $quote)) & 1)) {
               $quote = strpos($argument_string, '"', $quote + $ql);
             }
             $arguments[] = str_replace('""', '"', substr($argument_string, $pos, $quote + $ql - $pos - 1));

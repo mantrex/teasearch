@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
@@ -15,7 +17,7 @@ use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
  */
 #[CustomFieldWidget(
   id: 'email',
-  label: new TranslatableMarkup('E-mail'),
+  label: new TranslatableMarkup('Email'),
   category: new TranslatableMarkup('General'),
   field_types: [
     'email',
@@ -28,12 +30,13 @@ class EmailWidget extends CustomFieldWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'size' => 60,
-        'placeholder' => '',
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings'] = [
+      'size' => 60,
+      'placeholder' => '',
+    ] + $settings['settings'];
+
+    return $settings;
   }
 
   /**
@@ -41,7 +44,7 @@ class EmailWidget extends CustomFieldWidgetBase {
    */
   public function widget(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings');
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
 
     // Add our widget type and additional properties and return.
     return [
@@ -57,7 +60,7 @@ class EmailWidget extends CustomFieldWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
 
     $element['settings']['size'] = [
       '#type' => 'number',

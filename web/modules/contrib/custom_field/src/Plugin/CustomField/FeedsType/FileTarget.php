@@ -1,15 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FeedsType;
 
+use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\File\Exception\FileException;
+use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Utility\Token;
 use Drupal\custom_field\Attribute\CustomFieldFeedsType;
 use Drupal\feeds\Exception\EmptyFeedException;
 use Drupal\feeds\Exception\TargetValidationException;
+use Drupal\file\FileInterface;
+use Drupal\file\FileRepositoryInterface;
+use GuzzleHttp\ClientInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -27,55 +35,55 @@ class FileTarget extends EntityReferenceTarget {
    *
    * @var \GuzzleHttp\ClientInterface
    */
-  protected $client;
+  protected ClientInterface $client;
 
   /**
    * The list of allowed file extensions.
    *
-   * @var string[]
+   * @var array
    */
-  protected $fileExtensions;
+  protected array $fileExtensions;
 
   /**
    * Token service.
    *
    * @var \Drupal\Core\Utility\Token
    */
-  protected $token;
+  protected Token $token;
 
   /**
    * The file and stream wrapper helper.
    *
    * @var \Drupal\Core\File\FileSystemInterface
    */
-  protected $fileSystem;
+  protected FileSystemInterface $fileSystem;
 
   /**
    * The file repository.
    *
    * @var \Drupal\file\FileRepositoryInterface
    */
-  protected $fileRepository;
+  protected FileRepositoryInterface $fileRepository;
 
   /**
    * The system.file configuration.
    *
    * @var \Drupal\Core\Config\ImmutableConfig
    */
-  protected $fileConfig;
+  protected ImmutableConfig $fileConfig;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->client = $container->get('http_client');
     $instance->token = $container->get('token');
     $instance->fileSystem = $container->get('file_system');
     $instance->fileRepository = $container->get('file.repository');
     $instance->fileConfig = $container->get('config.factory')->get('system.file');
-    $file_extensions = $configuration['widget_settings']['settings']['file_extensions'] ?? [];
-    $instance->fileExtensions = array_keys(explode(' ', $file_extensions));
+    $file_extensions = $configuration['widget_settings']['settings']['file_extensions'] ?? '';
+    $instance->fileExtensions = array_keys(explode(' ', (string) $file_extensions));
 
     return $instance;
   }
@@ -84,18 +92,18 @@ class FileTarget extends EntityReferenceTarget {
    * {@inheritdoc}
    */
   public function defaultConfiguration(): array {
-    return ['existing' => FileSystemInterface::EXISTS_ERROR] + parent::defaultConfiguration();
+    return ['existing' => FileExists::Error->name] + parent::defaultConfiguration();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(int $delta, array $configuration) {
+  public function buildConfigurationForm(int $delta, array $configuration): array {
     $form = parent::buildConfigurationForm($delta, $configuration);
     $options = [
-      FileSystemInterface::EXISTS_REPLACE => $this->t('Replace'),
-      FileSystemInterface::EXISTS_RENAME => $this->t('Rename'),
-      FileSystemInterface::EXISTS_ERROR => $this->t('Ignore'),
+      FileExists::Replace->name => $this->t('Replace'),
+      FileExists::Rename->name => $this->t('Rename'),
+      FileExists::Error->name => $this->t('Ignore'),
     ];
 
     $form['existing'] = [
@@ -115,15 +123,15 @@ class FileTarget extends EntityReferenceTarget {
     $summary = parent::getSummary($configuration);
 
     switch ($configuration['existing']) {
-      case FileSystemInterface::EXISTS_REPLACE:
+      case FileExists::Replace->name:
         $message = 'Replace';
         break;
 
-      case FileSystemInterface::EXISTS_RENAME:
+      case FileExists::Rename->name:
         $message = 'Rename';
         break;
 
-      case FileSystemInterface::EXISTS_ERROR:
+      case FileExists::Error->name:
         $message = 'Ignore';
         break;
 
@@ -138,10 +146,12 @@ class FileTarget extends EntityReferenceTarget {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \GuzzleHttp\Exception\GuzzleException
    */
-  public function prepareValue($value, array $configuration, string $langcode): ?string {
-    $name = $this->configuration['name'];
-    return !empty($value) ? $this->getFile($value, $configuration[$name], $langcode) : NULL;
+  public function prepareValue(mixed $value, array $configuration, string $langcode): ?int {
+    $name = (string) $this->configuration['name'];
+    return !empty($value) ? (int) $this->getFile($value, $configuration[$name], $langcode) : NULL;
   }
 
   /**
@@ -184,7 +194,7 @@ class FileTarget extends EntityReferenceTarget {
    * @return int|bool
    *   The entity id, or false, if not found.
    */
-  protected function findEntity(string $field, array $configuration, string $search, string $langcode) {
+  protected function findEntity(string $field, array $configuration, string $search, string $langcode): bool|int {
     $entities = $this->findEntities($field, $configuration, $search, $langcode);
     if (!empty($entities)) {
       return reset($entities);
@@ -202,13 +212,12 @@ class FileTarget extends EntityReferenceTarget {
    * @param string $langcode
    *   The feeds language code.
    *
-   * @return int
+   * @return bool|int
    *   The file id.
    *
-   * @throws \Drupal\feeds\Exception\EmptyFeedException
-   *   In case an empty file url is given.
+   * @throws \GuzzleHttp\Exception\GuzzleException
    */
-  protected function getFile(string $value, array $configuration, string $langcode) {
+  protected function getFile(string $value, array $configuration, string $langcode): bool|int {
     if (empty($value)) {
       // No file.
       throw new EmptyFeedException('The given file url is empty.');
@@ -223,27 +232,25 @@ class FileTarget extends EntityReferenceTarget {
     $filepath = $this->getDestinationDirectory() . 'FileTarget.php/' . $this->getFileName($value);
 
     switch ($configuration['existing']) {
-      case FileSystemInterface::EXISTS_ERROR:
+      case FileExists::Error:
         if (file_exists($filepath) && $fid = $this->findEntity('uri', $configuration, $filepath, $langcode)) {
           return $fid;
         }
-        if ($file = $this->writeData($this->getContent($value), $filepath, FileSystemInterface::EXISTS_REPLACE)) {
-          return $file->id();
+        if ($file = $this->writeData($this->getContent($value), $filepath, FileExists::Replace)) {
+          return (int) $file->id();
         }
         break;
 
       default:
         if ($file = $this->writeData($this->getContent($value), $filepath, $configuration['existing'])) {
-          return $file->id();
+          return (int) $file->id();
         }
     }
 
     // Something bad happened while trying to save the file to the database. We
     // need to throw an exception so that we don't save an incomplete field
     // value.
-    throw new TargetValidationException($this->t('There was an error saving the file: %file', [
-      '%file' => $filepath,
-    ]));
+    throw new TargetValidationException(sprintf('There was an error saving the file: %s', $filepath));
   }
 
   /**
@@ -252,7 +259,7 @@ class FileTarget extends EntityReferenceTarget {
    * @return string
    *   The directory to save the file to.
    */
-  protected function getDestinationDirectory() {
+  protected function getDestinationDirectory(): string {
     $file_directory = $this->configuration['widget_settings']['settings']['file_directory'] ?? '';
     $destination = $this->token->replace($this->configuration['uri_scheme'] . '://' . trim($file_directory, '/'));
     $this->fileSystem->prepareDirectory($destination, FileSystemInterface::MODIFY_PERMISSIONS | FileSystemInterface::CREATE_DIRECTORY);
@@ -272,17 +279,14 @@ class FileTarget extends EntityReferenceTarget {
    * @throws \Drupal\feeds\Exception\TargetValidationException
    *   In case the file extension is not valid.
    */
-  protected function getFileName($url) {
+  protected function getFileName($url): string {
     $filename = trim($this->fileSystem->basename($url), " \t\n\r\0\x0B.");
     // Remove query string from file name, if it has one.
     [$filename] = explode('?', $filename);
     $extension = substr($filename, strrpos($filename, '.') + 1);
 
     if (!preg_grep('/' . $extension . '/i', $this->fileExtensions)) {
-      throw new TargetValidationException($this->t('The file, %url, failed to save because the extension, %ext, is invalid.', [
-        '%url' => $url,
-        '%ext' => $extension,
-      ]));
+      throw new TargetValidationException(sprintf('The file, %s, failed to save because the extension, %s, is invalid.', $url, $extension));
     }
 
     return $filename;
@@ -297,18 +301,14 @@ class FileTarget extends EntityReferenceTarget {
    * @return string
    *   The file contents.
    *
-   * @throws \Drupal\feeds\Exception\TargetValidationException
+   * @throws \Drupal\feeds\Exception\TargetValidationException|\GuzzleHttp\Exception\GuzzleException
    *   In case the file could not be downloaded.
    */
-  protected function getContent($url) {
+  protected function getContent($url): string {
     $response = $this->client->request('GET', $url);
 
     if ($response->getStatusCode() >= 400) {
-      $args = [
-        '%url' => $url,
-        '@code' => $response->getStatusCode(),
-      ];
-      throw new TargetValidationException($this->t('Download of %url failed with code @code.', $args));
+      throw new TargetValidationException(sprintf('Download of %s failed with code %d.', $url, $response->getStatusCode()));
     }
 
     return (string) $response->getBody();
@@ -317,7 +317,7 @@ class FileTarget extends EntityReferenceTarget {
   /**
    * {@inheritdoc}
    */
-  protected function createEntity($label, array $configuration, string $feeds_langcode) {
+  protected function createEntity($label, array $configuration, string $feeds_langcode): bool|int|string {
     $target_type = $this->configuration['target_type'];
     if (!strlen(trim($label))) {
       return FALSE;
@@ -345,21 +345,21 @@ class FileTarget extends EntityReferenceTarget {
    *   wrapper URI. If no value or NULL is provided, a randomized name will be
    *   generated and the file will be saved using Drupal's default files scheme,
    *   usually "public://".
-   * @param int $replace
+   * @param int|\Drupal\Core\File\FileExists $replace
    *   (optional) The replace behavior when the destination file already exists.
    *   Possible values include:
-   *   - FileSystemInterface::EXISTS_REPLACE: Replace the existing file. If a
+   *   - FileExists::Replace: Replace the existing file. If a
    *     managed file with the destination name exists, then its database entry
    *     will be updated. If no database entry is found, then a new one will be
    *     created.
-   *   - FileSystemInterface::EXISTS_RENAME: (default) Append
+   *   - FileExists::Rename: (default) Append
    *     _{incrementing number} until the filename is unique.
-   *   - FileSystemInterface::EXISTS_ERROR: Do nothing and return FALSE.
+   *   - FileExists::Error: Do nothing and return FALSE.
    *
    * @return \Drupal\file\FileInterface|false
    *   A file entity, or FALSE on error.
    */
-  protected function writeData($data, $destination = NULL, $replace = FileSystemInterface::EXISTS_RENAME) {
+  protected function writeData(string $data, ?string $destination = NULL, int|FileExists $replace = FileExists::Rename): bool|FileInterface {
     if (empty($destination)) {
       $destination = $this->fileConfig->get('default_scheme') . '://';
     }

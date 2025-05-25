@@ -1,13 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\DataType;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\Attribute\DataType;
-use Drupal\Core\TypedData\PrimitiveInterface;
-use Drupal\Core\TypedData\TypedData;
 use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 
 /**
@@ -21,26 +21,19 @@ use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
   label: new TranslatableMarkup('Entity reference'),
   definition_class: CustomFieldDataDefinition::class,
 )]
-class CustomFieldEntityReference extends TypedData implements PrimitiveInterface {
-
-  /**
-   * The data value.
-   *
-   * @var mixed
-   */
-  protected $value;
+class CustomFieldEntityReference extends CustomFieldDataTypeBase {
 
   /**
    * The entity object or null.
    *
    * @var \Drupal\Core\Entity\EntityInterface|null
    */
-  protected $entity = NULL;
+  protected ?EntityInterface $entity = NULL;
 
   /**
    * {@inheritdoc}
    */
-  public function setValue($value, $notify = TRUE) {
+  public function setValue($value, $notify = TRUE): void {
     $entity = $value['entity'] ?? NULL;
     if ($entity instanceof EntityInterface) {
       if ($entity->isNew()) {
@@ -62,8 +55,11 @@ class CustomFieldEntityReference extends TypedData implements PrimitiveInterface
    *
    * @return \Drupal\Core\Entity\EntityInterface|null
    *   The entity object or null.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function getEntity() {
+  public function getEntity(): ?EntityInterface {
     if (empty($this->entity) && !empty($this->value)) {
       $target_type = $this->getDataDefinition()->getSetting('target_type');
       $storage = \Drupal::entityTypeManager()->getStorage($target_type);

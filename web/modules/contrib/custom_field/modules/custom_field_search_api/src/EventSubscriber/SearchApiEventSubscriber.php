@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field_search_api\EventSubscriber;
 
 use Drupal\search_api\Event\MappingFieldTypesEvent;
@@ -21,7 +23,7 @@ class SearchApiEventSubscriber implements EventSubscriberInterface {
   /**
    * Handle the `search_api.mapping_field_types` event.
    */
-  public function onMappingFieldTypes(MappingFieldTypesEvent $event) {
+  public function onMappingFieldTypes(MappingFieldTypesEvent $event): void {
     $mapping = &$event->getFieldTypeMapping();
     $mapping['custom_field_string_long'] = 'text';
   }

@@ -2,6 +2,8 @@ services:
   plugin.manager.custom_field_type:
     class: Drupal\custom_field\Plugin\CustomFieldTypeManager
     parent: default_plugin_manager
+    arguments:
+      - '@plugin.manager.custom_field_widget'
 
   plugin.manager.custom_field_widget:
     class: Drupal\custom_field\Plugin\CustomFieldWidgetManager
@@ -16,6 +18,8 @@ services:
   plugin.manager.custom_field_feeds:
     class: Drupal\custom_field\Plugin\CustomFieldFeedsManager
     parent: default_plugin_manager
+    arguments:
+      - '@plugin.manager.custom_field_type'
 
   custom_field.update_manager:
     class: Drupal\custom_field\CustomFieldUpdateManager
@@ -33,8 +37,7 @@ services:
   custom_field.generate_data:
     class: Drupal\custom_field\CustomFieldGenerateData
     arguments:
-      - '@uuid'
-      - '@datetime.time'
+      - '@plugin.manager.custom_field_type'
 
   custom_field.normalizer.string_long:
     class: Drupal\custom_field\Normalizer\StringLongNormalizer
@@ -65,4 +68,11 @@ services:
       - '@container.namespaces'
       - '@module_handler'
       - '@theme_handler'
+      - '@cache.discovery'
+
+  plugin.manager.custom_field_link_attributes:
+    class: Drupal\custom_field\LinkAttributesManager
+    arguments:
+      - '@container.namespaces'
+      - '@module_handler'
       - '@cache.discovery'

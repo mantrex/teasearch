@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field_viewfield\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Core\Cache\CacheableMetadata;
@@ -36,7 +38,7 @@ class ViewfieldDefaultFormatter extends CustomFieldFormatterBase implements Cont
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->tokenService = $container->get('token');
 
@@ -69,7 +71,7 @@ class ViewfieldDefaultFormatter extends CustomFieldFormatterBase implements Cont
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
+  public function formatValue(FieldItemInterface $item, mixed $value): ?array {
     $widget_settings = $this->customFieldDefinition->getWidgetSetting('settings');
     $cacheability = new CacheableMetadata();
     $force_default = $widget_settings['force_default'] ?? FALSE;
@@ -164,7 +166,7 @@ class ViewfieldDefaultFormatter extends CustomFieldFormatterBase implements Cont
    * @return array
    *   The array of processed arguments.
    */
-  protected function processArguments($argument_string, FieldableEntityInterface $entity) {
+  protected function processArguments($argument_string, FieldableEntityInterface $entity): array {
     $arguments = [];
 
     if (!empty($argument_string)) {
@@ -176,7 +178,7 @@ class ViewfieldDefaultFormatter extends CustomFieldFormatterBase implements Cont
         if (strpos($argument_string, '"', $pos) === $pos) {
           if (($quote = strpos($argument_string, '"', ++$pos)) !== FALSE) {
             // Skip pairs of quotes.
-            while (!(($ql = strspn($argument_string, '"', $quote)) & 1)) {
+            while (!(($ql = strspn($argument_string, '"', (int) $quote)) & 1)) {
               $quote = strpos($argument_string, '"', $quote + $ql);
             }
             $arguments[] = str_replace('""', '"', substr($argument_string, $pos, $quote + $ql - $pos - 1));

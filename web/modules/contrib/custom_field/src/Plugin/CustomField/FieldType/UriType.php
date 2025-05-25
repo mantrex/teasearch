@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Component\Utility\Random;
@@ -16,9 +18,15 @@ use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
   id: 'uri',
   label: new TranslatableMarkup('URI'),
   description: new TranslatableMarkup('A field containing a URI.'),
-  category: new TranslatableMarkup('General'),
+  category: new TranslatableMarkup('Link'),
   default_widget: 'url',
   default_formatter: 'uri_link',
+  constraints: [
+    "CustomFieldLinkAccess" => [],
+    "CustomFieldLinkExternalProtocols" => [],
+    "CustomFieldLinkType" => [],
+    "CustomFieldLinkNotExistingInternal" => [],
+  ]
 )]
 class UriType extends CustomFieldTypeBase {
 
@@ -42,8 +50,8 @@ class UriType extends CustomFieldTypeBase {
   public static function propertyDefinitions(array $settings): array {
     ['name' => $name] = $settings;
 
-    $properties[$name] = CustomFieldDataDefinition::create('custom_field_uri')
-      ->setLabel(new TranslatableMarkup('@name', ['@name' => $name]))
+    $properties[$name] = CustomFieldDataDefinition::create('custom_field_link')
+      ->setLabel(new TranslatableMarkup('@label', ['@label' => $name]))
       ->setRequired(FALSE);
 
     return $properties;
@@ -52,24 +60,30 @@ class UriType extends CustomFieldTypeBase {
   /**
    * {@inheritdoc}
    */
-  public static function generateSampleValue(CustomFieldTypeInterface $field, string $target_entity_type): string {
+  public static function generateSampleValue(CustomFieldTypeInterface $field, string $target_entity_type): array {
     $random = new Random();
     $widget_settings = $field->getWidgetSetting('settings');
     $link_type = $widget_settings['link_type'] ?? NULL;
     if ($link_type & $field::LINK_EXTERNAL) {
       $tlds = ['com', 'net', 'gov', 'org', 'edu', 'biz', 'info'];
       $domain_length = mt_rand(7, 15);
-      $protocol = mt_rand(0, 1) ? 'https' : 'http';
-      $www = mt_rand(0, 1) ? 'www.' : '';
-      $domain = $random->word($domain_length);
-      $tld = $tlds[mt_rand(0, (count($tlds) - 1))];
-      $value = "$protocol://$www$domain.$tld";
+
+      $value['uri'] = 'https://www.' . $random->word($domain_length) . '.' . $tlds[mt_rand(0, (count($tlds) - 1))];
     }
     else {
-      $value = 'base:' . $random->name(mt_rand(1, 64));
+      $value['uri'] = 'base:' . $random->name(mt_rand(1, 64));
     }
 
     return $value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConstraints(array $settings): array {
+    /** @var array<string, mixed> $definition */
+    $definition = $this->pluginDefinition;
+    return $definition['constraints'];
   }
 
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin;
 
 use Drupal\Component\Plugin\Factory\DefaultFactory;
@@ -19,7 +21,7 @@ class CustomFieldFormatterManager extends DefaultPluginManager implements Custom
    *
    * @var \Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface
    */
-  protected $customFieldTypeManager;
+  protected CustomFieldTypeManagerInterface $customFieldTypeManager;
 
   /**
    * Constructs a new CustomFieldFormatterManager object.
@@ -61,6 +63,8 @@ class CustomFieldFormatterManager extends DefaultPluginManager implements Custom
     //   \Drupal\Core\Field\FormatterBase::__construct().
     // If the plugin provides a factory method, pass the container to it.
     if (is_subclass_of($plugin_class, 'Drupal\Core\Plugin\ContainerFactoryPluginInterface')) {
+      // @todo Find a better way to solve this, if possible at all.
+      // @phpstan-ignore-next-line
       return $plugin_class::create(\Drupal::getContainer(), $configuration, $plugin_id, $plugin_definition);
     }
 
@@ -68,133 +72,82 @@ class CustomFieldFormatterManager extends DefaultPluginManager implements Custom
   }
 
   /**
-   * Gets an instance of a formatter plugin.
-   *
-   * @param array $options
-   *   An array of options to build the plugin.
-   *
-   * @return \Drupal\custom_field\Plugin\CustomFieldFormatterInterface|false
-   *   A formatter object or FALSE when plugin is not found.
+   * {@inheritdoc}
    */
-  public function getInstance(array $options) {
-    $configuration = $options['configuration'];
-    /** @var \Drupal\custom_field\Plugin\CustomFieldTypeInterface $custom_field_definition */
-    $custom_field_definition = $options['custom_field_definition'];
-    $field_type = $custom_field_definition->getDataType();
+  public function createOptionsForInstance($custom_item, string $format_type, array $formatter_settings, string $view_mode): array {
+    return [
+      'custom_field_definition' => $custom_item,
+      'configuration' => [
+        'type' => $format_type,
+        'settings' => $formatter_settings,
+      ],
+      'view_mode' => $view_mode,
+    ];
+  }
 
-    // Fill in default configuration if needed.
-    if (!isset($options['prepare']) || $options['prepare'] == TRUE) {
-      $configuration = $this->prepareConfiguration($field_type, $configuration);
-    }
+  /**
+   * {@inheritdoc}
+   */
+  public function getInstance(array $options): ?CustomFieldFormatterInterface {
+    try {
+      $configuration = $options['configuration'];
+      $custom_field_definition = $options['custom_field_definition'];
 
-    $plugin_id = $configuration['type'];
+      assert($custom_field_definition instanceof CustomFieldTypeInterface);
+      $field_type = $custom_field_definition->getDataType();
 
-    // Switch back to default formatter if either:
-    // - the configuration does not specify a formatter class
-    // - the field type is not allowed for the formatter
-    // - the formatter is not applicable to the field definition.
-    $definition = $this->getDefinition($configuration['type'], FALSE);
-    if (!isset($definition['class']) || !in_array($field_type, $definition['field_types']) || !$definition['class']::isApplicable($custom_field_definition)) {
-      // Grabe the default formatter for the field type.
-      $field_type_definition = $this->customFieldTypeManager->getDefinition($field_type);
-      if (empty($field_type_definition['default_formatter'])) {
-        return FALSE;
+      // @todo Which subfield type uses this? Can this be dropped?
+      // Fill in default configuration if needed.
+      if (!isset($options['prepare']) || $options['prepare'] == TRUE) {
+        $configuration = $this->prepareConfiguration($field_type, $configuration);
       }
-      $plugin_id = $field_type_definition['default_formatter'];
-    }
 
-    $configuration += [
-      'custom_field_definition' => $custom_field_definition,
-      'view_mode' => $options['view_mode'] ?? 'default',
-    ];
-    return $this->createInstance($plugin_id, $configuration) ?? FALSE;
+      $plugin_id = $configuration['type'];
+
+      // Switch back to default formatter if either:
+      // - the configuration does not specify a formatter class
+      // - the field type is not allowed for the formatter
+      // - the formatter is not applicable to the field definition.
+      $definition = $this->getDefinition($configuration['type'], FALSE);
+      if (!isset($definition['class']) || !in_array($field_type, $definition['field_types']) || !$definition['class']::isApplicable($custom_field_definition)) {
+
+        // Grab the default formatter for the field type.
+        $field_type_definition = $this->customFieldTypeManager->getDefinition($field_type);
+        if (empty($field_type_definition['default_formatter'])) {
+          return NULL;
+        }
+        $plugin_id = $field_type_definition['default_formatter'];
+      }
+
+      $configuration += [
+        'custom_field_definition' => $custom_field_definition,
+        'view_mode' => $options['view_mode'] ?? 'default',
+      ];
+      /** @var \Drupal\custom_field\Plugin\CustomFieldFormatterInterface $instance */
+      $instance = $this->createInstance($plugin_id, $configuration);
+      return $instance;
+    }
+    catch (\Exception $exception) {
+      return NULL;
+    }
   }
 
   /**
-   * Merges default values for formatter configuration.
-   *
-   * @param string $field_type
-   *   The field type.
-   * @param array $configuration
-   *   An array of formatter configuration.
-   *
-   * @return array
-   *   The display properties with defaults added.
+   * {@inheritdoc}
    */
-  public function prepareConfiguration($field_type, array $configuration) {
-    // Fill in defaults for missing properties.
-    $configuration += [
-      'settings' => [],
-      'third_party_settings' => [],
-    ];
-
-    // If no formatter is specified, use the default formatter.
-    if (!isset($configuration['type'])) {
-      $field_type = $this->customFieldTypeManager->getDefinition($field_type);
-      $configuration['type'] = $field_type['default_formatter'];
+  public function getDefaultSettings(string $type): array {
+    try {
+      $plugin_definition = $this->getDefinition($type, FALSE);
+      if (!empty($plugin_definition['class'])) {
+        /** @var \Drupal\custom_field\Plugin\CustomFieldFormatterInterface $plugin_class */
+        $plugin_class = DefaultFactory::getPluginClass($type, $plugin_definition);
+        return $plugin_class::defaultSettings();
+      }
     }
-    // Filter out unknown settings, and fill in defaults for missing settings.
-    $default_settings = $this->getDefaultSettings($configuration['type']);
-    $configuration['settings'] = \array_intersect_key($configuration['settings'], $default_settings) + $default_settings;
-
-    return $configuration;
-  }
-
-  /**
-   * Returns the default settings of a custom_field formatter.
-   *
-   * @param string $type
-   *   A custom_field formatter type name.
-   *
-   * @return array
-   *   The formatter type's default settings, as provided by the plugin
-   *   definition, or an empty array if type or settings are undefined.
-   */
-  public function getDefaultSettings($type) {
-    $plugin_definition = $this->getDefinition($type, FALSE);
-    if (!empty($plugin_definition['class'])) {
-      $plugin_class = DefaultFactory::getPluginClass($type, $plugin_definition);
-      return $plugin_class::defaultSettings();
+    catch (\Exception $exception) {
+      // Silent fail, for now.
     }
     return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getOptions(CustomFieldTypeInterface $custom_field): array {
-    $options = [];
-    $field_type = $custom_field->getPluginId();
-    foreach ($this->getDefinitions() as $id => $definition) {
-      $plugin_class = DefaultFactory::getPluginClass($id, $definition);
-      $is_applicable = $plugin_class::isApplicable($custom_field);
-      if (!in_array($field_type, $definition['field_types']) || !$is_applicable) {
-        continue;
-      }
-      $options[$id] = $definition['label'];
-    }
-
-    return $options;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getInputPathForStatesApi(FormStateInterface $form_state, string $field_name, string $property, bool $is_views_subfield = FALSE): string {
-    $form_id = $form_state->getFormObject()->getFormId();
-    $is_views_form = $form_id === 'views_ui_config_item_form';
-    $is_block_form = $form_id === 'block_form';
-    $is_layout_builder_form = $form_id === 'layout_builder_add_block' || $form_id === 'layout_builder_update_block';
-    if ($is_views_form) {
-      return $is_views_subfield ? 'options[settings]' : "options[settings][fields][$property][formatter_settings]";
-    }
-    elseif ($is_block_form) {
-      return "settings[formatter_settings][fields][$property][formatter_settings]";
-    }
-    elseif ($is_layout_builder_form) {
-      return "settings[formatter][settings][fields][$property][formatter_settings]";
-    }
-    return "fields[$field_name][settings_edit_form][settings][fields][$property][formatter_settings]";
   }
 
   /**
@@ -250,6 +203,71 @@ class CustomFieldFormatterManager extends DefaultPluginManager implements Custom
     }
 
     return $value_keys;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getInputPathForStatesApi(FormStateInterface $form_state, string $field_name, string $property, bool $is_views_subfield = FALSE): string {
+    $form_id = $form_state->getFormObject()->getFormId();
+    $is_views_form = $form_id === 'views_ui_config_item_form';
+    $is_block_form = $form_id === 'block_form';
+    $is_layout_builder_form = $form_id === 'layout_builder_add_block' || $form_id === 'layout_builder_update_block';
+    if ($is_views_form) {
+      return $is_views_subfield ? 'options[settings]' : "options[settings][fields][$property][formatter_settings]";
+    }
+    elseif ($is_block_form) {
+      return "settings[formatter_settings][fields][$property][formatter_settings]";
+    }
+    elseif ($is_layout_builder_form) {
+      return "settings[formatter][settings][fields][$property][formatter_settings]";
+    }
+    return "fields[$field_name][settings_edit_form][settings][fields][$property][formatter_settings]";
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   */
+  public function getOptions(CustomFieldTypeInterface $custom_field): array {
+    $options = [];
+    $field_type = $custom_field->getPluginId();
+    foreach ($this->getDefinitions() as $id => $definition) {
+      /** @var \Drupal\custom_field\Plugin\CustomFieldFormatterInterface $plugin_class */
+      $plugin_class = DefaultFactory::getPluginClass($id, $definition);
+      $is_applicable = $plugin_class::isApplicable($custom_field);
+      if (!in_array($field_type, $definition['field_types']) || !$is_applicable) {
+        continue;
+      }
+      $options[$id] = $definition['label'];
+    }
+
+    return $options;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  public function prepareConfiguration(string $field_type, array $configuration): array {
+    // Fill in defaults for missing properties.
+    $configuration += [
+      'settings' => [],
+      'third_party_settings' => [],
+    ];
+
+    // If no formatter is specified, use the default formatter.
+    if (!isset($configuration['type'])) {
+      $field_type = $this->customFieldTypeManager->getDefinition($field_type);
+      $configuration['type'] = $field_type['default_formatter'];
+    }
+    // Filter out unknown settings, and fill in defaults for missing settings.
+    $default_settings = $this->getDefaultSettings($configuration['type']);
+    $configuration['settings'] = \array_intersect_key($configuration['settings'], $default_settings) + $default_settings;
+
+    return $configuration;
   }
 
 }

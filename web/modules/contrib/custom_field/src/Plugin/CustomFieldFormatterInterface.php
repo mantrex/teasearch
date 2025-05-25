@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin;
 
+use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -11,11 +14,19 @@ use Drupal\Core\Form\FormStateInterface;
  * This interface details the methods that most plugin implementations will want
  * to override. See Drupal\Core\Field\WidgetBaseInterface for base
  * wrapping methods that should most likely be inherited directly from
- * Drupal\Core\Field\WidgetBase..
+ * Drupal\Core\Field\WidgetBase.
  *
  * @ingroup field_widget
  */
-interface CustomFieldFormatterInterface {
+interface CustomFieldFormatterInterface extends PluginInspectionInterface {
+
+  /**
+   * Returns the formatter default settings.
+   *
+   * @return array<string, mixed>
+   *   An array of default settings.
+   */
+  public static function defaultSettings(): array;
 
   /**
    * Returns a form to configure settings for the widget.
@@ -24,12 +35,12 @@ interface CustomFieldFormatterInterface {
    * administrators to configure the widget. The field_ui module takes care of
    * handling submitted form values.
    *
-   * @param array $form
+   * @param array<string, mixed> $form
    *   The form where the settings form is being included in.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return array
+   * @return array<string, mixed>
    *   The form definition for the widget settings.
    */
   public function settingsForm(array $form, FormStateInterface $form_state): array;
@@ -40,7 +51,7 @@ interface CustomFieldFormatterInterface {
    * If an empty result is returned, a UI can still be provided to display
    * a settings form in case the widget has configurable settings.
    *
-   * @return array
+   * @return string[]
    *   A short summary of the widget settings.
    */
   public function settingsSummary(): array;
@@ -56,15 +67,15 @@ interface CustomFieldFormatterInterface {
    * @return mixed
    *   The formatted value.
    */
-  public function formatValue(FieldItemInterface $item, $value);
+  public function formatValue(FieldItemInterface $item, mixed $value): mixed;
 
   /**
    * Returns calculated dependencies for formatter plugin.
    *
-   * @param array $settings
+   * @param array<string, mixed> $settings
    *   The formatter settings for the plugin.
    *
-   * @return array
+   * @return array<string, mixed>
    *   The dependencies.
    */
   public function calculateFormatterDependencies(array $settings): array;
@@ -72,9 +83,9 @@ interface CustomFieldFormatterInterface {
   /**
    * Returns the changed settings for formatter plugin.
    *
-   * @param array $dependencies
+   * @param array<string, mixed> $dependencies
    *   The formatter dependencies array.
-   * @param array $settings
+   * @param array<string, mixed> $settings
    *   The formatter settings for the plugin.
    *
    * @return array

@@ -47,6 +47,8 @@ content:
         file_test: '12'
         image_test: '12'
         viewfield_test: '12'
+        time_test: '12'
+        link_test: '12'
       breakpoint: ''
     third_party_settings: {  }
   field_test_multiple:
@@ -76,6 +78,8 @@ content:
         file_test: '12'
         image_test: '12'
         viewfield_test: '12'
+        time_test: '12'
+        link_test: '12'
       breakpoint: ''
     third_party_settings: {  }
   field_test_unlimited:
@@ -105,6 +109,8 @@ content:
         file_test: '12'
         image_test: '12'
         viewfield_test: '12'
+        time_test: '12'
+        link_test: '12'
       breakpoint: ''
     third_party_settings: {  }
   path:

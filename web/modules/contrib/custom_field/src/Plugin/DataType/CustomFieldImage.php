@@ -1,15 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\DataType;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\Attribute\DataType;
 use Drupal\Core\TypedData\DataDefinitionInterface;
-use Drupal\Core\TypedData\PrimitiveInterface;
-use Drupal\Core\TypedData\TypedData;
-use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\custom_field\Plugin\Field\FieldType\CustomItem;
 use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
 
@@ -24,54 +24,49 @@ use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
   label: new TranslatableMarkup('Image'),
   definition_class: CustomFieldDataDefinition::class,
 )]
-class CustomFieldImage extends TypedData implements PrimitiveInterface {
-
-  /**
-   * The data value.
-   *
-   * @var mixed
-   */
-  protected $value;
+class CustomFieldImage extends CustomFieldDataTypeBase {
 
   /**
    * The entity object or null.
    *
    * @var \Drupal\Core\Entity\EntityInterface|null
    */
-  protected $entity = NULL;
+  protected ?EntityInterface $entity = NULL;
 
   /**
    * The image alt text value.
    *
    * @var string
    */
-  protected $alt;
+  protected mixed $alt;
 
   /**
    * The image title value.
    *
    * @var string
    */
-  protected $title;
+  protected mixed $title;
 
   /**
    * The image width value.
    *
    * @var int
    */
-  protected $width;
+  protected mixed $width;
 
   /**
    * The image height value.
    *
    * @var int
    */
-  protected $height;
+  protected mixed $height;
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
-  public function __construct(DataDefinitionInterface $definition, $name = NULL, ?TypedDataInterface $parent = NULL) {
+  public function __construct(DataDefinitionInterface $definition, $name = NULL, ?FieldItemInterface $parent = NULL) {
     parent::__construct($definition, $name, $parent);
     $this->value = $parent->{$this->getName()};
     $this->alt = $parent->get($this->getName() . '__alt')->getValue();
@@ -82,8 +77,10 @@ class CustomFieldImage extends TypedData implements PrimitiveInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
-  public function setValue($value, $notify = TRUE) {
+  public function setValue($value, $notify = TRUE): void {
     if (isset($value['alt'])) {
       $this->setAlt($value['alt']);
     }
@@ -111,8 +108,11 @@ class CustomFieldImage extends TypedData implements PrimitiveInterface {
    *
    * @return \Drupal\Core\Entity\EntityInterface|null
    *   The entity object or null.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function getEntity() {
+  public function getEntity(): ?EntityInterface {
     if (empty($this->entity) && !empty($this->value)) {
       $target_type = $this->getDataDefinition()->getSetting('target_type');
       $storage = \Drupal::entityTypeManager()->getStorage($target_type);
@@ -127,6 +127,8 @@ class CustomFieldImage extends TypedData implements PrimitiveInterface {
    *
    * @param string $alt
    *   The alt text value to set.
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   protected function setAlt(string $alt): void {
     $this->getParent()->set($this->getName() . CustomItem::SEPARATOR . 'alt', $alt);
@@ -138,6 +140,8 @@ class CustomFieldImage extends TypedData implements PrimitiveInterface {
    *
    * @param string $title
    *   The title text value to set.
+   *
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   protected function setTitle(string $title): void {
     $this->getParent()->set($this->getName() . CustomItem::SEPARATOR . 'title', $title);
@@ -157,7 +161,7 @@ class CustomFieldImage extends TypedData implements PrimitiveInterface {
    * @return string|null
    *   The image alt text.
    */
-  public function getAlt() {
+  public function getAlt(): ?string {
     return $this->alt;
   }
 
@@ -167,7 +171,7 @@ class CustomFieldImage extends TypedData implements PrimitiveInterface {
    * @return string|null
    *   The image title.
    */
-  public function getTitle() {
+  public function getTitle(): ?string {
     return $this->title;
   }
 
@@ -177,8 +181,8 @@ class CustomFieldImage extends TypedData implements PrimitiveInterface {
    * @return int|null
    *   The image width.
    */
-  public function getWidth() {
-    return $this->width;
+  public function getWidth(): ?int {
+    return $this->width ? (int) $this->width : NULL;
   }
 
   /**
@@ -187,8 +191,8 @@ class CustomFieldImage extends TypedData implements PrimitiveInterface {
    * @return int|null
    *   The image height.
    */
-  public function getHeight() {
-    return $this->height;
+  public function getHeight(): ?int {
+    return $this->height ? (int) $this->height : NULL;
   }
 
   /**

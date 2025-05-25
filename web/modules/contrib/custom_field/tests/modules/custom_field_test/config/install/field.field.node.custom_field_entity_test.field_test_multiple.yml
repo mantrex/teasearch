@@ -4,7 +4,8 @@ dependencies:
   config:
     - field.storage.node.field_test_multiple
     - node.type.custom_field_entity_test
-    - views.view.content_recent
+    - views.view.custom_field_test
+    - views.view.custom_field_test_2
   module:
     - custom_field
 id: node.custom_field_entity_test.field_test_multiple
@@ -25,6 +26,7 @@ settings:
       check_empty: false
       widget_settings:
         label: 'String test'
+        translatable: false
         settings:
           description: ''
           description_display: after
@@ -41,6 +43,7 @@ settings:
       check_empty: false
       widget_settings:
         label: 'String long test'
+        translatable: false
         settings:
           description: ''
           description_display: after
@@ -60,6 +63,7 @@ settings:
       check_empty: false
       widget_settings:
         label: 'Integer test'
+        translatable: false
         settings:
           description: ''
           description_display: after
@@ -75,6 +79,7 @@ settings:
       check_empty: false
       widget_settings:
         label: 'Decimal test'
+        translatable: false
         settings:
           description: ''
           description_display: after
@@ -90,6 +95,7 @@ settings:
       check_empty: false
       widget_settings:
         label: 'Float test'
+        translatable: false
         settings:
           description: ''
           description_display: after
@@ -105,6 +111,7 @@ settings:
       check_empty: false
       widget_settings:
         label: 'Email test'
+        translatable: false
         settings:
           description: ''
           description_display: after
@@ -117,12 +124,13 @@ settings:
       check_empty: false
       widget_settings:
         label: 'Telephone test'
+        translatable: false
         settings:
           description: ''
           description_display: after
           size: 60
           placeholder: ''
-          maxlength: 255
+          maxlength: 256
           maxlength_js: false
           prefix: ''
           suffix: ''
@@ -134,13 +142,12 @@ settings:
       check_empty: false
       widget_settings:
         label: 'Uri test'
+        translatable: false
         settings:
           description: ''
           description_display: after
           size: 60
           placeholder: ''
-          maxlength: 254
-          maxlength_js: false
           required: false
           link_type: 17
           field_prefix: default
@@ -151,6 +158,7 @@ settings:
       check_empty: false
       widget_settings:
         label: 'Boolean test'
+        translatable: false
         settings:
           description: ''
           description_display: after
@@ -165,6 +173,7 @@ settings:
       check_empty: false
       widget_settings:
         label: 'Color test'
+        translatable: false
         settings:
           description: ''
           description_display: after
@@ -175,6 +184,7 @@ settings:
       check_empty: false
       widget_settings:
         label: 'Map test'
+        translatable: false
         settings:
           description: ''
           description_display: after
@@ -188,6 +198,7 @@ settings:
       check_empty: false
       widget_settings:
         label: 'Map string test'
+        translatable: false
         settings:
           description: ''
           description_display: after
@@ -199,6 +210,7 @@ settings:
       check_empty: false
       widget_settings:
         label: 'Datetime test'
+        translatable: false
         settings:
           description: ''
           description_display: after
@@ -209,6 +221,7 @@ settings:
       check_empty: false
       widget_settings:
         label: 'Entity reference test'
+        translatable: false
         settings:
           description: ''
           description_display: after
@@ -232,6 +245,7 @@ settings:
       check_empty: false
       widget_settings:
         label: 'File test'
+        translatable: false
         settings:
           description: ''
           description_display: after
@@ -246,6 +260,7 @@ settings:
       check_empty: false
       widget_settings:
         label: 'Image test'
+        translatable: false
         settings:
           alt_field: true
           alt_field_required: true
@@ -267,11 +282,15 @@ settings:
       check_empty: false
       widget_settings:
         label: 'Viewfield test'
+        translatable: false
         settings:
           allowed_views:
-            content_recent:
+            custom_field_test:
               block_1: block_1
-              default: '0'
+              default: default
+            custom_field_test_2:
+              block_1: block_1
+              default: default
           description: ''
           description_display: after
           required: false
@@ -280,4 +299,44 @@ settings:
           token_browser:
             recursion_limit: 3
             global_types: false
+    time_test:
+      type: time_widget
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: Time
+        translatable: false
+        settings:
+          description: ''
+          description_display: after
+          required: false
+          seconds_enabled: false
+          seconds_step: 5
+    link_test:
+      type: link_default
+      weight: 0
+      check_empty: false
+      widget_settings:
+        label: 'Link test'
+        translatable: false
+        settings:
+          description: ''
+          description_display: after
+          required: false
+          link_type: 17
+          field_prefix: default
+          field_prefix_custom: ''
+          title: 1
+          enabled_attributes:
+            target: true
+            class: true
+            rel: true
+            title: false
+            aria-label: false
+            id: false
+            name: false
+            accesskey: false
+          widget_default_open: expandIfValuesSet
+          placeholder_url: ''
+          placeholder_title: ''
 field_type: custom

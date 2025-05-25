@@ -33,7 +33,7 @@ class CustomFieldDate extends NumericDate {
    *
    * @var bool
    */
-  protected $calculateOffset = TRUE;
+  protected bool $calculateOffset = TRUE;
 
   /**
    * {@inheritdoc}
@@ -44,12 +44,8 @@ class CustomFieldDate extends NumericDate {
     $plugin_definition,
     RouteMatchInterface $route_match,
     DateFormatterInterface $date_formatter,
-    ?TimeInterface $time = NULL,
+    TimeInterface $time,
   ) {
-    if (!$time) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $time argument is deprecated in drupal:10.3.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/3395991', E_USER_DEPRECATED);
-      $time = \Drupal::service('datetime.time');
-    }
     parent::__construct($configuration, $plugin_id, $plugin_definition, $route_match, $date_formatter, $time);
 
     if ($configuration['datetime_type'] === CustomFieldTypeInterface::DATETIME_TYPE_DATE) {
@@ -62,7 +58,7 @@ class CustomFieldDate extends NumericDate {
   /**
    * {@inheritdoc}
    */
-  public function getDateField() {
+  public function getDateField(): string {
     // Use string date storage/formatting since datetime fields are stored as
     // strings rather than UNIX timestamps.
     return $this->query->getDateField("$this->tableAlias.$this->realField", TRUE, $this->calculateOffset);
@@ -71,7 +67,7 @@ class CustomFieldDate extends NumericDate {
   /**
    * {@inheritdoc}
    */
-  public function getDateFormat($format) {
+  public function getDateFormat($format): string {
     // Pass in the string-field option.
     return $this->query->getDateFormat($this->getDateField(), $format, TRUE);
   }

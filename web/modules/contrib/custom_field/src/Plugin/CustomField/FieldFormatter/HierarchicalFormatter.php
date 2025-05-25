@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
@@ -119,20 +124,24 @@ class HierarchicalFormatter extends EntityReferenceFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
-
+  public function formatValue(FieldItemInterface $item, mixed $value): ?array {
     if (!$value instanceof EntityInterface) {
       return NULL;
     }
-
-    /** @var \Drupal\taxonomy\TermStorageInterface $storage */
-    $storage = $this->entityTypeManager->getStorage($value->getEntityTypeId());
+    try {
+      /** @var \Drupal\taxonomy\TermStorageInterface $storage */
+      $storage = $this->entityTypeManager->getStorage($value->getEntityTypeId());
+    }
+    catch (InvalidPluginDefinitionException | PluginNotFoundException $e) {
+      return NULL;
+    }
+    /** @var \Drupal\Core\Access\AccessResultInterface $access */
     $access = $this->checkAccess($value);
     if (!$access->isAllowed()) {
       return NULL;
     }
 
-    $tid = $value->id();
+    $tid = (int) $value->id();
     $langcode = $value->language()->getId();
     $term_tree = [];
 
@@ -162,7 +171,7 @@ class HierarchicalFormatter extends EntityReferenceFormatterBase {
           // Terms can have multiple parents. Now remove any remaining topmost
           // terms.
           foreach ($term_tree as $key => $term) {
-            $has_parents = $storage->loadAllParents($term->id());
+            $has_parents = $storage->loadAllParents((int) $term->id());
             // This has no parents and is topmost.
             if (empty($has_parents)) {
               unset($term_tree[$key]);
@@ -182,6 +191,7 @@ class HierarchicalFormatter extends EntityReferenceFormatterBase {
     }
 
     // Remove empty elements caused by discarded items.
+    /** @var \Drupal\taxonomy\TermInterface[] $term_tree */
     $term_tree = array_filter($term_tree);
 
     foreach ($term_tree as $index => $term) {
@@ -202,7 +212,7 @@ class HierarchicalFormatter extends EntityReferenceFormatterBase {
   /**
    * {@inheritdoc}
    */
-  protected function checkAccess(EntityInterface $entity) {
+  protected function checkAccess(EntityInterface $entity): bool|AccessResultInterface {
     return $entity->access('view label', NULL, TRUE);
   }
 

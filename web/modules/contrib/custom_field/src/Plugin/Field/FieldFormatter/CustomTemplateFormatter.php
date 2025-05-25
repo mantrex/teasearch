@@ -7,6 +7,7 @@ use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Utility\Token;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -24,26 +25,29 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class CustomTemplateFormatter extends BaseFormatter {
 
   /**
-   * The renderer service.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
    * The token service.
    *
    * @var \Drupal\Core\Utility\Token
    */
-  protected $tokenService;
+  protected Token $tokenService;
+
+  /**
+   * The token entity mapper service.
+   *
+   * @var \Drupal\token\TokenEntityMapperInterface
+   */
+  protected $tokenEntityMapper;
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
-    $instance->renderer = $container->get('renderer');
     $instance->tokenService = $container->get('token');
+    $instance->tokenEntityMapper = $container->get(
+      'token.entity_mapper',
+      ContainerInterface::NULL_ON_INVALID_REFERENCE
+    );
 
     return $instance;
   }
@@ -98,7 +102,7 @@ class CustomTemplateFormatter extends BaseFormatter {
         'placeholder' => $this->t('Insert tokens here along with any desired html.'),
       ],
     ];
-    // Build the basic tokens markup.
+    // Build the basic token markup.
     $basic_tokens = [
       '#theme' => 'item_list',
       '#items' => [],
@@ -111,7 +115,7 @@ class CustomTemplateFormatter extends BaseFormatter {
 
     $form['basic_tokens'] = [
       '#type' => 'item',
-      '#description' => $this->t('<p><strong>The following tokens are available for replacement.</strong></p>') . $this->renderer->render($basic_tokens),
+      '#description' => $this->t('<p><strong>The following tokens are available for replacement.</strong></p>') . $this->renderer->renderInIsolation($basic_tokens),
       '#states' => [
         'visible' => [
           ':input[name="' . $visibility_path . '[tokens]"]' => ['value' => 'basic'],
@@ -134,8 +138,7 @@ class CustomTemplateFormatter extends BaseFormatter {
       ];
     }
     else {
-      $token_mapper = \Drupal::service('token.entity_mapper');
-      $token_type = $token_mapper->getTokenTypeForEntityType($entity_type);
+      $token_type = $this->tokenEntityMapper->getTokenTypeForEntityType($entity_type);
       $form['advanced_tokens'] = [
         '#type' => 'token_browser',
         '#theme_wrappers' => ['fieldset'],

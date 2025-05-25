@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldType;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -70,11 +72,6 @@ class DecimalType extends NumericTypeBase {
     $widget_settings = $field->getWidgetSetting('settings');
     $precision = $field->getPrecision() ?: 10;
     $scale = $field->getScale() ?: 2;
-    $margin = $precision - $scale;
-    // Hack precision into valid value that can be stored.
-    if ($precision >= $margin) {
-      $precision = $margin + 2;
-    }
 
     $default_min = $field->isUnsigned() ? 0 : -pow(10, ($precision - $scale)) + 1;
     $default_max = pow(10, ($precision - $scale)) - 1;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField;
 
 use Drupal\Core\Field\FieldFilteredMarkup;
@@ -17,15 +19,16 @@ class NumberWidgetBase extends CustomFieldWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'min' => '',
-        'max' => '',
-        'prefix' => '',
-        'suffix' => '',
-        'placeholder' => '',
-      ],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings'] = [
+      'min' => '',
+      'max' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'placeholder' => '',
+    ] + $settings['settings'];
+
+    return $settings;
   }
 
   /**
@@ -33,7 +36,7 @@ class NumberWidgetBase extends CustomFieldWidgetBase {
    */
   public function widget(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings');
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
 
     // Number form element type.
     $element['#type'] = 'number';
@@ -68,7 +71,7 @@ class NumberWidgetBase extends CustomFieldWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
     $unsigned = $field->isUnsigned();
 
     $element['settings']['placeholder'] = [

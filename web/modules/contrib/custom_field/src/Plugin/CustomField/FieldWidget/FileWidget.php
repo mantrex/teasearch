@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Component\Utility\Bytes;
@@ -7,9 +9,12 @@ use Drupal\Component\Utility\Environment;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\ElementInfoManagerInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
+use Drupal\custom_field\Plugin\CustomField\FieldType\FileType;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
 use Drupal\file\Element\ManagedFile;
@@ -33,19 +38,19 @@ class FileWidget extends CustomFieldWidgetBase {
    *
    * @var \Drupal\Core\Render\ElementInfoManagerInterface
    */
-  protected $elementInfo;
+  protected ElementInfoManagerInterface $elementInfo;
 
   /**
    * The renderer service.
    *
    * @var \Drupal\Core\Render\RendererInterface
    */
-  protected $renderer;
+  protected RendererInterface $renderer;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->elementInfo = $container->get('element_info');
     $instance->renderer = $container->get('renderer');
@@ -57,14 +62,15 @@ class FileWidget extends CustomFieldWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'file_extensions' => 'txt',
-        'file_directory' => '[date:custom:Y]-[date:custom:m]',
-        'max_filesize' => '',
-        'progress_indicator' => 'throbber',
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings'] = [
+      'file_extensions' => 'txt',
+      'file_directory' => '[date:custom:Y]-[date:custom:m]',
+      'max_filesize' => '',
+      'progress_indicator' => 'throbber',
+    ] + $settings['settings'];
+
+    return $settings;
   }
 
   /**
@@ -130,8 +136,13 @@ class FileWidget extends CustomFieldWidgetBase {
    *
    * This function is assigned as an #element_validate callback in
    * fieldSettingsForm().
+   *
+   * @param array<string, mixed> $element
+   *   The form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
    */
-  public static function validateDirectory($element, FormStateInterface $form_state) {
+  public static function validateDirectory(array $element, FormStateInterface $form_state): void {
     // Strip slashes from the beginning and end of $element['file_directory'].
     $value = trim($element['#value'], '\\/');
     $form_state->setValueForElement($element, $value);
@@ -146,8 +157,13 @@ class FileWidget extends CustomFieldWidgetBase {
    * This doubles as a convenience clean-up function and a validation routine.
    * Commas are allowed by the end-user, but ultimately the value will be stored
    * as space-separated list for compatibility with file_validate_extensions().
+   *
+   * @param array<string, mixed> $element
+   *   The form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
    */
-  public static function validateExtensions($element, FormStateInterface $form_state) {
+  public static function validateExtensions(array $element, FormStateInterface $form_state): void {
     if (!empty($element['#value'])) {
       $extensions = preg_replace('/([, ]+\.?)/', ' ', trim(strtolower($element['#value'])));
       $extension_array = array_unique(array_filter(explode(' ', $extensions)));
@@ -184,8 +200,13 @@ class FileWidget extends CustomFieldWidgetBase {
    *
    * This function is assigned as an #element_validate callback in
    * fieldSettingsForm().
+   *
+   * @param array<string, mixed> $element
+   *   The form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
    */
-  public static function validateMaxFilesize($element, FormStateInterface $form_state) {
+  public static function validateMaxFilesize(array $element, FormStateInterface $form_state): void {
     $element['#value'] = trim($element['#value']);
     $form_state->setValue($element['#parents'], $element['#value']);
     if (!empty($element['#value']) && !Bytes::validate($element['#value'])) {
@@ -196,11 +217,14 @@ class FileWidget extends CustomFieldWidgetBase {
   /**
    * Retrieves the upload validators for a file field.
    *
-   * @return array
+   * @param array<string, mixed> $settings
+   *   The widget settings.
+   *
+   * @return array<string, mixed>
    *   An array suitable for passing to file_save_upload() or the file field
    *   element's '#upload_validators' property.
    */
-  public function getUploadValidators(array $settings) {
+  public function getUploadValidators(array $settings): array {
     $validators = [];
 
     // Cap the upload size according to the PHP limit.
@@ -225,6 +249,7 @@ class FileWidget extends CustomFieldWidgetBase {
    */
   public function widget(FieldItemListInterface $items, int $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
+    assert($field instanceof FileType);
     /** @var \Drupal\custom_field\Plugin\Field\FieldType\CustomItem $item */
     $item = $items[$delta];
     $fid = $item->{$field->getName()};
@@ -234,7 +259,7 @@ class FileWidget extends CustomFieldWidgetBase {
       $uri_scheme = $current_settings['columns'][$field->getName()]['uri_scheme'] ?? 'public';
     }
     else {
-      $uri_scheme = $item->getFieldDefinition()->getSetting('columns')[$field->getName()]['uri_scheme'];
+      $uri_scheme = $field->getSetting('uri_scheme');
     }
     $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
     $settings['uri_scheme'] = $uri_scheme;
@@ -251,7 +276,6 @@ class FileWidget extends CustomFieldWidgetBase {
     // Essentially we use the managed_file type, extended with some
     // enhancements.
     $element_info = $this->elementInfo->getInfo('managed_file');
-
     $element += [
       '#type' => 'managed_file',
       '#upload_location' => $field->getUploadLocation($settings),
@@ -275,7 +299,7 @@ class FileWidget extends CustomFieldWidgetBase {
         '#cardinality' => 1,
       ];
     }
-    $element['#description'] = $this->renderer->renderPlain($file_upload_help);
+    $element['#description'] = $this->renderer->renderInIsolation($file_upload_help);
 
     return $element;
   }
@@ -287,8 +311,18 @@ class FileWidget extends CustomFieldWidgetBase {
    * fields.
    *
    * This method is assigned as a #process callback in formElement() method.
+   *
+   * @param array<string, mixed> $element
+   *   The form element.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   * @param array<string, mixed> $form
+   *   The form.
+   *
+   * @return array<string, mixed>
+   *   The processed element.
    */
-  public static function process($element, FormStateInterface $form_state, $form) {
+  public static function process(array $element, FormStateInterface $form_state, array $form): array {
     return $element;
   }
 
@@ -296,8 +330,19 @@ class FileWidget extends CustomFieldWidgetBase {
    * Form API callback. Retrieves the value for the file_generic field element.
    *
    * This method is assigned as a #value_callback in formElement() method.
+   *
+   * @param array<string, mixed> $element
+   *   The form element.
+   * @param mixed $input
+   *   The incoming input to populate the form element. If this is FALSE, the
+   *   element's default value should be returned.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   *
+   * @return mixed
+   *   The value to return.
    */
-  public static function value($element, $input, FormStateInterface $form_state) {
+  public static function value(array $element, mixed $input, FormStateInterface $form_state): mixed {
     // Account for field config default values form initial state.
     if ($input == "") {
       return $element['#default_value'];

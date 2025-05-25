@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin;
 
 use Drupal\Component\Plugin\Exception\PluginException;
@@ -18,6 +20,13 @@ class CustomFieldTypeManager extends DefaultPluginManager implements CustomField
   use StringTranslationTrait;
 
   /**
+   * The custom field type manager.
+   *
+   * @var \Drupal\custom_field\Plugin\CustomFieldWidgetManagerInterface
+   */
+  protected CustomFieldWidgetManagerInterface $customFieldWidgetManager;
+
+  /**
    * Constructs a new CustomFieldTypeManager object.
    *
    * @param \Traversable $namespaces
@@ -27,8 +36,10 @@ class CustomFieldTypeManager extends DefaultPluginManager implements CustomField
    *   Cache backend instance to use.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
+   * @param \Drupal\custom_field\Plugin\CustomFieldWidgetManagerInterface $custom_field_widget_manager
+   *   The custom field widget manager.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, CustomFieldWidgetManagerInterface $custom_field_widget_manager) {
     parent::__construct(
       'Plugin/CustomField/FieldType',
       $namespaces,
@@ -40,6 +51,61 @@ class CustomFieldTypeManager extends DefaultPluginManager implements CustomField
 
     $this->alterInfo('custom_field_info');
     $this->setCacheBackend($cache_backend, 'custom_field_type_plugins');
+    $this->customFieldWidgetManager = $custom_field_widget_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createInstance($plugin_id, array $configuration = []) {
+    $plugin_definition = $this->getDefinition($plugin_id);
+    $plugin_class = DefaultFactory::getPluginClass($plugin_id, $plugin_definition);
+
+    // @todo This is copied from \Drupal\Core\Plugin\Factory\ContainerFactory.
+    //   Find a way to restore sanity to
+    //   \Drupal\Core\Field\FormatterBase::__construct().
+    // If the plugin provides a factory method, pass the container to it.
+    if (is_subclass_of($plugin_class, 'Drupal\Core\Plugin\ContainerFactoryPluginInterface')) {
+      // @todo Find a better way to solve this, if possible at all.
+      // @phpstan-ignore-next-line
+      return $plugin_class::create(\Drupal::getContainer(), $configuration, $plugin_id, $plugin_definition);
+    }
+
+    return new $plugin_class($plugin_id, $plugin_definition, $configuration['settings']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createOptionsForInstance(array $settings, array $column): array {
+    $type = $column['type'];
+    $definition = $this->getDefinitions()[$type];
+    $default_widget = $definition['default_widget'];
+    $widget_settings = $settings['widget_settings'] ?? [];
+    $widget_type = $settings['type'] ?? $default_widget;
+    if (empty($widget_settings)) {
+      try {
+        /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetInterface $plugin */
+        $plugin = $this->customFieldWidgetManager->createInstance($widget_type);
+        $widget_settings = [
+          'settings' => $plugin->defaultSettings()['settings'],
+          'label' => ucfirst(str_replace(['-', '_'], ' ', $column['name'])),
+        ];
+      }
+      catch (PluginException $e) {
+        // Plugin not found.
+      }
+    }
+    return [
+      'configuration' => [
+        'settings' => $column + [
+          'check_empty' => $settings['check_empty'] ?? FALSE,
+          'never_check_empty' => $definition['never_check_empty'] ?? FALSE,
+          'widget_settings' => $widget_settings,
+          'widget_plugin' => $widget_type,
+        ],
+      ],
+    ];
   }
 
   /**
@@ -54,25 +120,20 @@ class CustomFieldTypeManager extends DefaultPluginManager implements CustomField
     $columns = $this->sortFieldsByWeight($settings['columns'], $field_settings);
 
     foreach ($columns as $name => $column) {
+      if (!isset($column['type'])) {
+        continue;
+      }
       unset($column['weight']);
+      if (isset($column['remove'])) {
+        unset($column['remove']);
+      }
       $settings = $field_settings[$name] ?? [];
       $type = $column['type'];
-
+      $options = self::createOptionsForInstance($settings, $column);
       try {
-        $items[$name] = $this->createInstance($type, [
-          'name' => $column['name'],
-          'max_length' => (int) $column['max_length'],
-          'unsigned' => $column['unsigned'] ?? FALSE,
-          'data_type' => $column['type'],
-          'precision' => (int) $column['precision'],
-          'scale' => (int) $column['scale'],
-          'size' => $column['size'] ?? 'normal',
-          'target_type' => $column['target_type'] ?? NULL,
-          'datetime_type' => $column['datetime_type'] ?? 'datetime',
-          'check_empty' => $settings['check_empty'] ?? FALSE,
-          'widget_settings' => $settings['widget_settings'] ?? [],
-          'uri_scheme' => $column['uri_scheme'] ?? NULL,
-        ]);
+        /** @var \Drupal\custom_field\Plugin\CustomFieldTypeInterface $instance */
+        $instance = $this->createInstance($type, $options['configuration']);
+        $items[$name] = $instance;
       }
       catch (PluginException $e) {
         // Should we log the error?
@@ -84,8 +145,13 @@ class CustomFieldTypeManager extends DefaultPluginManager implements CustomField
 
   /**
    * {@inheritdoc}
+   *
+   * @param string[] $definition
+   *   The plugin definition.
+   * @param string $plugin_id
+   *   The plugin id.
    */
-  public function processDefinition(&$definition, $plugin_id) {
+  public function processDefinition(&$definition, $plugin_id): void {
     parent::processDefinition($definition, $plugin_id);
     // Ensure that every field type has a category.
     if (empty($definition['category'])) {
@@ -96,14 +162,14 @@ class CustomFieldTypeManager extends DefaultPluginManager implements CustomField
   /**
    * Sort fields by weight.
    *
-   * @param array $columns1
+   * @param array<string, mixed> $columns1
    *   Columns from \Drupal\custom_field\Plugin\Field\FieldType\CustomItem
    *   settings.
-   * @param array $field_settings
+   * @param array<string, mixed> $field_settings
    *   Field settings \Drupal\custom_field\Plugin\Field\FieldType\CustomItem
    *   settings.
    *
-   * @return array
+   * @return array<string, mixed>
    *   An array of fields sorted by weight.
    */
   private function sortFieldsByWeight(array $columns1, array $field_settings): array {
@@ -129,9 +195,9 @@ class CustomFieldTypeManager extends DefaultPluginManager implements CustomField
     // Sort the types by category and then by name.
     uasort($definitions, function ($a, $b) {
       if ($a['category'] != $b['category']) {
-        return strnatcasecmp($a['category'], $b['category']);
+        return strnatcasecmp((string) $a['category'], (string) $b['category']);
       }
-      return strnatcasecmp($a['label'], $b['label']);
+      return strnatcasecmp((string) $a['label'], (string) $b['label']);
     });
     foreach ($definitions as $id => $definition) {
       /** @var \Drupal\custom_field\Plugin\CustomFieldTypeInterface $plugin_class */

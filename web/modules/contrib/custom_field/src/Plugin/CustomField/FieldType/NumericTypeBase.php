@@ -97,10 +97,10 @@ class NumericTypeBase extends CustomFieldTypeBase {
    * @param array $settings
    *   An array of field settings.
    *
-   * @return int|float
+   * @return int
    *   The maximum value allowed by database.
    */
-  protected static function getDefaultMaxValue(array $settings): int|float {
+  protected static function getDefaultMaxValue(array $settings): int {
     if ($settings['unsigned']) {
       // Each value is (2 ^ (8 * bytes) - 1).
       $size_map = [
@@ -108,7 +108,7 @@ class NumericTypeBase extends CustomFieldTypeBase {
         'tiny' => 255,
         'small' => 65535,
         'medium' => 16777215,
-        'big' => 18446744073709551615,
+        'big' => PHP_INT_MAX,
       ];
     }
     else {
@@ -118,12 +118,12 @@ class NumericTypeBase extends CustomFieldTypeBase {
         'tiny' => 127,
         'small' => 32767,
         'medium' => 8388607,
-        'big' => 9223372036854775807,
+        'big' => PHP_INT_MAX,
       ];
     }
     $size = $settings['size'] ?? 'normal';
 
-    return $size_map[$size];
+    return $size_map[(string) $size];
   }
 
   /**

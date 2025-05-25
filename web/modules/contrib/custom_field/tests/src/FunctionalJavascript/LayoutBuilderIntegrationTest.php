@@ -49,22 +49,12 @@ class LayoutBuilderIntegrationTest extends InlineBlockTestBase {
             'string_1' => [
               'name' => 'string_1',
               'type' => 'string',
-              'max_length' => 255,
-              'unsigned' => FALSE,
-              'precision' => 10,
-              'scale' => 2,
-              'size' => 'normal',
-              'datetime_type' => 'datetime',
+              'length' => 255,
             ],
             'string_2' => [
               'name' => 'string_2',
               'type' => 'string',
-              'max_length' => 255,
-              'unsigned' => FALSE,
-              'precision' => 10,
-              'scale' => 2,
-              'size' => 'normal',
-              'datetime_type' => 'datetime',
+              'length' => 255,
             ],
           ],
         ],
@@ -139,7 +129,7 @@ class LayoutBuilderIntegrationTest extends InlineBlockTestBase {
   /**
    * Test case for layout builder integration.
    */
-  public function testLayoutBuilderIntegration() {
+  public function testLayoutBuilderIntegration(): void {
 
     $this->drupalLogin($this->drupalCreateUser([], NULL, TRUE));
 
@@ -194,7 +184,7 @@ class LayoutBuilderIntegrationTest extends InlineBlockTestBase {
 
     $assert_session->waitForElement('css', '.customfield');
 
-    // Make sure the page displays all of the item data.
+    // Make sure the page displays all item data.
     foreach ($custom_field_data as $delta => $field_data) {
       foreach ($field_data as $string_value) {
         $assert_session->pageTextContainsOnce($string_value);
@@ -240,7 +230,7 @@ class LayoutBuilderIntegrationTest extends InlineBlockTestBase {
 
     $assert_session->waitForElement('css', '.customfield');
 
-    // Make sure the page displays all of the item data.
+    // Make sure the page displays all item data.
     foreach ($custom_field_data as $field_data) {
       foreach ($field_data as $string_value) {
         $assert_session->pageTextContainsOnce($string_value);

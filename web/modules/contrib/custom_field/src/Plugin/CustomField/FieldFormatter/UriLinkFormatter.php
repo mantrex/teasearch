@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
@@ -13,6 +15,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
+use Drupal\link\AttributeXss;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -42,12 +45,20 @@ class UriLinkFormatter extends CustomFieldFormatterBase {
   protected $entityRepository;
 
   /**
+   * The token service.
+   *
+   * @var \Drupal\Core\Utility\Token
+   */
+  protected $tokenService;
+
+  /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->entityTypeManager = $container->get('entity_type.manager');
     $instance->entityRepository = $container->get('entity.repository');
+    $instance->tokenService = $container->get('token');
 
     return $instance;
   }
@@ -57,11 +68,20 @@ class UriLinkFormatter extends CustomFieldFormatterBase {
    */
   public static function defaultSettings(): array {
     return [
+      'link_text' => '',
       'trim_length' => '80',
       'url_plain' => FALSE,
+      'url_only' => FALSE,
       'rel' => '',
+      'noopener' => '',
+      'noreferrer' => '',
       'target' => '',
       'title' => '',
+      'class' => '',
+      'aria-label' => '',
+      'accesskey' => '',
+      'name' => '',
+      'id' => '',
     ];
   }
 
@@ -69,11 +89,13 @@ class UriLinkFormatter extends CustomFieldFormatterBase {
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state): array {
-    $elements['title'] = [
+    $visibility_path = $form['#visibility_path'];
+    $elements['link_text'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Title'),
-      '#description' => $this->t('Leave blank to render the url.'),
-      '#default_value' => $this->getSetting('title'),
+      '#title' => $this->t('Link text'),
+      '#description' => $this->t('This field can serve as the link text.'),
+      '#default_value' => $this->getSetting('link_text'),
+      '#placeholder' => $this->t('e.g. Learn More'),
     ];
     $elements['trim_length'] = [
       '#type' => 'number',
@@ -82,6 +104,12 @@ class UriLinkFormatter extends CustomFieldFormatterBase {
       '#default_value' => $this->getSetting('trim_length'),
       '#min' => 1,
       '#description' => $this->t('Leave blank to allow unlimited link text lengths.'),
+    ];
+    $elements['url_only'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('URL only'),
+      '#default_value' => $this->getSetting('url_only'),
+      '#access' => $this->getPluginId() == 'link',
     ];
     $elements['url_plain'] = [
       '#type' => 'checkbox',
@@ -96,9 +124,72 @@ class UriLinkFormatter extends CustomFieldFormatterBase {
     ];
     $elements['target'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Open link in new window'),
+      '#title' => $this->t('Open external link in new window'),
+      '#description' => $this->t('Adds target="_blank" to external links.'),
       '#return_value' => '_blank',
       '#default_value' => $this->getSetting('target'),
+    ];
+    $elements['noopener'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Add rel="noopener" to links'),
+      '#description' => $this->t('Recommended when "Open external link in new window" is checked.'),
+      '#states' => [
+        'visible' => [
+          ':input[name="' . $visibility_path . '[target]"]' => ['checked' => TRUE],
+        ],
+      ],
+      '#return_value' => 'noopener',
+      '#default_value' => $this->getSetting('noopener'),
+    ];
+    $elements['noreferrer'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Add rel="noreferrer" to links'),
+      '#description' => $this->t('Recommended when "Open external link in new window" is checked.'),
+      '#states' => [
+        'visible' => [
+          ':input[name="' . $visibility_path . '[target]"]' => ['checked' => TRUE],
+        ],
+      ],
+      '#return_value' => 'noreferrer',
+      '#default_value' => $this->getSetting('noreferrer'),
+    ];
+    $elements['title'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Title'),
+      '#default_value' => $this->getSetting('title'),
+      '#maxlength' => 255,
+    ];
+    $elements['aria-label'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('ARIA label'),
+      '#default_value' => $this->getSetting('aria-label'),
+      '#maxlength' => 255,
+    ];
+    $elements['class'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Class'),
+      '#description' => $this->t('Separate multiple classes by a single space.'),
+      '#default_value' => $this->getSetting('class'),
+    ];
+    $elements['id'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('ID'),
+      '#default_value' => $this->getSetting('id'),
+    ];
+    $elements['name'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Name'),
+      '#default_value' => $this->getSetting('name'),
+      '#maxlength' => 255,
+    ];
+    $elements['accesskey'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Access key'),
+      '#description' => $this->t('Must be a single alphanumeric character. Each access key on a page should be unique to avoid browser conflicts.'),
+      '#default_value' => $this->getSetting('accesskey'),
+      '#maxlength' => 1,
+      '#size' => 1,
+      '#pattern' => '[a-zA-Z0-9]',
     ];
 
     return $elements;
@@ -107,30 +198,80 @@ class UriLinkFormatter extends CustomFieldFormatterBase {
   /**
    * Builds the \Drupal\Core\Url object for a link field item.
    *
-   * @param string $value
-   *   The raw value to build the url from.
+   * @param array $value
+   *   The value to build the url from.
    *
    * @return \Drupal\Core\Url
    *   A Url object.
    */
-  protected function buildUrl($value) {
+  protected function buildUrl(array $value): Url {
+    $settings = $this->getSettings();
     try {
-      $url = $this->getUrl($value);
+      $url = $this->getUrl($value['uri']);
     }
     catch (\InvalidArgumentException $e) {
       // @todo Add logging here in https://www.drupal.org/project/drupal/issues/3348020
       $url = Url::fromRoute('<none>');
     }
 
-    $options = $url->getOptions();
+    $options = $value['options'] ?? [];
+    $options += $url->getOptions();
 
-    // Add optional 'rel' attribute to link options.
-    if (!empty($this->getSetting('rel'))) {
-      $options['attributes']['rel'] = $this->getSetting('rel');
+    // Check for widget attributes.
+    $rel = explode(' ', $options['attributes']['rel'] ?? '');
+    $class = $options['attributes']['class'] ?? [];
+    $id = trim($options['attributes']['id'] ?? '');
+    $target = $options['attributes']['target'] ?? '';
+    $accesskey = trim($options['attributes']['accesskey'] ?? '');
+    $ariaLabel = trim($options['attributes']['aria-label'] ?? '');
+    $name = trim($options['attributes']['name'] ?? '');
+    $title = trim($options['attributes']['title'] ?? '');
+
+    // Check for rel attributes from settings.
+    if (!empty($settings['rel'])) {
+      $rel[] = $settings['rel'];
     }
-    // Add optional 'target' attribute to link options.
-    if (!empty($this->getSetting('target')) && $url->isExternal()) {
-      $options['attributes']['target'] = $this->getSetting('target');
+    // Set ID attribute if not already set.
+    if (empty($id) && !empty($settings['id'])) {
+      $options['attributes']['id'] = $settings['id'];
+    }
+    // Merge classes.
+    if (!empty($settings['class'])) {
+      $class = array_merge($class, explode(' ', $settings['class']));
+      $options['attributes']['class'] = $class;
+    }
+    // Set 'target' if not already set and external rel attributes.
+    if (empty($target) && !empty($settings['target']) && $url->isExternal()) {
+      $options['attributes']['target'] = $settings['target'];
+      if (!empty($settings['noopener'])) {
+        $rel[] = $settings['noopener'];
+      }
+      if (!empty($settings['noreferrer'])) {
+        $rel[] = $settings['noreferrer'];
+      }
+    }
+    // Set 'accesskey' if not already set.
+    if (empty($accesskey) && !empty($settings['accesskey'])) {
+      $options['attributes']['accesskey'] = $settings['accesskey'];
+    }
+    // Set 'aria-label' if not already set.
+    if (empty($ariaLabel) && !empty($settings['aria-label'])) {
+      $options['attributes']['aria-label'] = $settings['aria-label'];
+    }
+    // Set 'name' if not already set.
+    if (empty($name) && !empty($settings['name'])) {
+      $options['attributes']['name'] = $settings['name'];
+    }
+    // Set 'title' if not already set.
+    if (empty($title) && !empty($settings['title'])) {
+      $options['attributes']['title'] = $title;
+    }
+    // Merge all rel attributes as string.
+    if (!empty($rel)) {
+      $options['attributes']['rel'] = implode(' ', $rel);
+    }
+    if (!empty($options['attributes'])) {
+      $options['attributes'] = AttributeXss::sanitizeAttributes($options['attributes']);
     }
     $url->setOptions($options);
 
@@ -146,31 +287,23 @@ class UriLinkFormatter extends CustomFieldFormatterBase {
    * @return \Drupal\Core\Url
    *   The Url object.
    */
-  protected function getUrl(string $value) {
+  protected function getUrl(string $value): Url {
     return Url::fromUri($value);
-  }
-
-  /**
-   * Helper function to determine if Url is external.
-   *
-   * @param string $value
-   *   The uri value to test.
-   *
-   * @return bool
-   *   The boolean value for if the url is external.
-   */
-  protected function isExternal(string $value) {
-    return $this->getUrl($value)->isExternal();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
-    $langcode = $item->getEntity()->language()->getId();
+  public function formatValue(FieldItemInterface $item, mixed $value): ?array {
+    $settings = $this->getSettings();
+    $entity = $item->getEntity();
+    $langcode = $entity->language()->getId();
     $url = $this->buildUrl($value);
     // Use the full URL as the link title by default.
     $link_title = $url->toString();
+    $title = $value['title'] ?? $settings['link_text'];
+
+    // Check for access for linked entities.
     $link_entity = NULL;
     if ($url->isRouted() && preg_match('/^entity\.(\w+)\.canonical$/', $url->getRouteName(), $matches)) {
       // Check access to the canonical entity route.
@@ -197,23 +330,35 @@ class UriLinkFormatter extends CustomFieldFormatterBase {
           if (!$access->isAllowed()) {
             return NULL;
           }
-          $link_title = $link_entity->label();
+          if (empty($title)) {
+            $title = $link_entity->label();
+          }
         }
       }
     }
 
-    // Trim the link text to the desired length.
-    if (!empty($this->getSetting('trim_length'))) {
-      $link_title = Unicode::truncate($link_title, $this->getSetting('trim_length'), FALSE, TRUE);
+    // If the title field value is available, use it for the link text.
+    if (empty($settings['url_only']) && !empty($title)) {
+      // Unsanitized token replacement here because the entire link title
+      // gets auto-escaped during link generation in
+      // \Drupal\Core\Utility\LinkGenerator::generate().
+      $link_title = $this->tokenService->replace($title, [$entity->getEntityTypeId() => $entity], ['clear' => TRUE]);
     }
 
-    // If the title field value is available, use it for the link text.
-    if (!empty($this->getSetting('title'))) {
-      $link_title = $this->getSetting('title');
+    // Trim the link text to the desired length.
+    if (!empty($settings['trim_length'])) {
+      $link_title = Unicode::truncate($link_title, $settings['trim_length'], FALSE, TRUE);
     }
-    if ($this->getSetting('url_plain')) {
+
+    // For link formatter.
+    if ($this->getPluginId() === 'link' && !empty($settings['url_only']) && !empty($settings['url_plain'])) {
       $build = [
-        '#plain_text' => $value,
+        '#plain_text' => $link_title,
+      ];
+    }
+    elseif ($this->getPluginId() === 'uri' && !empty($settings['url_plain'])) {
+      $build = [
+        '#plain_text' => $link_title,
       ];
     }
     else {

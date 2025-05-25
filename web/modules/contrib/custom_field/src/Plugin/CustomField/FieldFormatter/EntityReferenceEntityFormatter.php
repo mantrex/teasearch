@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
+use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
@@ -34,7 +37,7 @@ class EntityReferenceEntityFormatter extends EntityReferenceFormatterBase {
    *
    * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
    */
-  protected $entityDisplayRepository;
+  protected EntityDisplayRepositoryInterface $entityDisplayRepository;
 
   /**
    * An array of counters for the recursive rendering protection.
@@ -46,12 +49,12 @@ class EntityReferenceEntityFormatter extends EntityReferenceFormatterBase {
    *
    * @see \Drupal\Core\Field\Plugin\Field\FieldFormatter\EntityReferenceEntityFormatter::viewElements()
    */
-  protected static $recursiveRenderDepth = [];
+  protected static array $recursiveRenderDepth = [];
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->entityDisplayRepository = $container->get('entity_display.repository');
 
@@ -87,12 +90,12 @@ class EntityReferenceEntityFormatter extends EntityReferenceFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
-
+  public function formatValue(FieldItemInterface $item, mixed $value): ?array {
     if (!$value instanceof EntityInterface) {
       return NULL;
     }
 
+    /** @var \Drupal\Core\Access\AccessResultInterface $access */
     $access = $this->checkAccess($value);
 
     if (!$access->isAllowed()) {

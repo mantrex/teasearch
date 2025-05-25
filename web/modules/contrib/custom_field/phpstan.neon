@@ -1,9 +1,18 @@
-parameters:
-  level: 1
-
-  ignoreErrors:
-    - "#^Unsafe usage of new static#"
-
 includes:
   - phar://phpstan.phar/conf/bleedingEdge.neon
   - phpstan-baseline.neon
+
+parameters:
+  level: 6
+  treatPhpDocTypesAsCertain: false
+  reportUnmatchedIgnoredErrors: false
+  excludePaths:
+    - '*/tests/*.php'
+    # Exclude tokens.inc until we refactor.
+    - custom_field.tokens.inc
+  scanDirectories:
+    - ../../../../vendor/drush/drush/src-symfony-compatibility
+  ignoreErrors:
+    - identifier: missingType.generics
+    - identifier: missingType.iterableValue
+    - "#^Unsafe usage of new static#"

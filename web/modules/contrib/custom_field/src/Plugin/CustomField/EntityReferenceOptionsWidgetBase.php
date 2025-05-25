@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField;
 
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
+use Drupal\views\Plugin\EntityReferenceSelection\ViewsSelection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -17,12 +21,12 @@ class EntityReferenceOptionsWidgetBase extends EntityReferenceWidgetBase {
    *
    * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
    */
-  protected $entityTypeBundleInfo;
+  protected EntityTypeBundleInfoInterface $entityTypeBundleInfo;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->entityTypeBundleInfo = $container->get('entity_type.bundle.info');
 
@@ -33,12 +37,12 @@ class EntityReferenceOptionsWidgetBase extends EntityReferenceWidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    return [
-      'settings' => [
-        'handler_settings' => [],
-        'empty_option' => '- Select -',
-      ] + parent::defaultSettings()['settings'],
-    ] + parent::defaultSettings();
+    $settings = parent::defaultSettings();
+    $settings['settings'] = [
+      'empty_option' => '- Select -',
+    ] + $settings['settings'];
+
+    return $settings;
   }
 
   /**
@@ -46,7 +50,7 @@ class EntityReferenceOptionsWidgetBase extends EntityReferenceWidgetBase {
    */
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widgetSettingsForm($form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
 
     $element['settings']['empty_option'] = [
       '#type' => 'textfield',
@@ -64,7 +68,7 @@ class EntityReferenceOptionsWidgetBase extends EntityReferenceWidgetBase {
    */
   public function widget(FieldItemListInterface $items, int $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
     $target_type = $field->getTargetType();
     if (!isset($settings['handler'])) {
       $settings['handler'] = 'default:' . $target_type;
@@ -72,7 +76,7 @@ class EntityReferenceOptionsWidgetBase extends EntityReferenceWidgetBase {
 
     /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface $handler */
     $handler = $this->getSelectionHandler($settings, $target_type);
-    if ($handler->pluginId === 'views') {
+    if ($handler instanceof ViewsSelection) {
       $configuration = $handler->configuration;
       // Return early if the view hasn't been selected.
       if (empty($configuration['view']['view_name'])) {

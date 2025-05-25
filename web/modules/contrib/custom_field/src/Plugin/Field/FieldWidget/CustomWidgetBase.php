@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\Field\FieldWidget;
 
 use Drupal\Component\Plugin\Exception\PluginException;
@@ -7,8 +9,11 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface;
+use Drupal\custom_field\Plugin\CustomFieldWidgetManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * Base widget definition for custom field type.
@@ -20,14 +25,14 @@ abstract class CustomWidgetBase extends WidgetBase {
    *
    * @var \Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface
    */
-  protected $customFieldManager;
+  protected CustomFieldTypeManagerInterface $customFieldTypeManager;
 
   /**
    * The custom field widget manager.
    *
-   * @var \Drupal\custom_field\Plugin\CustomFieldWidgetManager
+   * @var \Drupal\custom_field\Plugin\CustomFieldWidgetManagerInterface
    */
-  protected $customFieldWidgetManager;
+  protected CustomFieldWidgetManagerInterface $customFieldWidgetManager;
 
   /**
    * {@inheritdoc}
@@ -45,7 +50,7 @@ abstract class CustomWidgetBase extends WidgetBase {
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
-    $instance->customFieldManager = $container->get('plugin.manager.custom_field_type');
+    $instance->customFieldTypeManager = $container->get('plugin.manager.custom_field_type');
     $instance->customFieldWidgetManager = $container->get('plugin.manager.custom_field_widget');
 
     return $instance;
@@ -152,7 +157,7 @@ abstract class CustomWidgetBase extends WidgetBase {
    *   An array of custom field items.
    */
   public function getCustomFieldItems(): array {
-    return $this->customFieldManager->getCustomFieldItems($this->fieldDefinition->getSettings());
+    return $this->customFieldTypeManager->getCustomFieldItems($this->fieldDefinition->getSettings());
   }
 
   /**
@@ -160,17 +165,19 @@ abstract class CustomWidgetBase extends WidgetBase {
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state): array {
     $columns = $this->getFieldSetting('columns');
-    $field_settings = $this->getFieldSetting('field_settings');
+    $custom_items = $this->getCustomFieldItems();
     foreach ($values as &$value) {
       foreach ($value as $name => $field_value) {
-        if (isset($columns[$name])) {
-          $type = $columns[$name]['type'];
-          /** @var \Drupal\custom_field\Plugin\CustomFieldTypeInterface $plugin */
-          $plugin = $this->customFieldManager->createInstance($type);
-          $widget_type = $field_settings[$name]['type'] ?? $plugin->getPluginDefinition()['default_widget'];
-          $widget_plugin = $this->customFieldWidgetManager->createInstance($widget_type);
-          if (method_exists($widget_plugin, 'massageFormValue')) {
-            $value[$name] = $widget_plugin->massageFormValue($field_value, $columns[$name]);
+        if (isset($custom_items[$name])) {
+          $custom_item = $custom_items[$name];
+          try {
+            $widget_plugin = $this->customFieldWidgetManager->createInstance($custom_item->getWidgetPluginId());
+            if (method_exists($widget_plugin, 'massageFormValue')) {
+              $value[$name] = $widget_plugin->massageFormValue($field_value, $columns[$name]);
+            }
+          }
+          catch (PluginException $e) {
+            continue;
           }
         }
       }
@@ -182,7 +189,7 @@ abstract class CustomWidgetBase extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  protected function formMultipleElements(FieldItemListInterface $items, array &$form, FormStateInterface $form_state) {
+  protected function formMultipleElements(FieldItemListInterface $items, array &$form, FormStateInterface $form_state): array {
     $parents = $form['#parents'];
     $field_name = $this->fieldDefinition->getName();
     $cardinality = $this->fieldDefinition->getFieldStorageDefinition()->getCardinality();
@@ -217,14 +224,17 @@ abstract class CustomWidgetBase extends WidgetBase {
   public function errorElement(array $element, ConstraintViolationInterface $error, array $form, FormStateInterface $form_state) {
     $path = explode('.', $error->getPropertyPath());
     $field_name = end($path);
-    $field_settings = $this->getFieldSetting('field_settings');
-    $columns = $this->getFieldSetting('columns');
-    if (!empty($element[$field_name])) {
-      $definition = $this->customFieldManager->createInstance($columns[$field_name]['type'])->getPluginDefinition();
-      $widget_type = $field_settings[$field_name]['type'] ?? $definition['default_widget'];
-      $widget_plugin = $this->customFieldWidgetManager->createInstance($widget_type);
-      if (method_exists($widget_plugin, 'errorElement')) {
-        return $widget_plugin->errorElement($element, $error, $form, $form_state);
+    $custom_items = $this->getCustomFieldItems();
+    if (!empty($element[$field_name]) && isset($custom_items[$field_name])) {
+      $custom_item = $custom_items[$field_name];
+      try {
+        $widget_plugin = $this->customFieldWidgetManager->createInstance($custom_item->getWidgetPluginId());
+        if (method_exists($widget_plugin, 'errorElement')) {
+          return $widget_plugin->errorElement($element, $error, $form, $form_state);
+        }
+      }
+      catch (PluginException $e) {
+        // Plugin not found.
       }
     }
     return isset($error->arrayPropertyPath[0]) ? $element[$error->arrayPropertyPath[0]] : $element;
@@ -235,26 +245,55 @@ abstract class CustomWidgetBase extends WidgetBase {
    */
   public function calculateDependencies(): array {
     $dependencies = parent::calculateDependencies();
-    $field_settings = $this->getFieldSetting('field_settings');
-    if (!empty($field_settings)) {
-      foreach ($field_settings as $field_setting) {
-        $widget_settings = $field_setting['widget_settings'] ?? [];
-        if (empty($widget_settings)) {
-          continue;
-        }
-        try {
-          /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetInterface $plugin */
-          $plugin = $this->customFieldWidgetManager->createInstance($field_setting['type']);
-          $plugin_dependencies = $plugin->calculateWidgetDependencies($widget_settings);
-          $dependencies = array_merge($dependencies, $plugin_dependencies);
-        }
-        catch (PluginException $e) {
-          // No dependencies applicable if we somehow have invalid plugin.
-        }
+    $custom_items = $this->getCustomFieldItems();
+    foreach ($custom_items as $custom_item) {
+      $widget_settings = $custom_item->getWidgetSettings() ?? [];
+      if (empty($widget_settings)) {
+        continue;
+      }
+      try {
+        /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetInterface $plugin */
+        $plugin = $this->customFieldWidgetManager->createInstance($custom_item->getWidgetPluginId());
+        $plugin_dependencies = $plugin->calculateWidgetDependencies($widget_settings);
+        $dependencies = array_merge($dependencies, $plugin_dependencies);
+      }
+      catch (PluginException $e) {
+        // No dependencies applicable if we somehow have invalid plugin.
       }
     }
 
     return $dependencies;
+  }
+
+  /**
+   * Reports field-level validation errors against actual form elements.
+   *
+   * @param \Drupal\Core\Field\FieldItemListInterface<\Drupal\custom_field\Plugin\Field\FieldType\CustomItem> $items
+   *   The field values.
+   * @param \Symfony\Component\Validator\ConstraintViolationListInterface $violations
+   *   A list of constraint violations to flag.
+   * @param array<string, mixed> $form
+   *   The form structure where field elements are attached to. This might be a
+   *   full form structure, or a sub-element of a larger form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   */
+  public function flagErrors(FieldItemListInterface $items, ConstraintViolationListInterface $violations, array $form, FormStateInterface $form_state): void {
+    $custom_items = $this->getCustomFieldItems();
+    foreach ($custom_items as $custom_item) {
+      try {
+        /** @var \Drupal\custom_field\Plugin\CustomFieldWidgetInterface $plugin */
+        $plugin = $this->customFieldWidgetManager->createInstance($custom_item->getWidgetPluginId());
+        if (method_exists($plugin, 'flagErrors')) {
+          $plugin->flagErrors($items, $violations, $form, $form_state);
+        }
+      }
+      catch (PluginException $e) {
+        // No errors applicable if we somehow have invalid plugin.
+      }
+    }
+
+    parent::flagErrors($items, $violations, $form, $form_state);
   }
 
 }

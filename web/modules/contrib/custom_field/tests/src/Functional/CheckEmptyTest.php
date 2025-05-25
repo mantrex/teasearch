@@ -50,22 +50,12 @@ class CheckEmptyTest extends BrowserTestBase {
             'string_1' => [
               'name' => 'string_1',
               'type' => 'string',
-              'max_length' => 255,
-              'unsigned' => FALSE,
-              'precision' => 10,
-              'scale' => 2,
-              'size' => 'normal',
-              'datetime_type' => 'datetime',
+              'length' => 255,
             ],
             'string_2' => [
               'name' => 'string_2',
               'type' => 'string',
-              'max_length' => 255,
-              'unsigned' => FALSE,
-              'precision' => 10,
-              'scale' => 2,
-              'size' => 'normal',
-              'datetime_type' => 'datetime',
+              'length' => 255,
             ],
           ],
         ],
@@ -112,7 +102,7 @@ class CheckEmptyTest extends BrowserTestBase {
   /**
    * Test case for the 'check empty' feature.
    */
-  public function testCheckEmpty() {
+  public function testCheckEmpty(): void {
     $entity = EntityTest::create([
       'type' => 'entity_test',
       'field_test' => [
@@ -142,8 +132,6 @@ class CheckEmptyTest extends BrowserTestBase {
       0 => ['string_1' => 'Test 1', 'string_2' => 'Test 2'],
     ];
     $this->assertSame($expected, $entity->field_test->getValue());
-
-    $this->assertTrue(TRUE);
   }
 
 }

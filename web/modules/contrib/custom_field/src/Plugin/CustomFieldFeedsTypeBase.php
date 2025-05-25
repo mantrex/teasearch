@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin;
 
 use Drupal\Component\Plugin\PluginBase;
@@ -17,7 +19,7 @@ abstract class CustomFieldFeedsTypeBase extends PluginBase implements CustomFiel
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     return new static(
       $configuration,
       $plugin_id,
@@ -28,7 +30,7 @@ abstract class CustomFieldFeedsTypeBase extends PluginBase implements CustomFiel
   /**
    * {@inheritdoc}
    */
-  public function prepareValue($value, array $configuration, string $langcode): mixed {
+  public function prepareValue(mixed $value, array $configuration, string $langcode): mixed {
     return is_string($value) ? trim($value) : $value;
   }
 
@@ -42,7 +44,9 @@ abstract class CustomFieldFeedsTypeBase extends PluginBase implements CustomFiel
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(int $delta, array $configuration) {}
+  public function buildConfigurationForm(int $delta, array $configuration): array {
+    return [];
+  }
 
   /**
    * {@inheritdoc}

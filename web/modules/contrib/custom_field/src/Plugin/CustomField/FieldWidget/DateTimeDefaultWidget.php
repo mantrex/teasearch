@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
@@ -36,18 +38,16 @@ class DateTimeDefaultWidget extends DateTimeWidgetBase {
     }
 
     // Identify the type of date and time elements to use.
+    $date_type = 'date';
+    $date_format = $date_storage->load('html_date')->getPattern();
     switch ($datetime_type) {
       case CustomFieldTypeInterface::DATETIME_TYPE_DATE:
-        $date_type = 'date';
         $time_type = 'none';
-        $date_format = $date_storage->load('html_date')->getPattern();
         $time_format = '';
         break;
 
       default:
-        $date_type = 'date';
         $time_type = 'time';
-        $date_format = $date_storage->load('html_date')->getPattern();
         $time_format = $date_storage->load('html_time')->getPattern();
         break;
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -31,7 +33,7 @@ class DateTimeDefaultFormatter extends DateTimeFormatterBase {
   /**
    * {@inheritdoc}
    */
-  protected function formatDate(object $date): string {
+  protected function formatDate($date): string {
     $format_type = $this->getSetting('format_type');
     $timezone = $this->getSetting('timezone_override') ?: $date->getTimezone()->getName();
     return $this->dateFormatter->format($date->getTimestamp(), $format_type, '', $timezone != '' ? $timezone : NULL);

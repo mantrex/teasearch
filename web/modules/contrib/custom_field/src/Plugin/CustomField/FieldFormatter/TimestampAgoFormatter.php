@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Plugin implementation of the 'timestamp_ago' formatter.
@@ -28,19 +32,19 @@ class TimestampAgoFormatter extends CustomFieldFormatterBase {
    *
    * @var \Drupal\Core\Datetime\DateFormatterInterface
    */
-  protected $dateFormatter;
+  protected DateFormatterInterface $dateFormatter;
 
   /**
    * The current Request object.
    *
    * @var \Symfony\Component\HttpFoundation\Request
    */
-  protected $request;
+  protected Request $request;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->request = $container->get('request_stack')->getCurrentRequest();
     $instance->dateFormatter = $container->get('date.formatter');
@@ -93,7 +97,7 @@ class TimestampAgoFormatter extends CustomFieldFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
+  public function formatValue(FieldItemInterface $item, mixed $value): ?array {
     return $this->formatTimestamp($value);
   }
 
@@ -113,12 +117,14 @@ class TimestampAgoFormatter extends CustomFieldFormatterBase {
     ];
 
     if ($this->request->server->get('REQUEST_TIME') > $timestamp) {
+      /** @var \Drupal\Core\Datetime\FormattedDateDiff $result */
       $result = $this->dateFormatter->formatTimeDiffSince($timestamp, $options);
       $build = [
         '#markup' => new FormattableMarkup($this->getSetting('past_format'), ['@interval' => $result->getString()]),
       ];
     }
     else {
+      /** @var \Drupal\Core\Datetime\FormattedDateDiff $result */
       $result = $this->dateFormatter->formatTimeDiffUntil($timestamp, $options);
       $build = [
         '#markup' => new FormattableMarkup($this->getSetting('future_format'), ['@interval' => $result->getString()]),

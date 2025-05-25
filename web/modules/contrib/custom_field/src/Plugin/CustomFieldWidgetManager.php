@@ -41,9 +41,14 @@ class CustomFieldWidgetManager extends DefaultPluginManager implements CustomFie
   }
 
   /**
-   * {@inheritdoc}
+   * Performs extra processing on plugin definitions.
+   *
+   * @param array|\Drupal\Component\Plugin\Definition\PluginDefinitionInterface $definition
+   *   The plugin definition.
+   * @param string $plugin_id
+   *   The plugin id.
    */
-  public function processDefinition(&$definition, $plugin_id) {
+  public function processDefinition(&$definition, $plugin_id): void {
     parent::processDefinition($definition, $plugin_id);
     // Ensure that every field type has a category.
     if (empty($definition['category'])) {

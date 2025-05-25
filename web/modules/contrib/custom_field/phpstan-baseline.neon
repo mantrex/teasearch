@@ -1,6 +1,0 @@
-parameters:
-	ignoreErrors:
-		-
-			message: "#^Method Drupal\\\\custom_field\\\\Plugin\\\\Field\\\\FieldType\\\\CustomItemList\\:\\:postSave\\(\\) should return bool but return statement is missing\\.$#"
-			count: 1
-			path: src/Plugin/Field/FieldType/CustomItemList.php

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Core\Field\Attribute\FieldFormatter;
@@ -24,26 +26,23 @@ class BooleanFormatter extends CustomFieldFormatterBase {
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
-    $settings = [];
-
-    // Fall back to field settings by default.
-    $settings['format'] = 'yes-no';
-    $settings['format_custom_false'] = '';
-    $settings['format_custom_true'] = '';
-
-    return $settings;
+    return [
+      'format' => 'yes-no',
+      'format_custom_false' => '',
+      'format_custom_true' => '',
+    ];
   }
 
   /**
    * Gets the available format options.
    *
-   * @return array|string
+   * @return array<string, mixed>
    *   A list of output formats. Each entry is keyed by the machine name of the
    *   format. The value is an array, of which the first item is the result for
    *   boolean TRUE, the second is for boolean FALSE. The value can be also an
    *   array, but this is just the case for the custom format.
    */
-  protected function getOutputFormats(): array|string {
+  protected function getOutputFormats(): array {
     return [
       'yes-no' => [$this->t('Yes'), $this->t('No')],
       'true-false' => [$this->t('True'), $this->t('False')],
@@ -64,19 +63,19 @@ class BooleanFormatter extends CustomFieldFormatterBase {
       if (is_array($format)) {
         if ($format_name == 'default') {
           $formats[$format_name] = $this->t('Field settings (@on_label / @off_label)', [
-            '@on_label' => $format[0],
-            '@off_label' => $format[1],
+            '@on_label' => (string) $format[0],
+            '@off_label' => (string) $format[1],
           ]);
         }
         else {
           $formats[$format_name] = $this->t('@on_label / @off_label', [
-            '@on_label' => $format[0],
-            '@off_label' => $format[1],
+            '@on_label' => (string) $format[0],
+            '@off_label' => (string) $format[1],
           ]);
         }
       }
       else {
-        $formats[$format_name] = $format;
+        $formats[$format_name] = (string) $format;
       }
     }
 
@@ -114,7 +113,7 @@ class BooleanFormatter extends CustomFieldFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
+  public function formatValue(FieldItemInterface $item, mixed $value): mixed {
     $formats = $this->getOutputFormats();
     $format = $this->getSetting('format');
 

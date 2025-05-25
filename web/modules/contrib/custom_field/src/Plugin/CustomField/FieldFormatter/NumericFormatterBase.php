@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Core\Field\FieldItemInterface;
@@ -84,10 +86,10 @@ abstract class NumericFormatterBase extends CustomFieldFormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function formatValue(FieldItemInterface $item, $value) {
+  public function formatValue(FieldItemInterface $item, mixed $value): mixed {
     $widget_settings = $this->customFieldDefinition->getWidgetSetting('settings');
     $allowed_values = $this->getFieldWidgetSetting('allowed_values') ?? [];
-    $output = $this->numberFormat($value);
+    $output = $this->numberFormat((float) $value);
     if (!empty($allowed_values) && $this->getSetting('key_label') == 'label') {
       $index = array_search($output, array_column($allowed_values, 'key'));
       $output = $index !== FALSE ? $allowed_values[$index]['value'] : $output;

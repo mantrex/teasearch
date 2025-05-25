@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\custom_field\Plugin;
 
+use Drupal\Component\Utility\Html;
+use Drupal\content_translation\ContentTranslationManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\PluginSettingsBase;
@@ -11,6 +15,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * Base class for CustomField widget plugins.
@@ -22,7 +27,7 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
   /**
    * The widget settings.
    *
-   * @var array
+   * @var array<string, mixed>
    */
   protected $settings;
 
@@ -31,26 +36,26 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
    *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface $moduleHandler;
 
   /**
    * The language manager.
    *
    * @var \Drupal\Core\Language\LanguageManagerInterface
    */
-  protected $languageManager;
+  protected LanguageManagerInterface $languageManager;
 
   /**
    * The content translation manager, if available.
    *
    * @var \Drupal\content_translation\ContentTranslationManagerInterface|null
    */
-  protected $contentTranslationManager;
+  protected ?ContentTranslationManagerInterface $contentTranslationManager;
 
   /**
    * {@inheritdoc}
    */
-  final public function __construct(array $configuration, $plugin_id, $plugin_definition, array $settings, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager, $content_translation_manager = NULL) {
+  final public function __construct(array $configuration, $plugin_id, $plugin_definition, array $settings, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager, ?ContentTranslationManagerInterface $content_translation_manager = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->settings = $settings;
     $this->moduleHandler = $module_handler;
@@ -61,7 +66,7 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     $module_handler = $container->get('module_handler');
     $language_manager = $container->get('language_manager');
     $content_translation_manager = $module_handler->moduleExists('content_translation')
@@ -71,7 +76,7 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
       $configuration,
       $plugin_id,
       $plugin_definition,
-        $configuration['settings'] ?? self::defaultSettings(),
+        $configuration['settings'] ?? static::defaultSettings(),
       $module_handler,
       $language_manager,
       $content_translation_manager,
@@ -102,7 +107,7 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
     $field_definition = $items->getFieldDefinition();
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $items->getEntity();
-    $settings = $field->getWidgetSetting('settings');
+    $settings = $field->getWidgetSetting('settings') ?? static::defaultSettings()['settings'];
     $is_required = $items->getFieldDefinition()->isRequired();
     $description = !empty($settings['description']) ? $this->t('@description', ['@description' => $settings['description']]) : NULL;
     /** @var \Drupal\custom_field\Plugin\Field\FieldType\CustomItem $item */
@@ -134,9 +139,11 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
   public function widgetSettingsForm(FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $label = $field->getLabel();
     $translatable = $field->getWidgetSetting('translatable');
-    $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
-    /** @var \Drupal\field\Entity\FieldConfig $field_definition */
-    $field_definition = $form_state->getFormObject()->getEntity();
+    $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
+    /** @var \Drupal\field_ui\Form\FieldConfigEditForm $form_object */
+    $form_object = $form_state->getFormObject();
+    /** @var \Drupal\Core\Field\FieldConfigInterface $field_definition */
+    $field_definition = $form_object->getEntity();
     $bundle_is_translatable = FALSE;
     if ($this->contentTranslationManager) {
       $bundle_is_translatable = $this->contentTranslationManager->isEnabled($field_definition->getTargetEntityTypeId(), $field_definition->getTargetBundle());
@@ -186,7 +193,7 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
     $element['settings']['description'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Help text'),
-      '#description' => $this->t('Instructions to present to the user below this field on the editing form.'),
+      '#description' => $this->t('Instructions to present to the user for this field on the editing form.'),
       '#rows' => 2,
       '#default_value' => $settings['description'],
     ];
@@ -223,14 +230,14 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
    *   The label.
    */
   public function getLabel(): string {
-    return $this->settings['label'];
+    return $this->settings['label'] ?? '';
   }
 
   /**
    * {@inheritdoc}
    */
   public function getWidgetSettings(): array {
-    return $this->settings['settings'] ?? self::defaultSettings()['settings'];
+    return $this->settings['settings'] ?? static::defaultSettings()['settings'];
   }
 
   /**
@@ -243,7 +250,7 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
    *   The property value.
    */
   public function getWidgetSetting(string $key): mixed {
-    return $this->settings['settings'][$key] ?? NULL;
+    return $this->settings['settings'][$key] ?? (static::defaultSettings()['settings'][$key] ?? NULL);
   }
 
   /**
@@ -272,6 +279,45 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
    */
   protected function isDefaultValueWidget(FormStateInterface $form_state): bool {
     return (bool) $form_state->get('default_value_widget');
+  }
+
+  /**
+   * Reports field-level validation errors against actual form elements.
+   *
+   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   *   The field values.
+   * @param \Symfony\Component\Validator\ConstraintViolationListInterface $violations
+   *   A list of constraint violations to flag.
+   * @param array $form
+   *   The form structure where field elements are attached to. This might be a
+   *   full form structure, or a sub-element of a larger form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   */
+  public function flagErrors(FieldItemListInterface $items, ConstraintViolationListInterface $violations, array $form, FormStateInterface $form_state): void {}
+
+  /**
+   * Helper function to create a unique identifier for the element.
+   *
+   * @param array<string, mixed> $form
+   *   The form.
+   * @param string $field_name
+   *   The field name.
+   * @param int $delta
+   *   The item number.
+   * @param string $custom_field_name
+   *   The custom field name.
+   * @param string $separator
+   *   An optional separator to construct the id.
+   *
+   * @return string
+   *   The unique id.
+   */
+  public function getUniqueElementId(array $form, string $field_name, int $delta, string $custom_field_name, string $separator = '-'): string {
+    $parents = is_array($form['#parents']) ? $form['#parents'] : [];
+    $id = implode($separator, [...$parents, $field_name, $delta, $custom_field_name]);
+
+    return Html::cleanCssIdentifier($id);
   }
 
 }
