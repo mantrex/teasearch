@@ -16,13 +16,15 @@ body {
 /* Example color overrides */
 .site-header {
   background-color: #6b9f00; /* A green shade */
-  box-shadow: #222222 0px 0px 3px 0px;
+  border-bottom:1px solid #83be0d;
+  box-shadow: #516049 0px 0px 2px 0px ;
   position:sticky;
   top:0;
   z-index:10;
 }
 
 .footer-section {
+  box-shadow: #5c4c46 0px 00px 3px 0px ;
   background-color: #76613c; /* A brown shade */
   color: #fff;
   padding: 20px 0;
@@ -36,5 +38,6 @@ body {
 
 
 .region-footer .footer-logo img {
+
   width:150px;
 }

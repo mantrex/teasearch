@@ -1,0 +1,303 @@
+
+.categories-wrapper {
+  width: 100%;
+  margin: 0 auto;
+  padding-bottom:2rem;
+  max-width: 1200px;
+
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 8px;
+  height: 70vh;
+  min-height: 650px;
+  max-height: 900px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.category-item {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow: hidden;
+  border-radius: 8px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  background: #f8f9fa;
+}
+
+.category-item:hover {
+  transform: scale(1.03) translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.category-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: transform 0.6s ease;
+  filter: brightness(0.9);
+}
+
+.category-item:hover .category-background {
+  transform: scale(1.08);
+  filter: brightness(1.1);
+}
+
+.category-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.6) 40%, transparent 100%);
+  padding: 40px 30px 30px;
+  color: white;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.category-item:hover .category-overlay {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.7) 50%, transparent 100%);
+}
+
+.category-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0 0 12px 0;
+  text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.8);
+  line-height: 1.1;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.category-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.95rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.category-type {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.category-weight {
+  background: rgba(76, 175, 80, 0.9);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: bold;
+  min-width: 28px;
+  text-align: center;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.category-link-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+  z-index: 3;
+  border-radius: 8px;
+}
+
+.category-icon {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: all 0.3s ease;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.category-item:hover .category-icon {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.1) rotate(5deg);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+.category-icon svg {
+  width: 24px;
+  height: 24px;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+/* Sfondi di default per categorie senza immagine */
+.category-default-bg-primary-sources { 
+  background: linear-gradient(135deg, #8D6E63 0%, #A1887F 100%);
+}
+.category-default-bg-videos { 
+  background: linear-gradient(135deg, #E91E63 0%, #F06292 100%);
+}
+.category-default-bg-images { 
+  background: linear-gradient(135deg, #9E9E9E 0%, #BDBDBD 100%);
+}
+.category-default-bg-bibliography { 
+  background: linear-gradient(135deg, #FF9800 0%, #FFB74D 100%);
+}
+.category-default-bg-contributors { 
+  background: linear-gradient(135deg, #3F51B5 0%, #7986CB 100%);
+}
+.category-default-bg-first-reference { 
+  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .categories-grid {
+    height: 70vh;
+    min-height: 600px;
+  }
+  
+  .category-title {
+    font-size: 1.6rem;
+    letter-spacing: 1.5px;
+  }
+}
+
+@media (max-width: 992px) {
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    height: auto;
+    min-height: 800px;
+    gap: 6px;
+  }
+  
+  .category-title {
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+  }
+  
+  .category-overlay {
+    padding: 30px 20px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .categories-wrapper {
+    padding: 0.5rem;
+  }
+  
+  .categories-grid {
+    gap: 4px;
+    min-height: 700px;
+  }
+  
+  .category-title {
+    font-size: 1.2rem;
+  }
+  
+  .category-icon {
+    width: 40px;
+    height: 40px;
+    top: 15px;
+    right: 15px;
+  }
+  
+  .category-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .categories-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(6, 180px);
+    gap: 3px;
+    height: auto;
+    min-height: auto;
+  }
+  
+  .category-item {
+    min-height: 180px;
+  }
+  
+  .category-title {
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .category-overlay {
+    padding: 20px 15px 15px;
+  }
+  
+  .category-meta {
+    gap: 8px;
+  }
+  
+  .category-type {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Animazioni di caricamento */
+@media (prefers-reduced-motion: no-preference) {
+  .category-item {
+    animation: fadeInUp 0.6s ease-out backwards;
+  }
+  
+  .category-item:nth-child(1) { animation-delay: 0.1s; }
+  .category-item:nth-child(2) { animation-delay: 0.2s; }
+  .category-item:nth-child(3) { animation-delay: 0.3s; }
+  .category-item:nth-child(4) { animation-delay: 0.4s; }
+  .category-item:nth-child(5) { animation-delay: 0.5s; }
+  .category-item:nth-child(6) { animation-delay: 0.6s; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -11,7 +11,9 @@ global-scripts:
     - core/jquery
   js:
     js/custom.js: {}
+    js/category_selector.js: {}
 global-styling:
   css:
     theme:
       css/style.css: {} 
+      css/category_selector.css: {} 

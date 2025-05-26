@@ -1,0 +1,70 @@
+{#
+/**
+ * @file
+ * Template per views-view--category-selector.html.twig
+ * Tema: TeaSearch
+ * Campo categoria: field_category_menu_list
+ */
+#}
+
+{# Debug (decommentare per vedere le variabili) #}
+{# {{ dump(current_language) }} #}
+{# {{ dump(categories_data) }} #}
+
+{# Verifica se siamo nella front page - Drupal 11 compatible #}
+{% set current_path = path('<current>') %}
+  {% set front_path = path('<front>') %}
+  {% set is_front = current_path == front_path %}
+
+  {% if   categories_data %}
+    <section class="categories-wrapper" role="main" aria-label="{{ 'Categories navigation'|t }}">
+      <div class="categories-grid">
+        {% for category in categories_data %}
+          <article class="category-item category-{{ category.category_selector|clean_class }}" 
+                   data-category="{{ category.category_selector }}"
+                   data-weight="{{ category.weight }}"
+                   data-node-id="{{ category.node_id }}">
+            
+            {# Background image or default #}
+            {% if category.image_url %}
+              <div class="category-background" 
+                   style="background-image: url('{{ category.image_url }}');"
+                   role="img" 
+                   aria-label="{{ category.link_title }}"></div>
+            {% else %}
+              <div class="category-background category-default-bg-{{ category.category_selector|clean_class }}"
+                   role="img" 
+                   aria-label="{{ category.link_title }}"></div>
+            {% endif %}
+            
+            {# Content overlay #}
+            <div class="category-overlay">
+              <header class="category-header">
+                <h2 class="category-title">{{ category.link_title }}</h2>
+                <div class="category-meta">
+                  <span class="category-type">{{ category.category_selector|replace({'_': ' '})|title }}</span>
+                  {% if category.weight > 0 %}
+                   {# <span class="category-weight" aria-label="{{ 'Priority'|t }}">{{ category.weight }}</span>#}
+                  {% endif %}
+                </div>
+              </header>
+            </div>
+            
+            {# Accessible link #}
+            <a href="{{ category.category_link }}" 
+               class="category-link-overlay" 
+               aria-label="{{ 'Navigate to'|t }} {{ category.link_title }}"
+               title="{{ category.link_title }}">
+              <span class="visually-hidden">{{ category.link_title }} - {{ 'Click to explore'|t }}</span>
+            </a>
+            
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+  
+  {% else %}
+    {# Messaggio di debug (rimuovi in produzione) #}
+    <!-- TeaSearch Categories Grid: Not displayed (Front: {{ is_front_page ? 'true' : 'false' }}, Data count: {{ categories_data|length }}) -->
+  {% endif %}
+  

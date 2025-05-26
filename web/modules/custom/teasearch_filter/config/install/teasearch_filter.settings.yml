@@ -1,16 +1,22 @@
+# Configurazione per teasearch_filter
+# Supporta content type di nodi e ricerca negli utenti
+
 content_types:
+  # Content type normali (nodi)
   primary_sources:
     filters:
       categories:
         type: taxonomy
         vocabulary: categories
         label: 'Categories'
+  
   first_reference:
     filters:
       subjects:
         type: taxonomy
         vocabulary: subjects
         label: 'Subjects'
+  
   video:
     filters:
       categories:
@@ -20,3 +26,54 @@ content_types:
       keywords:
         type: free_text
         label: 'Keywords'
+  
+  # RICERCA UTENTI: contributors cerca negli utenti con ruolo "contributor"
+  contributors:
+    # Questo cerca negli utenti (entità user) non nei nodi
+    # Gli utenti devono avere il ruolo "contributor"
+    filters:
+      # Questi sono campi sui profili utente (field_* sugli user)
+      expertise:
+        type: taxonomy
+        vocabulary: expertise_areas  # Vocabulary per aree di competenza
+        label: 'Areas of Expertise'
+      
+      location:
+        type: taxonomy
+        vocabulary: locations        # Vocabulary per ubicazioni
+        label: 'Location'
+      
+      organization:
+        type: taxonomy
+        vocabulary: organizations    # Vocabulary per organizzazioni
+        label: 'Organization'
+      
+      keywords:
+        type: free_text
+        label: 'Search in name or bio'  # Cerca in: name, field_display_name, field_bio, field_description
+
+# Note per la configurazione:
+# 
+# 1. Per CONTRIBUTORS (utenti):
+#    - Sistema cerca in entità "user" 
+#    - Filtra automaticamente per ruolo "contributor"
+#    - I campi taxonomy devono esistere sui profili utente: field_expertise, field_location, etc.
+#    - Il free_text cerca nei campi: name, field_display_name, field_bio, field_description
+#
+# 2. Per CONTENT TYPE normali (nodi):
+#    - Sistema cerca in entità "node" 
+#    - I campi taxonomy devono esistere sui nodi: field_categories, field_subjects, etc.
+#    - Il free_text cerca nei campi: title, body
+#
+# 3. Struttura campi utente tipica:
+#    - field_display_name: Nome visualizzato
+#    - field_bio: Biografia
+#    - field_expertise: Riferimento taxonomy (aree competenza)
+#    - field_location: Riferimento taxonomy (ubicazione)
+#    - field_organization: Riferimento taxonomy (organizzazione)
+#    - user_picture: Immagine profilo (campo nativo Drupal)
+#
+# 4. Per aggiungere altri tipi di ricerca utenti:
+#    - Aggiungi il content_type alla lista in isUserBasedContentType()
+#    - Configura i filtri qui sotto
+#    - Il sistema gestirà automaticamente la ricerca negli utenti
