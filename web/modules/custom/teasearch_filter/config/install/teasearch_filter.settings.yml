@@ -1,23 +1,44 @@
 # Configurazione per teasearch_filter
 # Supporta content type di nodi e ricerca negli utenti
-
 content_types:
   # Content type normali (nodi)
-  primary_sources:
-    filters:
-      categories:
-        type: taxonomy
-        vocabulary: categories
-        label: 'Categories'
-  
-  first_reference:
+  texts:
+    machine_name: primary_sources
+    type: node
+    label: 'Texts'
+    results:
+      mainfield: title
+      subfield: field_content
+    
     filters:
       subjects:
         type: taxonomy
         vocabulary: subjects
         label: 'Subjects'
-  
+      categories:
+        type: taxonomy
+        vocabulary: categories
+        label: 'Categories'
+  essentials:
+    machine_name: reference_materials
+    type: node
+    label: 'Essentials'
+    results:
+      mainfield: title
+      subfield: content
+    filters:
+      keywords:
+        type: free_text
+        label: 'Keywords'
+
   video:
+    machine_name: video
+    type: node
+    label: 'Videos'
+    results:
+      mainfield: title
+      subfield: field_content
+      image: field_image
     filters:
       categories:
         type: taxonomy
@@ -27,53 +48,49 @@ content_types:
         type: free_text
         label: 'Keywords'
   
-  # RICERCA UTENTI: contributors cerca negli utenti con ruolo "contributor"
+  # Esempio con condizione WHERE per filtrare nodi specifici
   contributors:
-    # Questo cerca negli utenti (entità user) non nei nodi
-    # Gli utenti devono avere il ruolo "contributor"
+    machine_name: people
+    type: node
+    label: 'Contributors'
+    where: '[{"field_roles.target_id":"contributors"}]'
+    results:
+      mainfield: title
+      subfield: field_bio
+      fullname: dynamic
+      image: field_avatar
+      image_format: rounded # significa che diventa un cerchio
     filters:
-      # Questi sono campi sui profili utente (field_* sugli user)
-      expertise:
+      skills:
         type: taxonomy
-        vocabulary: expertise_areas  # Vocabulary per aree di competenza
-        label: 'Areas of Expertise'
-      
+        vocabulary: skills
+        label: 'Skills'
       location:
         type: taxonomy
-        vocabulary: locations        # Vocabulary per ubicazioni
+        vocabulary: location
         label: 'Location'
-      
-      organization:
-        type: taxonomy
-        vocabulary: organizations    # Vocabulary per organizzazioni
-        label: 'Organization'
-      
       keywords:
         type: free_text
-        label: 'Search in name or bio'  # Cerca in: name, field_display_name, field_bio, field_description
+        label: 'Keywords'
+  
+  # Esempio per cercare direttamente negli utenti
+#  users:
+#   machine_name: user
+#    type: user
+#    label: 'Site Users'
+#    results:
+#      mainfield: name
+#      subfield: field_biography
+#      image: user_picture
+#      image_format: rounded
+#    filters:
+#      roles:
+#        type: user_roles
+#        label: 'User Roles'
+#      status:
+#        type: user_status
+#        label: 'Account Status'
 
-# Note per la configurazione:
-# 
-# 1. Per CONTRIBUTORS (utenti):
-#    - Sistema cerca in entità "user" 
-#    - Filtra automaticamente per ruolo "contributor"
-#    - I campi taxonomy devono esistere sui profili utente: field_expertise, field_location, etc.
-#    - Il free_text cerca nei campi: name, field_display_name, field_bio, field_description
-#
-# 2. Per CONTENT TYPE normali (nodi):
-#    - Sistema cerca in entità "node" 
-#    - I campi taxonomy devono esistere sui nodi: field_categories, field_subjects, etc.
-#    - Il free_text cerca nei campi: title, body
-#
-# 3. Struttura campi utente tipica:
-#    - field_display_name: Nome visualizzato
-#    - field_bio: Biografia
-#    - field_expertise: Riferimento taxonomy (aree competenza)
-#    - field_location: Riferimento taxonomy (ubicazione)
-#    - field_organization: Riferimento taxonomy (organizzazione)
-#    - user_picture: Immagine profilo (campo nativo Drupal)
-#
-# 4. Per aggiungere altri tipi di ricerca utenti:
-#    - Aggiungi il content_type alla lista in isUserBasedContentType()
-#    - Configura i filtri qui sotto
-#    - Il sistema gestirà automaticamente la ricerca negli utenti
+# Mappatura per retrocompatibilità
+legacy_mappings:
+  people: contributors

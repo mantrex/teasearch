@@ -1,282 +1,38 @@
 {#
 /**
  * @file
- * Theme override for Teasearch filter page.
+ * Teasearch filter page template.
  *
  * Variables:
- * - filter_form: Render array del form di filtro.
- * - nodes: Array di entità (nodi o utenti).
- * - users: Array di utenti (se is_user_search è true).
- * - filters: Configurazione filtri raw.
- * - grouped_filters: Filtri preparati per il template.
- * - content_type: Tipo di contenuto corrente.
- * - is_user_search: Boolean che indica se stiamo cercando utenti.
+ * - filter_form: Filter form render array
+ * - entities: Array of loaded entities (nodes or users)
+ * - content_type_config: Complete content type configuration
+ * - entity_type: Entity type (node or user)
+ * - total_results: Total number of results
+ * - has_filters: Whether there are active filters
+ * - grouped_filters: Prepared filters for display
  */
 #}
 
-<div class="teasearch-wrapper">
+
+<div
+	class="teasearch-wrapper">
+	{# Sidebar with filters #}
 	<aside class="teasearch-sidebar">
-		{# Mostra sempre la sidebar con gli stili personalizzati #}
-		<div class="teasearch-filters-custom">
-			<form method="get" class="teasearch-filter-form">
-				<input type="hidden" name="content_type" value="{{ content_type }}">
-
-				{# Se ci sono filtri configurati, mostrali #}
-				{% if grouped_filters %}
-					{% for field_name, filter in grouped_filters %}
-						<details class="teasearch-filter-group" data-name="{{ field_name }}" {{ filter.is_open ? 'open' : '' }}>
-							<summary class="teasearch-filter-title">
-								{{ filter.label|t }}
-								{% if filter.selected|length > 0 %}
-									<span class="filter-count">({{ filter.selected|length }})</span>
-								{% endif %}
-							</summary>
-
-							<div class="teasearch-filter-content">
-								{% if filter.type == 'taxonomy' %}
-									{% for tid, option in filter.options %}
-										<div class="form-check">
-											<input class="form-check-input" type="checkbox" name="{{ field_name }}" value="{{ tid }}" id="{{ field_name }}_{{ tid }}" {{ option.selected ? 'checked' : '' }}>
-											<label class="form-check-label" for="{{ field_name }}_{{ tid }}">
-												{{ option.label }}
-												({{ option.count }})
-											</label>
-										</div>
-									{% endfor %}
-								{% else %}
-									<div class="form-group">
-										<input type="text" name="{{ field_name }}" class="form-control" value="{{ filter.selected is iterable ? filter.selected|join(',') : filter.selected|default('') }}" placeholder="{{ 'Enter keywords...'|t }}">
-										<small class="form-text text-muted">
-											{% if is_user_search %}
-												{{ 'Search in names, bio, or other profile fields.'|t }}
-											{% else %}
-												{{ 'Enter one or more comma-separated keywords.'|t }}
-											{% endif %}
-										</small>
-									</div>
-								{% endif %}
-							</div>
-						</details>
-					{% endfor %}
-				{% else %}
-					{# Se non ci sono filtri configurati, mostra un messaggio informativo #}
-					<div class="teasearch-filter-group">
-						<div class="teasearch-filter-title" style="cursor: default;">
-							{{ 'Search Settings'|t }}
-						</div>
-						<div class="teasearch-filter-content">
-							<div class="alert alert-info" style="margin: 0; border-radius: 8px; border: 2px solid #259a00; background: rgba(37, 154, 0, 0.05);">
-								<h5 style="color: #259a00; margin-bottom: 0.5rem;">{{ 'No filters configured'|t }}</h5>
-								<p style="margin: 0; font-size: 0.9rem; color: #666;">
-									{{ 'Configure filters in teasearch_filter.settings.yml for this content type:'|t }} <strong>{{ content_type }}</strong>
-								</p>
-							</div>
-						</div>
-					</div>
-				{% endif %}
-
-				{# Mostra sempre i pulsanti di azione con gli stili corretti #}
-				<div class="teasearch-actions">
-					<button type="submit" class="btn btn-primary">
-						{% if grouped_filters %}
-							{{ 'Search'|t }}
-						{% else %}
-							{{ 'Search All'|t }}
-						{% endif %}
-					</button>
-					<a href="{{ url('teasearch_filter.search', {'content_type': content_type}) }}" class="btn btn-secondary">
-						{{ 'Clear All'|t }}
-					</a>
-				</div>
-			</form>
-		</div>
+		{% if grouped_filters %}
+			{% include 'modules/custom/teasearch_filter/templates/partials/filter-form.html.twig' %}
+		{% else %}
+			{{ filter_form }}
+		{% endif %}
 	</aside>
 
-	<section class="teasearch-results">
-		{# Header dei risultati - mostra sempre #}
-		<div class="results-header">
-			<h3>
-				{% if nodes %}
-					{% if is_user_search %}
-						{{ 'Contributors Found'|t }} ({{ nodes|length }})
-					{% else %}
-						{{ 'Results'|t }} ({{ nodes|length }})
-					{% endif %}
-				{% else %}
-					{% if is_user_search %}
-						{{ 'Search Contributors'|t }}
-					{% else %}
-						{{ 'Search Results'|t }}
-					{% endif %}
-				{% endif %}
-			</h3>
-		</div>
-
-		{# Contenuto dei risultati #}
-		{% if nodes %}
-			{# Se ci sono risultati, mostrali #}
-			{% for entity in nodes %}
-				{% if is_user_search %}
-					{# Template per utenti (contributors) #}
-					<article class="teasearch-item teasearch-user-item card mb-3">
-						<div class="card-body">
-							<div class="row">
-								<div class="col-md-3">
-									{# Avatar/immagine profilo #}
-									<div class="user-avatar">
-										{% if entity.user_picture and entity.user_picture.entity %}
-											<img src="{{ file_url(entity.user_picture.entity.fileuri) }}" alt="{{ entity.name.value|default('User') }}" class="rounded-circle img-fluid">
-										{% else %}
-											<div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center">
-												<i class="fas fa-user fa-2x text-muted"></i>
-											</div>
-										{% endif %}
-									</div>
-								</div>
-								<div class="col-md-9">
-									<h2 class="card-title h4">
-										{% if entity.uid.value %}
-											<a href="{{ path('entity.user.canonical', {'user': entity.uid.value}) }}">
-												{% if entity.field_display_name.value %}
-													{{ entity.field_display_name.value }}
-												{% else %}
-													{{ entity.name.value }}
-												{% endif %}
-											</a>
-										{% else %}
-											{% if entity.field_display_name.value %}
-												{{ entity.field_display_name.value }}
-											{% else %}
-												{{ entity.name.value }}
-											{% endif %}
-										{% endif %}
-									</h2>
-
-									{# Bio o descrizione #}
-									{% if entity.field_bio and entity.field_bio.value %}
-										{% set bio = entity.field_bio.value|striptags %}
-										<p class="card-text">
-											{{ bio|slice(0, 200) }}{{ bio|length > 200 ? '…' }}
-										</p>
-									{% elseif entity.field_description and entity.field_description.value %}
-										{% set description = entity.field_description.value|striptags %}
-										<p class="card-text">
-											{{ description|slice(0, 200) }}{{ description|length > 200 ? '…' }}
-										</p>
-									{% endif %}
-
-									{# Informazioni aggiuntive per contributors #}
-									<div class="user-meta mt-2">
-										{% if entity.field_expertise and entity.field_expertise.referencedEntities %}
-											<div class="user-expertise mb-1">
-												<strong>{{ 'Expertise:'|t }}</strong>
-												{% for expertise in entity.field_expertise.referencedEntities %}
-													{% if expertise.name and expertise.name.value %}
-														<span class="badge" style="background-color: #259a00; margin-right: 0.25rem;">{{ expertise.name.value }}</span>
-													{% endif %}
-												{% endfor %}
-											</div>
-										{% endif %}
-
-										{% if entity.field_location and entity.field_location.entity and entity.field_location.entity.name %}
-											<div class="user-location">
-												<strong>{{ 'Location:'|t }}</strong>
-												<span class="text-muted">{{ entity.field_location.entity.name.value }}</span>
-											</div>
-										{% endif %}
-
-										{% if entity.created and entity.created.value %}
-											<small class="text-muted d-block mt-2">
-												{{ 'Member since'|t }} {{ entity.created.value|format_date('medium') }}
-											</small>
-										{% endif %}
-									</div>
-								</div>
-							</div>
-						</div>
-					</article>
-				{% else %}
-					{# Template per nodi (content normale) #}
-					<article class="teasearch-item teasearch-node-item card mb-3">
-						<div class="card-body">
-							<h2 class="card-title h4">
-								{% if entity.nid and entity.nid.value %}
-									<a href="{{ path('entity.node.canonical', {'node': entity.nid.value}) }}">
-										{{ entity.label|default('Untitled') }}
-									</a>
-								{% else %}
-									{{ entity.label|default('Untitled') }}
-								{% endif %}
-							</h2>
-
-							{% if entity.field_content and entity.field_content.value %}
-								{% set teaser = entity.field_content.value|striptags %}
-								<p class="card-text">
-									{{ teaser|slice(0, 200) }}{{ teaser|length > 200 ? '…' }}
-								</p>
-							{% elseif entity.body and entity.body.value %}
-								{% set teaser = entity.body.value|striptags %}
-								<p class="card-text">
-									{{ teaser|slice(0, 200) }}{{ teaser|length > 200 ? '…' }}
-								</p>
-							{% endif %}
-
-							{% if entity.created and entity.created.value %}
-								<small class="text-muted">
-									{{ entity.created.value|format_date('medium') }}
-								</small>
-							{% endif %}
-						</div>
-					</article>
-				{% endif %}
-			{% endfor %}
+	{# Main results area #}
+	<main class="teasearch-results">
+		{% if entities %}
+			{% include 'modules/custom/teasearch_filter/templates/partials/results-header.html.twig' %}
+			{% include 'modules/custom/teasearch_filter/templates/partials/results-list.html.twig' %}
 		{% else %}
-			{# Se non ci sono risultati #}
-			<div class="teasearch-no-results">
-				<div class="alert alert-info" style="border: 2px solid #259a00; border-radius: 12px; background: rgba(37, 154, 0, 0.05); padding: 2rem; text-align: center;">
-					<div style="color: #259a00; font-size: 3rem; margin-bottom: 1rem;">
-						{% if is_user_search %}
-							<i class="fas fa-users" aria-hidden="true"></i>
-						{% else %}
-							<i class="fas fa-search" aria-hidden="true"></i>
-						{% endif %}
-					</div>
-					<h4 style="color: #259a00; margin-bottom: 1rem; font-weight: 600;">
-						{% if is_user_search %}
-							{{ 'No contributors found'|t }}
-						{% else %}
-							{{ 'No content found'|t }}
-						{% endif %}
-					</h4>
-					<p style="margin-bottom: 1.5rem; color: #666; font-size: 1.1rem;">
-						{% if grouped_filters %}
-							{{ 'Try adjusting your filters or search terms to find more content.'|t }}
-						{% else %}
-							{% if is_user_search %}
-								{{ 'No contributors match your criteria.'|t }}
-							{% else %}
-								{{ 'No content available for this content type.'|t }}
-							{% endif %}
-						{% endif %}
-					</p>
-					
-					{# Suggerimenti per migliorare la ricerca #}
-					<div style="background: white; border-radius: 8px; padding: 1.5rem; margin-top: 1rem; text-align: left;">
-						<h5 style="color: #259a00; margin-bottom: 1rem;">{{ 'Search Tips:'|t }}</h5>
-						<ul style="margin: 0; padding-left: 1.5rem; color: #666;">
-							<li>{{ 'Clear some filters to broaden your search'|t }}</li>
-							<li>{{ 'Try different keywords or terms'|t }}</li>
-							<li>{{ 'Check spelling of search terms'|t }}</li>
-							{% if is_user_search %}
-								<li>{{ 'Search in user names or profile information'|t }}</li>
-							{% endif %}
-							{% if not grouped_filters %}
-								<li>{{ 'Contact administrator to configure search filters'|t }}</li>
-							{% endif %}
-						</ul>
-					</div>
-				</div>
-			</div>
+			{% include 'modules/custom/teasearch_filter/templates/partials/no-results.html.twig' %}
 		{% endif %}
-	</section>
+	</main>
 </div>

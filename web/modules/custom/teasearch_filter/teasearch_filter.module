@@ -26,10 +26,16 @@ function teasearch_filter_theme($existing, $type, $theme, $path)
     'teasearch' => [
       'variables' => [
         'filter_form' => NULL,
-        'nodes' => NULL,
+        'entities' => NULL,
         'filters' => NULL,
         'grouped_filters' => NULL,
         'content_type' => NULL,
+        'content_type_config' => NULL,
+        'entity_type' => NULL,
+        'total_results' => NULL,
+        'has_filters' => NULL,
+        'module_path' => NULL,
+        'page_title' => NULL,
       ],
       'template' => 'teasearch',
     ],

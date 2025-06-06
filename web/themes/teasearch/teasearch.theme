@@ -8,7 +8,8 @@
 /**
  * Implements hook_preprocess_image_widget().
  */
-function teasearch_preprocess_image_widget(array &$variables): void {
+function teasearch_preprocess_image_widget(array &$variables): void
+{
   $data = &$variables['data'];
 
   // This prevents image widget templates from rendering preview container HTML
@@ -27,8 +28,6 @@ function teasearch_preprocess(array &$variables)
   $theme_path = \Drupal::theme()->getActiveTheme()->getPath();
   // Define a global variable for the logo image.
   $variables['theme']['logo_image'] = base_path() . $theme_path . '/images/teasearch-logo.svg';
-
-  
 }
 
 function teasearch_preprocess_status_messages(&$variables)
@@ -58,26 +57,38 @@ function teasearch_preprocess_status_messages(&$variables)
  * Implements hook_preprocess_views_view__VIEW_ID().
  * Hook specifico per la view category_selector.
  */
-function teasearch_preprocess_views_view__category_selector(&$variables) {
-$language_manager = \Drupal::languageManager();
+function teasearch_preprocess_views_view__category_selector(&$variables)
+{
+  $language_manager = \Drupal::languageManager();
   $current_language = $language_manager->getCurrentLanguage()->getId();
   $variables['current_language'] = $current_language;
-  
+
   // Base URL per costruire i link
   $base_url = \Drupal::request()->getSchemeAndHttpHost();
   $variables['base_url'] = $base_url;
+
+
   
   // Processa i risultati della view
   $categories_data = [];
-  
+
   foreach ($variables['view']->result as $row) {
     $node = $row->_entity;
-    
+
+    // Ottieni la chiave (machine name)
+    $category_selector = $node->get('field_category_menu_list')->value ?: '';
+
+    // Ottieni l'etichetta leggibile
+    $field_definition = $node->getFieldDefinition('field_category_menu_list');
+    $allowed_values = $field_definition->getFieldStorageDefinition()->getSetting('allowed_values');
+    $category_label = $allowed_values[$category_selector] ?? $category_selector;
+
+
     // Usa la traduzione se disponibile
     if ($node->hasTranslation($current_language)) {
       $node = $node->getTranslation($current_language);
     }
-    
+
     // Ottieni i campi necessari
     $image_url = '';
     $image_field = $node->get('field_image');
@@ -87,38 +98,35 @@ $language_manager = \Drupal::languageManager();
         $image_url = \Drupal::service('file_url_generator')->generateAbsoluteString($image_entity->getFileUri());
       }
     }
-    
+
     $link_title = $node->get('field_link_title')->value ?: '';
     $category_selector = $node->get('field_category_menu_list')->value ?: '';
-    
+
     // Ottieni il peso se esiste
     $weight = 0;
     if ($node->hasField('field_weight') && !$node->get('field_weight')->isEmpty()) {
       $weight = $node->get('field_weight')->value;
     }
 
-    $base_url = \Drupal\Core\Url::fromUserInput('/category/' . $category_selector, [
+    $base_url = \Drupal\Core\Url::fromUserInput('/category/' . $category_label, [
       'language' => $language_manager->getLanguage($current_language),
       'absolute' => TRUE
     ])->toString();
 
-    // Costruisci il link completo
-    $category_link = $base_url;
-    
     $categories_data[] = [
       'image_url' => $image_url,
       'link_title' => $link_title,
       'category_selector' => $category_selector,
-      'category_link' => $category_link,
+      'category_link' => $base_url,
       'weight' => $weight,
       'node_id' => $node->id(),
     ];
   }
-  
+
   // Ordina per peso (peso maggiore = prima posizione)
-  usort($categories_data, function($a, $b) {
+  usort($categories_data, function ($a, $b) {
     return $b['weight'] <=> $a['weight'];
   });
-  
+
   $variables['categories_data'] = $categories_data;
 }

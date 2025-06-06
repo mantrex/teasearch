@@ -1,0 +1,72 @@
+{#
+/**
+ * @file
+ * Entity metadata partial template.
+ */
+#}
+
+<div class="entity-meta">
+	{% if entity_type == 'user' %}
+		{# User metadata #}
+		{% if entity.roles %}
+			<span class="meta-roles">
+				{% set user_roles = [] %}
+				{% for role in entity.roles %}
+					{% if role.target_id != 'authenticated' %}
+						{% set user_roles = user_roles|merge([role.entity.label]) %}
+					{% endif %}
+				{% endfor %}
+				{% if user_roles|length > 0 %}
+					<strong>{{ 'Roles:'|t }}</strong>
+					{{ user_roles|join(', ') }}
+				{% endif %}
+			</span>
+		{% endif %}
+
+		{% if entity.created.value %}
+			<span class="meta-date">
+				{{ 'Member since'|t }}
+				{{ entity.created.value|format_date('short') }}
+			</span>
+		{% endif %}
+
+	{% else %}
+		{# Node metadata #}
+		{% if entity.created.value %}
+			<span class="meta-date">
+				{{ entity.created.value|format_date('medium') }}
+			</span>
+		{% endif %}
+
+		{% if entity.uid.entity %}
+			<span class="meta-author">
+				{{ 'by'|t }}
+				{{ entity.uid.entity.label }}
+			</span>
+		{% endif %}
+	{% endif %}
+
+	{# Special handling for contributors content type #}
+	{% if content_type == 'contributors' %}
+		{% if entity.field_skills %}
+			<div class="meta-terms skills">
+				<strong>{{ 'Skills:'|t }}</strong>
+				{% for skill in entity.field_skills|slice(0, 3) %}
+					<span class="term-badge">{{ skill.entity.name }}</span>
+				{% endfor %}
+				{% if entity.field_skills|length > 3 %}
+					<span class="term-more">+{{ entity.field_skills|length - 3 }}</span>
+				{% endif %}
+			</div>
+		{% endif %}
+
+		{% if entity.field_location %}
+			<div class="meta-terms location">
+				<strong>{{ 'Location:'|t }}</strong>
+				{% for location in entity.field_location %}
+					<span class="term-badge secondary">{{ location.entity.name }}</span>
+				{% endfor %}
+			</div>
+		{% endif %}
+	{% endif %}
+</div>

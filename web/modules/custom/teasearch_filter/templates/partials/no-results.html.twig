@@ -1,0 +1,27 @@
+{#
+/**
+ * @file
+ * No results partial template.
+ */
+#}
+
+<div class="no-results">
+	<div class="no-results-content">
+		<h2 class="no-results-title">{{ 'No results found'|t }}</h2>
+
+		{% if has_filters %}
+			<p class="no-results-text">
+				{{ 'No content matches your current filters. Try adjusting your search criteria.'|t }}
+			</p>
+			<div class="no-results-actions">
+				<a href="{{ url('teasearch_filter.search', {'content_type': content_type}) }}" class="btn btn-primary">
+					{{ 'Clear all filters'|t }}
+				</a>
+			</div>
+		{% else %}
+			<p class="no-results-text">
+				{{ 'Use the filters on the left to search for content.'|t }}
+			</p>
+		{% endif %}
+	</div>
+</div>

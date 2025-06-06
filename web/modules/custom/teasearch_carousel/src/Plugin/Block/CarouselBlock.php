@@ -22,9 +22,11 @@ class CarouselBlock extends BlockBase
   {
     return [
       '#markup' => '
-        <div class="container-fluid">
-          <div class="swiper">
-            <div class="swiper-wrapper" id="carousel-content"></div>
+        
+        <div class="container-fluid">'.
+          '<div class="swiper">'
+        . '<div class="news_title">'.$this->t('News and Highlights').'</div>'.
+           '<div class="swiper-wrapper" id="carousel-content"></div>
             <div class="swiper-pagination"></div>
             <div class="swiper-button-prev"></div>
             <div class="swiper-button-next"></div>

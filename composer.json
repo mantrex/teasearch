@@ -27,9 +27,12 @@
     "drupal/core-project-message": "^11.1",
     "drupal/core-recommended": "^11.1",
     "drupal/custom_field": "^3.1",
+    "drupal/entity_browser": "^2.13",
     "drupal/field_group": "^3.6",
     "drupal/gin": "^4.0",
     "drupal/gin_toolbar": "^2.0",
+    "drupal/inline_entity_form": "^3.0@RC",
+    "drupal/mfd": "^3.0",
     "drupal/migrate_plus": "^6.0",
     "drupal/realname": "^2.0",
     "drupal/redirect": "^1.11",
@@ -38,8 +41,7 @@
     "drupal/vani": "^11.0",
     "drush/drush": "*",
     "twbs/bootstrap": "^5.3",
-    "zodiacmedia/drupal-libraries-installer": "^1.6",
-    "drupal/mfd": "^3.0"
+    "zodiacmedia/drupal-libraries-installer": "^1.6"
   },
   "conflict": {
     "drupal/drupal": "*"

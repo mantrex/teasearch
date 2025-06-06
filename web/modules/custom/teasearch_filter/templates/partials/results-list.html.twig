@@ -1,0 +1,87 @@
+{#
+/**
+ * @file
+ * Results list - NUOVO DA ZERO
+ */
+#}
+
+<div class="results-list">
+	{% for entity in entities %}
+		{% set entity_config = content_type_config.results %}
+		{% set main_field = entity_config.mainfield|default('title') %}
+		{% set sub_field = entity_config.subfield %}
+		{% set image_field = entity_config.image %}
+		{% set image_format = entity_config.image_format|default('square') %}
+
+		<article class="result-item">
+			<div
+				class="item-content">
+
+				{# IMMAGINE - provare tutti i campi possibili #}
+				{% if image_field %}
+					<div class="item-image">
+						{% set image_url = null %}
+
+						{# Prova campo configurato #}
+						{% if entity[image_field].0.entity.fileuri %}
+							{% set image_url = file_url(entity[image_field].0.entity.fileuri) %}
+						{% endif %}
+
+						{# Prova field_avatar #}
+						{% if not image_url and entity.field_avatar.0.entity.fileuri %}
+							{% set image_url = file_url(entity.field_avatar.0.entity.fileuri) %}
+						{% endif %}
+
+						{# Prova field_image #}
+						{% if not image_url and entity.field_image.0.entity.fileuri %}
+							{% set image_url = file_url(entity.field_image.0.entity.fileuri) %}
+						{% endif %}
+
+						{# Mostra immagine o default #}
+						{% if image_url %}
+							<img src="{{ image_url }}" alt="{{ entity.label }}" class="entity-image {{ image_format == 'rounded' ? 'rounded-circle' : 'rounded' }}" width="64" height="64">
+						{% else %}
+     
+							<img src="{{ module_path }}/images/default.png" alt="Default avatar" class="entity-image {{ image_format == 'rounded' ? 'rounded-circle' : 'rounded' }}" width="64" height="64">
+						{% endif %}
+					</div>
+				{% endif %}
+
+				{# CONTENUTO #}
+				<div class="item-body">
+					<h2 class="item-title">
+						<a href="{{ path('entity.node.canonical', {'node': entity.nid.value}) }}" class="entity-link">
+							{{ entity.label }}
+						</a>
+					</h2>
+
+					{% if sub_field and entity[sub_field] %}
+						<div class="item-description">
+							{% if entity[sub_field].summary %}
+								{{ entity[sub_field].summary|striptags|slice(0, 150) }}
+								{% if entity[sub_field].summary|length > 150 %}…
+								{% endif %}
+							{% elseif entity[sub_field].value %}
+								{{ entity[sub_field].value|striptags|slice(0, 150) }}
+								{% if entity[sub_field].value|length > 150 %}…
+								{% endif %}
+							{% endif %}
+						</div>
+					{% endif %}
+
+					<div class="item-meta">
+						{% if entity.created.value %}
+							{{ entity.created.value|format_date('medium') }}
+						{% endif %}
+
+						{% if entity.uid.entity %}
+							|
+							{{ 'by'|t }}
+							{{ entity.uid.entity.label }}
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</article>
+	{% endfor %}
+</div>

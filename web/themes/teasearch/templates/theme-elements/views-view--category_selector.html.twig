@@ -42,15 +42,16 @@
               <header class="category-header">
                 <h2 class="category-title">{{ category.link_title }}</h2>
                 <div class="category-meta">
-                  <span class="category-type">{{ category.category_selector|replace({'_': ' '})|title }}</span>
+                  <span class="category-type">{{ category.link_title }}</span>
                   {% if category.weight > 0 %}
                    {# <span class="category-weight" aria-label="{{ 'Priority'|t }}">{{ category.weight }}</span>#}
                   {% endif %}
                 </div>
               </header>
             </div>
-            
+             
             {# Accessible link #}
+       
             <a href="{{ category.category_link }}" 
                class="category-link-overlay" 
                aria-label="{{ 'Navigate to'|t }} {{ category.link_title }}"

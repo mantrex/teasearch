@@ -1,0 +1,16 @@
+{#
+/**
+ * @file
+ * Entity link partial template.
+ */
+#}
+
+{% if entity_type == 'user' %}
+	<a href="{{ path('entity.user.canonical', {'user': entity.uid.value}) }}" class="entity-link">
+		{{ entity[field].value|default(entity.label) }}
+	</a>
+{% else %}
+	<a href="{{ path('entity.node.canonical', {'node': entity.nid.value}) }}" class="entity-link">
+		{{ entity[field].value|default(entity.label) }}
+	</a>
+{% endif %}
