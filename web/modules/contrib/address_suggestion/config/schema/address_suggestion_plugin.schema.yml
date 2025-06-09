@@ -1,0 +1,22 @@
+ckeditor5.plugin.address_suggestion_plugin:
+  type: mapping
+  label: List
+  mapping:
+    provider:
+      type: string
+      label: Provider api
+    endpoint:
+      type: string
+      label: Parser url endpoint
+    api_key:
+      type: string
+      label: Api key
+    username:
+      type: string
+      label: User name SwissPost api
+    password:
+      type: string
+      label: Password SwissPost api
+    token:
+      type: string
+      label: Token for api

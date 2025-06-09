@@ -1,0 +1,398 @@
+{#
+/**
+ * @file
+ * Century/Year range filter partial template.
+ * 
+ * Variables:
+ * - content_type: Current content type
+ * - century_data: Century configuration and data
+ */
+#}
+
+{% if century_data and century_data.enabled %}
+	<details class="filter-group century-filter" data-name="century_selector">
+		<summary class="filter-title">
+			{{ 'Timeline'|t }}
+			{% if century_data.selected_from or century_data.selected_to %}
+				<span class="filter-badge">1</span>
+			{% endif %}
+		</summary>
+
+		<div class="filter-content">
+			<div
+				class="century-timeline-container">
+
+				{# Header con pulsante Details #}
+				<div class="timeline-header">
+					<button type="button" class="btn btn-sm btn-outline-secondary toggle-details" onclick="toggleYearDetails()">
+						{{ 'Details'|t }}
+					</button>
+				</div>
+
+				{# Current selection display #}
+				<div class="selection-display">
+					<span id="selection-text">
+						{{ 'From'|t }}
+						<strong id="from-text">{{ century_data.centuries[0].label }}</strong>
+						{{ 'to'|t }}
+						<strong id="to-text">{{ century_data.centuries|last.label }}</strong>
+					</span>
+				</div>
+
+				{# Timeline bar #}
+				<div class="timeline-bar">
+					<div class="timeline-line"></div>
+
+					{# Century markers - solo 5 per evitare overflow #}
+					{% set total_centuries = century_data.centuries|length %}
+					{% for i in 0..4 %}
+						{% set index = (i * (total_centuries - 1) / 4)|round %}
+						{% set century = century_data.centuries[index] %}
+						<div class="timeline-marker" style="left: {{ (i * 25) }}%">
+							<div class="marker-point"></div>
+							<div class="marker-label">{{ century.label|replace({'-': '-<br>'})|raw }}</div>
+						</div>
+					{% endfor %}
+
+					{# Selection range slider #}
+					<div class="timeline-selection">
+						<input type="range" id="century-from" class="timeline-slider from-slider" min="0" max="{{ total_centuries - 1 }}" value="0" oninput="updateTimelineSelection()">
+						<input type="range" id="century-to" class="timeline-slider to-slider" min="0" max="{{ total_centuries - 1 }}" value="{{ total_centuries - 1 }}" oninput="updateTimelineSelection()">
+						<div class="selection-range"></div>
+					</div>
+				</div>
+
+				{# Detailed year input (hidden by default) #}
+				<div class="year-details" id="year-details" style="display: none;">
+					<div class="year-inputs">
+						<div class="year-input-group">
+							<label for="year_from" class="form-label">{{ 'From Year'|t }}</label>
+							<input type="number" id="year_from" name="year_from" class="form-control" value="{{ century_data.selected_from|default('') }}" placeholder="{{ 'e.g. -500'|t }}" onchange="updateFromDetailedInput()">
+							<small class="form-text text-muted">{{ 'Negative = BC'|t }}</small>
+						</div>
+						<div class="year-input-group">
+							<label for="year_to" class="form-label">{{ 'To Year'|t }}</label>
+							<input type="number" id="year_to" name="year_to" class="form-control" value="{{ century_data.selected_to|default('') }}" placeholder="{{ 'e.g. 500'|t }}" onchange="updateToDetailedInput()">
+							<small class="form-text text-muted">{{ 'Positive = CE'|t }}</small>
+						</div>
+					</div>
+				</div>
+
+				{# Hidden inputs for form submission #}
+				<input type="hidden" id="hidden_year_from" name="year_from" value="{{ century_data.selected_from|default('') }}">
+				<input type="hidden" id="hidden_year_to" name="year_to" value="{{ century_data.selected_to|default('') }}">
+			</div>
+		</div>
+	</details>
+
+	{# JavaScript for timeline functionality #}
+	<script>
+		// Century data from server
+const centuryData = {{ century_data.centuries|json_encode|raw }};
+
+function toggleYearDetails() {
+const details = document.getElementById('year-details');
+const button = document.querySelector('.toggle-details');
+
+if (details.style.display === 'none') {
+details.style.display = 'block';
+button.textContent = '{{ 'Hide Details'|t }}';
+} else {
+details.style.display = 'none';
+button.textContent = '{{ 'Details'|t }}';
+}
+}
+
+function updateTimelineSelection() {
+const fromSlider = document.getElementById('century-from');
+const toSlider = document.getElementById('century-to');
+const fromIndex = parseInt(fromSlider.value);
+const toIndex = parseInt(toSlider.value);
+
+// Ensure from is always <= to
+if (fromIndex > toIndex) {
+if (event.target === fromSlider) {
+toSlider.value = fromIndex;
+} else {
+fromSlider.value = toIndex;
+}
+return updateTimelineSelection();
+}
+
+// Update display
+const fromCentury = centuryData[fromIndex];
+const toCentury = centuryData[toIndex];
+
+document.getElementById('from-text').textContent = fromCentury.label;
+document.getElementById('to-text').textContent = toCentury.label;
+
+// Update hidden inputs
+document.getElementById('hidden_year_from').value = fromCentury.start_year;
+document.getElementById('hidden_year_to').value = toCentury.end_year;
+
+// Update detailed inputs
+document.getElementById('year_from').value = fromCentury.start_year;
+document.getElementById('year_to').value = toCentury.end_year;
+
+// Update visual selection
+updateSelectionRange(fromIndex, toIndex);
+}
+
+function updateSelectionRange(fromIndex, toIndex) {
+const selectionRange = document.querySelector('.selection-range');
+const total = centuryData.length - 1;
+const left = (fromIndex / total) * 100;
+const width = ((toIndex - fromIndex) / total) * 100;
+
+selectionRange.style.left = left + '%';
+selectionRange.style.width = width + '%';
+}
+
+function updateFromDetailedInput() {
+const yearFrom = document.getElementById('year_from').value;
+document.getElementById('hidden_year_from').value = yearFrom;
+}
+
+function updateToDetailedInput() {
+const yearTo = document.getElementById('year_to').value;
+document.getElementById('hidden_year_to').value = yearTo;
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function () {
+updateTimelineSelection();
+});
+	</script>
+
+	{# CSS for timeline styling #}
+	<style>
+		.century-filter {
+			margin: 1rem 0;
+		}
+
+		.century-filter summary {
+			cursor: pointer;
+			padding: 0.75rem;
+			background: #e9ecef;
+			border-radius: 4px;
+			user-select: none;
+		}
+
+		.filter-badge {
+			background: #007bff;
+			color: white;
+			border-radius: 50%;
+			padding: 0.2rem 0.5rem;
+			font-size: 0.8rem;
+			margin-left: 0.5rem;
+		}
+
+		.century-timeline-container {
+			padding: 1rem;
+			background: #f8f9fa;
+			border: 1px solid #dee2e6;
+			border-top: none;
+			overflow: hidden; /* Previene ogni overflow */
+		}
+
+		.timeline-header {
+			display: flex;
+			justify-content: flex-end;
+			margin-bottom: 1rem;
+		}
+
+		.selection-display {
+			text-align: center;
+			margin-bottom: 1.5rem;
+			padding: 0.75rem;
+			background: white;
+			border-radius: 4px;
+			border: 1px solid #dee2e6;
+			font-size: 0.9rem;
+		}
+
+		.timeline-bar {
+			position: relative;
+			height: 90px; /* Aumentata per le label a due righe */
+			margin: 1.5rem 0;
+			padding: 0 10px; /* Padding per evitare overflow */
+			overflow: hidden; /* Nasconde qualsiasi overflow */
+		}
+
+		.timeline-line {
+			position: absolute;
+			top: 45px; /* Centrata nell'altezza aumentata */
+			left: 10px;
+			right: 10px;
+			height: 4px;
+			background: #dee2e6;
+			border-radius: 2px;
+		}
+
+		.timeline-marker {
+			position: absolute;
+			top: 45px;
+			transform: translate(-50%, -50%);
+			z-index: 2;
+			width: 80px; /* Larghezza fissa per contenere le label */
+		}
+
+		.marker-point {
+			width: 12px;
+			height: 12px;
+			background: #6c757d;
+			border: 2px solid white;
+			border-radius: 50%;
+			margin: 0 auto 8px;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+		}
+
+		.marker-label {
+			font-size: 0.65rem;
+			text-align: center;
+			color: #495057;
+			font-weight: 500;
+			background: rgba(255, 255, 255, 0.95);
+			padding: 2px 4px;
+			border-radius: 3px;
+			border: 1px solid #dee2e6;
+			line-height: 1.2;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			max-width: 100%;
+		}
+
+		.timeline-selection {
+			position: absolute;
+			top: 0;
+			left: 10px;
+			right: 10px;
+			height: 100%;
+			z-index: 3;
+		}
+
+		.timeline-slider {
+			position: absolute;
+			top: 45px;
+			left: 0;
+			right: 0;
+			transform: translateY(-50%);
+			appearance: none;
+			background: transparent;
+			pointer-events: none;
+			height: 30px;
+			outline: none;
+		}
+
+		.timeline-slider::-webkit-slider-thumb {
+			appearance: none;
+			width: 20px;
+			height: 20px;
+			background: #007bff;
+			border-radius: 50%;
+			cursor: pointer;
+			pointer-events: all;
+			border: 2px solid white;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+			transition: all 0.15s ease;
+		}
+
+		.timeline-slider::-webkit-slider-thumb:hover {
+			background: #0056b3;
+			transform: scale(1.1);
+		}
+
+		.timeline-slider::-moz-range-thumb {
+			width: 20px;
+			height: 20px;
+			background: #007bff;
+			border-radius: 50%;
+			cursor: pointer;
+			pointer-events: all;
+			border: 2px solid white;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+		}
+
+		.selection-range {
+			position: absolute;
+			top: 45px;
+			height: 4px;
+			background: linear-gradient(90deg, #007bff, #0056b3);
+			border-radius: 2px;
+			transform: translateY(-50%);
+			pointer-events: none;
+			z-index: 1;
+			box-shadow: 0 1px 3px rgba(0, 123, 255, 0.3);
+		}
+
+		.year-details {
+			margin-top: 1rem;
+			padding: 1rem;
+			background: white;
+			border-radius: 4px;
+			border: 1px solid #dee2e6;
+		}
+
+		.year-inputs {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 1rem;
+		}
+
+		.year-input-group {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.form-label {
+			margin-bottom: 0.5rem;
+			font-weight: 600;
+			color: #495057;
+			font-size: 0.9rem;
+		}
+
+		.form-control {
+			padding: 0.5rem;
+			border: 1px solid #ced4da;
+			border-radius: 4px;
+			font-size: 0.9rem;
+		}
+
+		.form-control:focus {
+			border-color: #007bff;
+			outline: none;
+			box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+		}
+
+		.form-text {
+			margin-top: 0.25rem;
+			font-size: 0.75rem;
+			color: #6c757d;
+		}
+
+		.toggle-details {
+			font-size: 0.8rem;
+			padding: 0.25rem 0.5rem;
+		}
+
+		@media(max-width: 768px) {
+			.year-inputs {
+				grid-template-columns: 1fr;
+			}
+
+			.marker-label {
+				font-size: 0.6rem;
+			}
+
+			.timeline-bar {
+				height: 80px;
+				padding: 0 5px;
+			}
+
+			.timeline-marker {
+				width: 60px;
+			}
+		}
+	</style>
+{% endif %}

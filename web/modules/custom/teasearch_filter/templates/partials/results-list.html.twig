@@ -1,7 +1,7 @@
 {#
 /**
  * @file
- * Results list - NUOVO DA ZERO
+ * Results list template - Clean version
  */
 #}
 
@@ -17,67 +17,77 @@
 			<div
 				class="item-content">
 
-				{# IMMAGINE - provare tutti i campi possibili #}
+				{# IMMAGINE - gestita tramite partial #}
 				{% if image_field %}
-					<div class="item-image">
-						{% set image_url = null %}
-
-						{# Prova campo configurato #}
-						{% if entity[image_field].0.entity.fileuri %}
-							{% set image_url = file_url(entity[image_field].0.entity.fileuri) %}
-						{% endif %}
-
-						{# Prova field_avatar #}
-						{% if not image_url and entity.field_avatar.0.entity.fileuri %}
-							{% set image_url = file_url(entity.field_avatar.0.entity.fileuri) %}
-						{% endif %}
-
-						{# Prova field_image #}
-						{% if not image_url and entity.field_image.0.entity.fileuri %}
-							{% set image_url = file_url(entity.field_image.0.entity.fileuri) %}
-						{% endif %}
-
-						{# Mostra immagine o default #}
-						{% if image_url %}
-							<img src="{{ image_url }}" alt="{{ entity.label }}" class="entity-image {{ image_format == 'rounded' ? 'rounded-circle' : 'rounded' }}" width="64" height="64">
-						{% else %}
-     
-							<img src="{{ module_path }}/images/default.png" alt="Default avatar" class="entity-image {{ image_format == 'rounded' ? 'rounded-circle' : 'rounded' }}" width="64" height="64">
-						{% endif %}
-					</div>
+					{% include 'modules/custom/teasearch_filter/templates/partials/entity-image.html.twig' with {
+						'entity': entity,
+						'entity_type': entity_type,
+						'image_field': image_field,
+						'image_format': image_format,
+						'module_path': module_path
+					} %}
 				{% endif %}
 
 				{# CONTENUTO #}
 				<div class="item-body">
 					<h2 class="item-title">
-						<a href="{{ path('entity.node.canonical', {'node': entity.nid.value}) }}" class="entity-link">
-							{{ entity.label }}
-						</a>
+						{% if entity_type == 'user' %}
+							<a href="{{ path('entity.user.canonical', {'user': entity.uid.value}) }}" class="entity-link">
+								{{ entity.label }}
+							</a>
+						{% else %}
+							<a href="{{ path('entity.node.canonical', {'node': entity.nid.value}) }}" class="entity-link">
+								{{ entity.label }}
+							</a>
+						{% endif %}
 					</h2>
 
-					{% if sub_field and entity[sub_field] %}
-						<div class="item-description">
-							{% if entity[sub_field].summary %}
-								{{ entity[sub_field].summary|striptags|slice(0, 150) }}
-								{% if entity[sub_field].summary|length > 150 %}…
+					{# Descrizione/sommario #}
+					{% if sub_field %}
+						{% set field_data = attribute(entity, sub_field) %}
+						{% if field_data and field_data.0 %}
+							<div class="item-description">
+								{% set description = null %}
+
+								{# Gestione diversi tipi di campo per la descrizione #}
+								{% if field_data.0.summary %}
+									{% set description = field_data.0.summary %}
+								{% elseif field_data.0.value %}
+									{% set description = field_data.0.value %}
+								{% elseif field_data.value %}
+									{% set description = field_data.value %}
 								{% endif %}
-							{% elseif entity[sub_field].value %}
-								{{ entity[sub_field].value|striptags|slice(0, 150) }}
-								{% if entity[sub_field].value|length > 150 %}…
+
+								{% if description %}
+									{{ description|striptags|slice(0, 200) }}
+									{% if description|length > 200 %}…
+									{% endif %}
 								{% endif %}
-							{% endif %}
-						</div>
+							</div>
+						{% endif %}
 					{% endif %}
 
+					{# Metadati #}
 					<div class="item-meta">
-						{% if entity.created.value %}
-							{{ entity.created.value|format_date('medium') }}
+						{% if entity.created and entity.created.value %}
+							<span class="item-date">
+								{{ entity.created.value|format_date('medium') }}
+							</span>
 						{% endif %}
 
-						{% if entity.uid.entity %}
-							|
-							{{ 'by'|t }}
-							{{ entity.uid.entity.label }}
+						{% if entity.uid and entity.uid.entity and entity_type != 'user' %}
+							<span class="item-author">
+								|
+								{{ 'by'|t }}
+								{{ entity.uid.entity.label }}
+							</span>
+						{% endif %}
+
+						{% if entity.type and entity.type.entity %}
+							<span class="item-type">
+								|
+								{{ entity.type.entity.label }}
+							</span>
 						{% endif %}
 					</div>
 				</div>

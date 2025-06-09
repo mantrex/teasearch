@@ -21,6 +21,8 @@
   "require": {
     "bower-asset/select2": "^4.0.13",
     "composer/installers": "^2.3",
+    "drupal/address": "^2.0",
+    "drupal/address_suggestion": "^1.0",
     "drupal/better_exposed_filters": "^7.0",
     "drupal/chosen": "^5.0",
     "drupal/core-composer-scaffold": "^11.1",
@@ -71,6 +73,9 @@
       "drupal/mfd": {
         "Compatibilità Drupal 11 (info.yml)": "patches/mfd-info-core11.patch",
         "Rimuovi @Translation da category in MultilingualFormDisplayType": "patches/mfd-fieldtype-category.patch"
+      },
+      "drupal/entity_browser": {
+        "Fix key() expects array, null given error": "patches/entity-browser.patch"
       }
     },
     "drupal-scaffold": {

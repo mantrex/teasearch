@@ -6,9 +6,11 @@ content_types:
     machine_name: primary_sources
     type: node
     label: 'Texts'
+    
     results:
       mainfield: title
       subfield: field_content
+      image: field_pdf_image
     
     filters:
       subjects:
@@ -19,6 +21,10 @@ content_types:
         type: taxonomy
         vocabulary: categories
         label: 'Categories'
+      century_selector:
+        from: year_from
+        to: year_to
+        display: auto
   essentials:
     machine_name: reference_materials
     type: node

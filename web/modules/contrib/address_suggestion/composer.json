@@ -1,0 +1,25 @@
+{
+  "name": "drupal/address_suggestion",
+  "description": "This module enhances the Address module with autocomplete",
+  "type": "drupal-module",
+  "minimum-stability": "dev",
+  "keywords": ["Drupal", "Address", "suggestion", "geo", "location", "autocomplete"],
+  "homepage": "https://www.drupal.org/project/address_suggestion",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/address_suggestion",
+    "source": "https://git.drupalcode.org/project/address_suggestion"
+  },
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "NGUYEN Bao",
+      "email": "n.bao@yahoo.com",
+      "homepage": "https://www.drupal.org/u/lazzyvn",
+      "role": "Maintainer"
+    }
+  ],
+  "require": {
+    "drupal/core": "^9 || ^10 || ^11",
+    "drupal/address": "^1 || ^2"
+  }
+}

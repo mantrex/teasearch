@@ -1,0 +1,308 @@
+(function ($, Drupal, drupalSettings, once) {
+  'use strict';
+  Drupal.behaviors.continent = {
+    attach: function (context, settings) {
+
+      $(once('continent', '.continent-suggestion', context)).each(function () {
+        let selector = $(this).find('input[type="checkbox"]');
+        if(selector.length) {
+          filterCheckboxes(selector);
+          selector.change(function() {
+            filterCheckboxes($(this));
+          });
+        } else {
+          selector = $(this);
+          filterSelect(selector);
+          selector.change(function() {
+            filterSelect($(this));
+          });
+        }
+
+      });
+      function filterCheckboxes(that) {
+        let activeContinent = that.closest('.form-checkboxes').find('input[type="checkbox"]:checked').map(function () {
+          return $(this).val();
+        }).get();
+        let list_country = getCountriesByContinent(activeContinent);
+        that.closest('.field--type-address-country').find('select.country option').each(function() {
+          $(this).show();
+          if (list_country.length && !list_country.includes($(this).val())) {
+            $(this).hide();
+          }
+        });
+      }
+      function filterSelect(that) {
+        let list_country = getCountriesByContinent(that.val());
+        that.closest('.field--type-address-country').find('select.country option').each(function() {
+          $(this).show();
+          if (list_country.length && !list_country.includes($(this).val())) {
+            $(this).hide();
+          }
+        });
+      }
+    }
+  }
+  function getCountriesByContinent(continentCode) {
+    let continentCodes = Array.isArray(continentCode) ? continentCode : [continentCode];
+    let data = countryContinents();
+    let allCountries = Object.keys(data);
+
+    return allCountries.filter(function (countryCode) {
+      return continentCodes.includes(data[countryCode]);
+    });
+  }
+
+  function countryContinents() {
+    return {
+      AD: 'eu',
+      AE: 'as',
+      AF: 'as',
+      AG: 'na',
+      AI: 'na',
+      AL: 'eu',
+      AM: 'as',
+      AO: 'af',
+      AQ: 'an',
+      AR: 'sa',
+      AS: 'oc',
+      AT: 'eu',
+      AU: 'oc',
+      AW: 'na',
+      AX: 'eu',
+      AZ: 'as',
+      BA: 'eu',
+      BB: 'na',
+      BD: 'as',
+      BE: 'eu',
+      BF: 'af',
+      BG: 'eu',
+      BH: 'as',
+      BI: 'af',
+      BJ: 'af',
+      BL: 'na',
+      BM: 'na',
+      BN: 'as',
+      BO: 'sa',
+      BQ: 'na',
+      BR: 'sa',
+      BS: 'na',
+      BT: 'as',
+      BV: 'an',
+      BW: 'af',
+      BY: 'eu',
+      BZ: 'na',
+      CA: 'na',
+      CC: 'as',
+      CD: 'af',
+      CF: 'af',
+      CG: 'af',
+      CH: 'eu',
+      CI: 'af',
+      CK: 'oc',
+      CL: 'sa',
+      CM: 'af',
+      CN: 'as',
+      CO: 'sa',
+      CR: 'na',
+      CU: 'na',
+      CV: 'af',
+      CW: 'na',
+      CX: 'as',
+      CY: 'as',
+      CZ: 'eu',
+      DE: 'eu',
+      DJ: 'af',
+      DK: 'eu',
+      DM: 'na',
+      DO: 'na',
+      DZ: 'af',
+      EC: 'sa',
+      EE: 'eu',
+      EG: 'af',
+      EH: 'af',
+      ER: 'af',
+      ES: 'eu',
+      ET: 'af',
+      FI: 'eu',
+      FJ: 'oc',
+      FK: 'sa',
+      FM: 'oc',
+      FO: 'eu',
+      FR: 'eu',
+      GA: 'af',
+      GB: 'eu',
+      GD: 'na',
+      GE: 'as',
+      GF: 'sa',
+      GG: 'eu',
+      GH: 'af',
+      GI: 'eu',
+      GL: 'na',
+      GM: 'af',
+      GN: 'af',
+      GP: 'na',
+      GQ: 'af',
+      GR: 'eu',
+      GS: 'an',
+      GT: 'na',
+      GU: 'oc',
+      GW: 'af',
+      GY: 'sa',
+      HK: 'as',
+      HM: 'an',
+      HN: 'na',
+      HR: 'eu',
+      HT: 'na',
+      HU: 'eu',
+      ID: 'as',
+      IE: 'eu',
+      IL: 'as',
+      IM: 'eu',
+      IN: 'as',
+      IO: 'as',
+      IQ: 'as',
+      IR: 'as',
+      IS: 'eu',
+      IT: 'eu',
+      JE: 'eu',
+      JM: 'na',
+      JO: 'as',
+      JP: 'as',
+      KE: 'af',
+      KG: 'as',
+      KH: 'as',
+      KI: 'oc',
+      KM: 'af',
+      KN: 'na',
+      KP: 'as',
+      KR: 'as',
+      KW: 'as',
+      KY: 'na',
+      KZ: 'as',
+      LA: 'as',
+      LB: 'as',
+      LC: 'na',
+      LI: 'eu',
+      LK: 'as',
+      LR: 'af',
+      LS: 'af',
+      LT: 'eu',
+      LU: 'eu',
+      LV: 'eu',
+      LY: 'af',
+      MA: 'af',
+      MC: 'eu',
+      MD: 'eu',
+      ME: 'eu',
+      MF: 'na',
+      MG: 'af',
+      MH: 'oc',
+      MK: 'eu',
+      ML: 'af',
+      MM: 'as',
+      MN: 'as',
+      MO: 'as',
+      MP: 'oc',
+      MQ: 'na',
+      MR: 'af',
+      MS: 'na',
+      MT: 'eu',
+      MU: 'af',
+      MV: 'as',
+      MW: 'af',
+      MX: 'na',
+      MY: 'as',
+      MZ: 'af',
+      NA: 'af',
+      NC: 'oc',
+      NE: 'af',
+      NF: 'oc',
+      NG: 'af',
+      NI: 'na',
+      NL: 'eu',
+      NO: 'eu',
+      NP: 'as',
+      NR: 'oc',
+      NU: 'oc',
+      NZ: 'oc',
+      OM: 'as',
+      PA: 'na',
+      PE: 'sa',
+      PF: 'oc',
+      PG: 'oc',
+      PH: 'as',
+      PK: 'as',
+      PL: 'eu',
+      PM: 'na',
+      PN: 'oc',
+      PR: 'na',
+      PS: 'as',
+      PT: 'eu',
+      PW: 'oc',
+      PY: 'sa',
+      QA: 'as',
+      RE: 'af',
+      RO: 'eu',
+      RS: 'eu',
+      RU: 'eu',
+      RW: 'af',
+      SA: 'as',
+      SB: 'oc',
+      SC: 'af',
+      SD: 'af',
+      SE: 'eu',
+      SG: 'as',
+      SH: 'af',
+      SI: 'eu',
+      SJ: 'eu',
+      SK: 'eu',
+      SL: 'af',
+      SM: 'eu',
+      SN: 'af',
+      SO: 'af',
+      SR: 'sa',
+      SS: 'af',
+      ST: 'af',
+      SV: 'na',
+      SX: 'na',
+      SY: 'as',
+      SZ: 'af',
+      TC: 'na',
+      TD: 'af',
+      TF: 'an',
+      TG: 'af',
+      TH: 'as',
+      TJ: 'as',
+      TK: 'oc',
+      TL: 'as',
+      TM: 'as',
+      TN: 'af',
+      TO: 'oc',
+      TR: 'as',
+      TT: 'na',
+      TV: 'oc',
+      TW: 'as',
+      TZ: 'af',
+      UA: 'eu',
+      UG: 'af',
+      UM: 'oc',
+      US: 'na',
+      UY: 'sa',
+      UZ: 'as',
+      VA: 'eu',
+      VC: 'na',
+      VE: 'sa',
+      VG: 'na',
+      VI: 'na',
+      VN: 'as',
+      VU: 'oc',
+      WF: 'oc',
+      WS: 'oc',
+      YE: 'as',
+      YT: 'af',
+      ZA: 'af',
+      ZM: 'af',
+      ZW: 'af'
+    }
+  }
+})(jQuery, Drupal, drupalSettings, once);

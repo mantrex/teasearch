@@ -2,34 +2,64 @@
 /**
  * @file
  * Entity image partial template.
+ * 
+ * Variables:
+ * - entity: The entity object
+ * - entity_type: Entity type (node/user)
+ * - image_field: Field machine name for the image
+ * - image_format: Image format (rounded/square)
+ * - module_path: Module path for default images
  */
 #}
 
-{% if entity_type == 'user' %}
-	{# User picture #}
-	{% if image_field == 'user_picture' and entity.user_picture.0 %}
-		{% set image_url = file_url(entity.user_picture.0.entity.fileuri) %}
-	{% else %}
-		{% set image_url = '/themes/custom/default/images/default-avatar.png' %}
-	{% endif %}
-{% else %}
-	{# Node image - Debug first #}
+<div class="item-image">
 	{% set image_url = null %}
 
-	{% if entity[image_field] and entity[image_field].0 %}
-		{% if entity[image_field].0.entity %}
-			{% set image_url = file_url(entity[image_field].0.entity.fileuri) %}
-		{% elseif entity[image_field].0.target_id %}
-			{% set file = drupal_entity('file', entity[image_field].0.target_id) %}
-			{% if file %}
-				{% set image_url = file_url(file.fileuri) %}
+	{# Gestione immagini per utenti #}
+	{% if entity_type == 'user' %}
+		{% if image_field == 'user_picture' and entity.user_picture.0 %}
+			{% if entity.user_picture.0.entity and entity.user_picture.0.entity.fileuri %}
+				{% set image_url = file_url(entity.user_picture.0.entity.fileuri) %}
+			{% endif %}
+		{% else %}
+			{# Per altri campi immagine degli utenti, usa accesso dinamico #}
+			{% set field_data = attribute(entity, image_field) %}
+			{% if field_data and field_data.0 %}
+				{% if field_data.0.entity and field_data.0.entity.fileuri %}
+					{% set image_url = file_url(field_data.0.entity.fileuri) %}
+				{% elseif field_data.0.uri %}
+					{% set image_url = file_url(field_data.0.uri) %}
+				{% endif %}
+			{% endif %}
+		{% endif %}
+	{% else %}
+		{# Gestione immagini per nodi - accesso dinamico al campo configurato #}
+		{% set field_data = attribute(entity, image_field) %}
+		{% if field_data and field_data.0 %}
+			{# Approccio 1: entity.fileuri (più comune per campi immagine) #}
+			{% if field_data.0.entity and field_data.0.entity.fileuri %}
+				{% set image_url = file_url(field_data.0.entity.fileuri) %}
+
+				{# Approccio 2: preprocess hook result (per campi con target_id) #}
+			{% elseif entity.teasearch_image_url %}
+				{% set image_url = entity.teasearch_image_url %}
+
+				{# Approccio 3: uri diretto (per alcuni tipi di campo) #}
+			{% elseif field_data.0.uri %}
+				{% set image_url = file_url(field_data.0.uri) %}
 			{% endif %}
 		{% endif %}
 	{% endif %}
 
+	{# Fallback: immagine di default appropriata #}
 	{% if not image_url %}
-		{% set image_url = '/themes/custom/default/images/default-person.png' %}
+		{% if entity_type == 'user' %}
+			{% set image_url = module_path ~ '/images/default-avatar.png' %}
+		{% else %}
+			{% set image_url = module_path ~ '/images/default.png' %}
+		{% endif %}
 	{% endif %}
-{% endif %}
 
-<img src="{{ image_url }}" alt="{{ entity.label }}" class="entity-image {{ image_format == 'rounded' ? 'rounded-circle' : 'rounded' }}" loading="lazy" onerror="this.src='/themes/custom/default/images/placeholder.png'; this.onerror=null;">
+	{# Rendering dell'immagine #}
+	<img src="{{ image_url }}" alt="{{ entity.label }}" class="entity-image {{ image_format == 'rounded' ? 'rounded-circle' : 'rounded' }}" width="64" height="64" loading="lazy" onerror="this.src='{{ module_path }}/images/placeholder.png'; this.onerror=null;">
+</div>

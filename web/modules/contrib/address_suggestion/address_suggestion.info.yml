@@ -1,0 +1,12 @@
+name: Address suggestion
+type: module
+description: 'Provides an autocomplete feature for address fields'
+core_version_requirement: ^9.2 || ^10 || ^11
+package: Field types
+dependencies:
+  - address:address
+
+# Information added by Drupal.org packaging script on 2024-09-25
+version: '1.0.23'
+project: 'address_suggestion'
+datestamp: 1727277271

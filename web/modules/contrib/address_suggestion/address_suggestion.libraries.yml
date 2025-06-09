@@ -1,0 +1,124 @@
+address_suggestion:
+  js:
+    js/address_suggestion.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+
+address_suggestion_widget:
+  js:
+    js/address_suggestion_widget.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+
+ckeditor.address_suggestion:
+  js:
+    js/build/addressSuggestion.js: { preprocess: false, minified: true }
+  dependencies:
+    - core/ckeditor5
+
+# Loaded in the text format configuration form to provide styling for the icon
+# used in toolbar config.
+admin.address_suggestion:
+  css:
+    theme:
+      css/address-suggestion.admin.css: { }
+
+continent:
+  js:
+    js/continent_suggestion.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+
+address_map.leafletjs:
+  js:
+    //unpkg.com/leaflet@1.9.4/dist/leaflet.js: { type: external, minified: true, crossorigin: anonymous, integrity: "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="}
+  css:
+    theme:
+      //unpkg.com/leaflet@1.9.4/dist/leaflet.css: { type: external, minified: true, crossorigin: anonymous, integrity: "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="}
+
+address_map.mapbox:
+  js:
+    //api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js: { type: external, minified: true}
+    js/address_map/mapbox.js: {}
+  css:
+    theme:
+      //api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css: { type: external, minified: true, crossorigin: anonymous}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+
+address_map.here:
+  js:
+    //js.api.here.com/v3/3.1/mapsjs-core.js: { type: external, minified: true}
+    //js.api.here.com/v3/3.1/mapsjs-service.js: { type: external, minified: true}
+    //js.api.here.com/v3/3.1/mapsjs-ui.js: { type: external, minified: true}
+    //js.api.here.com/v3/3.1/mapsjs-mapevents.js: { type: external, minified: true}
+    js/address_map/here.js: {}
+  css:
+    theme:
+      //api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css: { type: external, minified: true, crossorigin: anonymous}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+
+address_map.arcgis:
+  js:
+    //js.arcgis.com/4.29/: { type: external, minified: true}
+    js/address_map/arcgis.js: {}
+  css:
+    theme:
+      //js.arcgis.com/4.29/esri/themes/light/main.css: { type: external, minified: true, crossorigin: anonymous}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+
+address_map.mapquest:
+  js:
+    //api.mqcdn.com/sdk/mapquest-js/v1.3.2/mapquest.js: { type: external, minified: true}
+    js/address_map/mapquest.js: {}
+  css:
+    theme:
+      //api.mqcdn.com/sdk/mapquest-js/v1.3.2/mapquest.css: { type: external, minified: true, crossorigin: anonymous}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+
+address_map.tomtom:
+  js:
+    //api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.25.0/maps/maps-web.min.js: { type: external, minified: true}
+    //api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.25.0/services/services-web.min.js: { type: external, minified: true}
+    js/address_map/tomtom.js: {}
+  css:
+    theme:
+      //api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.25.0/maps/maps.css: { type: external, minified: true, crossorigin: anonymous}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+
+address_map.osm:
+  js:
+    js/address_map/osm.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal
+    - address_suggestion/address_map.leafletjs
+
+address_map.google:
+  js:
+    js/address_map/google.js: {}
+  dependencies:
+    - core/jquery
+    - core/once
+    - core/drupal

@@ -1,0 +1,99 @@
+field.widget.settings.address_suggestion:
+  type: mapping
+  label: Address suggestion settings
+  mapping:
+    location_field:
+      type: string
+      label: 'Link location field'
+    provider:
+      type: string
+      label: 'Provider'
+    endpoint:
+      type: string
+      label: 'API Url Endpoint'
+    api_key:
+      type: string
+      label: 'API key'
+    username:
+      type: string
+      label: 'User name'
+    password:
+      type: string
+      label: 'Password'
+    hide:
+      type: boolean
+      label: 'Hide address field'
+
+field.widget.settings.address_suggestion_widget:
+  type: mapping
+  label: Address suggestion for text field widget settings
+  mapping:
+    location_field:
+      type: string
+      label: 'Link location field'
+    provider:
+      type: string
+      label: 'Provider'
+    endpoint:
+      type: string
+      label: 'API Url Endpoint'
+    api_key:
+      type: string
+      label: 'API key'
+    username:
+      type: string
+      label: 'User name'
+    password:
+      type: string
+      label: 'Password'
+
+field.widget.settings.country_continent:
+  type: mapping
+  label: 'Default country continent widget settings'
+  mapping:
+    multi:
+      type: boolean
+      label: 'Multi continent filter'
+    continent:
+      type: sequence
+      label: 'Show the filter country by continent'
+      sequence:
+        type: string
+        label: 'Continent'
+
+field.formatter.settings.address_map:
+  type: mapping
+  label: Address Suggestion Map formatter settings
+  mapping:
+    provider:
+      type: string
+      label: Provider
+    width:
+      type: number
+      label: Width
+    height:
+      type: number
+      label: Height
+    zoom:
+      type: number
+      label: Zoom
+
+field.formatter.settings.address_suggestion_map:
+  type: mapping
+  label: Address Suggestion Map formatter settings
+  mapping:
+    location_field:
+      type: string
+      label: Location field
+    provider:
+      type: string
+      label: Provider
+    width:
+      type: number
+      label: Width
+    height:
+      type: number
+      label: Height
+    zoom:
+      type: number
+      label: Zoom

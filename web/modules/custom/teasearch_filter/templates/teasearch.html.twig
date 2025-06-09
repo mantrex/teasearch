@@ -20,11 +20,16 @@
 	{# Sidebar with filters #}
 	<aside class="teasearch-sidebar">
 		{% if grouped_filters %}
-			{% include 'modules/custom/teasearch_filter/templates/partials/filter-form.html.twig' %}
+			{% include 'modules/custom/teasearch_filter/templates/partials/filter-form.html.twig' with {
+				'grouped_filters': grouped_filters,
+				'content_type': content_type,
+				'century_data': century_data
+			} %}
 		{% else %}
 			{{ filter_form }}
 		{% endif %}
 	</aside>
+
 
 	{# Main results area #}
 	<main class="teasearch-results">

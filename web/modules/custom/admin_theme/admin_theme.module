@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ * Modulo per aggiungere CSS e JS custom all'area admin.
+ */
+
+/**
+ * Implements hook_page_attachments().
+ */
+function admin_theme_page_attachments(array &$attachments)
+{
+  // Aggiunge la libreria solo nelle pagine di amministrazione.
+  if (\Drupal::service('router.admin_context')->isAdminRoute()) {
+    $attachments['#attached']['library'][] = 'admin_theme/admin_assets';
+  }
+}

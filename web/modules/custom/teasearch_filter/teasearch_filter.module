@@ -7,18 +7,6 @@
 
 /**
  * Implements hook_theme().
- *
- * @param array  $existing
- *   Pre-existing theme hook definitions.
- * @param string $type
- *   Invocation type ('module').
- * @param string $theme
- *   The active theme name.
- * @param string $path
- *   The base path to this module.
- *
- * @return array
- *   Theme hook definitions.
  */
 function teasearch_filter_theme($existing, $type, $theme, $path)
 {
@@ -36,8 +24,10 @@ function teasearch_filter_theme($existing, $type, $theme, $path)
         'has_filters' => NULL,
         'module_path' => NULL,
         'page_title' => NULL,
+        'century_data' => NULL,
       ],
       'template' => 'teasearch',
     ],
   ];
 }
+

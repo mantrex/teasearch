@@ -1,0 +1,7 @@
+services:
+  plugin.manager.address_provider:
+    class: Drupal\address_suggestion\AddressProviderManager
+    parent: default_plugin_manager
+  address_suggestion.query_services:
+    class: Drupal\address_suggestion\QueryService
+    arguments: ['@plugin.manager.address_provider', '@entity_type.manager', '@state']

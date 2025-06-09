@@ -32,7 +32,7 @@ class StringType extends CustomFieldTypeBase {
 
     $columns[$name] = [
       'type' => 'varchar',
-      'length' => $settings['length'] ?? self::MAX_LENGTH,
+      'length' => $settings['max_length'] ?? $settings['length'] ?? self::MAX_LENGTH,
     ];
 
     return $columns;

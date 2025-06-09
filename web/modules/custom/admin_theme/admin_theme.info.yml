@@ -1,0 +1,8 @@
+name: Admin Theme
+type: module
+description: 'Modulo custom per aggiungere CSS e JS personalizzati'
+core_version_requirement: ^11
+package: Custom
+version: 1.0
+dependencies:
+  - drupal:system

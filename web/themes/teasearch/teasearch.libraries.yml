@@ -4,6 +4,7 @@ bootstrap:
     theme:
       ../../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css: {}
       css/login.css: {}
+      css/entity-browser-fix.css: {}
   js:
     ../../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js: {}
 global-scripts:

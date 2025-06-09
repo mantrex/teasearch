@@ -496,7 +496,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
           'options' => $item->{$name . '__options'},
         ];
       }
-      elseif (in_array($data_type, ['entity_reference', 'file'])) {
+      elseif (in_array($data_type, ['entity_reference', 'file', 'image'])) {
         $entity = $item->{$name . '__entity'};
         if (!$entity instanceof EntityInterface) {
           continue;

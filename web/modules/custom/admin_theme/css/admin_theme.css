@@ -1,0 +1,29 @@
+/*
+ * Applica questo a tutti gli elementi figli diretti di .views-row 
+ * (sia il div del checkbox che gli span del nome).
+ */
+ .entity-browser-form .views-row  {
+  position:relative;
+  padding: 8px;
+  border-radius:2px;
+}
+
+/*
+ * A volte il wrapper del form aggiunge margini extra che creano problemi.
+ * Questa regola li azzera per sicurezza.
+ */
+ .entity-browser-form .views-field-entity-browser-select {
+
+right:0;
+  margin:0;
+  padding: 0;
+
+  
+}
+
+.entity-browser-form .views-field-entity-browser-select .field-content {
+  display:inline-block;
+  position:absolute;
+  right:0;
+  top:-4px;
+}

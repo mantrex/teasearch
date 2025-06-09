@@ -1,0 +1,12 @@
+/* Allinea meglio il checkbox accanto all'input */
+.entity-browser-widget table.entity-browser-table 
+  td.views-field-entity_browser_select .form-checkbox {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+  position: relative;
+  top: -1px;
+}
+.field-content {
+  background:yellow;
+}

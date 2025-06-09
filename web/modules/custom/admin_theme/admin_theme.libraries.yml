@@ -1,0 +1,9 @@
+admin_assets:
+  css:
+    theme:
+      css/admin_theme.css: {}
+  js:
+    js/admin_theme.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery

@@ -1,0 +1,4 @@
+parameters:
+	excludePaths:
+		- src/Plugin/Action/*
+		- src/Plugin/AddressProvider/*

@@ -1,0 +1,17 @@
+address_suggestion.addresses:
+  path: '/address/suggestion/{entity_type}/{bundle}/{field_name}'
+  defaults:
+    _controller: '\Drupal\address_suggestion\Controller\AddressSuggestion::handleAutocomplete'
+    _format: json
+  requirements:
+    # Request from widget form get address list.
+    _access: 'TRUE'
+
+address_suggestion.ckeditor:
+  path: '/address/suggestion/{format}'
+  defaults:
+    _controller: '\Drupal\address_suggestion\Controller\AddressSuggestion::ckeditor'
+    _format: json
+  requirements:
+    # Request from ckeditor form get address list.
+    _access: 'TRUE'

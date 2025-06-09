@@ -17,15 +17,37 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class SearchController extends ControllerBase
 {
 
+  /**
+   * The config factory service.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
   protected $configFactory;
+
+  /**
+   * The entity type manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
   protected $entityTypeManager;
 
+  /**
+   * Constructs a new SearchController.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory service.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager service.
+   */
   public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager)
   {
     $this->configFactory = $config_factory;
     $this->entityTypeManager = $entity_type_manager;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public static function create(ContainerInterface $container)
   {
     return new static(
@@ -41,22 +63,23 @@ class SearchController extends ControllerBase
   {
     $config = $this->configFactory->get('teasearch_filter.settings');
     $legacy_mappings = $config->get('legacy_mappings') ?: [];
-    
+
     $path_parts = explode('/', $request->getPathInfo());
     $old_content_type = end($path_parts);
-    
+
     if (isset($legacy_mappings[$old_content_type])) {
       $new_content_type = $legacy_mappings[$old_content_type];
       $query_params = $request->query->all();
-      
-      $url = Url::fromRoute('teasearch_filter.search', 
+
+      $url = Url::fromRoute(
+        'teasearch_filter.search',
         ['content_type' => $new_content_type],
         ['query' => $query_params]
       );
-      
+
       return new RedirectResponse($url->toString(), 301);
     }
-    
+
     throw new NotFoundHttpException();
   }
 
@@ -74,18 +97,18 @@ class SearchController extends ControllerBase
    */
   public function search($content_type, Request $request)
   {
-    // Load configuration
+    // Load and validate configuration
     $config = $this->configFactory->get('teasearch_filter.settings');
     $content_types = $config->get('content_types') ?: [];
-    
+
     if (!isset($content_types[$content_type])) {
       throw new NotFoundHttpException('Content type not configured for search.');
     }
-    
+
     $content_type_config = $content_types[$content_type];
     $filters = $content_type_config['filters'] ?: [];
 
-    // Get page title from categories
+    // Get page title
     $page_title = $this->getCategoryTitle($content_type);
 
     // Build filter form
@@ -94,8 +117,9 @@ class SearchController extends ControllerBase
       $content_type
     );
 
-    // Prepare grouped filters
+    // Prepare data for templates
     $grouped_filters = $this->prepareGroupedFilters($filters, $content_type_config, $request);
+    $century_data = $this->prepareCenturyData($filters, $content_type_config, $request);
 
     // Search entities
     $entity_type = $content_type_config['type'] ?? 'node';
@@ -119,6 +143,7 @@ class SearchController extends ControllerBase
       '#total_results' => $total,
       '#has_filters' => $this->hasActiveFilters($request, $filters),
       '#page_title' => $page_title,
+      '#century_data' => $century_data,
       '#module_path' => $request->getBasePath() . '/' . \Drupal::service('extension.list.module')->getPath('teasearch_filter'),
       '#attached' => [
         'library' => [
@@ -151,11 +176,8 @@ class SearchController extends ControllerBase
 
         foreach ($category_nodes as $category_node) {
           if ($category_node->hasField('field_category_menu_list') && !$category_node->get('field_category_menu_list')->isEmpty()) {
-
-            // Recupera il valore testuale del campo.
             $field_value = $category_node->get('field_category_menu_list')->getString();
 
-            // Confronta il valore (non la chiave) con il parametro $content_type
             if (trim($field_value) === trim($content_type)) {
               if ($category_node->hasField('field_link_title') && !$category_node->get('field_link_title')->isEmpty()) {
                 return $category_node->get('field_link_title')->value;
@@ -165,15 +187,14 @@ class SearchController extends ControllerBase
         }
       }
     } catch (\Exception $e) {
-      \Drupal::logger('teasearch_filter')->error('Errore in getCategoryTitle: @message', ['@message' => $e->getMessage()]);
+      \Drupal::logger('teasearch_filter')->error('Error in getCategoryTitle: @message', ['@message' => $e->getMessage()]);
     }
 
-    // Fallback al titolo configurato
+    // Fallback to configured title
     $config = $this->configFactory->get('teasearch_filter.settings');
     $content_types = $config->get('content_types') ?: [];
     return $content_types[$content_type]['label'] ?? ucfirst($content_type);
   }
-
 
   /**
    * Search nodes.
@@ -182,43 +203,25 @@ class SearchController extends ControllerBase
   {
     $machine_name = $config['machine_name'];
     $filters = $config['filters'] ?: [];
-    
+
     $query = $this->entityTypeManager->getStorage('node')->getQuery()
       ->accessCheck(TRUE)
       ->condition('type', $machine_name)
       ->condition('status', 1);
 
-    // Apply WHERE conditions
-    if (!empty($config['where'])) {
-      $where_conditions = json_decode($config['where'], TRUE);
-      if (is_array($where_conditions)) {
-        foreach ($where_conditions as $condition) {
-          foreach ($condition as $field => $value) {
-            if (strpos($field, '.target_id') !== FALSE) {
-              $clean_field = str_replace('.target_id', '', $field);
-              if (!is_numeric($value)) {
-                $term_id = $this->getTermIdByName($value);
-                if ($term_id) {
-                  $query->condition($clean_field, $term_id);
-                }
-              } else {
-                $query->condition($clean_field, $value);
-              }
-            } else {
-              $query->condition($field, $value);
-            }
-          }
-        }
-      }
-    }
+    // Apply WHERE conditions from config
+    $this->applyWhereConditions($query, $config);
 
     // Apply user filters
     $this->applyFiltersToQuery($query, $filters, $request, 'node');
 
+    // Apply year range filtering
+    $this->applyYearRangeFiltering($query, $filters, $request);
+
     // Get total count
     $total_query = clone $query;
     $total = $total_query->count()->execute();
-    
+
     // Apply pagination
     $page = $request->query->get('page', 0);
     $limit = 20;
@@ -229,7 +232,7 @@ class SearchController extends ControllerBase
       ->execute();
 
     $entities = $this->entityTypeManager->getStorage('node')->loadMultiple($ids);
-    
+
     return [$entities, $total];
   }
 
@@ -239,7 +242,7 @@ class SearchController extends ControllerBase
   private function searchUsers($config, Request $request)
   {
     $filters = $config['filters'] ?: [];
-    
+
     $query = $this->entityTypeManager->getStorage('user')->getQuery()
       ->accessCheck(TRUE)
       ->condition('status', 1);
@@ -254,29 +257,154 @@ class SearchController extends ControllerBase
   }
 
   /**
+   * Apply WHERE conditions from configuration.
+   */
+  private function applyWhereConditions($query, $config)
+  {
+    if (empty($config['where'])) {
+      return;
+    }
+
+    $where_conditions = json_decode($config['where'], TRUE);
+    if (!is_array($where_conditions)) {
+      return;
+    }
+
+    foreach ($where_conditions as $condition) {
+      foreach ($condition as $field => $value) {
+        if (strpos($field, '.target_id') !== FALSE) {
+          $clean_field = str_replace('.target_id', '', $field);
+
+          if (!is_numeric($value)) {
+            $resolved_value = $this->resolveFieldValue($clean_field, $value, $config);
+            if ($resolved_value !== null) {
+              $query->condition($clean_field, $resolved_value);
+            }
+          } else {
+            $query->condition($clean_field, $value);
+          }
+        } else {
+          $query->condition($field, $value);
+        }
+      }
+    }
+  }
+
+  /**
+   * Resolve field value for entity references.
+   */
+  private function resolveFieldValue($field_name, $value, $config)
+  {
+    // Try to find vocabulary for taxonomy fields
+    $vocabulary = $this->getVocabularyForField($field_name, $config);
+    if ($vocabulary) {
+      return $this->getTermIdByName($value, $vocabulary);
+    }
+
+    // Try to find node by title for entity reference
+    if (strpos($field_name, 'field_') === 0) {
+      $nodes = $this->entityTypeManager->getStorage('node')->getQuery()
+        ->accessCheck(TRUE)
+        ->condition('title', $value)
+        ->condition('status', 1)
+        ->execute();
+
+      if (!empty($nodes)) {
+        return reset($nodes);
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Get vocabulary for a field.
+   */
+  private function getVocabularyForField($field_name, $config)
+  {
+    // Check in current config filters
+    if (!empty($config['filters'])) {
+      foreach ($config['filters'] as $filter_field => $filter_config) {
+        if (
+          $filter_field === str_replace('field_', '', $field_name) &&
+          isset($filter_config['vocabulary'])
+        ) {
+          return $filter_config['vocabulary'];
+        }
+      }
+    }
+
+    // Common field mappings
+    $field_vocabulary_mapping = [
+      'field_roles' => 'roles',
+      'field_categories' => 'categories',
+      'field_subjects' => 'subjects',
+      'field_skills' => 'skills',
+      'field_location' => 'location',
+    ];
+
+    if (isset($field_vocabulary_mapping[$field_name])) {
+      return $field_vocabulary_mapping[$field_name];
+    }
+
+    // Try to infer from field name
+    $clean_field_name = str_replace('field_', '', $field_name);
+    $vocabularies = $this->entityTypeManager->getStorage('taxonomy_vocabulary')->loadMultiple();
+
+    if (isset($vocabularies[$clean_field_name])) {
+      return $clean_field_name;
+    }
+
+    return null;
+  }
+
+  /**
+   * Get term ID by name.
+   */
+  private function getTermIdByName($term_name, $vocabulary = null)
+  {
+    $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
+
+    $query = $term_storage->getQuery()
+      ->accessCheck(TRUE)
+      ->condition('name', $term_name);
+
+    if ($vocabulary) {
+      $query->condition('vid', $vocabulary);
+    }
+
+    $tids = $query->execute();
+    return !empty($tids) ? reset($tids) : null;
+  }
+
+  /**
    * Apply filters to query.
    */
   private function applyFiltersToQuery($query, $filters, Request $request, $entity_type)
   {
-    foreach ($filters as $field => $filter) {
+    $standard_filters = $this->getStandardFilters($filters);
+
+    foreach ($standard_filters as $field => $filter) {
       $value = $request->query->get($field);
-      if (empty($value)) continue;
+      if (empty($value)) {
+        continue;
+      }
 
       switch ($filter['type']) {
         case 'taxonomy':
           $this->applyTaxonomyFilter($query, $field, $value, $entity_type);
           break;
-          
+
         case 'free_text':
           $this->applyFreeTextFilter($query, $field, $value, $entity_type);
           break;
-          
+
         case 'user_roles':
           if ($entity_type === 'user') {
             $this->applyUserRolesFilter($query, $value);
           }
           break;
-          
+
         case 'user_status':
           if ($entity_type === 'user') {
             $this->applyUserStatusFilter($query, $value);
@@ -287,19 +415,92 @@ class SearchController extends ControllerBase
   }
 
   /**
+   * Get standard filters, excluding special configurations.
+   */
+  private function getStandardFilters(array $filters)
+  {
+    $standard_filters = [];
+    $special_keys = ['century_selector'];
+
+    foreach ($filters as $field_name => $filter) {
+      if (in_array($field_name, $special_keys)) {
+        continue;
+      }
+
+      if (!isset($filter['type'])) {
+        continue;
+      }
+
+      $standard_filters[$field_name] = $filter;
+    }
+
+    return $standard_filters;
+  }
+
+  /**
+   * Apply year range filtering.
+   */
+  private function applyYearRangeFiltering($query, $filters, Request $request)
+  {
+    if (!isset($filters['century_selector'])) {
+      return;
+    }
+
+    $century_config = $filters['century_selector'];
+    $from_field = $century_config['from'] ?? 'year_from';
+    $to_field = $century_config['to'] ?? 'year_to';
+
+    $year_from = $request->query->get('year_from');
+    $year_to = $request->query->get('year_to');
+
+    if ($year_from === null && $year_to === null) {
+      return;
+    }
+
+    $this->applyNodeYearRangeFilter($query, $from_field, $to_field, $year_from, $year_to);
+  }
+
+  /**
+   * Apply year range filter to node query.
+   */
+  private function applyNodeYearRangeFilter($query, $from_field, $to_field, $year_from, $year_to)
+  {
+    $year_group = $query->orConditionGroup();
+
+    if ($year_from !== null && $year_to !== null) {
+      // Entity range overlaps with selected range
+      $overlap1 = $query->andConditionGroup()
+        ->condition($from_field, $year_from, '>=')
+        ->condition($from_field, $year_to, '<=');
+
+      $overlap2 = $query->andConditionGroup()
+        ->condition($to_field, $year_from, '>=')
+        ->condition($to_field, $year_to, '<=');
+
+      $overlap3 = $query->andConditionGroup()
+        ->condition($from_field, $year_from, '<=')
+        ->condition($to_field, $year_to, '>=');
+
+      $year_group->condition($overlap1);
+      $year_group->condition($overlap2);
+      $year_group->condition($overlap3);
+    } elseif ($year_from !== null) {
+      $year_group->condition($to_field, $year_from, '>=');
+    } elseif ($year_to !== null) {
+      $year_group->condition($from_field, $year_to, '<=');
+    }
+
+    $query->condition($year_group);
+  }
+
+  /**
    * Apply taxonomy filter.
    */
   private function applyTaxonomyFilter($query, $field, $value, $entity_type)
   {
-    if (is_string($value)) {
-      $values = explode(',', $value);
-    } elseif (is_array($value)) {
-      $values = $value;
-    } else {
-      $values = [$value];
-    }
-    
+    $values = is_string($value) ? explode(',', $value) : (array) $value;
     $clean_values = array_filter(array_map('intval', $values));
+
     if (!empty($clean_values)) {
       $field_name = $entity_type === 'user' ? $field : "field_{$field}";
       $query->condition("{$field_name}.target_id", $clean_values, 'IN');
@@ -358,11 +559,7 @@ class SearchController extends ControllerBase
    */
   private function getTextFieldsForEntity($entity_type)
   {
-    if ($entity_type === 'user') {
-      return ['name'];
-    }
-    
-    return ['title', 'body.value'];
+    return $entity_type === 'user' ? ['name'] : ['title', 'body.value'];
   }
 
   /**
@@ -370,36 +567,16 @@ class SearchController extends ControllerBase
    */
   private function hasActiveFilters(Request $request, $filters)
   {
-    foreach (array_keys($filters) as $field) {
+    $standard_filters = $this->getStandardFilters($filters);
+
+    foreach (array_keys($standard_filters) as $field) {
       if (!empty($request->query->get($field))) {
         return TRUE;
       }
     }
-    return FALSE;
-  }
 
-  /**
-   * Get term ID by name.
-   */
-  private function getTermIdByName($term_name, $vocabulary = null)
-  {
-    $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
-    
-    $query = $term_storage->getQuery()
-      ->accessCheck(TRUE)
-      ->condition('name', $term_name);
-      
-    if ($vocabulary) {
-      $query->condition('vid', $vocabulary);
-    }
-    
-    $tids = $query->execute();
-    
-    if (!empty($tids)) {
-      return reset($tids);
-    }
-    
-    return null;
+    // Check year range
+    return !empty($request->query->get('year_from')) || !empty($request->query->get('year_to'));
   }
 
   /**
@@ -411,10 +588,11 @@ class SearchController extends ControllerBase
     $query_values = $request->query->all();
     $entity_type = $config['type'] ?? 'node';
     $machine_name = $config['machine_name'];
+    $standard_filters = $this->getStandardFilters($filters);
 
-    foreach ($filters as $field_name => $filter) {
+    foreach ($standard_filters as $field_name => $filter) {
       $selected = $query_values[$field_name] ?? [];
-      
+
       if (in_array($filter['type'], ['taxonomy', 'user_roles'])) {
         if (is_string($selected)) {
           $selected = explode(',', $selected);
@@ -443,11 +621,11 @@ class SearchController extends ControllerBase
         case 'taxonomy':
           $filter_data['options'] = $this->getTaxonomyOptions($filter, $machine_name, $field_name, $selected, $entity_type);
           break;
-          
+
         case 'user_roles':
           $filter_data['options'] = $this->getUserRoleOptions($selected);
           break;
-          
+
         case 'user_status':
           $filter_data['options'] = $this->getUserStatusOptions($selected);
           break;
@@ -457,6 +635,122 @@ class SearchController extends ControllerBase
     }
 
     return $grouped_filters;
+  }
+
+  /**
+   * Prepare century selector data.
+   */
+  private function prepareCenturyData($filters, $config, Request $request)
+  {
+    if (!isset($filters['century_selector'])) {
+      return null;
+    }
+
+    $century_config = $filters['century_selector'];
+    $machine_name = $config['machine_name'];
+    $display_mode = $century_config['display'] ?? 'manual';
+
+    $data = [
+      'enabled' => true,
+      'from_field' => $century_config['from'] ?? 'year_from',
+      'to_field' => $century_config['to'] ?? 'year_to',
+      'display_mode' => $display_mode,
+      'selected_from' => $request->query->get('year_from'),
+      'selected_to' => $request->query->get('year_to'),
+    ];
+
+    if ($display_mode === 'manual') {
+      $data['min_year'] = -3000;
+      $data['max_year'] = date('Y');
+    } else {
+      $year_range = $this->calculateYearRange($machine_name, $data['from_field'], $data['to_field']);
+      $data['min_year'] = $year_range['min'];
+      $data['max_year'] = $year_range['max'];
+    }
+
+    $data['centuries'] = $this->generateCenturies($data['min_year'], $data['max_year']);
+
+    return $data;
+  }
+
+  /**
+   * Calculate year range from existing data.
+   */
+  private function calculateYearRange($machine_name, $from_field, $to_field)
+  {
+    try {
+      $query = $this->entityTypeManager->getStorage('node')->getQuery()
+        ->accessCheck(TRUE)
+        ->condition('type', $machine_name)
+        ->condition('status', 1);
+
+      $nids = $query->execute();
+
+      if (empty($nids)) {
+        return ['min' => -3000, 'max' => date('Y')];
+      }
+
+      $nodes = $this->entityTypeManager->getStorage('node')->loadMultiple($nids);
+      $min_year = null;
+      $max_year = null;
+
+      foreach ($nodes as $node) {
+        if ($node->hasField($from_field) && !$node->get($from_field)->isEmpty()) {
+          $from_value = $node->get($from_field)->value;
+          if ($min_year === null || $from_value < $min_year) {
+            $min_year = $from_value;
+          }
+        }
+
+        if ($node->hasField($to_field) && !$node->get($to_field)->isEmpty()) {
+          $to_value = $node->get($to_field)->value;
+          if ($max_year === null || $to_value > $max_year) {
+            $max_year = $to_value;
+          }
+        }
+      }
+
+      return [
+        'min' => $min_year ?? -3000,
+        'max' => $max_year ?? date('Y')
+      ];
+    } catch (\Exception $e) {
+      \Drupal::logger('teasearch_filter')->error('Error calculating year range: @message', [
+        '@message' => $e->getMessage()
+      ]);
+      return ['min' => -3000, 'max' => date('Y')];
+    }
+  }
+
+  /**
+   * Generate centuries for timeline.
+   */
+  private function generateCenturies($min_year, $max_year)
+  {
+    $centuries = [];
+
+    $start_century = intval(floor($min_year / 100));
+    $end_century = intval(ceil($max_year / 100));
+
+    for ($century = $start_century; $century <= $end_century; $century++) {
+      $century_start = $century * 100;
+      $century_end = $century_start + 99;
+
+      if ($century < 0) {
+        $label = abs($century_start) . '-' . abs($century_end) . ' AC';
+      } else {
+        $label = $century_start . '-' . $century_end . ' CE';
+      }
+
+      $centuries[] = [
+        'value' => $century,
+        'label' => $label,
+        'start_year' => $century_start,
+        'end_year' => $century_end,
+      ];
+    }
+
+    return $centuries;
   }
 
   /**
@@ -470,34 +764,40 @@ class SearchController extends ControllerBase
 
     $terms = $this->entityTypeManager->getStorage('taxonomy_term')->loadTree($filter['vocabulary']);
     $options = [];
-    
-    foreach ($terms as $term) {
-      if ($entity_type === 'user') {
-        $count = $this->entityTypeManager->getStorage('user')->getQuery()
-          ->accessCheck(TRUE)
-          ->condition('status', 1)
-          ->condition("{$field_name}.target_id", $term->tid)
-          ->count()
-          ->execute();
-      } else {
-        $count = $this->entityTypeManager->getStorage('node')->getQuery()
-          ->accessCheck(TRUE)
-          ->condition('type', $machine_name)
-          ->condition('status', 1)
-          ->condition("field_{$field_name}.target_id", $term->tid)
-          ->count()
-          ->execute();
-      }
 
-      if ($count) {
-        $options[$term->tid] = [
-          'label' => $term->name ?? '',
-          'count' => $count,
-          'selected' => in_array((string)$term->tid, $selected, true)
-        ];
+    foreach ($terms as $term) {
+      try {
+        if ($entity_type === 'user') {
+          $count = $this->entityTypeManager->getStorage('user')->getQuery()
+            ->accessCheck(TRUE)
+            ->condition('status', 1)
+            ->condition("{$field_name}.target_id", $term->tid)
+            ->count()
+            ->execute();
+        } else {
+          $count = $this->entityTypeManager->getStorage('node')->getQuery()
+            ->accessCheck(TRUE)
+            ->condition('type', $machine_name)
+            ->condition('status', 1)
+            ->condition("field_{$field_name}.target_id", $term->tid)
+            ->count()
+            ->execute();
+        }
+
+        if ($count > 0) {
+          $options[$term->tid] = [
+            'label' => $term->name ?? '',
+            'count' => $count,
+            'selected' => in_array((string)$term->tid, $selected, true)
+          ];
+        }
+      } catch (\Exception $e) {
+        \Drupal::logger('teasearch_filter')->error('Error getting taxonomy count: @message', [
+          '@message' => $e->getMessage()
+        ]);
       }
     }
-    
+
     return $options;
   }
 
@@ -508,24 +808,30 @@ class SearchController extends ControllerBase
   {
     $roles = user_roles(TRUE);
     $options = [];
-    
+
     foreach ($roles as $rid => $role) {
-      $count = $this->entityTypeManager->getStorage('user')->getQuery()
-        ->accessCheck(TRUE)
-        ->condition('status', 1)
-        ->condition('roles', $rid)
-        ->count()
-        ->execute();
-        
-      if ($count) {
-        $options[$rid] = [
-          'label' => $role->label(),
-          'count' => $count,
-          'selected' => in_array($rid, $selected, true)
-        ];
+      try {
+        $count = $this->entityTypeManager->getStorage('user')->getQuery()
+          ->accessCheck(TRUE)
+          ->condition('status', 1)
+          ->condition('roles', $rid)
+          ->count()
+          ->execute();
+
+        if ($count > 0) {
+          $options[$rid] = [
+            'label' => $role->label(),
+            'count' => $count,
+            'selected' => in_array($rid, $selected, true)
+          ];
+        }
+      } catch (\Exception $e) {
+        \Drupal::logger('teasearch_filter')->error('Error getting user role count: @message', [
+          '@message' => $e->getMessage()
+        ]);
       }
     }
-    
+
     return $options;
   }
 
@@ -534,19 +840,26 @@ class SearchController extends ControllerBase
    */
   private function getUserStatusOptions($selected)
   {
-    return [
-      'active' => [
-        'label' => $this->t('Active'),
-        'count' => $this->entityTypeManager->getStorage('user')->getQuery()
-          ->accessCheck(TRUE)->condition('status', 1)->count()->execute(),
-        'selected' => $selected === 'active'
-      ],
-      'blocked' => [
-        'label' => $this->t('Blocked'),
-        'count' => $this->entityTypeManager->getStorage('user')->getQuery()
-          ->accessCheck(TRUE)->condition('status', 0)->count()->execute(),
-        'selected' => $selected === 'blocked'
-      ]
-    ];
+    try {
+      return [
+        'active' => [
+          'label' => $this->t('Active'),
+          'count' => $this->entityTypeManager->getStorage('user')->getQuery()
+            ->accessCheck(TRUE)->condition('status', 1)->count()->execute(),
+          'selected' => $selected === 'active'
+        ],
+        'blocked' => [
+          'label' => $this->t('Blocked'),
+          'count' => $this->entityTypeManager->getStorage('user')->getQuery()
+            ->accessCheck(TRUE)->condition('status', 0)->count()->execute(),
+          'selected' => $selected === 'blocked'
+        ]
+      ];
+    } catch (\Exception $e) {
+      \Drupal::logger('teasearch_filter')->error('Error getting user status count: @message', [
+        '@message' => $e->getMessage()
+      ]);
+      return [];
+    }
   }
 }

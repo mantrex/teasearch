@@ -192,6 +192,9 @@ class View extends WidgetBase {
    * {@inheritdoc}
    */
   protected function prepareEntities(array $form, FormStateInterface $form_state) {
+        if (!isset($form_state->getUserInput()['entity_browser_select'])) {
+           return [];
+         }
     if (is_array($form_state->getUserInput()['entity_browser_select'])) {
       $selected_rows = array_values(array_filter($form_state->getUserInput()['entity_browser_select']));
     }

@@ -163,6 +163,12 @@ class CustomFieldUpdateManager implements CustomFieldUpdateManagerInterface {
       throw new \Exception($message);
     }
 
+    // Calculate a safe max column length to coincide with SQL column limit.
+    $max_name_length = 64 - strlen($field_name) - 12;
+    if (strlen($new_property) > $max_name_length) {
+      throw new \Exception(sprintf('The new column name cannot exceed %d characters.', $max_name_length));
+    }
+
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
     $storage = $this->entityTypeManager->getStorage($entity_type_id);
     $definitions = $this->customFieldTypeManager->getDefinitions();

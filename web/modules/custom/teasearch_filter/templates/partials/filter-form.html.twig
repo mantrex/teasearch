@@ -36,6 +36,14 @@
 			</details>
 		{% endfor %}
 
+		{# Special century selector - appears at the end #}
+		{% if century_data and century_data.enabled %}
+			{% include 'modules/custom/teasearch_filter/templates/partials/filter-form-century.html.twig' with {
+				'content_type': content_type,
+				'century_data': century_data
+			} %}
+		{% endif %}
+
 		<div class="filter-actions">
 			<button type="submit" class="btn btn-primary">{{ 'Search'|t }}</button>
 			<a href="{{ url('teasearch_filter.search', {'content_type': content_type}) }}" class="btn btn-outline-secondary">
