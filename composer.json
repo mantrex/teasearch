@@ -42,6 +42,7 @@
     "drupal/updated": "^2.0",
     "drupal/vani": "^11.0",
     "drush/drush": "*",
+    "google/apiclient": "^2.18",
     "twbs/bootstrap": "^5.3",
     "zodiacmedia/drupal-libraries-installer": "^1.6"
   },

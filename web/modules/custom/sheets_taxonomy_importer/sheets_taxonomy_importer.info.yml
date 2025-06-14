@@ -1,0 +1,9 @@
+name: 'Google Sheets Taxonomy Importer'
+type: module
+description: 'Imports taxonomy terms from Google Sheets with translations'
+core_version_requirement: ^11
+package: Custom
+dependencies:
+  - taxonomy
+  - content_translation
+  - locale

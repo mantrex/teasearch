@@ -1,0 +1,7 @@
+sheets_taxonomy_importer.import_form:
+  path: '/admin/config/content/sheets-import'
+  defaults:
+    _form: '\Drupal\sheets_taxonomy_importer\Form\SheetsImportForm'
+    _title: 'Google Sheets Taxonomy Import'
+  requirements:
+    _permission: 'administer taxonomy'
