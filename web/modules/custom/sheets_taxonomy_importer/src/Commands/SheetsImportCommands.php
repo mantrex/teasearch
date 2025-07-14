@@ -66,7 +66,8 @@ class SheetsImportCommands extends DrushCommands
       'image_formats' => 'image_formats',
       'usage_rights' => 'usage_rights',
       'video_genres' => 'video_genres',
-      'types' => 'types',
+      'publication_types' => 'publication_types',
+      'periodical_frequency' => 'periodical_frequency',
       'news_types' => 'news_types',
     ];
 
