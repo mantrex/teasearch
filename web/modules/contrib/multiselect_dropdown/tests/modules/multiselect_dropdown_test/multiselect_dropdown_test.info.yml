@@ -1,0 +1,17 @@
+name: Multiselect Dropdown Test
+description: 'Provides test configuration for multiselect_dropdown.'
+type: module
+package: Testing
+
+dependencies:
+  - 'drupal:field'
+  - 'drupal:node'
+  - 'drupal:options'
+  - 'drupal:path'
+  - 'drupal:taxonomy'
+  - 'multiselect_dropdown:multiselect_dropdown'
+
+# Information added by Drupal.org packaging script on 2025-06-20
+version: '1.2.4'
+project: 'multiselect_dropdown'
+datestamp: 1750456713

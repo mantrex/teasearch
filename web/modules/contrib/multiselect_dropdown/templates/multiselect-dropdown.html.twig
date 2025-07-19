@@ -1,0 +1,120 @@
+{#
+/**
+ * @file
+ * Default theme implementation for a multiselect dropdown.
+ *
+ * Available variables:
+ * @var \Drupal\Core\Template\Attribute attributes
+ *   HTML attributes for the root element.
+ * @var string toggle_label
+ *   Toggle button label.
+ * @var \Drupal\Core\Template\Attribute toggle_attributes
+ *   HTML attributes for the toggle button.
+ * @var \Drupal\Core\Template\Attribute dialog_attributes
+ *   HTML attributes for the dialog.
+ * @var \Drupal\Core\Template\Attribute wrapper_attributes
+ *   HTML attributes for the container that wraps all dialog contents.
+ * @var string close_label
+ *   Close button label.
+ * @var \Drupal\Core\Template\Attribute close_attributes
+ *   HTML attributes for the dialog close button.
+ * @var string select_all_label
+ *   Select all button label.
+ * @var \Drupal\Core\Template\Attribute select_all_label
+ *   HTML attributes for the select all button.
+ * @var string select_none_label
+ *   Select none button label.
+ * @var \Drupal\Core\Template\Attribute select_none_label
+ *   HTML attributes for the select none button.
+ * @var \Drupal\Core\Template\Attribute scroll_attributes
+ *   HTML attributes for the scroll container.
+ * @var \Drupal\Core\Template\Attribute list_attributes
+ *   HTML attributes for the checkbox list.
+ * @var string submit_label
+ *   Submit button label.
+ * @var \Drupal\Core\Template\Attribute submit_attributes
+ *   HTML attributes for the submit button.
+ * @var string clear_label
+ *   Clear button label.
+ * @var \Drupal\Core\Template\Attribute clear_attributes
+ *   HTML attributes for the clear button.
+ * @var array search
+ *   Search field render array.
+ * @var array children
+ *   The rendered checkboxes.
+ *
+ * @see template_preprocess_multiselect_dropdown()
+ *
+ * @ingroup themeable
+ */
+#}
+<div{{ attributes.addClass('multiselect-dropdown') }}>
+  {% block toggle %}
+    <button{{ toggle_attributes.addClass('multiselect-dropdown__toggle', 'form-select', 'form-element', 'form-element--type-select') }}>{{ toggle_label }}</button>
+  {% endblock %}
+
+  {% block dialog %}
+    <dialog{{ dialog_attributes.addClass('multiselect-dropdown__dialog') }}>
+      <div{{ wrapper_attributes.addClass('multiselect-dropdown__wrapper') }}>
+        {% block dialog_close %}
+          <button{{ close_attributes.addClass('multiselect-dropdown__dialog-close') }}>{{ close_label }}</button>
+        {% endblock %}
+
+        {% block actions %}
+          {% if select_all_label or select_none_label %}
+            <div class="multiselect-dropdown__actions">
+              {% if select_all_label %}
+                <button{{ select_all_attributes.addClass('multiselect-dropdown__action', 'multiselect-dropdown__action--all')  }}>{{ select_all_label }}</button>
+              {% endif %}
+              {% if select_none_label %}
+                <button{{ select_none_attributes.addClass('multiselect-dropdown__action', 'multiselect-dropdown__action--none') }}>{{ select_none_label }}</button>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endblock %}
+
+        {% block search %}
+          {{ search }}
+        {% endblock %}
+
+        {% block list %}
+          <div{{ scroll_attributes.addClass('multiselect-dropdown__scroll') }}>
+            <ul{{ list_attributes.addClass('multiselect-dropdown__list') }}>
+              {% block children %}
+                {% import _self as self %}
+                {{ self.children(children) }}
+              {% endblock %}
+            </ul>
+          </div>
+        {% endblock %}
+
+        {% block buttons %}
+          {% if submit_label or clear_label %}
+            <div class="multiselect-dropdown__buttons">
+              {% if submit_label %}
+                <button{{ submit_attributes.addClass('multiselect-dropdown__button', 'multiselect-dropdown__button--submit') }}>{{ submit_label }}</button>
+              {% endif %}
+              {% if clear_label %}
+                <button{{ clear_attributes.addClass('multiselect-dropdown__button', 'multiselect-dropdown__button--clear') }}>{{ clear_label }}</button>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endblock %}
+      </div>
+    </dialog>
+  {% endblock %}
+</div>
+
+{% macro children(items) %}
+  {% import _self as self %}
+  {% for item in items %}
+    <li class="multiselect-dropdown__item{% if item.below is defined %} multiselect-dropdown__item--grouped{% endif %}">
+      {{ item|without('below') }}
+      {% if item.below is defined %}
+        <ul class="multiselect-dropdown__group">
+          {{ self.children(item.below) }}
+        </ul>
+      {% endif %}
+    </li>
+  {% endfor %}
+{% endmacro %}

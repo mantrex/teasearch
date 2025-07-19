@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations for multiselect_dropdown_polyfill.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function multiselect_dropdown_polyfill_help(
+  string $route_name,
+  RouteMatchInterface $route_match,
+): string {
+  $output = '';
+  if ($route_name === 'help.page.multiselect_dropdown_polyfill') {
+    $output .= '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('Provides a dialog element polyfill for older browsers using multiselect dropdown.') . '</p>';
+    // phpcs:ignore Drupal.Arrays.Array.LongLineDeclaration
+    $output .= '<p>' . t('For a full description of the module and configuration instructions visit the <a href=":project" target="_blank">project page</a> or consult the <a href=":readme" target="_blank">README.md</a> in the module directory.', [':project' => 'https://www.drupal.org/project/multiselect_dropdown', ':readme' => 'https://git.drupalcode.org/project/multiselect_dropdown/-/blob/1.0.x/README.md']) . '</p>';
+    $output .= '<p>' . t('Submit bug reports, feature suggestions or track changes in the <a href=":queue" target="_blank">issue queue</a>.', [':queue' => 'https://www.drupal.org/project/issues/multiselect_dropdown']) . '</p>';
+  }
+  return $output;
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function multiselect_dropdown_polyfill_preprocess_multiselect_dropdown(array &$variables): void {
+  if (\in_array('multiselect_dropdown/element', $variables['#attached']['library'] ?? [], TRUE)) {
+    $variables['#attached']['library'][] = 'multiselect_dropdown_polyfill/polyfill';
+  }
+}

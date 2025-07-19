@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations for multiselect_dropdown_bef_test.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function multiselect_dropdown_bef_test_help(
+  string $route_name,
+  RouteMatchInterface $route_match,
+): string {
+  $output = '';
+  if ($route_name === 'help.page.multiselect_dropdown_bef_test') {
+    $output .= '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('Provides test configuration for multiselect_dropdown_bef.') . '</p>';
+    // phpcs:ignore Drupal.Arrays.Array.LongLineDeclaration
+    $output .= '<p>' . t('For a full description of the module and configuration instructions visit the <a href=":project" target="_blank">project page</a> or consult the <a href=":readme" target="_blank">README.md</a> in the module directory.', [':project' => 'https://www.drupal.org/project/multiselect_dropdown', ':readme' => 'https://git.drupalcode.org/project/multiselect_dropdown/-/blob/1.0.x/README.md']) . '</p>';
+    $output .= '<p>' . t('Submit bug reports, feature suggestions or track changes in the <a href=":queue" target="_blank">issue queue</a>.', [':queue' => 'https://www.drupal.org/project/issues/multiselect_dropdown']) . '</p>';
+  }
+  return $output;
+}

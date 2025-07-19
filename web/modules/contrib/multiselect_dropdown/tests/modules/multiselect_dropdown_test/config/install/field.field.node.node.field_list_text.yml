@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_list_text
+    - node.type.node
+  module:
+    - options
+  enforced:
+    module:
+      - multiselect_dropdown_test
+id: node.node.field_list_text
+field_name: field_list_text
+entity_type: node
+bundle: node
+label: 'List Text'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

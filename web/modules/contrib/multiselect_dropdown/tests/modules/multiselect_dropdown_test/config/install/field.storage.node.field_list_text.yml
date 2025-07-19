@@ -1,0 +1,38 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - options
+  enforced:
+    module:
+      - multiselect_dropdown_test
+id: node.field_list_text
+field_name: field_list_text
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: one
+      label: One
+    -
+      value: two
+      label: Two
+    -
+      value: three
+      label: Three
+    -
+      value: four
+      label: Four
+    -
+      value: unused
+      label: Unused
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

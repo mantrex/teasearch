@@ -1,0 +1,18 @@
+polyfill:
+  version: '1.2.2'
+  css:
+    component:
+      css/multiselect-dropdown-polyfill.css: {}
+  js:
+    js/dist/multiselect-dropdown-polyfill.js: { attributes: { type: module } }
+  dependencies:
+    - multiselect_dropdown_polyfill/vendor
+    - multiselect_dropdown/element
+
+vendor:
+  version: '0.5.6'
+  css:
+    component:
+      node_modules/dialog-polyfill/dist/dialog-polyfill.css: {}
+  js:
+    node_modules/dialog-polyfill/dist/dialog-polyfill.esm.js: { attributes: { type: module } }

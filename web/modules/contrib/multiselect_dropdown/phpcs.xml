@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="Module">
+  <file>.</file>
+  <arg name="extensions" value="php,module,inc,install,test,profile,theme,info,txt,md,yml"/>
+  <arg name="ignore" value="node_modules"/>
+
+  <!-- Include all Drupal and DrupalPractice sniffs. -->
+  <rule ref="vendor/drupal/coder/coder_sniffer/Drupal"/>
+  <rule ref="vendor/drupal/coder/coder_sniffer/DrupalPractice"/>
+
+  <!-- Since the module uses typed properties, ignore variable comments missing. -->
+  <rule ref="Drupal.Commenting.VariableComment.Missing"><severity>0</severity></rule>
+
+  <!-- Since the module uses typed properties, parameter comments for functions are not always necessary. -->
+  <rule ref="Drupal.Commenting.FunctionComment.MissingParamComment"><severity>0</severity></rule>
+
+  <!-- Since the module uses typed properties, return comments for functions are not always necessary. -->
+  <rule ref="Drupal.Commenting.FunctionComment.MissingReturnComment"><severity>0</severity></rule>
+</ruleset>

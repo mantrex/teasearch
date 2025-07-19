@@ -1,0 +1,10 @@
+name: Multiselect Dropdown Test Theme
+description: 'Theme for testing multiselect dropdowns. Ensures required elements are present and clickable during automated testing.'
+type: theme
+base theme: stark
+package: Testing
+
+# Information added by Drupal.org packaging script on 2025-06-20
+version: '1.2.4'
+project: 'multiselect_dropdown'
+datestamp: 1750456713

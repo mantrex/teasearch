@@ -1,0 +1,26 @@
+{
+    "name": "drupal/multiselect_dropdown",
+    "description": "Provides a form render element which displays checkboxes in a dropdown select-like element.",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://www.drupal.org/project/multiselect_dropdown",
+    "authors": [
+        {
+            "name": "Benjamin Baird",
+            "homepage": "https://www.drupal.org/u/benabaird"
+        }
+    ],
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/multiselect_dropdown",
+        "source": "https://git.drupalcode.org/project/multiselect_dropdown"
+    },
+    "require": {
+        "php": "^8.1"
+    },
+    "require-dev": {
+        "drupal/better_exposed_filters": "^6 || ^7"
+    },
+    "suggest": {
+        "drupal/better_exposed_filters": "^6 || ^7"
+    }
+}

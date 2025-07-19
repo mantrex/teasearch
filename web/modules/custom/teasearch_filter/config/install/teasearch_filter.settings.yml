@@ -59,7 +59,7 @@ content_types:
     machine_name: people
     type: node
     label: 'Contributors'
-    where: '[{"field_roles.target_id":"contributors"}]'
+    #where: '[{"field_roles.target_id":"contributors"}]'
     results:
       mainfield: title
       subfield: field_bio

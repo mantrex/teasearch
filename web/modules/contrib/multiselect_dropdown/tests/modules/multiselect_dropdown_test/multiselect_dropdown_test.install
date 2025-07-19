@@ -1,0 +1,77 @@
+<?php
+
+/**
+ * @file
+ * Install and update hooks for multiselect_dropdown_test.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_install().
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function multiselect_dropdown_test_install(bool $is_syncing): void {
+  if ($is_syncing) {
+    return;
+  }
+
+  $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+
+  $entities = [
+    1 => 'One',
+    2 => 'Two',
+    3 => 'Three',
+    4 => 'Four',
+    5 => 'Five',
+    6 => 'Six',
+    7 => 'Seven',
+    8 => 'Eight',
+    9 => 'Nine',
+    10 => 'Unused',
+  ];
+
+  foreach ($entities as $id => $label) {
+    $term_storage
+      ->create([
+        'tid' => $id,
+        'vid' => 'taxonomy',
+        'name' => $label,
+        'parent' => $id === 9 ? 1 : 0,
+      ])
+      ->save();
+
+    $node_storage
+      ->create([
+        'nid' => $id,
+        'type' => 'node',
+        'title' => $label,
+        'field_list_text' => strtolower($entities[max(1, $id % 5)]),
+        'field_taxonomy' => max(1, $id % 9),
+      ])
+      ->save();
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function multiselect_dropdown_test_uninstall(bool $is_syncing): void {
+  if ($is_syncing) {
+    return;
+  }
+
+  $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  $term_storage->delete($term_storage->loadByProperties(['vid' => 'taxonomy']));
+
+  $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+  $node_storage->delete($node_storage->loadByProperties(['type' => 'node']));
+}

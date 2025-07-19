@@ -1,0 +1,23 @@
+{
+  "name": "multiselect_dropdown",
+  "description": "Provides a form render element which displays checkboxes in a dropdown select-like element.",
+  "license": "GPL-2.0",
+  "engines": {
+    "node": "^20",
+    "npm": "^10"
+  },
+  "scripts": {
+    "clean": "rm -rf js/dist/*.js",
+    "babel": "babel js/src -d js/dist",
+    "build": "npm run clean && npm run babel"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.23.9",
+    "@babel/core": "^7.23.9",
+    "@babel/preset-env": "^7.23.9",
+    "browserlist": "^1.0.1"
+  },
+  "browserslist": [
+    "since 2019-01"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "multiselect_dropdown_polyfill",
+  "description": "Provides a dialog element polyfill for older browsers using multiselect dropdown.",
+  "license": "GPL-2.0",
+  "engines": {
+    "node": "^20",
+    "npm": "^10"
+  },
+  "scripts": {
+    "clean": "rm -rf js/dist/*.js",
+    "babel": "babel js/src -d js/dist",
+    "build": "npm run clean && npm run babel"
+  },
+  "dependencies": {
+    "dialog-polyfill": "^0.5.6"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.23.9",
+    "@babel/core": "^7.23.9",
+    "@babel/preset-env": "^7.23.9",
+    "browserlist": "^1.0.1"
+  },
+  "browserslist": [
+    "since 2019-01"
+  ]
+}

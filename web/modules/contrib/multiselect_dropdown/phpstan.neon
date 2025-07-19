@@ -1,0 +1,11 @@
+includes:
+  - phar://phpstan.phar/conf/bleedingEdge.neon
+  - phpstan-baseline.neon
+
+parameters:
+  level: 9
+  ignoreErrors:
+    # See https://www.drupal.org/project/drupal/issues/3325057
+    -
+      message: '#Call to an undefined method Drupal\\Tests\\WebAssert::(assertWait|waitFor)[a-zA-Z0-9]+\(\)#'
+      reportUnmatched: false

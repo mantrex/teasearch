@@ -1,0 +1,132 @@
+/**
+ * @file
+ * Base styles for Multiselect Dropdown.
+ */
+.multiselect-dropdown {
+  position: relative;
+  min-width: 260px;
+}
+
+.multiselect-dropdown__toggle {
+  width: 100%;
+}
+
+[dir='ltr'] .multiselect-dropdown__toggle {
+  text-align: left;
+}
+
+[dir='rtl'] .multiselect-dropdown__toggle {
+  text-align: right;
+}
+
+.multiselect-dropdown__dialog {
+  overflow: visible;
+  box-sizing: border-box;
+  width: 75vw;
+  max-width: 300px;
+  border: var(--input-border-size, 1px) solid var(--input-border-color, gray);
+  border-radius: var(--button-border-radius-size, 0);
+}
+
+.multiselect-dropdown__dialog::backdrop {
+  background-color: #0009;
+}
+
+.multiselect-dropdown__dialog-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  transform: translateY(-100%);
+  color: white;
+  border: 0;
+  background: transparent;
+  font-weight: 700;
+}
+
+.multiselect-dropdown__scroll {
+  max-height: 50vh;
+}
+
+.multiselect-dropdown__action {
+  padding: 0 var(--space-xs, 0) 0 0;
+  cursor: pointer;
+  text-decoration: underline;
+  border: 0;
+  background: none;
+  font-weight: 600;
+}
+
+.multiselect-dropdown__action--all {
+  color: var(--color-blue-600, darkblue);
+}
+
+.multiselect-dropdown__action--none {
+  color: var(--color-red-600, darkred);
+}
+
+.multiselect-dropdown__button {
+  width: 100%;
+  margin-top: var(--space-xs, 0);
+  padding: var(--space-xs, 0);
+  cursor: pointer;
+  border: 0;
+  border-radius: var(--button-border-radius-size, 0);
+  font-weight: 600;
+}
+
+.multiselect-dropdown__button--submit {
+  color: white;
+  background-color: var(--color-blue-600, darkblue);
+}
+
+.multiselect-dropdown__button--clear {
+  background-color: var(--color-gray-200, lightgray);
+}
+
+.multiselect-dropdown__scroll {
+  overflow-y: scroll;
+}
+
+.multiselect-dropdown__list,
+.multiselect-dropdown__group {
+  list-style: none;
+}
+
+.multiselect-dropdown__list {
+  margin: 0;
+}
+
+.multiselect-dropdown__item .form-item {
+  margin-block: var(--space-xs, 0);
+}
+
+@media screen and (min-width: 769px) {
+  .multiselect-dropdown__dialog {
+    position: absolute;
+    /** 501 ensures the dialog displays above Claro views table headings. */
+    z-index: 501;
+    width: 100%;
+    margin-top: calc(var(--input-border-size, 1px) * -1);
+  }
+
+  .multiselect-dropdown__dialog-close {
+    display: none;
+  }
+
+  .multiselect-dropdown__scroll {
+    max-height: 250px;
+  }
+}
+
+/** Ensure the dialog is visible when JavaScript is disabled. */
+:root:not(.js) .multiselect-dropdown__dialog {
+  position: relative;
+  display: block;
+}
+
+/** Hide action that require JavaScript when JavaScript is disabled. */
+:root:not(.js) .multiselect-dropdown__action,
+:root:not(.js) .multiselect-dropdown__button--clear {
+  display: none;
+}

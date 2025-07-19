@@ -1,0 +1,12 @@
+{#
+/**
+ * @file
+ * Theme implementation of a views exposed form for multiselect dropdown tests.
+ *
+ * The default view template does not contain the .view-content or .view-empty
+ * elements which are used to focus the results when submitting multiselects.
+ * Using an include so tests are affected by any changes to starterkit's
+ * default markup.
+ */
+#}
+{% include '@starterkit_theme/templates/views/views-view.html.twig' %}

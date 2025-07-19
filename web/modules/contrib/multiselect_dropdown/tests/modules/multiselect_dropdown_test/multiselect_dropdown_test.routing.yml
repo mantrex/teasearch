@@ -1,0 +1,15 @@
+multiselect_dropdown_test.form:
+  path: '/multiselect-dropdown/form'
+  defaults:
+    _form: \Drupal\multiselect_dropdown_test\Form\MultiselectDropdownTestForm
+    _title: Multiselect Dropdown Test Form
+  requirements:
+    _permission: access content
+
+multiselect_dropdown_test.breakpoint:
+  path: '/multiselect-dropdown/breakpoint'
+  defaults:
+    _form: \Drupal\multiselect_dropdown_test\Form\MultiselectDropdownBreakpointTestFrom
+    _title: Multiselect Dropdown Breakpoint Test Form
+  requirements:
+    _permission: access content

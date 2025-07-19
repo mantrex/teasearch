@@ -1,0 +1,7 @@
+/**
+ * @file
+ * Base styles for Multiselect Dropdown dialog-polyfill.
+ */
+.multiselect-dropdown__dialog + .backdrop {
+  background-color: #0009;
+}

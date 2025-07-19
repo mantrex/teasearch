@@ -25,6 +25,7 @@
     "drupal/address_suggestion": "^1.0",
     "drupal/better_exposed_filters": "^7.0",
     "drupal/chosen": "^5.0",
+    "drupal/chosen_lib": "^5.0",
     "drupal/core-composer-scaffold": "^11.1",
     "drupal/core-project-message": "^11.1",
     "drupal/core-recommended": "^11.1",
@@ -37,6 +38,7 @@
     "drupal/inline_entity_form": "^3.0@RC",
     "drupal/mfd": "^3.0",
     "drupal/migrate_plus": "^6.0",
+    "drupal/multiselect_dropdown": "^1.2",
     "drupal/paragraphs": "^1.19",
     "drupal/realname": "^2.0",
     "drupal/redirect": "^1.11",
@@ -45,6 +47,7 @@
     "drupal/vani": "^11.0",
     "drush/drush": "*",
     "google/apiclient": "^2.18",
+    "npm-asset/select2": "^4.0",
     "twbs/bootstrap": "^5.3",
     "zodiacmedia/drupal-libraries-installer": "^1.6"
   },

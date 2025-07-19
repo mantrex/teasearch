@@ -1,0 +1,113 @@
+<?php
+
+/**
+ * @file
+ * Install and update hooks for multiselect_dropdown_bef.
+ */
+
+declare(strict_types=1);
+
+use Drupal\multiselect_dropdown\ModalType;
+
+/**
+ * Set the existing multiselect dropdowns in views to persist when opened.
+ */
+function multiselect_dropdown_bef_update_100101(): void {
+  /** @var \Drupal\views\Entity\View[] $views */
+  $views = \Drupal::entityTypeManager()
+    ->getStorage('view')
+    ->loadMultiple();
+  foreach ($views as $view) {
+    $updated = FALSE;
+
+    /** @var array<string, array> $displays @phpstan-ignore missingType.iterableValue */
+    $displays = $view->get('display');
+    foreach ($displays as $display => $config) {
+      if (($config['display_options']['exposed_form']['type'] ?? '') !== 'bef') {
+        continue;
+      }
+
+      foreach ($config['display_options']['exposed_form']['options']['bef']['filter'] as $filter_id => $filter) {
+        if ($filter['plugin_id'] === 'multiselect_dropdown') {
+          $displays[$display]['display_options']['exposed_form']['options']['bef']['filter'][$filter_id]['persist_open'] = TRUE;
+          $updated = TRUE;
+        }
+      }
+    }
+
+    if ($updated) {
+      $view->set('display', $displays)->save();
+    }
+  }
+}
+
+/**
+ * Add search default values to multiselect dropdowns in better exposed filters.
+ */
+function multiselect_dropdown_bef_update_100102(): void {
+  /** @var \Drupal\views\Entity\View[] $views */
+  $views = \Drupal::entityTypeManager()
+    ->getStorage('view')
+    ->loadMultiple();
+  foreach ($views as $view) {
+    $updated = FALSE;
+
+    /** @var array<string, array> $displays @phpstan-ignore missingType.iterableValue */
+    $displays = $view->get('display');
+    foreach ($displays as $display => $config) {
+      if (($config['display_options']['exposed_form']['type'] ?? '') !== 'bef') {
+        continue;
+      }
+
+      foreach ($config['display_options']['exposed_form']['options']['bef']['filter'] as $filter_id => $filter) {
+        if ($filter['plugin_id'] === 'multiselect_dropdown') {
+          $displays[$display]['display_options']['exposed_form']['options']['bef']['filter'][$filter_id]['search_title'] = '';
+          $displays[$display]['display_options']['exposed_form']['options']['bef']['filter'][$filter_id]['search_title_display'] = '';
+          $displays[$display]['display_options']['exposed_form']['options']['bef']['filter'][$filter_id]['search_placeholder'] = '';
+          $displays[$display]['display_options']['exposed_form']['options']['bef']['filter'][$filter_id]['search_character_threshold'] = 3;
+          $updated = TRUE;
+        }
+      }
+    }
+
+    if ($updated) {
+      $view->set('display', $displays)->save();
+    }
+  }
+}
+
+/**
+ * Reverse the values of modal type options to align with a JavaScript fix.
+ */
+function multiselect_dropdown_bef_update_100103(): void {
+  /** @var \Drupal\views\Entity\View[] $views */
+  $views = \Drupal::entityTypeManager()
+    ->getStorage('view')
+    ->loadMultiple();
+  foreach ($views as $view) {
+    $updated = FALSE;
+
+    /** @var array<string, array> $displays @phpstan-ignore missingType.iterableValue */
+    $displays = $view->get('display');
+    foreach ($displays as $display => $config) {
+      if (($config['display_options']['exposed_form']['type'] ?? '') !== 'bef') {
+        continue;
+      }
+
+      foreach ($config['display_options']['exposed_form']['options']['bef']['filter'] as $filter_id => $filter) {
+        if (($filter['plugin_id'] ?? '') === 'multiselect_dropdown') {
+          $displays[$display]['display_options']['exposed_form']['options']['bef']['filter'][$filter_id]['modal_type'] = match (ModalType::from($filter['modal_type'])) {
+            ModalType::Dialog => ModalType::Modal->value,
+            ModalType::Modal => ModalType::Dialog->value,
+            default => ModalType::Breakpoint->value,
+          };
+          $updated = TRUE;
+        }
+      }
+    }
+
+    if ($updated) {
+      $view->set('display', $displays)->save();
+    }
+  }
+}

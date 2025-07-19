@@ -1,0 +1,23 @@
+{
+  "extends": "../../../core/.eslintrc.passing.json",
+  "ignorePatterns": [
+    "**/node_modules",
+    "**/js/dist",
+    "*.yml",
+    "**/Nightwatch/Tests"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2022
+  },
+  "rules": {
+    "max-nested-callbacks": ["warn", 4],
+    "strict": "off",
+    "import/extensions": ["warn", "ignorePackages"],
+    "import/no-relative-packages": "off",
+    "valid-jsdoc": ["warn", {
+      "requireParamDescription": false,
+      "requireReturn": false,
+      "requireReturnDescription": false
+    }]
+  }
+}

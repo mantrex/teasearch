@@ -1,0 +1,58 @@
+better_exposed_filters.filter.multiselect_dropdown:
+  label: 'Multiselect dropdown better exposed filters settings'
+  type: better_exposed_filters_filter_widget
+  mapping:
+    label_aria:
+      type: required_label
+      label: Accessible Label
+    label_none:
+      type: required_label
+      label: None Label
+    label_all:
+      type: required_label
+      label: All Label
+    label_single:
+      type: required_label
+      label: Single Label
+    label_plural:
+      type: required_label
+      label: Plural Label
+    label_select_all:
+      type: label
+      label: Select All Button
+    label_select_none:
+      type: label
+      label: Deselect All Button
+    label_close:
+      type: label
+      label: Submit Button
+    label_submit:
+      type: label
+      label: Submit Button
+    label_clear:
+      type: label
+      label: Clear Button
+    search_title:
+      type: label
+      label: Search Input Label
+    search_title_display:
+      type: label
+      label: Search Input Label Display
+    search_placeholder:
+      type: label
+      label: Search Input Placeholder
+    search_character_threshold:
+      type: integer
+      label: Search Input Character Threshold
+    modal_type:
+      type: label
+      label: 'Open Dialog As...'
+    modal_breakpoint:
+      type: integer
+      label: Modal Breakpoint
+    default_open:
+      type: boolean
+      label: Default Open
+    persist_open:
+      type: boolean
+      label: Keep Open on AJAX Submission

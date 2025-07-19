@@ -1,0 +1,171 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Function multiselect_dropdown_bef_preprocess_multiselect_dropdown\\(\\) has parameter \\$variables with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: modules/multiselect_dropdown_bef/multiselect_dropdown_bef.module
+
+		-
+			message: "#^Function multiselect_dropdown_bef_theme_suggestions_alter\\(\\) has parameter \\$suggestions with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: modules/multiselect_dropdown_bef/multiselect_dropdown_bef.module
+
+		-
+			message: "#^Function multiselect_dropdown_bef_theme_suggestions_alter\\(\\) has parameter \\$variables with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: modules/multiselect_dropdown_bef/multiselect_dropdown_bef.module
+
+		-
+			message: "#^Access to an undefined property Drupal\\\\views\\\\Plugin\\\\views\\\\ViewsHandlerInterface\\:\\:\\$options\\.$#"
+			count: 9
+			path: modules/multiselect_dropdown_bef/src/Plugin/better_exposed_filters/filter/MultiselectDropdownFilterWidget.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown_bef\\\\Plugin\\\\better_exposed_filters\\\\filter\\\\MultiselectDropdownFilterWidget\\:\\:buildConfigurationForm\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: modules/multiselect_dropdown_bef/src/Plugin/better_exposed_filters/filter/MultiselectDropdownFilterWidget.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown_bef\\\\Plugin\\\\better_exposed_filters\\\\filter\\\\MultiselectDropdownFilterWidget\\:\\:buildConfigurationForm\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: modules/multiselect_dropdown_bef/src/Plugin/better_exposed_filters/filter/MultiselectDropdownFilterWidget.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown_bef\\\\Plugin\\\\better_exposed_filters\\\\filter\\\\MultiselectDropdownFilterWidget\\:\\:defaultConfiguration\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: modules/multiselect_dropdown_bef/src/Plugin/better_exposed_filters/filter/MultiselectDropdownFilterWidget.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown_bef\\\\Plugin\\\\better_exposed_filters\\\\filter\\\\MultiselectDropdownFilterWidget\\:\\:exposedFormAlter\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: modules/multiselect_dropdown_bef/src/Plugin/better_exposed_filters/filter/MultiselectDropdownFilterWidget.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown_bef\\\\Plugin\\\\better_exposed_filters\\\\filter\\\\MultiselectDropdownFilterWidget\\:\\:isApplicable\\(\\) has parameter \\$filter_options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: modules/multiselect_dropdown_bef/src/Plugin/better_exposed_filters/filter/MultiselectDropdownFilterWidget.php
+
+		-
+			message: "#^Function multiselect_dropdown_polyfill_preprocess_multiselect_dropdown\\(\\) has parameter \\$variables with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: modules/multiselect_dropdown_polyfill/multiselect_dropdown_polyfill.module
+
+		-
+			message: "#^Function multiselect_dropdown_theme\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: multiselect_dropdown.module
+
+		-
+			message: "#^Function multiselect_dropdown_theme_suggestions_alter\\(\\) has parameter \\$suggestions with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: multiselect_dropdown.module
+
+		-
+			message: "#^Function multiselect_dropdown_theme_suggestions_alter\\(\\) has parameter \\$variables with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: multiselect_dropdown.module
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown\\\\Element\\\\MultiselectDropdown\\:\\:getInfo\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Element/MultiselectDropdown.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown\\\\Element\\\\MultiselectDropdown\\:\\:processCheckboxes\\(\\) has parameter \\$complete_form with no type specified\\.$#"
+			count: 1
+			path: src/Element/MultiselectDropdown.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown\\\\Element\\\\MultiselectDropdown\\:\\:processCheckboxes\\(\\) has parameter \\$element with no type specified\\.$#"
+			count: 1
+			path: src/Element/MultiselectDropdown.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown\\\\Element\\\\MultiselectDropdown\\:\\:processCheckboxes\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Element/MultiselectDropdown.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown\\\\Plugin\\\\Field\\\\FieldWidget\\\\MultiselectDropdownWidget\\:\\:defaultSettings\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/MultiselectDropdownWidget.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown\\\\Plugin\\\\Field\\\\FieldWidget\\\\MultiselectDropdownWidget\\:\\:formElement\\(\\) has parameter \\$element with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/MultiselectDropdownWidget.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown\\\\Plugin\\\\Field\\\\FieldWidget\\\\MultiselectDropdownWidget\\:\\:formElement\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/MultiselectDropdownWidget.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown\\\\Plugin\\\\Field\\\\FieldWidget\\\\MultiselectDropdownWidget\\:\\:formElement\\(\\) has parameter \\$items with generic interface Drupal\\\\Core\\\\Field\\\\FieldItemListInterface but does not specify its types\\: T$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/MultiselectDropdownWidget.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown\\\\Plugin\\\\Field\\\\FieldWidget\\\\MultiselectDropdownWidget\\:\\:formElement\\(\\) has parameter \\$items with no value type specified in iterable type Drupal\\\\Core\\\\Field\\\\FieldItemListInterface\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/MultiselectDropdownWidget.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown\\\\Plugin\\\\Field\\\\FieldWidget\\\\MultiselectDropdownWidget\\:\\:formElement\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/MultiselectDropdownWidget.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown\\\\Plugin\\\\Field\\\\FieldWidget\\\\MultiselectDropdownWidget\\:\\:settingsForm\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/MultiselectDropdownWidget.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown\\\\Plugin\\\\Field\\\\FieldWidget\\\\MultiselectDropdownWidget\\:\\:settingsForm\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/MultiselectDropdownWidget.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown\\\\Plugin\\\\Field\\\\FieldWidget\\\\MultiselectDropdownWidget\\:\\:settingsSummary\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Plugin/Field/FieldWidget/MultiselectDropdownWidget.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown_test\\\\Form\\\\MultiselectDropdownBreakpointTestFrom\\:\\:buildForm\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: tests/modules/multiselect_dropdown_test/src/Form/MultiselectDropdownBreakpointTestFrom.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown_test\\\\Form\\\\MultiselectDropdownBreakpointTestFrom\\:\\:buildForm\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: tests/modules/multiselect_dropdown_test/src/Form/MultiselectDropdownBreakpointTestFrom.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown_test\\\\Form\\\\MultiselectDropdownBreakpointTestFrom\\:\\:submitForm\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: tests/modules/multiselect_dropdown_test/src/Form/MultiselectDropdownBreakpointTestFrom.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown_test\\\\Form\\\\MultiselectDropdownTestForm\\:\\:afterBuild\\(\\) has parameter \\$element with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: tests/modules/multiselect_dropdown_test/src/Form/MultiselectDropdownTestForm.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown_test\\\\Form\\\\MultiselectDropdownTestForm\\:\\:afterBuild\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: tests/modules/multiselect_dropdown_test/src/Form/MultiselectDropdownTestForm.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown_test\\\\Form\\\\MultiselectDropdownTestForm\\:\\:buildForm\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: tests/modules/multiselect_dropdown_test/src/Form/MultiselectDropdownTestForm.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown_test\\\\Form\\\\MultiselectDropdownTestForm\\:\\:buildForm\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: tests/modules/multiselect_dropdown_test/src/Form/MultiselectDropdownTestForm.php
+
+		-
+			message: "#^Method Drupal\\\\multiselect_dropdown_test\\\\Form\\\\MultiselectDropdownTestForm\\:\\:submitForm\\(\\) has parameter \\$form with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: tests/modules/multiselect_dropdown_test/src/Form/MultiselectDropdownTestForm.php

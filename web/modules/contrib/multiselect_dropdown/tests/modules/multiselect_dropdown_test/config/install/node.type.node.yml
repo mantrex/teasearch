@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - multiselect_dropdown_test
+third_party_settings: {  }
+name: Node
+type: node
+description: 'Node'
+help: 'Node'
+new_revision: false
+preview_mode: 0
+display_submitted: false

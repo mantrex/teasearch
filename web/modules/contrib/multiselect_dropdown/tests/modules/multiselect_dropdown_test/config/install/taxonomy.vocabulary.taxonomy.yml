@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - multiselect_dropdown_test
+name: Taxonomy
+vid: taxonomy
+description: 'Taxonomy'
+weight: 0

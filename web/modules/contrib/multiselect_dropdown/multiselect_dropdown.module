@@ -1,0 +1,318 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations for multiselect_dropdown.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Template\Attribute;
+use Drupal\multiselect_dropdown\ModalType;
+use Drupal\multiselect_dropdown\Plugin\Field\FieldWidget\MultiselectDropdownWidget;
+
+/**
+ * Implements hook_help().
+ */
+function multiselect_dropdown_help(
+  string $route_name,
+  RouteMatchInterface $route_match,
+): string {
+  $output = '';
+  if ($route_name === 'help.page.multiselect_dropdown') {
+    $output .= '<h3>' . t('About') . '</h3>';
+    $output .= '<p>' . t('Provides a form render element which displays checkboxes in a dropdown select-like element.') . '</p>';
+    // phpcs:ignore Drupal.Arrays.Array.LongLineDeclaration
+    $output .= '<p>' . t('For a full description of the module and configuration instructions visit the <a href=":project" target="_blank">project page</a> or consult the <a href=":readme" target="_blank">README.md</a> in the module directory.', [':project' => 'https://www.drupal.org/project/multiselect_dropdown', ':readme' => 'https://git.drupalcode.org/project/multiselect_dropdown/-/blob/1.0.x/README.md']) . '</p>';
+    $output .= '<p>' . t('Submit bug reports, feature suggestions or track changes in the <a href=":queue" target="_blank">issue queue</a>.', [':queue' => 'https://www.drupal.org/project/issues/multiselect_dropdown']) . '</p>';
+  }
+  return $output;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function multiselect_dropdown_theme(): array {
+  return [
+    'multiselect_dropdown' => [
+      'render element' => 'element',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_alter().
+ */
+function multiselect_dropdown_theme_suggestions_alter(
+  array &$suggestions,
+  array $variables,
+  string $hook,
+): void {
+  if (
+    $hook === 'multiselect_dropdown'
+    && isset($variables['element']['#name'])
+  ) {
+    $suggestions[] = "{$hook}__{$variables['element']['#name']}";
+  }
+}
+
+// phpcs:disable Drupal.Commenting.FunctionComment.MissingParamName
+// phpcs:disable Drupal.Commenting.FunctionComment.ParamCommentIndentation
+
+/**
+ * Prepares variables for multiselect dropdown templates.
+ *
+ * Default template: multiselect-dropdown.html.twig.
+ *
+ * @param array{
+ *   element: array<int|string, mixed>,
+ *   attributes: \Drupal\Core\Template\Attribute,
+ *   toggle_label: string,
+ *   toggle_attributes: \Drupal\Core\Template\Attribute,
+ *   dialog_attributes: \Drupal\Core\Template\Attribute,
+ *   wrapper_attributes: \Drupal\Core\Template\Attribute,
+ *   close_label: string,
+ *   close_attributes: \Drupal\Core\Template\Attribute,
+ *   select_all_label: string,
+ *   select_all_attributes: \Drupal\Core\Template\Attribute,
+ *   select_none_label: string,
+ *   select_none_attributes: \Drupal\Core\Template\Attribute,
+ *   scroll_attributes: \Drupal\Core\Template\Attribute,
+ *   list_attributes: \Drupal\Core\Template\Attribute,
+ *   submit_label: string,
+ *   submit_attributes: \Drupal\Core\Template\Attribute,
+ *   clear_label: string,
+ *   clear_attributes: \Drupal\Core\Template\Attribute,
+ *   search: mixed[],
+ *   children: mixed[],
+ * } &$variables
+ *   An associative array containing:
+ *   - element: The multiselect dropdown render array.
+ *   - attributes: HTML attributes for the root element.
+ *   - toggle_label: Toggle button label.
+ *   - toggle_attributes: HTML attributes for the toggle button.
+ *   - dialog_attributes: HTML attributes for the dialog.
+ *   - wrapper_attributes: HTML attributes for the container that wraps all
+ *     dialog contents.
+ *   - close_label: Close button label.
+ *   - close_attributes: HTML attributes for the dialog close button.
+ *   - select_all_label: Select all button label.
+ *   - select_all_attributes: HTML attributes for the select all button.
+ *   - select_none_label: Select none button label.
+ *   - select_none_attributes: HTML attributes for the select none button.
+ *   - scroll_attributes: HTML attributes for the scroll container.
+ *   - list_attributes: HTML attributes for the checkbox list.
+ *   - submit_label: Submit button label.
+ *   - submit_attributes: HTML attributes for the submit button.
+ *   - clear_label: Clear button label.
+ *   - clear_attributes: HTML attributes for the clear button.
+ *   - search: The search field render array.
+ *   - children: The rendered checkboxes.
+ */
+function template_preprocess_multiselect_dropdown(array &$variables): void {
+  $variables['#attached']['library'][] = 'multiselect_dropdown/element';
+
+  $element = $variables['element'];
+  $variables['children'] = [];
+  foreach (Element::children($element) as $key) {
+    $variables['children'][] = $element[$key];
+  }
+  $variables['children'] = multiselect_dropdown_nest_children($variables['children']);
+
+  $defaults = MultiselectDropdownWidget::defaultSettings();
+  $label_aria = $element['#label_aria'] ?? $defaults['label_aria'];
+  $label_none = $element['#label_none'] ?? $defaults['label_none'];
+  $label_all = $element['#label_all'] ?? $defaults['label_all'];
+  $label_single = $element['#label_single'] ?? $defaults['label_single'];
+  $label_plural = $element['#label_plural'] ?? $defaults['label_plural'];
+
+  $breakpoint = '768';
+  if (\is_numeric($element['#modal_breakpoint'])) {
+    $breakpoint = (string) $element['#modal_breakpoint'];
+  }
+  else {
+    $error_value = '';
+    try {
+      $modal_type = ModalType::from($element['#modal_breakpoint']);
+      if (!\in_array($modal_type, [ModalType::Dialog, ModalType::Modal], TRUE)) {
+        $error_value = ModalType::Breakpoint->value;
+      }
+      $breakpoint = $modal_type->value;
+    }
+    catch (\ValueError) {
+      $error_value = $element['#modal_breakpoint'];
+    }
+
+    if ($error_value) {
+      throw new \ValueError(sprintf(
+        'Value "%s" of "#modal_breakpoint" is not allowed in multiselect dropdown "%s".',
+        $error_value,
+        $element['#id']
+      ));
+    }
+  }
+
+  $variables['attributes'] = (new Attribute($element['#attributes']))
+    ->setAttribute('id', $element['#id'])
+    ->setAttribute('data-drupal-selector', $element['#name'])
+    ->setAttribute('data-multiselect-dropdown', '')
+    ->setAttribute('data-multiselect-dropdown-label-none', $label_none)
+    ->setAttribute('data-multiselect-dropdown-label-all', $label_all)
+    ->setAttribute('data-multiselect-dropdown-label-single', $label_single)
+    ->setAttribute('data-multiselect-dropdown-label-plural', $label_plural)
+    ->setAttribute('data-multiselect-dropdown-breakpoint', $breakpoint);
+
+  $label = match ($selected = count($element['#value'] ?? [])) {
+    0 => $label_none,
+    1 => $label_single,
+    count($element['#options']) => $label_all,
+    default => $label_plural,
+  };
+  $variables['toggle_label'] = sprintf((string) $label, $selected);
+
+  $variables['toggle_attributes'] = new Attribute([
+    'aria-label' => $label_aria,
+    'aria-controls' => "{$element['#id']}-container",
+    'aria-expanded' => 'false',
+    'data-multiselect-dropdown-toggle' => '',
+    'type' => 'button',
+  ]);
+
+  $variables['dialog_attributes'] = new Attribute([
+    'id' => "{$element['#id']}-container",
+    'data-multiselect-dropdown-dialog' => '',
+  ]);
+
+  $variables['wrapper_attributes'] = new Attribute([
+    'aria-label' => t('Close this select and return to the form by pressing escape. Submit an item by pressing enter when focusing an item.'),
+    'tabindex' => '0',
+    'data-multiselect-dropdown-wrapper' => '',
+  ]);
+
+  $variables['close_label'] = (string) ($element['#label_close'] ?? '');
+  $variables['close_attributes'] = new Attribute([
+    'aria-label' => t('Close the dropdown and return to the toggle button.'),
+    'type' => 'button',
+    'data-multiselect-dropdown-dialog-close' => '',
+  ]);
+
+  $variables['select_all_label'] = (string) ($element['#label_select_all'] ?? '');
+  $variables['select_all_attributes'] = new Attribute([
+    'aria-label' => t('Select all items'),
+    'type' => 'button',
+    'data-multiselect-dropdown-select-all' => '',
+  ]);
+  $variables['select_none_label'] = (string) ($element['#label_select_none'] ?? '');
+  $variables['select_none_attributes'] = new Attribute([
+    'aria-label' => t('Deselect all items'),
+    'type' => 'button',
+    'data-multiselect-dropdown-select-none' => '',
+  ]);
+
+  $variables['scroll_attributes'] = new Attribute([
+    'data-multiselect-dropdown-scroll' => '',
+  ]);
+
+  $variables['list_attributes'] = new Attribute([
+    'data-multiselect-dropdown-list' => '',
+  ]);
+
+  $variables['submit_label'] = (string) ($element['#label_submit'] ?? '');
+  $variables['submit_attributes'] = new Attribute([
+    'aria-label' => t('Submit all selected items'),
+    'data-multiselect-dropdown-submit' => '',
+  ]);
+  $variables['clear_label'] = (string) ($element['#label_clear'] ?? '');
+  $variables['clear_attributes'] = new Attribute([
+    'aria-label' => t('Clear all selected items and submit'),
+    'data-multiselect-dropdown-clear' => '',
+  ]);
+
+  $variables['search'] = [];
+  if (isset($element['#search_title']) && $element['#search_title'] !== '') {
+    $variables['search'] = [
+      '#type' => 'search',
+      '#title' => $element['#search_title'],
+      '#title_display' => $element['#search_title_display'],
+      '#placeholder' => $element['#search_placeholder'],
+      '#id' => "{$element['#id']}-search",
+      '#attributes' => [
+        'aria-label' => t('Narrow the item list by searching'),
+        'data-multiselect-dropdown-search' => '',
+        'data-multiselect-dropdown-search-character-threshold' => $element['#search_character_threshold'] ?? 3,
+        'data-bef-auto-submit-exclude' => '',
+      ],
+    ];
+  }
+
+  if ($element['#default_open'] ?? FALSE) {
+    $variables['attributes']->setAttribute('data-multiselect-dropdown-open', '');
+    $variables['toggle_attributes']->setAttribute('aria-expanded', 'true');
+    $variables['dialog_attributes']->setAttribute('open', '');
+  }
+}
+
+/**
+ * Nest child items for rendering in multiselect dropdowns.
+ *
+ * @param array<array{
+ *   '#title': string,
+ *   '#return_value': int|string,
+ *   '#attributes': array<int|string>
+ * }> $children
+ *   Flat children to nest.
+ *
+ * @return mixed[]
+ *   Nested children.
+ */
+function multiselect_dropdown_nest_children(array $children): array {
+  $nested_children = [];
+  $parents = [];
+
+  foreach ($children as $child) {
+    // 'below' is not a true depth, just the key to house the children, so do
+    // not count it.
+    $current_depth = max(
+      \count(array_filter($parents, fn(string|int $item) => $item !== 'below')) - 1,
+      0,
+    );
+
+    $child_depth = (int) ($child['#attributes']['data-multiselect-dropdown-depth'] ?? 0);
+    // Convert nested taxonomy terms to depth attributes when displayed in views
+    // and ensure a depth is always present.
+    if (!isset($child['#attributes']['data-multiselect-dropdown-depth'])) {
+      $title = (string) $child['#title'];
+      if (str_starts_with($title, '-')) {
+        $child_depth = mb_strlen($title) - mb_strlen(ltrim($title, '-'));
+        $child['#title'] = ltrim($title, '- ');
+      }
+      $child['#attributes']['data-multiselect-dropdown-depth'] = $child_depth;
+    }
+
+    match(TRUE) {
+      // Root element, reset the trail.
+      $child_depth === 0 => $parents = [],
+      // Same depth, remove the current element.
+      $child_depth === $current_depth => array_pop($parents),
+      // Moving down, add an element to contain the children.
+      $child_depth > $current_depth => $parents[] = 'below',
+      // Moving up, remove all parents before the new depth. Because each parent
+      // has an associated 'below' element, this number is double the child
+      // depth.
+      $child_depth < $current_depth => $parents = array_slice($parents, 0, $child_depth * 2),
+      default => '',
+    };
+    // Add the current item.
+    $parents[] = $child['#return_value'];
+
+    NestedArray::setValue($nested_children, $parents, $child);
+  }
+
+  return $nested_children;
+}
+
+// phpcs:enable Drupal.Commenting.FunctionComment.MissingParamName
+// phpcs:enable Drupal.Commenting.FunctionComment.ParamCommentIndentation

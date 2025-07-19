@@ -1,0 +1,39 @@
+<?php
+
+/**
+ * @file
+ * Install and update hooks for multiselect_dropdown.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Add search default values to multiselect dropdowns in entity forms.
+ */
+function multiselect_dropdown_update_100101(): void {
+  /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface[] $forms */
+  $forms = \Drupal::entityTypeManager()
+    ->getStorage('entity_form_display')
+    ->loadMultiple();
+  foreach ($forms as $form) {
+    $updated = FALSE;
+
+    foreach ($form->getComponents() as $name => $settings) {
+      if (
+        isset($settings['type'])
+        && $settings['type'] === 'multiselect_dropdown'
+      ) {
+        $settings['settings']['search_title'] = '';
+        $settings['settings']['search_title_display'] = '';
+        $settings['settings']['search_placeholder'] = '';
+        $settings['settings']['search_character_threshold'] = 3;
+        $form->setComponent($name, $settings);
+        $updated = TRUE;
+      }
+    }
+
+    if ($updated) {
+      $form->save();
+    }
+  }
+}

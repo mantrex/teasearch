@@ -1,0 +1,11 @@
+/**
+ * @file
+ * Styles for Multiselect Dropdown field widgets.
+ */
+.multiselect-dropdown {
+  max-width: 300px;
+}
+
+.multiselect-dropdown__actions {
+  margin-bottom: var(--space-m, 1em);
+}
