@@ -1,0 +1,11 @@
+name: 'Test Select View'
+description: 'Provides a view containing a select filter for testing the choices module.'
+type: module
+package: Testing
+dependencies:
+  - drupal:node
+
+# Information added by Drupal.org packaging script on 2023-07-21
+version: '2.1.5'
+project: 'choices'
+datestamp: 1689935990

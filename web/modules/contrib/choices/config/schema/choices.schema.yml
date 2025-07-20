@@ -1,0 +1,27 @@
+choices.settings:
+  type: config_object
+  label: 'Choices settings'
+  mapping:
+    use_cdn:
+      type: boolean
+      label: 'Use CDN for loading the Choices.js library instead of loading it locally.'
+    css_selector:
+      type: string
+      label: 'CSS selectors of the elements which to apply Choices on.'
+    include:
+      type: integer
+      label: 'Defines to load Choices in frontend, admin or both.'
+    configuration_options:
+      type: string
+      label: 'JSON configuration object to pass to Choices.'
+    enable_globally:
+      type: boolean
+      label: 'Enable Choices globally'
+
+field.widget.settings.choices_widget:
+  type: mapping
+  label: 'Choices widget settings'
+  mapping:
+    configuration_options:
+      type: string
+      label: 'Configuration options to pass into choices'

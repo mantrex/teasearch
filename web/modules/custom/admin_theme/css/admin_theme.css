@@ -27,3 +27,13 @@ right:0;
   right:0;
   top:-4px;
 }
+
+.choices {
+  width:100%;
+}
+
+.choices__list--multiple .choices__item {
+  background:#3eb300;
+  border-color:#276e00;
+
+}

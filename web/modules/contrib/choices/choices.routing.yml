@@ -1,0 +1,7 @@
+choices.admin:
+  path: '/admin/config/user-interface/choices'
+  defaults:
+    _form: '\Drupal\choices\Form\ConfigForm'
+    _title: 'Choices'
+  requirements:
+    _permission: 'administer site configuration'

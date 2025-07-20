@@ -1,0 +1,5 @@
+use_cdn: FALSE
+css_selector: 'select[multiple]'
+include: 2
+configuration_options: ''
+enable_globally: FALSE

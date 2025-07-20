@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * @file
+ * General functions and hook implementations.
+ */
+
+/**
+ * Implements hook_element_info_alter().
+ */
+function choices_element_info_alter(&$info) {
+  // Only render, if global choices are enabled:
+  if (\Drupal::config('choices.settings')->get('enable_globally')) {
+    $info['select']['#pre_render'][] = '\Drupal\choices\ChoicesCallbacks::preRender';
+  }
+}
+
+/**
+ * Implements hook_library_info_alter().
+ */
+function choices_library_info_alter(&$libraries, $extension) {
+  if ($extension !== 'choices') {
+    return;
+  }
+
+  // Alter the library to use the CDN if configured.
+  if (!\Drupal::config('choices.settings')->get('use_cdn')) {
+    return;
+  }
+
+  // Unset global choices library entries:
+  unset($libraries['library']['js']['/libraries/choices.js/public/assets/scripts/choices.min.js']);
+  unset($libraries['library']['css']['component']['/libraries/choices.js/public/assets/styles/choices.min.css']);
+
+  // Add the remote files before the local ones.
+  $libraries['library']['css']['component']['https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css'] = [
+    'type' => 'external',
+    'minified' => TRUE,
+  ];
+
+  $libraries['library']['js']['https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js'] = [
+    'type' => 'external',
+    'minified' => TRUE,
+  ];
+}

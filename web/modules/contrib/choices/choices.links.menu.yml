@@ -1,0 +1,6 @@
+choices.config_menu:
+  title: 'Choices'
+  route_name: choices.admin
+  description: 'Configure Choices.js.'
+  parent: system.admin_config_ui
+  weight: 0

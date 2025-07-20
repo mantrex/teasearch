@@ -1,0 +1,13 @@
+name: Choices.js Facets
+type: module
+description: Provides a Choices.js Facet widget.
+package: Search
+core_version_requirement: ^8.9 || ^9 || ^10  || ^11
+dependencies:
+  - facets:facets
+  - choices:choices
+
+# Information added by Drupal.org packaging script on 2023-07-21
+version: '2.1.5'
+project: 'choices'
+datestamp: 1689935990

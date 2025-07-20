@@ -1,0 +1,11 @@
+name: Choices.js
+description: Improves select elements using <a target="_blank" href="https://github.com/jshjohnson/Choices">Choices</a>.
+type: module
+core_version_requirement: ^8.9 || ^9 || ^10  || ^11
+package: User interface
+configure: choices.admin
+
+# Information added by Drupal.org packaging script on 2023-07-21
+version: '2.1.5'
+project: 'choices'
+datestamp: 1689935990

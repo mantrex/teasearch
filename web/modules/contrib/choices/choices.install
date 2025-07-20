@@ -1,0 +1,95 @@
+<?php
+
+/**
+ * @file
+ * Install, uninstall and update hooks for the Choices module.
+ */
+
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_requirements().
+ */
+function choices_requirements($phase) {
+  $requirements = [];
+  // If we are not in runtime phase, there is nothing to do. So bail out early.
+  if ($phase !== 'runtime') {
+    return [];
+  }
+
+  /** @var \Drupal\Core\Asset\LibrariesDirectoryFileFinder $library_file_finder */
+  $library_file_finder = \Drupal::service('library.libraries_directory_file_finder');
+
+  // Init.
+  $severity = REQUIREMENT_OK;
+  $message = '';
+  $description = '';
+
+  if (\Drupal::config('choices.settings')->get('use_cdn') === TRUE) {
+    // Set to load the library from CDN:
+    $severity = REQUIREMENT_OK;
+    $message = t('Loading Choices.js library from CDN.');
+    $description = t('The required Choices.js library is loaded from CDN, as configured in the module settings.');
+  }
+  else {
+    // Set to load the library locally:
+    // Detect if the library is present locally:
+    if ($library_file_finder->find('choices.js/public/assets/scripts/choices.min.js') &&
+        $library_file_finder->find('choices.js/public/assets/styles/choices.min.css')) {
+      // Found locally!
+      $severity = REQUIREMENT_OK;
+      $message = t('Choices.js found locally.');
+      $description = t('The required Choices.js library was found and is loaded locally.');
+    }
+    else {
+      // Neither found locally nor loaded from CDN!
+      $severity = REQUIREMENT_ERROR;
+      $message = t('<strong>Choices.js local library NOT found!</strong>');
+      $description = t('The required library is not present locally nor loaded via CDN!
+      You can either activate "CDN" on the choices <a href="@settings_url">settings page</a>, to load the
+      choices.js library from CDN or download the <a href="@url">Choices.js plugin from the project page</a>,
+      extract the archive and place the choices.js directory in the "libraries" directory on your server. See README.md for details.',
+      [
+        '@url' => 'https://github.com/Choices-js/Choices/archive/refs/tags/v10.1.0.zip',
+        '@settings_url' => Url::fromRoute('choices.admin')->toString(),
+      ]);
+    }
+  }
+
+  // Return requirements:
+  $requirements['choices_library'] = [
+    'title' => t('Choices.js Library'),
+    'severity' => $severity,
+    'value' => $message,
+    'description' => $description,
+  ];
+
+  return $requirements;
+}
+
+/**
+ * Empty update hook.
+ *
+ * Empty update hook for compability issues emerging through
+ * https://www.drupal.org/project/choices/issues/3318640.
+ */
+function choices_update_8001() {
+}
+
+/**
+ * Remove config "dropdown_type".
+ */
+function choices_update_8002() {
+  $config_factory = \Drupal::configFactory();
+  $config = $config_factory->getEditable('choices.settings');
+  $config->clear('dropdown_type')->save();
+}
+
+/**
+ * Enable the global choices setting for existing installations.
+ */
+function choices_update_8003() {
+  $config_factory = \Drupal::configFactory();
+  $config = $config_factory->getEditable('choices.settings');
+  $config->set('enable_globally', TRUE)->save();
+}

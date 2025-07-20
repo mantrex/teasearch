@@ -1,0 +1,17 @@
+library:
+  js:
+      /libraries/choices.js/public/assets/scripts/choices.min.js:  { minified: true }
+  css:
+    component:
+      /libraries/choices.js/public/assets/styles/choices.min.css: {}
+      css/choices.css: {}
+global:
+  js:
+    js/choices_global.js: {}
+  dependencies:
+    - choices/library
+widget:
+  js:
+    js/choices_widget.js: {}
+  dependencies:
+    - choices/library

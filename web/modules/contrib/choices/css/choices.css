@@ -1,0 +1,11 @@
+.choices {
+  width: 200px;
+}
+
+.choices__inner {
+  box-sizing: border-box;
+}
+
+.choices__list--dropdown {
+  z-index: 10;
+}
