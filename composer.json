@@ -44,6 +44,7 @@
     "drupal/realname": "^2.0",
     "drupal/redirect": "^1.11",
     "drupal/select2": "^2.0",
+    "drupal/svg_image_field": "^2.3",
     "drupal/tagify": "^1.2",
     "drupal/updated": "^2.0",
     "drupal/vani": "^11.0",
