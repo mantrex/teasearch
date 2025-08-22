@@ -2,6 +2,15 @@ body {
   border: 0;
   padding: 0;
   background: #ede8e2;
+  color:#2B2727;
+}
+
+a {
+  color:green;
+  text-decoration:none;
+}
+.text-bold {
+  font-weight:bold;
 }
 
 .site-wrapper {
@@ -45,6 +54,7 @@ body {
 .region-footer .footer-logo img {
   width: 150px;
 }
+
 
 .brown-bar {
   background-color: #45392e;
@@ -102,4 +112,30 @@ body {
 
 .text-below-logo {
   font-size:x-small;
+}
+
+.white-border {
+  border:1px solid #eeeeee;
+  border-bottom:2px solid #cccccc;
+}
+
+
+.teasearch-introblock {
+  margin-top:2em;
+  margin-bottom:1em;
+  background:white;
+  padding:2px;
+  text-align:center;
+
+}
+.teasearch-introblock .introblock-body p {
+  margin:0;
+  padding:0;
+}
+
+.categories-wrapper .category-selector-label {
+  text-align: center;
+  font-weight:bold;
+  text-transform: uppercase;;
+  margin-bottom:1em;
 }

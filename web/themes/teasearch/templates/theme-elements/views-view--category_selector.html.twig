@@ -17,7 +17,10 @@
   {% set is_front = current_path == front_path %}
 
   {% if   categories_data %}
-    <section class="categories-wrapper" role="main" aria-label="{{ 'Categories navigation'|t }}">
+
+  <section class="categories-wrapper" role="main" aria-label="{{ 'Categories navigation'|t }}">
+  <div class="category-selector-label">{% trans %}resources{% endtrans %}</div>
+
       <div class="categories-grid">
         {% for category in categories_data %}
           <article class="category-item category-{{ category.category_selector|clean_class }}" 
@@ -42,7 +45,7 @@
               <header class="category-header">
                 <h2 class="category-title">{{ category.link_title }}</h2>
                 <div class="category-meta">
-                  <span class="category-type">{{ category.link_title }}</span>
+                  <span class="category-description">{{ category.field_description }}</span>
                   {% if category.weight > 0 %}
                    {# <span class="category-weight" aria-label="{{ 'Priority'|t }}">{{ category.weight }}</span>#}
                   {% endif %}

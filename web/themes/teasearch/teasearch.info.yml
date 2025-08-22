@@ -9,6 +9,7 @@ libraries:
   - teasearch/login.css
 regions:
   header: Header
+  intro: Intro
   content: Content
   hero: Hero
   footer: Footer

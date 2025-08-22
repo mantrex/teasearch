@@ -172,6 +172,7 @@ function teasearch_preprocess_views_view__category_selector(&$variables)
     }
 
     // Ottieni i campi necessari
+    $category_description = $node->get("field_description");
     $image_url = '';
     $image_field = $node->get('field_image');
     if (!$image_field->isEmpty()) {
@@ -202,6 +203,7 @@ function teasearch_preprocess_views_view__category_selector(&$variables)
       'category_link' => $base_url,
       'weight' => $weight,
       'node_id' => $node->id(),
+      "category_description"=>$category_description
     ];
   }
 
