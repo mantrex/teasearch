@@ -1,53 +1,75 @@
 <!DOCTYPE html>
 <html lang="{{ language.getId() }}">
-  <head>
-    {{ head }}
-    <head-placeholder token="{{ placeholder_token }}" />
-    <title>{{ head_title|safe_join(' | ') }}</title>
-    {{ styles }}
-    {{ scripts }}
-  </head>
-  <body{{ attributes }}>
-  <div class="site-wrapper">
-    {{ page_top }}
-    {#{{ page }}#}
+	<head></head>
+	{{ head }}
+	<head-placeholder token="{{ placeholder_token }}"/>
+	<title>{{ head_title|safe_join(' | ') }}</title>
+	{{ styles }}{{ scripts }}
+</html></head><body{{attributes}}>
+<div class="site-wrapper">
+	{{ page_top }}
+	{#{{ page }}#}
+	{# BARRA MARRONE#}
+<div class="brown-bar">
+	<div class="container-fluid">
+		<div class="w-100">
+			<ul
+				class="language-selector">
+				{# Debug info - rimuovi in produzione #}
+				{% if debug_info is defined %}<!-- DEBUG: current_path = {{ debug_info.current_path }} -->
+					<!-- DEBUG: base_url = {{ debug_info.base_url }} -->
+					<!-- DEBUG: current_language = {{ debug_info.current_language }} -->
+				{% endif %}
 
-    {# HEADER #}
-    {% if page.header %}
-      <header class="site-header" role="banner">
-        <div >
-          {{ page.header }}
-        </div>
-      </header>
-    {% endif %}
+				{% for lang_code, lang_info in language_data %}
+					<li>
+						<a href="{{ lang_info['#lang_url'] }}" class="{{ lang_info['#is_current'] ? 'active' : '' }}" title="{{ lang_info['#lang_title'] }}">
+							{{ lang_info['#lang_label'] }}
+						</a>
+					</li>
+					{% if not loop.last %}
+						<li class="language-separator">|</li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+</div>
 
 
-    {# MAIN CONTENT #}
-    <main role="main" class=" site-content my-4">
-      <div class="container">
-        {% if page.content %}
-          {{ page.content }}
-        {% endif %}
-      </div>
-    </main>
+	{# HEADER #}
+		{% if page.header %}
+			<header class="site-header" role="banner"> <div>
+				{{ page.header }}
+			</div>
+		</header>
+	{% endif %}
 
-        {# HERO (OPTIONAL) #}
-    {% if page.hero %}
-      <section class="hero-section">
-        {{ page.hero }}
-      </section>
-    {% endif %}
 
-    {# FOOTER #}
+	{# MAIN CONTENT #}
+	<main role="main" class=" site-content my-4">
+		<div class="container">
+			{% if page.content %}
+				{{ page.content }}
+			{% endif %}
+		</div>
+	</main>
 
-      <footer class="site-footer footer-section" role="contentinfo">
-        <div class="container">
-          {{ page.footer }}
-        </div>
-      </footer>
-  
+	{# HERO (OPTIONAL) #}
+	{% if page.hero %}
+		<section class="hero-section">
+			{{ page.hero }}
+		</section>
+	{% endif %}
 
-    {{ page_bottom }}
-    </div>
-  </body>
-</html>
+	{# FOOTER #}
+
+	<footer class="site-footer footer-section" role="contentinfo">
+		<div class="container">
+			{{ page.footer }}
+		</div>
+	</footer>
+
+
+	{{ page_bottom }}
+</div></body></html>

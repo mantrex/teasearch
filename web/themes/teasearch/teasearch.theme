@@ -8,6 +8,88 @@
 /**
  * Implements hook_preprocess_image_widget().
  */
+function teasearch_preprocess_page(&$variables)
+{
+  $language_manager = \Drupal::languageManager();
+  $current_language = $language_manager->getCurrentLanguage();
+  $current_language_id = $current_language->getId();
+
+  // Ottieni l'URL corrente
+  $request = \Drupal::request();
+  $current_path = $request->getPathInfo();
+  $query_string = $request->getQueryString();
+  $base_url = $request->getSchemeAndHttpHost() . $request->getBasePath();
+
+  // Inizializza i link delle lingue
+  $language_data = [];
+
+  // Lingue supportate
+  $supported_languages = ['en', 'it'];
+
+  foreach ($supported_languages as $lang_code) {
+    $url = $base_url;
+
+    // Rimuovi il prefisso lingua attuale se presente
+    $clean_path = preg_replace('/^\/(en|it)\//', '/', $current_path);
+    $clean_path = preg_replace('/^\/(en|it)$/', '', $current_path);
+
+    // Se il path è vuoto o solo "/", usa la homepage
+    if (empty($clean_path) || $clean_path === '/') {
+      $url .= '/' . $lang_code;
+    } else {
+      $url .= '/' . $lang_code . $clean_path;
+    }
+
+    // Aggiungi query string se presente
+    if ($query_string) {
+      $url .= '?' . $query_string;
+    }
+
+    $language_data[$lang_code] = [
+      '#lang_url' => $url,
+      '#lang_code' => $lang_code,
+      '#lang_label' => strtoupper($lang_code),
+      '#is_current' => ($lang_code === $current_language_id),
+      '#lang_title' => $lang_code === 'en' ? 'English' : 'Italiano'
+    ];
+  }
+
+  // Aggiungi le variabili al template
+  $variables['language_data'] = $language_data;
+  $variables['current_language'] = $current_language_id;
+
+  // Debug info (rimuovi in produzione)
+  $variables['debug_info'] = [
+    'current_path' => $current_path,
+    'base_url' => $base_url,
+    'query_string' => $query_string,
+    'current_language' => $current_language_id
+  ];
+}
+
+
+function teasearch_node_access(\Drupal\node\NodeInterface $node, $op, \Drupal\Core\Session\AccountInterface $account)
+{
+  // Debug per verificare che la funzione venga chiamata
+  \Drupal::logger('teasearch')->debug('Hook node_access chiamato per nodo: @nid, tipo: @type, operazione: @op', [
+    '@nid' => $node->id(),
+    '@type' => $node->bundle(),
+    '@op' => $op
+  ]);
+
+  if ($node->bundle() === 'categories' && $op === 'view') {
+    // Controlla se siamo nella pagina diretta del nodo
+    $route_name = \Drupal::routeMatch()->getRouteName();
+    if ($route_name === 'entity.node.canonical') {
+      \Drupal::logger('teasearch')->debug('Accesso negato al nodo categories: @nid', ['@nid' => $node->id()]);
+      return \Drupal\Core\Access\AccessResult::forbidden('Category nodes are not accessible as standalone pages.');
+    }
+  }
+
+  return \Drupal\Core\Access\AccessResult::neutral();
+}
+
+
 function teasearch_preprocess_image_widget(array &$variables): void
 {
   $data = &$variables['data'];

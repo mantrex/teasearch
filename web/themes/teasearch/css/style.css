@@ -1,7 +1,7 @@
 body {
-  border:0;
-  padding:0;
-  background:#faffea;
+  border: 0;
+  padding: 0;
+  background: #ede8e2;
 }
 
 .site-wrapper {
@@ -9,36 +9,97 @@ body {
   flex-direction: column;
   min-height: 100vh; /* Full viewport height */
 }
-
+.main-menu {
+  padding-top:2px;
+  padding-bottom:0px;
+}
 .site-content {
   flex: 1; /* Allow main content to expand and push the footer down */
 }
 
 /* Example color overrides */
 .site-header {
-  background-color: #6b9f00; /* A green shade */
-  border-bottom:1px solid #83be0d;
-  box-shadow: #516049 0px 0px 2px 0px ;
-  position:sticky;
-  top:0;
-  z-index:10;
+  background-color: #6b8e23; /* A green shade */
+  border-bottom: 1px solid #5e7e1e;
+  box-shadow: #516049 0px 0px 2px 0px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .footer-section {
-  box-shadow: #5c4c46 0px 00px 3px 0px ;
+  box-shadow: #5c4c46 0px 00px 3px 0px;
   background-color: #76613c; /* A brown shade */
   color: #fff;
   padding: 20px 0;
-  height:230px;
+  height: 230px;
 }
 
 /* Adjust brand logo, spacing, etc. */
 .navbar-brand img {
- width:120px;
+  width: 120px;
+}
+.navbar-nav {
+  text-transform: uppercase;
+}
+.region-footer .footer-logo img {
+  width: 150px;
 }
 
+.brown-bar {
+  background-color: #45392e;
+  height: 35px;
+  border-bottom: 1px solid #332a22;
+  font-size: 13px;
+}
 
-.region-footer .footer-logo img {
+.brown-bar .language-selector {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
 
-  width:150px;
+.brown-bar .language-selector li {
+  margin: 0;
+}
+
+.brown-bar .language-selector a {
+  color: #ffffff;
+  text-decoration: none;
+  padding: 8px 12px;
+  display: block;
+  text-transform: uppercase;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.brown-bar .language-selector a:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.brown-bar .language-selector a.active {
+  background-color: #514336;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.brown-bar .language-separator {
+  color: #d2b48c;
+  margin: 0 3px;
+  font-weight: 300;
+}
+
+.brown-bar .container {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.text-below-logo {
+  font-size:x-small;
 }
