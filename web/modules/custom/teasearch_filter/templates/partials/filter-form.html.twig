@@ -5,6 +5,9 @@
  */
 #}
 
+<div	class='element-title'>
+	Filters
+</div>
 <div class="teasearch-filters">
 	<form method="get" class="teasearch-filter-form">
 		<input type="hidden" name="content_type" value="{{ content_type }}">
@@ -37,16 +40,26 @@
 		{% endfor %}
 
 		{# Special century selector - appears at the end #}
-		{% if century_data and century_data.enabled %}
-			{% include 'modules/custom/teasearch_filter/templates/partials/filter-form-century.html.twig' with {
+{# Century selector - appears if configured #}
+{% if century_data and century_data.enabled %}
+	{% include 'modules/custom/teasearch_filter/templates/partials/filter-form-century.html.twig' with {
 				'content_type': content_type,
 				'century_data': century_data
 			} %}
-		{% endif %}
+{% endif %}
+
+{# Date selector - appears if configured #}
+{% if date_data and date_data.enabled %}
+	{% include 'modules/custom/teasearch_filter/templates/partials/filter-form-date.html.twig' with {
+				'content_type': content_type,
+				'date_data': date_data
+			} %}
+{% endif %}
 
 		<div class="filter-actions">
-			<button type="submit" class="btn btn-primary">{{ 'Search'|t }}</button>
-			<a href="{{ url('teasearch_filter.search', {'content_type': content_type}) }}" class="btn btn-outline-secondary">
+			<button type="submit" class="fbtn fbtn-primary">{{ 'Search'|t }}</button>
+
+			<a href="{{ url('teasearch_filter.search', {'content_type': content_type}) }}" class="fbtn fbtn-primary">
 				{{ 'Clear'|t }}
 			</a>
 		</div>

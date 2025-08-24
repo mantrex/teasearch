@@ -3,9 +3,9 @@
    ============================================================================= */
 
    :root {
-   --filter-item: #DBE5C1;
-   --filter-item-hover: #e1ebc6;
-   
+   --filter-group: #DBE5C1;
+   --filter-group-hover: #e1ebc6;
+   --filter-group-open:#e4efca;
    --filter-actions: #D5D0CB;
    --filter-actions-button:#628320;
    --filter-actions-button-hover:#6b8e23;
@@ -52,7 +52,7 @@
   .filter-title {
     padding: 1rem;
     margin: 0;
-    background: var(--filter-item);
+    background: var(--filter-group);
     cursor: pointer;
     font-weight: 500;
     display: flex;
@@ -65,7 +65,7 @@
   }
   
   .filter-title:hover {
-    background: var(--filter-item-hover);
+    background: var(--filter-group-hover);
   }
   
   .filter-badge {
@@ -142,18 +142,17 @@
     gap: 0.5rem;
   }
   
-  .filter-actions .btn {
+  .filter-actions .fbtn {
     flex: 1;
-    font-size: 0.9rem;
-    background:var(--filter-actions-button);
-    color:white;
-    border-color:var(--filter-actions-button-border);
 
   }
   
   /* Buttons */
-  .btn {
+  .fbtn {
     display: inline-block;
+    border-color:var(--filter-actions-button-border);
+    font-size:0.9rem;
+
     padding: 0.375rem 0.75rem;
     margin-bottom: 0;
     font-size: 1rem;
@@ -168,28 +167,28 @@
     transition: all 0.15s ease-in-out;
   }
   
-  .btn-primary {
+  .fbtn-primary {
     color: #fff;
-    background-color: var(---primary);
-    border-color: var(--green-primary);
+    background-color: var(--filter-actions-button);
+    border-color: var(--filter-actions-button-border);
   }
   
-  .btn-primary:hover {
+  .fbtn-primary:hover {
     color: #fff;
-    background-color: var(--green-dark);
-    border-color: var(--green-dark);
+    background-color: var(--filter-actions-button-hover);
+    border-color: var(--filter-actions-button-border);
     text-decoration: none;
   }
   
-  .btn-secondary,
-  .btn-outline-secondary {
+  .fbtn-secondary,
+  .fbtn-outline-secondary {
     color: var(--gray-text);
     background-color: transparent;
     border-color: var(--gray-text);
   }
   
-  .btn-secondary:hover,
-  .btn-outline-secondary:hover {
+  .fbtn-secondary:hover,
+  .fbtn-outline-secondary:hover {
     color: #fff;
     background-color: var(--filter-actions-button-hover);
     border-color: var(--filter-actions-button-border);
@@ -389,8 +388,7 @@
   }
   
   details[open] .filter-title {
-    border-bottom: 1px solid var(--gray-border);
-    background: var(--green-light);
+    background: var(--filter-group-open);
   }
   
   /* Focus States */

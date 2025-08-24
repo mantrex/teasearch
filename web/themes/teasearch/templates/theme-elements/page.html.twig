@@ -10,6 +10,9 @@
 	{{ page_top }}
 	{#{{ page }}#}
 	{# BARRA MARRONE#}
+
+
+<header class="site-header">
 <div class="brown-bar">
 	<div class="container-fluid">
 		<div class="w-100">
@@ -39,11 +42,13 @@
 
 	{# HEADER #}
 		{% if page.header %}
-			<header class="site-header" role="banner"> <div>
+			<div class="site-green-bar" role="banner"> 
+			<div>
 				{{ page.header }}
 			</div>
-		</header>
+		</div>
 	{% endif %}
+</header>
 
 {# Page intro#}
 {% if page.intro %}

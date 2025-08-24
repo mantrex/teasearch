@@ -31,13 +31,11 @@ a {
 }
 
 /* Example color overrides */
-.site-header {
+.site-green-bar {
   background-color: #6b8e23; /* A green shade */
   border-bottom: 1px solid #5e7e1e;
   box-shadow: #516049 0px 0px 2px 0px;
-  position: sticky;
   top: 0;
-  z-index: 10;
 }
 
 /*FOOTER RELATED*/
@@ -226,6 +224,7 @@ a {
   height: 35px;
   border-bottom: 1px solid #332a22;
   font-size: 13px;
+
 }
 
 .brown-bar .language-selector {

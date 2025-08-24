@@ -10,17 +10,13 @@ content_types:
     results:
       mainfield: title
       subfield: field_content
-      image: field_pdf_image
-    
+      image: field_main_image
+      altimage: field_square_thumbnail
     filters:
       subjects:
         type: taxonomy
         vocabulary: subjects
         label: 'Subjects'
-      categories:
-        type: taxonomy
-        vocabulary: categories
-        label: 'Categories'
       century_selector:
         from: year_from
         to: year_to

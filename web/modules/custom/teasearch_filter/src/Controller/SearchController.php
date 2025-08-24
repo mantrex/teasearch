@@ -120,6 +120,7 @@ class SearchController extends ControllerBase
     // Prepare data for templates
     $grouped_filters = $this->prepareGroupedFilters($filters, $content_type_config, $request);
     $century_data = $this->prepareCenturyData($filters, $content_type_config, $request);
+    $date_data = $this->prepareDateData($filters, $content_type_config, $request);
 
     // Search entities
     $entity_type = $content_type_config['type'] ?? 'node';
@@ -144,6 +145,7 @@ class SearchController extends ControllerBase
       '#has_filters' => $this->hasActiveFilters($request, $filters),
       '#page_title' => $page_title,
       '#century_data' => $century_data,
+      '#date_data' => $date_data,
       '#module_path' => $request->getBasePath() . '/' . \Drupal::service('extension.list.module')->getPath('teasearch_filter'),
       '#attached' => [
         'library' => [
@@ -420,7 +422,7 @@ class SearchController extends ControllerBase
   private function getStandardFilters(array $filters)
   {
     $standard_filters = [];
-    $special_keys = ['century_selector'];
+    $special_keys = ['century_selector', 'date_selector'];
 
     foreach ($filters as $field_name => $filter) {
       if (in_array($field_name, $special_keys)) {
@@ -442,13 +444,25 @@ class SearchController extends ControllerBase
    */
   private function applyYearRangeFiltering($query, $filters, Request $request)
   {
-    if (!isset($filters['century_selector'])) {
-      return;
+    $from_field = null;
+    $to_field = null;
+
+    // Check century_selector
+    if (isset($filters['century_selector'])) {
+      $century_config = $filters['century_selector'];
+      $from_field = $century_config['from'] ?? 'year_from';
+      $to_field = $century_config['to'] ?? 'year_to';
+    }
+    // Check date_selector
+    elseif (isset($filters['date_selector'])) {
+      $date_config = $filters['date_selector'];
+      $from_field = $date_config['from'] ?? 'year_from';
+      $to_field = $date_config['to'] ?? 'year_to';
     }
 
-    $century_config = $filters['century_selector'];
-    $from_field = $century_config['from'] ?? 'year_from';
-    $to_field = $century_config['to'] ?? 'year_to';
+    if (!$from_field || !$to_field) {
+      return;
+    }
 
     $year_from = $request->query->get('year_from');
     $year_to = $request->query->get('year_to');
@@ -668,9 +682,78 @@ class SearchController extends ControllerBase
       $data['max_year'] = $year_range['max'];
     }
 
-    $data['centuries'] = $this->generateCenturies($data['min_year'], $data['max_year']);
+    // Generate century options for SELECT
+    $data['century_options'] = $this->generateCenturyOptions($data['min_year'], $data['max_year']);
 
     return $data;
+  }
+
+  /**
+   * Prepare date selector data (new).
+   */
+  private function prepareDateData($filters, $config, Request $request)
+  {
+    if (!isset($filters['date_selector'])) {
+      return null;
+    }
+
+    $date_config = $filters['date_selector'];
+
+    return [
+      'enabled' => true,
+      'from_field' => $date_config['from'] ?? 'year_from',
+      'to_field' => $date_config['to'] ?? 'year_to',
+      'selected_from' => $request->query->get('year_from'),
+      'selected_to' => $request->query->get('year_to'),
+      'min_year' => $date_config['min_year'] ?? -3000,
+      'max_year' => $date_config['max_year'] ?? date('Y'),
+    ];
+  }
+
+  /**
+   * Generate century options for SELECT elements.
+   */
+  private function generateCenturyOptions($min_year, $max_year)
+  {
+    $centuries = [];
+
+    // Determine the range of centuries
+    $start_century = floor($min_year / 100);
+    $end_century = ceil($max_year / 100);
+
+    // Add "Before X Century BC" for very old dates
+    if ($start_century < -10) {
+      $before_century = abs($start_century);
+      $centuries[] = [
+        'label' => "Before {$before_century} Century BC",
+        'start_year' => -10000, // Very old date
+        'end_year' => ($start_century * 100) - 1
+      ];
+      $start_century = -10; // Start from 10th century BC
+    }
+
+    // Generate century options
+    for ($century = $start_century; $century <= $end_century; $century++) {
+      $century_start = $century * 100;
+      $century_end = $century_start + 99;
+
+      if ($century < 0) {
+        // BC centuries
+        $abs_century = abs($century);
+        $label = "{$abs_century} Century BC";
+      } else {
+        // AD/CE centuries
+        $label = ($century == 0) ? "1 Century AD" : "{$century} Century AD";
+      }
+
+      $centuries[] = [
+        'label' => $label,
+        'start_year' => $century_start,
+        'end_year' => $century_end,
+      ];
+    }
+
+    return $centuries;
   }
 
   /**
@@ -720,37 +803,6 @@ class SearchController extends ControllerBase
       ]);
       return ['min' => -3000, 'max' => date('Y')];
     }
-  }
-
-  /**
-   * Generate centuries for timeline.
-   */
-  private function generateCenturies($min_year, $max_year)
-  {
-    $centuries = [];
-
-    $start_century = intval(floor($min_year / 100));
-    $end_century = intval(ceil($max_year / 100));
-
-    for ($century = $start_century; $century <= $end_century; $century++) {
-      $century_start = $century * 100;
-      $century_end = $century_start + 99;
-
-      if ($century < 0) {
-        $label = abs($century_start) . '-' . abs($century_end) . ' AC';
-      } else {
-        $label = $century_start . '-' . $century_end . ' CE';
-      }
-
-      $centuries[] = [
-        'value' => $century,
-        'label' => $label,
-        'start_year' => $century_start,
-        'end_year' => $century_end,
-      ];
-    }
-
-    return $centuries;
   }
 
   /**
