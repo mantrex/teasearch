@@ -1,86 +1,133 @@
 <!DOCTYPE html>
-<html lang="{{ language.getId() }}">
+<html	lang="{{ language.getId() }}">
 	<head></head>
 	{{ head }}
-	<head-placeholder token="{{ placeholder_token }}"/>
-	<title>{{ head_title|safe_join(' | ') }}</title>
-	{{ styles }}{{ scripts }}
-</html></head><body{{attributes}}>
-<div class="site-wrapper">
+	<head-placeholder	token="{{ placeholder_token }}" />
+	<title>
+		{{ head_title|safe_join(' | ') }}
+	</title>
+	{{ styles }}
+	{{ scripts }}{# Regole minime per la versione compatta; puoi spostarle nel tuo CSS principale #}</html></head><body	{{ attributes }}>
+<div	class="site-wrapper">
 	{{ page_top }}
-	{#{{ page }}#}
-	{# BARRA MARRONE#}
 
+	<header	class="site-header"	role="banner"	aria-label="Header principale">
+		{# BARRA MARRONE #}
+		<div	class="brown-bar">
+			<div	class="container-fluid">
+				<div	class="w-100">
+					<ul	class="language-selector"	role="list"	aria-label="Selettore lingua">
+						{# Debug info - rimuovi in produzione #}
+						{% if debug_info is defined %}<!-- DEBUG: current_path = {{ debug_info.current_path }} -->
+						<!-- DEBUG: base_url = {{ debug_info.base_url }} -->
+						<!-- DEBUG: current_language = {{ debug_info.current_language }} -->
+						{% endif %}
 
-<header class="site-header">
-<div class="brown-bar">
-	<div class="container-fluid">
-		<div class="w-100">
-			<ul
-				class="language-selector">
-				{# Debug info - rimuovi in produzione #}
-				{% if debug_info is defined %}<!-- DEBUG: current_path = {{ debug_info.current_path }} -->
-					<!-- DEBUG: base_url = {{ debug_info.base_url }} -->
-					<!-- DEBUG: current_language = {{ debug_info.current_language }} -->
-				{% endif %}
-
-				{% for lang_code, lang_info in language_data %}
-					<li>
-						<a href="{{ lang_info['#lang_url'] }}" class="{{ lang_info['#is_current'] ? 'active' : '' }}" title="{{ lang_info['#lang_title'] }}">
-							{{ lang_info['#lang_label'] }}
-						</a>
-					</li>
-					{% if not loop.last %}
-						<li class="language-separator">|</li>
-					{% endif %}
-				{% endfor %}
-			</ul>
-		</div>
-	</div>
-</div>
-
-
-	{# HEADER #}
-		{% if page.header %}
-			<div class="site-green-bar" role="banner"> 
-			<div>
-				{{ page.header }}
+							{% for lang_code, lang_info in language_data %}
+								<li>
+									<a	href="{{ lang_info['#lang_url'] }}"	class="{{ lang_info['#is_current'] ? 'active' : '' }}"	lang="{{ lang_code }}"	hreflang="{{ lang_code }}"	title="{{ lang_info['#lang_title'] }}"	aria-current="{{ lang_info['#is_current'] ? 'true' : 'false' }}">	{{ lang_info['#lang_label'] }}
+								</a>
+							</li>
+							{% if not loop.last %}
+								<li	class="language-separator"	aria-hidden="true">
+									|
+								</li>
+							{% endif %}
+						{% endfor %}
+					</ul>
+				</div>
 			</div>
 		</div>
+
+		{# BARRA VERDE (sticky + compattabile) #}
+		{% if page.header %}
+			<div	id="siteGreenBar"	class="site-green-bar ">
+				<div	class="container-fluid">
+					{{ page.header }}
+				</div>
+			</div>
+		{% endif %}
+	</header>
+
+	{# INTRO (opzionale) #}
+	{% if page.intro %}
+
+		<div	class="container-fluid">
+			{{ page.intro }}
+		</div>
+
 	{% endif %}
-</header>
 
-{# Page intro#}
-{% if page.intro %}
-	<div>
-		{{page.intro}}
-	</div>
-{% endif %}
-
-	{# MAIN CONTENT #}
-	<main role="main" class=" site-content my-4">
-		<div class="container">
+	{# CONTENUTO PRINCIPALE #}
+	<main	id="main-content"	class="site-content my-4"	role="main">
+		<div	class="container">
 			{% if page.content %}
 				{{ page.content }}
 			{% endif %}
 		</div>
 	</main>
 
-	{# HERO (OPTIONAL) #}
+	{# HERO (opzionale) #}
 	{% if page.hero %}
-		<section class="hero-section">
-			{{ page.hero }}
+		<section	class="hero-section"	aria-label="Hero">
+			<div	class="container-floid">
+				{{ page.hero }}
+			</div>
 		</section>
 	{% endif %}
 
 	{# FOOTER #}
-
-	<footer class="site-footer footer-section" role="contentinfo">
-		<div class="container">
+	<footer	class="site-footer footer-section"	role="contentinfo">
+		<div	class="container-fluid">
 			{{ page.footer }}
 		</div>
 	</footer>
 
-
 	{{ page_bottom }}
-</div></body></html>
+</div>
+{# Script per compattare la barra verde dopo X px di scroll #}
+
+<script>
+(function () {
+  var bar = document.getElementById('siteGreenBar');
+  var logoText = document.querySelector(".text-below-logo");
+  if (!bar) return;
+
+  // isteresi: compatta > ENTER, espandi < EXIT
+  var ENTER = 120; // diventa compatta sopra questa soglia
+  var EXIT  = 60;  // torna normale sotto questa soglia
+  var isCompact = false;
+  var ticking = false;
+
+  function applyState() {
+    bar.classList.toggle('is-compact', isCompact);
+    if (logoText) {
+      logoText.classList.toggle('is-hidden', isCompact);
+    }
+  }
+
+  function update() {
+    var y = window.scrollY || document.documentElement.scrollTop || 0;
+
+    if (!isCompact && y > ENTER) {
+      isCompact = true;
+      applyState();
+    } else if (isCompact && y < EXIT) {
+      isCompact = false;
+      applyState();
+    }
+    ticking = false;
+  }
+
+  function onScroll() {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  }
+
+  update(); // stato iniziale
+  window.addEventListener('scroll', onScroll, { passive: true });
+})();
+</script>
+</body></html>

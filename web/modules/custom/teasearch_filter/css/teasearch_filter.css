@@ -460,7 +460,15 @@
       justify-content: center;
     }
   }
+
+  .century-select-group {
+    margin-bottom:1em;
+  }
   
+  .century-select-group label {
+    margin-bottom:0;
+    font-weight:bold;
+  }
   /* Accessibility */
   @media (prefers-reduced-motion: reduce) {
     * {

@@ -2,19 +2,19 @@ body {
   border: 0;
   padding: 0;
   background: #ede8e2;
-  color:#2B2727;
+  color: #2b2727;
 }
 
 a {
-  color:green;
-  text-decoration:none;
+  color: green;
+  text-decoration: none;
 }
 .href-white {
-  color:white;
-  text-decoration:none;
+  color: white;
+  text-decoration: none;
 }
 .text-bold {
-  font-weight:bold;
+  font-weight: bold;
 }
 
 .site-wrapper {
@@ -23,19 +23,45 @@ a {
   min-height: 100vh; /* Full viewport height */
 }
 .main-menu {
-  padding-top:2px;
-  padding-bottom:0px;
+  padding-top: 2px;
+  padding-bottom: 0px;
 }
 .site-content {
   flex: 1; /* Allow main content to expand and push the footer down */
 }
 
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10000;
+}
 /* Example color overrides */
 .site-green-bar {
   background-color: #6b8e23; /* A green shade */
   border-bottom: 1px solid #5e7e1e;
   box-shadow: #516049 0px 0px 2px 0px;
   top: 0;
+  transition:
+    padding 180ms ease,
+    min-height 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+.site-green-bar .navbar-brand {
+  height:auto;
+}
+.site-green-bar.is-compact {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  height:60px;
+}
+.site-green-bar.is-compact .navbar {
+  height:60px;
+
+}
+/* Riduzione logo/brand quando compatto (se presente) */
+.site-green-bar.is-compact .navbar-brand img {
+  width: 96px; /* da 120px a 96px */
+  transition: width 180ms ease;
 }
 
 /*FOOTER RELATED*/
@@ -48,11 +74,11 @@ a {
   height: 280px;
 }
 .footer01-logobase {
-  padding-bottom:1rem;
+  padding-bottom: 1rem;
 }
 
 .footer-cf-logo-wrapper .cf-text {
-  line-height:1.3em;
+  line-height: 1.3em;
 }
 /* Adjust brand logo, spacing, etc. */
 .navbar-brand img {
@@ -66,155 +92,153 @@ a {
 }
 
 .footer-email {
-	margin-bottom: 1em;
+  margin-bottom: 1em;
 }
-
 
 /* Newsletter Section */
 .newsletter-section {
-	margin-bottom: 25px;
+  margin-bottom: 25px;
 }
 
 .newsletter-title {
-	color: white;
-	font-size: 16px;
-	font-weight: 500;
-	margin-bottom: 2px;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 2px;
 }
 
 .newsletter-form {
-	display: flex;
-	margin-bottom: 10px;
+  display: flex;
+  margin-bottom: 10px;
 }
 
 .newsletter-input {
-	flex: 1;
-	padding: 8px 12px;
-	border: none;
-	background-color: rgba(255, 255, 255, 0.1);
-	color: white;
-	font-size: 14px;
-	border-radius: 4px 0 0 4px;
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 14px;
+  border-radius: 4px 0 0 4px;
 }
 
 .newsletter-input::placeholder {
-	color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .newsletter-input:focus {
-	outline: none;
-	background-color: rgba(255, 255, 255, 0.15);
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
 .newsletter-btn {
-	padding: 8px 16px;
-	background-color: white;
-	color: grey;
-	border: none;
-	font-size: 14px;
-	font-weight: 600;
-	cursor: pointer;
-	border-radius: 0 4px 4px 0;
-	transition: background-color 0.3s;
+  padding: 8px 16px;
+  background-color: white;
+  color: grey;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 0 4px 4px 0;
+  transition: background-color 0.3s;
 }
 
 .newsletter-btn:hover {
-	background-color: white;
+  background-color: white;
 }
 
 /* Social Media Section */
 .social-section {
-
 }
 
 .social-title {
-	color: white;
-	font-size: 16px;
-	font-weight: 500;
-  padding-right:32px;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  padding-right: 32px;
 }
 
 .social-icons {
-	display: flex;
-	gap: 10px;
+  display: flex;
+  gap: 10px;
 }
 
 .social-icon {
-	display: inline-flex;
-	width: 32px;
-	height: 32px;
-	background-color: rgba(255, 255, 255, 0.1);
-	color: white;
-	align-items: center;
-	justify-content: center;
-	text-decoration: none;
-	border-radius: 4px;
-	transition: all 0.3s;
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.3s;
 }
 
 .social-icon:hover {
-	background-color: rgba(255, 255, 255, 0.2);
-	color: white;
-	transform: translateY(-2px);
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  transform: translateY(-2px);
 }
 
 .social-icon.facebook:hover {
-	background-color: #1877f2;
+  background-color: #1877f2;
 }
 
 .social-icon.twitter:hover {
-	background-color: #1da1f2;
+  background-color: #1da1f2;
 }
 
 .social-icon.youtube:hover {
-	background-color: #ff0000;
+  background-color: #ff0000;
 }
 
 .social-icon.instagram:hover {
-	background-color: #e4405f;
+  background-color: #e4405f;
 }
 
 /* Privacy Section */
 .privacy-section {
-	margin-top: 30px;
-	padding-top: 15px;
-	border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 30px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .privacy-link {
-	color: rgba(255, 255, 255, 0.8);
-	text-decoration: none;
-	font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 13px;
 }
 
 .privacy-link:hover {
-	color: white;
-	text-decoration: underline;
+  color: white;
+  text-decoration: underline;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-	.footer-right-column {
-		text-align: center;
-		padding: 15px;
-	}
-	
-	.newsletter-form {
-		flex-direction: column;
-		gap: 8px;
-	}
-	
-	.newsletter-btn {
-		border-radius: 4px;
-	}
-	
-	.newsletter-input {
-		border-radius: 4px;
-	}
-	
-	.social-icons {
-		justify-content: center;
-	}
+  .footer-right-column {
+    text-align: center;
+    padding: 15px;
+  }
+
+  .newsletter-form {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .newsletter-btn {
+    border-radius: 4px;
+  }
+
+  .newsletter-input {
+    border-radius: 4px;
+  }
+
+  .social-icons {
+    justify-content: center;
+  }
 }
 
 /*FOOTER RELATED END*/
@@ -224,7 +248,6 @@ a {
   height: 35px;
   border-bottom: 1px solid #332a22;
   font-size: 13px;
-
 }
 
 .brown-bar .language-selector {
@@ -275,32 +298,37 @@ a {
 }
 
 .text-below-logo {
-  font-size:x-small;
+  font-size: x-small;
+  opacity: 1;
+  transition: opacity 0.4s ease; /* durata e easing */
+}
+
+.text-below-logo.is-hidden {
+  opacity: 0;
+  display:none;
+  pointer-events: none; /* opzionale: evita click */
 }
 
 .white-border {
-  border:1px solid #eeeeee;
-  border-bottom:2px solid #cccccc;
+  border: 1px solid #eeeeee;
+  border-bottom: 2px solid #cccccc;
 }
-
 
 .teasearch-introblock {
-  margin-top:2em;
-  margin-bottom:1em;
-  background:white;
-  padding:2px;
-  text-align:center;
-
+  margin-top: 2em;
+  margin-bottom: 1em;
+  background: white;
+  padding: 2px;
+  text-align: center;
 }
 .teasearch-introblock .introblock-body p {
-  margin:0;
-  padding:0;
+  margin: 0;
+  padding: 0;
 }
 
 .categories-wrapper .category-selector-label {
   text-align: center;
-  font-weight:bold;
-  text-transform: uppercase;;
-  margin-bottom:1em;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 1em;
 }
-
