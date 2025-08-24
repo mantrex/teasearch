@@ -10,6 +10,10 @@
    --filter-actions-button:#628320;
    --filter-actions-button-hover:#6b8e23;
    --filter-actions-button-border:#59781c;
+   --result-item-bg: #fff;
+   --result-item-hover:  #bdc6a5;
+   --result-item-img:#E5DDD7;
+   --result-item-title:#6F8C2F;
    --gray-border: #DDDDDD;
 
   }
@@ -197,25 +201,18 @@
   
   /* Results Header */
   .results-header {
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid var(--gray-border);
   }
   
   .results-title {
-    font-size: 1.75rem;
     font-weight: 600;
     color: #212529;
     margin: 0;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
   }
   
   .results-count {
     font-weight: normal;
-    color: var(--gray-text);
-    font-size: 1.25rem;
   }
   
   .results-status {
@@ -234,20 +231,20 @@
   .results-list {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 0.2rem;
   }
   
   .result-item {
-    background: #fff;
+    background: var(--result-item-bg);
     border: 1px solid var(--gray-border);
-    border-radius: 0.5rem;
-    padding: 1.5rem;
+    border-radius: 0.2rem;
+    padding: 0.2rem;
     transition: all 0.15s ease;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
   }
   
   .result-item:hover {
-    border-color: var(--green-primary);
+    border-color: var(--result-item-hover);
     box-shadow: 0 0.125rem 0.25rem rgba(40, 167, 69, 0.15);
   }
   
@@ -259,6 +256,8 @@
   
   .item-image {
     flex-shrink: 0;
+    border:1px solid var(--result-item-img);
+  
   }
   
   .entity-image {
@@ -270,7 +269,7 @@
   }
   
   .entity-image.rounded {
-    border-radius: 0.5rem;
+    border-radius: 0!important; /*tolto arrotondamento immagine*/
   }
   
   .entity-image.rounded-circle {
@@ -278,7 +277,7 @@
   }
   
   .result-item:hover .entity-image {
-    border-color: var(--green-primary);
+    border-color: var();
   }
   
   .item-body {
@@ -287,10 +286,9 @@
   }
   
   .item-title {
-    font-size: 1.25rem;
     font-weight: 600;
-    margin: 0 0 0.5rem 0;
     line-height: 1.3;
+    color: var(--result-item-title);
   }
   
   .entity-link {

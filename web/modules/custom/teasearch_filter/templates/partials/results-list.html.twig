@@ -31,7 +31,7 @@
 
 				{# CONTENUTO #}
 				<div	class="item-body">
-					<h2	class="item-title">
+					<div	class="item-title">
 						{% if entity_type == 'user' %}
 							<a	href="{{ path('entity.user.canonical', {'user': entity.uid.value}) }}"	class="entity-link">
 								{{ entity.label }}
@@ -41,7 +41,7 @@
 								{{ entity.label }}
 							</a>
 						{% endif %}
-					</h2>
+					</div>
 
 					{# Descrizione/sommario #}
 					{% if sub_field %}
