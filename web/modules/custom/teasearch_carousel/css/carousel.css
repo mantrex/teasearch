@@ -29,10 +29,12 @@
 .swiper {
   width: 100%;
   padding: 2rem 0;
+  padding-bottom:50px;
   position: relative;
   margin-bottom:2rem;
   margin-top:2em;
 }
+
 
 .plain {
   color: #333;
@@ -56,6 +58,8 @@
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   border: 2px solid rgba(37, 154, 0, 0.1);
   position: relative;
+  width:clamp(240px,20vw,320px);
+  flex-shrink:0;
 }
 
 .swiper-slide::before {
@@ -95,6 +99,10 @@
   filter: brightness(0.95);
 }
 
+/* Mantieni altezza media coerente delle immagini */
+.news-thumbnail { aspect-ratio: 16 / 9; }
+.news-thumbnail img { width:100%; height:100%; object-fit:cover; }
+
 .swiper-slide:hover .news-thumbnail img {
   transform: scale(1.08);
   filter: brightness(1.05);
@@ -117,9 +125,25 @@
 }
 
 .news-title {
-  padding: 1rem 1rem 0.5rem;
-  font-size: 0.95rem;
-  position: relative;
+  padding: 0.9rem 1rem 0.75rem;
+  background: #fff;
+}
+
+/* Applica lo stile al contenuto interno (div/h3/qualsiasi) */
+.news-title > * {
+  margin: 0;
+  
+ 
+  line-height: 1.35;       /* fattore per il calcolo dell'altezza */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;   /* max 2 righe */
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  /* forza la stessa altezza per tutti: esattamente 2 righe */
+  height: calc(1.35em * 2);
+  min-height: calc(1.35em * 2);
 }
 
 .news-title h3 {
@@ -275,6 +299,31 @@
   outline-offset: 2px;
 }
 
+.swiper.swiper-initialized { 
+  overflow: visible !important;        /* sovrascrive il CDN */
+  padding-bottom: 26px !important;     /* spazio per i pallini */
+}
+.swiper.swiper-horizontal > .swiper-pagination-bullets,
+.swiper .swiper-pagination {
+  bottom: 10px !important;             /* spostali sotto di 10px */
+  z-index: 10;
+}
+
+
+.news-kicker{
+  margin: 0.4rem 1rem 0;         /* spazio sinistra uguale al titolo */
+  font-size: .60rem;
+  line-height: 1.1;
+
+  text-transform: uppercase;
+  color: #6b6b6b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 1.1em; 
+  text-align:right;           
+}
+
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .swiper-slide {
@@ -289,3 +338,17 @@
     color: #259a00;
   }
 }
+
+
+/* Mobile: titolo leggermente più piccolo ma sempre 2 righe */
+@media (max-width: 768px) {
+  .news-title > * {
+    font-size: 1rem;
+    line-height: 1.35;
+    height: calc(1.35em * 2);
+    min-height: calc(1.35em * 2);
+  }
+    .swiper .swiper-slide { width: 75vw; }   /* ~1.3–1.4 card visibili */
+
+}
+

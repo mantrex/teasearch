@@ -1,7 +1,11 @@
-carousel_data.endpoint:
+# teasearch_carousel.routing.yml
+teasearch_carousel.data:
   path: '/carousel-data'
   defaults:
     _controller: '\Drupal\teasearch_carousel\Controller\CarouselController::getData'
     _format: 'json'
   requirements:
-    _permission: 'TRUE'
+    _access: 'TRUE'            # ← NON _permission
+  methods:  [GET]
+  options:
+    _no_login_required: TRUE   # (opzionale, esplicita l’intento)
