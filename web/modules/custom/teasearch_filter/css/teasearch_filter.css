@@ -96,6 +96,7 @@
     margin-bottom: 0.75rem;
     cursor: pointer;
     transition: color 0.15s ease;
+    border-bottom:1px solid var(--gray-border);
   }
   
   .filter-option:last-child {
@@ -209,6 +210,7 @@
     margin: 0;
     display: flex;
     align-items: center;
+    text-transform:uppercase;
   }
   
   .results-count {
@@ -287,7 +289,7 @@
   
   .item-title {
     font-weight: 600;
-    line-height: 1.3;
+  
     color: var(--result-item-title);
   }
   

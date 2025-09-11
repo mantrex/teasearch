@@ -1,0 +1,22 @@
+<header class="results-header">
+  <div class="results-title">
+    {{ page_title }}
+    {% if total_results %}
+    {% endif %}
+  </div>
+{#
+<span class="results-count">
+  (
+  {{ total_results }}
+  )
+</span>
+#}
+
+  {% if has_filters %}
+    <div class="results-status">
+      <span class="status-text">
+        {{ 'Filtered results'|t }}
+      </span>
+    </div>
+  {% endif %}
+</header>

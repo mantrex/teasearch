@@ -9,7 +9,8 @@ content_types:
     
     results:
       mainfield: title
-      subfield: field_content
+      subfield: field_description
+      content_threshold: 10
       image: field_main_image
       altimage: field_square_thumbnail
     filters:

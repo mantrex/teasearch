@@ -29,6 +29,16 @@ function teasearch_filter_theme($existing, $type, $theme, $path)
       ],
       'template' => 'teasearch',
     ],
+    'teasearch_free_search' => [
+      'variables' => [
+        'entities' => NULL,
+        'search_query' => NULL,
+        'content_type_filter' => NULL,
+        'total_results' => NULL,
+        'page_title' => NULL,
+        'module_path' => NULL,
+      ],
+      'template' => 'teasearch-free-search',
+    ],
   ];
 }
-

@@ -1,0 +1,43 @@
+{#
+  /**
+  * @file
+  * Teasearch filter page template.
+  *
+  * Variables:
+  * - filter_form: Filter form render array
+  * - entities: Array of loaded entities (nodes or users)
+  * - content_type_config: Complete content type configuration
+  * - entity_type: Entity type (node or user)
+  * - total_results: Total number of results
+  * - has_filters: Whether there are active filters
+  * - grouped_filters: Prepared filters for display
+  * - century_data: Century selector configuration
+  * - date_data: Date selector configuration
+  */
+#}
+
+<div class="teasearch-wrapper">
+  {# Sidebar with filters #}
+  <aside class="teasearch-sidebar">
+    {% if grouped_filters %}
+      {% include 'modules/custom/teasearch_filter/templates/partials/filter-form.html.twig' with {
+				'grouped_filters': grouped_filters,
+				'content_type': content_type,
+				'century_data': century_data,
+				'date_data': date_data
+			} %}
+    {% else %}
+      {{ filter_form }}
+    {% endif %}
+  </aside>
+
+  {# Main results area #}
+  <main class="teasearch-results">
+    {% if entities %}
+      {% include 'modules/custom/teasearch_filter/templates/partials/results-header.html.twig' %}
+      {% include 'modules/custom/teasearch_filter/templates/partials/results-list.html.twig' %}
+    {% else %}
+      {% include 'modules/custom/teasearch_filter/templates/partials/no-results.html.twig' %}
+    {% endif %}
+  </main>
+</div>

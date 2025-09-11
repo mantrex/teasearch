@@ -6,3 +6,11 @@ teasearch_filter.search:
   requirements:
     _permission: 'access content'
     content_type: '[a-z0-9_]+'
+
+teasearch_filter.free_search_results:
+  path: '/search'
+  defaults:
+    _controller: '\Drupal\teasearch_filter\Controller\SearchController::freeSearchResults'
+    _title: 'Search Results'
+  requirements:
+    _permission: 'access content'
