@@ -288,8 +288,8 @@
   }
   
   .item-title {
-    font-weight: 600;
-  
+    font-weight: 500;
+    font-size:1.1rem;
     color: var(--result-item-title);
   }
   
@@ -308,6 +308,7 @@
     color: var(--gray-text);
     line-height: 1.5;
     margin-bottom: 0.75rem;
+    font-size:0.9rem;
   }
   
   /* Entity Metadata */
@@ -426,6 +427,10 @@
     background-size: 1rem;
   }
   
+  .item-meta {
+    font-size:0.8em;
+    color:var(--gray-text);
+  }
   /* Responsive */
   @media (max-width: 768px) {
     .teasearch-wrapper {

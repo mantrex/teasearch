@@ -19,8 +19,8 @@ content_types:
         vocabulary: subjects
         label: 'Subjects'
       century_selector:
-        from: year_from
-        to: year_to
+        from: field_year_range.year_from
+        to: field_year_range.year_to
         display: auto
   essentials:
     machine_name: reference_materials

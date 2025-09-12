@@ -85,7 +85,7 @@
                 {{ entity.created.value|format_date('medium') }}
               </span>
             {% endif %}
-
+            {#
             {% if entity.uid and entity.uid.entity and entity_type != 'user' %}
               <span class="item-author">
                 |
@@ -93,6 +93,7 @@
                 {{ entity.uid.entity.label }}
               </span>
             {% endif %}
+            #}
 
             {% if entity.type and entity.type.entity %}
               <span class="item-type">
