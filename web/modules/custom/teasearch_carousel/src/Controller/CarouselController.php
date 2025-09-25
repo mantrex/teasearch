@@ -61,6 +61,8 @@ class CarouselController
       'news_image_candidates' => ['field_main_image', 'field_image'],
       'image_style' => 'large',
       'default_image' => $base . '/' . $modulePath . '/assets/default-card.png',
+      'start_date_constraint' => false
+
     ];
 
     $allBundles = array_merge(['news'], array_keys($config['valid_content_types']));
@@ -116,11 +118,11 @@ class CarouselController
     }
 
     if ($hasField('news', 'field_end_date')) {
-      // end_date assente O >= now
-      $group = $qNews->orConditionGroup()
-        ->notExists('field_end_date')
-        ->condition('field_end_date', $now, '>=');
-      $qNews->condition($group);
+      $this->addDateTimeCondition($qNews, 'news', 'field_end_date', '>=',true);
+    }
+
+    if ($config['start_date_constraint'] && $hasField('news', 'field_start_date')) {
+      $this->addDateTimeCondition($qNews, 'news', 'field_start_date', '<=',false);
     }
 
     // Ordine naturale per le news (usato anche in news_first)
@@ -135,6 +137,14 @@ class CarouselController
 
     $newsNids = $qNews->execute();
     $newsNodes = $storage->loadMultiple($newsNids);
+    //debug
+    /*
+    foreach ($newsNodes as $node) {
+      if ($node->hasField('field_start_date')) {
+        $startDateValue = $node->get('field_start_date')->value;
+        error_log('NEWS: ' . $node->label() . ' | field_start_date: ' . ($startDateValue ?? 'EMPTY'));
+      }
+    }*/
 
     $news = [];
     foreach ($newsNodes as $node) {
@@ -278,5 +288,41 @@ class CarouselController
     }
 
     return $labels;
+  }
+
+  /**
+   * Applica una condizione di confronto data su un campo datetime.
+   * 
+   * @param bool $allowEmpty Se true, include i nodi con campo vuoto (OR condition)
+   */
+  private function addDateTimeCondition($query, string $bundle, string $fieldName, string $operator, bool $allowEmpty = false): void
+  {
+    $fieldManager = \Drupal::service('entity_field.manager');
+    $defs = $fieldManager->getFieldDefinitions('node', $bundle);
+
+    if (!isset($defs[$fieldName])) {
+      return; // Campo non esiste
+    }
+
+    $fc = \Drupal\field\Entity\FieldConfig::loadByName('node', $bundle, $fieldName);
+    if ($fc) {
+      $storage = $fc->getFieldStorageDefinition();
+      $datetime_type = $storage->getSetting('datetime_type') ?? 'date';
+
+      $nowValue = ($datetime_type === 'date')
+        ? gmdate('Y-m-d')
+        : gmdate('Y-m-d\TH:i:s');
+
+      if ($allowEmpty) {
+        // Campo vuoto O condizione soddisfatta
+        $group = $query->orConditionGroup()
+          ->notExists($fieldName)
+          ->condition($fieldName . '.value', $nowValue, $operator);
+        $query->condition($group);
+      } else {
+        // Solo condizione (campo deve essere compilato)
+        $query->condition($fieldName . '.value', $nowValue, $operator);
+      }
+    }
   }
 }
