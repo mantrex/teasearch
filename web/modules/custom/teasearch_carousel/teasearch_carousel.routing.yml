@@ -9,3 +9,14 @@ teasearch_carousel.data:
   methods:  [GET]
   options:
     _no_login_required: TRUE   # (opzionale, esplicita l’intento)
+
+teasearch_carousel.view_all:
+  path: '/carousel-all'
+  defaults:
+    _controller: '\Drupal\teasearch_carousel\Controller\CarouselController::viewAll'
+    _title: 'News and Highlights'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+  options:
+    _no_login_required: TRUE

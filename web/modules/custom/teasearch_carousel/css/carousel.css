@@ -237,6 +237,59 @@
 .swiper-slide:nth-child(4) { animation-delay: 0.4s; }
 .swiper-slide:nth-child(5) { animation-delay: 0.5s; }
 
+/* View All Button Styles */
+.carousel-view-all-wrapper {
+  text-align: center;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.carousel-view-all-btn {
+  display: inline-block;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #259a00, #32c000);
+  color: white;
+  text-decoration: none;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 15px rgba(37, 154, 0, 0.2);
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.carousel-view-all-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.carousel-view-all-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(37, 154, 0, 0.3);
+  text-decoration: none;
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.carousel-view-all-btn:hover::before {
+  left: 100%;
+}
+
+.carousel-view-all-btn:active {
+  transform: translateY(0) scale(1.02);
+}
+
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .swiper {

@@ -2,21 +2,6 @@
    Teasearch Filter Styles - COMPLETAMENTE VERDE
    ============================================================================= */
 
-   :root {
-   --filter-group: #DBE5C1;
-   --filter-group-hover: #e1ebc6;
-   --filter-group-open:#e4efca;
-   --filter-actions: #D5D0CB;
-   --filter-actions-button:#628320;
-   --filter-actions-button-hover:#6b8e23;
-   --filter-actions-button-border:#59781c;
-   --result-item-bg: #fff;
-   --result-item-hover:  #bdc6a5;
-   --result-item-img:#E5DDD7;
-   --result-item-title:#6F8C2F;
-   --gray-border: #DDDDDD;
-
-  }
   
   /* Layout */
   .teasearch-wrapper {
@@ -37,8 +22,8 @@
   
   /* Filters Container */
   .teasearch-filters {
-    background: #fff;
-    border: 1px solid var(--gray-border);
+    background: var(--light);
+    border: 1px solid var(--light-border);
     border-radius: 0.5rem;
     overflow: hidden;
     box-shadow: 0 0.125rem 0.25rem rgba(40, 167, 69, 0.1);
@@ -46,7 +31,7 @@
   
   /* Filter Groups */
   .filter-group {
-    border-bottom: 1px solid var(--gray-border);
+    border-bottom: 1px solid var(--light-border);
   }
   
   .filter-group:last-child {
@@ -56,7 +41,7 @@
   .filter-title {
     padding: 1rem;
     margin: 0;
-    background: var(--filter-group);
+    background: var(--light);
     cursor: pointer;
     font-weight: 500;
     display: flex;
@@ -73,7 +58,7 @@
   }
   
   .filter-badge {
-    background: var(--green-primary);
+
     color: white;
     padding: 0.25rem 0.5rem;
     border-radius: 1rem;
@@ -96,7 +81,7 @@
     margin-bottom: 0.75rem;
     cursor: pointer;
     transition: color 0.15s ease;
-    border-bottom:1px solid var(--gray-border);
+    border-bottom:1px solid var(--light-border);
   }
   
   .filter-option:last-child {
@@ -104,13 +89,14 @@
   }
   
   .filter-option:hover {
-    color: var(--green-primary);
+    accent-color: var(--item-primary);
+
   }
   
   .filter-option input[type="checkbox"] {
     margin-right: 0.5rem;
     margin-top: 0;
-    accent-color: var(--green-primary);
+    accent-color: var(--item-primary);
   }
   
   .option-text {
@@ -119,7 +105,7 @@
   }
   
   .option-text small {
-    color: var(--gray-text);
+    color: var(--light-text);
   }
   
   /* Text Input */
@@ -133,8 +119,8 @@
   }
   
   .filter-input:focus {
-    border-color: var(--green-primary);
-    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    border-color: var(--item-primary);
+    box-shadow: 0 0 0 0.2rem var(--box-shadow);
     outline: 0;
   }
   
@@ -155,7 +141,7 @@
   /* Buttons */
   .fbtn {
     display: inline-block;
-    border-color:var(--filter-actions-button-border);
+    border-color:var(--actions-button-border);
     font-size:0.9rem;
 
     padding: 0.375rem 0.75rem;
@@ -174,29 +160,29 @@
   
   .fbtn-primary {
     color: #fff;
-    background-color: var(--filter-actions-button);
-    border-color: var(--filter-actions-button-border);
+    background-color: var(--actions-button);
+    border-color: var(--actions-button-border);
   }
   
   .fbtn-primary:hover {
     color: #fff;
-    background-color: var(--filter-actions-button-hover);
-    border-color: var(--filter-actions-button-border);
+    background-color: var(--actions-button-hover);
+    border-color: var(--actions-button-border);
     text-decoration: none;
   }
   
   .fbtn-secondary,
   .fbtn-outline-secondary {
-    color: var(--gray-text);
+    color: var(--light-text);
     background-color: transparent;
-    border-color: var(--gray-text);
+    border-color: var(--light-border);
   }
   
   .fbtn-secondary:hover,
   .fbtn-outline-secondary:hover {
-    color: #fff;
-    background-color: var(--filter-actions-button-hover);
-    border-color: var(--filter-actions-button-border);
+    color: var(--light);
+    background-color: var(--actions-button-hover);
+    border-color: var(--actions-button-border);
     text-decoration: none;
   }
   
@@ -206,7 +192,7 @@
   
   .results-title {
     font-weight: 600;
-    color: #212529;
+    color: var(--body-text);
     margin: 0;
     display: flex;
     align-items: center;
@@ -223,9 +209,8 @@
   
   .status-text {
     font-size: 0.9rem;
-    color: var(--gray-text);
+    color: var(--light-text);
     padding: 0.25rem 0.5rem;
-    background: var(--green-light);
     border-radius: 0.25rem;
   }
   
@@ -237,17 +222,17 @@
   }
   
   .result-item {
-    background: var(--result-item-bg);
-    border: 1px solid var(--gray-border);
+    background: var(--list-result);
+    border: 1px solid var(--light-border);
     border-radius: 0.2rem;
     padding: 0.2rem;
     transition: all 0.15s ease;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    box-shadow: 0 0.125rem 0.25rem var(--box-shadow)
   }
   
   .result-item:hover {
-    border-color: var(--result-item-hover);
-    box-shadow: 0 0.125rem 0.25rem rgba(40, 167, 69, 0.15);
+    border: 2px solid var(--list-hover);
+    box-shadow: 0 0.125rem 0.25rem var(--box-shadow)
   }
   
   .item-content {
@@ -258,7 +243,7 @@
   
   .item-image {
     flex-shrink: 0;
-    border:1px solid var(--result-item-img);
+   
   
   }
   
@@ -266,7 +251,7 @@
     width: 64px;
     height: 64px;
     object-fit: cover;
-    border: 2px solid var(--gray-border);
+    border: 2px solid var(--light-border);
     transition: border-color 0.15s ease;
   }
   
@@ -290,22 +275,22 @@
   .item-title {
     font-weight: 500;
     font-size:1.1rem;
-    color: var(--result-item-title);
+    color: var(--item-title);
   }
   
   .entity-link {
-    color: var(--green-primary);
+
     text-decoration: none;
     transition: color 0.15s ease;
   }
   
   .entity-link:hover {
-    color: var(--green-dark);
+
     text-decoration: underline;
   }
   
   .item-description {
-    color: var(--gray-text);
+    color: var(--ligh-text);
     line-height: 1.5;
     margin-bottom: 0.75rem;
     font-size:0.9rem;
@@ -337,7 +322,7 @@
   }
   
   .term-badge {
-    background: var(--green-primary);
+    background: var(--item-primary);
     color: white;
     padding: 0.125rem 0.5rem;
     border-radius: 1rem;
@@ -396,7 +381,7 @@
   .filter-title:focus,
   .filter-option:focus,
   .entity-link:focus {
-    outline: 2px solid var(--green-primary);
+    outline: 2px solid var(--item-primary);
     outline-offset: 2px;
   }
   
@@ -411,12 +396,12 @@
   }
   
   .filter-content::-webkit-scrollbar-thumb {
-    background: var(--green-primary);
+    background: var(--item-primary);
     border-radius: 3px;
   }
   
   .filter-content::-webkit-scrollbar-thumb:hover {
-    background: var(--green-dark);
+    background: var(--item-secondary);
   }
   
   /* Loading States */

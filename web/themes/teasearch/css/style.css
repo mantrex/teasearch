@@ -1,8 +1,43 @@
+:root {
+  --body-bg: #ede8e2;
+  --body-text: #2b2727;
+  --top-bar:#45392e; /* barra top con le lingue */
+  --top-bar-bottom:#332a22; /* bordo marrone inferiore alla top-bar */
+  --language-active:#514336;/* lingua selezionata */
+  --language-hover:#ffffff26; /* hoover lingua */
+  --header:#6b8e24; /* per l'header del layout*/
+  --header-bottom:#5e7e1e;
+  --footer: #523e39; /*background del footer*/
+  --foter-shadow: #3d2e2b;/* shadow background del footer*/
+  --footer-light:#ffffff1a; /* footer input fields */
+  --footer-light-hover:#ffffff33;
+  --footer-item-focus:#ffffff26; /* solo per footer*/
+  --light: #ffffff; /* si usa in tutti i riquadri chiari e negli elementi in evidenza */
+  --light-almost:#ffffffcc; /* per ora solo nel footer */
+  --light-border-bottom:#cccccc; /* per piccoli interventi di stile */
+  --light-border: #dddddd;
+  --light-text:#aaaaaa;
+  --list-result:#ffffff; /* su usa come background nei risultati delle liste */
+  --list-border:#dddddd;/* bordo dell'item della lista su usa nei risultati delle liste - bordo*/
+  --list-hover: #259a00; /* item la lista quando ci metti il mouse sopra --hover*/
+  --item-title: #6f8c2f; /* tutti i titoli nelle liste */
+  --item-primary:#259a00; /* lo uso per i checkbox, per altre parti ecc*/
+  --item-secondary:#155b00; /*  da usare come contrasto, è più scuro */
+  --filter-group-hover: #e1ebc6; /* appoggio il mouse sull'area filtri*/
+  --filter-group-open: #e4efca; /* apro l'area filtri */
+  --filter-actions: #d5d0cb; /* alla base dell'area filtri dove ci sono i bottoni */
+  --actions-button: #628320; /* tutti i tasti */
+  --actions-button-hover: #6b8e23; /* tutti i tasti hover */
+  --actions-button-border: #59781c; /* tutti i tasti bordo */
+  --box-shadow:#28a74526;
+  --form-color:grey; /* tasto per la newsletter - da fare */
+}
+
 body {
   border: 0;
   padding: 0;
-  background: #ede8e2;
-  color: #2b2727;
+  background: var(--body-bg);
+  color: var(--body-text);
 }
 
 a {
@@ -10,7 +45,7 @@ a {
   text-decoration: none;
 }
 .href-white {
-  color: white;
+  color: var(--light);
   text-decoration: none;
 }
 .text-bold {
@@ -37,9 +72,9 @@ a {
 }
 /* Example color overrides */
 .site-green-bar {
-  background-color: #6b8e23; /* A green shade */
-  border-bottom: 1px solid #5e7e1e;
-  box-shadow: #516049 0px 0px 2px 0px;
+  background-color: var(--header); /* A green shade */
+  border-bottom: 1px solid var(--header-bottom);
+  box-shadow: var(--box-shadow);
   top: 0;
   transition:
     padding 180ms ease,
@@ -48,15 +83,14 @@ a {
     background-color 180ms ease;
 }
 .site-green-bar .navbar-brand {
-  height:auto;
+  height: auto;
 }
 .site-green-bar.is-compact {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  height:60px;
+  box-shadow: 0 2px 6px var(--box-shadow);
+  height: 60px;
 }
 .site-green-bar.is-compact .navbar {
-  height:60px;
-
+  height: 60px;
 }
 /* Riduzione logo/brand quando compatto (se presente) */
 .site-green-bar.is-compact .navbar-brand img {
@@ -67,9 +101,9 @@ a {
 /*FOOTER RELATED*/
 
 .footer-section {
-  box-shadow: #3d2e2b 0px 00px 3px 0px;
-  background-color: #523e39; /* A brown shade */
-  color: #fff;
+  box-shadow: var(--footer-shadow) 0px 00px 3px 0px;
+  background-color: var(--footer); /* A brown shade */
+  color: var(--light);
   padding: 20px 0;
   height: 280px;
 }
@@ -101,7 +135,7 @@ a {
 }
 
 .newsletter-title {
-  color: white;
+  color: var(--light);
   font-size: 16px;
   font-weight: 500;
   margin-bottom: 2px;
@@ -116,25 +150,25 @@ a {
   flex: 1;
   padding: 8px 12px;
   border: none;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
+  background-color: var(--footer-light);
+  color: var(--light);
   font-size: 14px;
   border-radius: 4px 0 0 4px;
 }
 
 .newsletter-input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--light)
 }
 
 .newsletter-input:focus {
   outline: none;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: var(--footer-item-focus)
 }
 
 .newsletter-btn {
   padding: 8px 16px;
-  background-color: white;
-  color: grey;
+  background-color: var(--light);
+  color: var(--formal-color);
   border: none;
   font-size: 14px;
   font-weight: 600;
@@ -144,7 +178,7 @@ a {
 }
 
 .newsletter-btn:hover {
-  background-color: white;
+  background-color: var(--light);
 }
 
 /* Social Media Section */
@@ -152,7 +186,7 @@ a {
 }
 
 .social-title {
-  color: white;
+  color: var(--light);
   font-size: 16px;
   font-weight: 500;
   padding-right: 32px;
@@ -167,8 +201,8 @@ a {
   display: inline-flex;
   width: 32px;
   height: 32px;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
+  background-color: var(--footer-light);
+  color: var(--light);
   align-items: center;
   justify-content: center;
   text-decoration: none;
@@ -177,42 +211,42 @@ a {
 }
 
 .social-icon:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--footer-light-hover);
   color: white;
   transform: translateY(-2px);
 }
 
 .social-icon.facebook:hover {
-  background-color: #1877f2;
+  background-color: #1877f2; /*placeholder*/
 }
 
 .social-icon.twitter:hover {
-  background-color: #1da1f2;
+  background-color: #1da1f2;/*placeholder*/
 }
 
 .social-icon.youtube:hover {
-  background-color: #ff0000;
+  background-color: #ff0000;/*placeholder*/
 }
 
 .social-icon.instagram:hover {
-  background-color: #e4405f;
+  background-color: #e4405f;/*placeholder*/
 }
 
 /* Privacy Section */
 .privacy-section {
   margin-top: 30px;
   padding-top: 15px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid var(--footer-light);
 }
 
 .privacy-link {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--light-almost);
   text-decoration: none;
   font-size: 13px;
 }
 
 .privacy-link:hover {
-  color: white;
+  color: var(--light);
   text-decoration: underline;
 }
 
@@ -244,9 +278,9 @@ a {
 /*FOOTER RELATED END*/
 
 .brown-bar {
-  background-color: #45392e;
+  background-color: var(--top-bar);
   height: 35px;
-  border-bottom: 1px solid #332a22;
+  border-bottom: 1px solid var(--top-bar-bottom);
   font-size: 13px;
 }
 
@@ -265,7 +299,7 @@ a {
 }
 
 .brown-bar .language-selector a {
-  color: #ffffff;
+  color: var(--light);
   text-decoration: none;
   padding: 8px 12px;
   display: block;
@@ -275,18 +309,18 @@ a {
 }
 
 .brown-bar .language-selector a:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
+  background-color: var(--language-hover);
+  color: var(--light);
 }
 
 .brown-bar .language-selector a.active {
-  background-color: #514336;
-  color: #ffffff;
+  background-color: var(--language-active);
+  color: var(--light);
   font-weight: 600;
 }
 
 .brown-bar .language-separator {
-  color: #d2b48c;
+  color: var(--light-almost);
   margin: 0 3px;
   font-weight: 300;
 }
@@ -305,19 +339,19 @@ a {
 
 .text-below-logo.is-hidden {
   opacity: 0;
-  display:none;
+  display: none;
   pointer-events: none; /* opzionale: evita click */
 }
 
 .white-border {
-  border: 1px solid #eeeeee;
-  border-bottom: 2px solid #cccccc;
+  border: 1px solid var(--light-border);
+  border-bottom: 2px solid var(--light-border-bottom);
 }
 
 .teasearch-introblock {
   margin-top: 2em;
   margin-bottom: 1em;
-  background: white;
+  background: var(--light);
   padding: 2px;
   text-align: center;
 }

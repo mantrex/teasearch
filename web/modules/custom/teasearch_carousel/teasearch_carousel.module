@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Teasearch Carousel module.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function teasearch_carousel_theme($existing, $type, $theme, $path)
+{
+  return [
+    'carousel_view_all' => [
+      'variables' => [
+        'news' => [],
+        'highlights' => [],
+      ],
+      'template' => 'carousel-view-all',
+    ],
+  ];
+}

@@ -914,4 +914,168 @@ class SearchController extends ControllerBase
       return [];
     }
   }
+
+
+
+  /**
+   * Free search results across all content types.
+   */
+  public function freeSearchResults(Request $request)
+  {
+    $search_query = trim($request->query->get('query', ''));
+    $content_type_filter = $request->query->get('content_type', 'all');
+
+    if (empty($search_query)) {
+      return [
+        '#theme' => 'teasearch_free_search',
+        '#entities' => [],
+        '#search_query' => $search_query,
+        '#content_type_filter' => $content_type_filter,
+        '#total_results' => 0,
+        '#page_title' => $this->t('Search Results'),
+        '#module_path' => $request->getBasePath() . '/' . \Drupal::service('extension.list.module')->getPath('teasearch_filter'),
+        '#cache' => [
+          'contexts' => ['url.query_args'],
+        ],
+      ];
+    }
+
+    $config = $this->configFactory->get('teasearch_filter.settings');
+    $content_types = $config->get('content_types') ?: [];
+
+    $all_entities = [];
+    $total_results = 0;
+
+    // Cerca in tutti i content type configurati o in quello selezionato
+    foreach ($content_types as $content_type_key => $content_type_config) {
+      // Se è selezionato un content type specifico, cerca solo in quello
+      if ($content_type_filter !== 'all' && $content_type_filter !== $content_type_key) {
+        continue;
+      }
+
+      $entity_type = $content_type_config['type'] ?? 'node';
+
+      if ($entity_type === 'user') {
+        $entities = $this->searchUsersForFreeSearch($content_type_config, $search_query);
+      } else {
+        $entities = $this->searchNodesForFreeSearch($content_type_config, $search_query);
+      }
+
+      // Aggiungi label del content type agli entity per il template
+      foreach ($entities as &$entity) {
+        $entity->teasearch_content_type_label = $content_type_config['label'] ?? ucfirst($content_type_key);
+
+        // Aggiungi contenuto processato per la descrizione
+        if ($entity_type === 'node') {
+          $entity->teasearch_processed_content = $this->getProcessedContentForEntity($entity, $content_type_config);
+        }
+      }
+
+      $all_entities = array_merge($all_entities, $entities);
+    }
+
+    // Ordina per data di creazione (più recenti prima)
+    usort($all_entities, function ($a, $b) {
+      $time_a = $a->created ? $a->created->value : $a->getCreatedTime();
+      $time_b = $b->created ? $b->created->value : $b->getCreatedTime();
+      return $time_b - $time_a;
+    });
+
+    // Limita i risultati
+    $limit = 50;
+    $total_results = count($all_entities);
+    $all_entities = array_slice($all_entities, 0, $limit);
+
+    return [
+      '#theme' => 'teasearch_free_search',
+      '#entities' => $all_entities,
+      '#search_query' => $search_query,
+      '#content_type_filter' => $content_type_filter,
+      '#total_results' => $total_results,
+      '#page_title' => $this->t('Search Results'),
+      '#module_path' => $request->getBasePath() . '/' . \Drupal::service('extension.list.module')->getPath('teasearch_filter'),
+      '#cache' => [
+        'contexts' => ['url.query_args'],
+        'tags' => ['node_list', 'user_list', 'config:teasearch_filter.settings'],
+      ],
+    ];
+  }
+
+  /**
+   * Search nodes for free search.
+   */
+  private function searchNodesForFreeSearch($config, $search_query)
+  {
+    $machine_name = $config['machine_name'];
+
+    $query = $this->entityTypeManager->getStorage('node')->getQuery()
+      ->accessCheck(TRUE)
+      ->condition('type', $machine_name)
+      ->condition('status', 1);
+
+    // Apply WHERE conditions from config
+    $this->applyWhereConditions($query, $config);
+
+    // Search in title and body
+    $search_group = $query->orConditionGroup();
+    $search_group->condition('title', "%{$search_query}%", 'LIKE');
+    $search_group->condition('body.value', "%{$search_query}%", 'LIKE');
+
+    $query->condition($search_group);
+
+    $ids = $query->sort('created', 'DESC')
+      ->range(0, 100) // Limit per content type
+      ->execute();
+
+    return $this->entityTypeManager->getStorage('node')->loadMultiple($ids);
+  }
+
+  /**
+   * Search users for free search.
+   */
+  private function searchUsersForFreeSearch($config, $search_query)
+  {
+    $query = $this->entityTypeManager->getStorage('user')->getQuery()
+      ->accessCheck(TRUE)
+      ->condition('status', 1);
+
+    // Search in username and bio-like fields
+    $search_group = $query->orConditionGroup();
+    $search_group->condition('name', "%{$search_query}%", 'LIKE');
+
+    // Add common bio fields
+    $bio_fields = ['field_bio', 'field_biography', 'field_description'];
+    foreach ($bio_fields as $field) {
+      $search_group->condition("{$field}.value", "%{$search_query}%", 'LIKE');
+    }
+
+    $query->condition($search_group);
+
+    $ids = $query->sort('created', 'DESC')
+      ->range(0, 50) // Limit per content type
+      ->execute();
+
+    return $this->entityTypeManager->getStorage('user')->loadMultiple($ids);
+  }
+
+  /**
+   * Get processed content for entity description.
+   */
+  private function getProcessedContentForEntity($entity, $config)
+  {
+    $results_config = $config['results'] ?? [];
+    $subfield = $results_config['subfield'] ?? 'body';
+
+    if (!$entity->hasField($subfield) || $entity->get($subfield)->isEmpty()) {
+      return '';
+    }
+
+    $field_data = $entity->get($subfield);
+    if ($field_data->first()) {
+      $value = $field_data->first()->value ?? '';
+      return strip_tags($value);
+    }
+
+    return '';
+  }
 }
