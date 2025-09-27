@@ -214,3 +214,34 @@ function teasearch_preprocess_views_view__category_selector(&$variables)
 
   $variables['categories_data'] = $categories_data;
 }
+
+
+function teasearch_suggestions_teasearch_alter(array &$suggestions, array $variables)
+{
+  if (!empty($variables['content_type'])) {
+    // Mappa content_type → template
+    $template_mapping = [
+      'news' => 'card_layout',
+      'events' => 'card_layout',
+      'announcements' => 'card_layout',
+
+      'texts' => 'list_layout',
+      'documents' => 'list_layout',
+
+      'images' => 'gallery_layout',
+      'videos' => 'gallery_layout',
+
+      // Fallback: se non è nella mappa, usa il nome del content_type
+    ];
+
+    $content_type = $variables['content_type'];
+
+    if (isset($template_mapping[$content_type])) {
+      // Usa il template mappato
+      $suggestions[] = 'teasearch__' . $template_mapping[$content_type];
+    } else {
+      // Fallback: usa il nome del content_type
+      $suggestions[] = 'teasearch__' . str_replace('-', '_', $content_type);
+    }
+  }
+}

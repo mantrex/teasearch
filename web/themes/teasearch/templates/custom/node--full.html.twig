@@ -1,0 +1,24 @@
+{#
+/**
+ * @file
+ * Theme override to display a node in full view mode.
+ */
+#}
+
+{# Debug per vedere il content type #}
+{# {{ dump(node.bundle) }} #}
+
+{% if node.bundle == 'news' %}
+  {% include '@teasearch/custom/node-news-full.html.twig' %}
+  {#
+{% elseif node.bundle == 'primary-sources' %}
+  {% include '@teasearch/partials/node-primary-sources-full.html.twig' %}
+{% elseif node.bundle == 'texts' %}
+  {% include '@teasearch/partials/node-texts-full.html.twig' %}
+{% elseif node.bundle == 'images' %}
+  {% include '@teasearch/partials/node-images-full.html.twig' %}
+  #}
+{% else %}
+  {# Fallback: usa il template di default #}
+  {% include '@teasearch/custom/node-default-full.html.twig' %}
+{% endif %}

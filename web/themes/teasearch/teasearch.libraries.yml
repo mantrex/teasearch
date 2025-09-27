@@ -20,3 +20,11 @@ global-styling:
     theme:
       css/style.css: {} 
       css/category_selector.css: {} 
+image-lightbox:
+  css:
+    theme:
+      css/image-lightbox.css: {}
+  js:
+    js/image-lightbox.js: {}
+  dependencies:
+    - core/drupal

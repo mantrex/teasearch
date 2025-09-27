@@ -58,6 +58,7 @@
   }
   
   .filter-badge {
+
     color: white;
     padding: 0.25rem 0.5rem;
     border-radius: 1rem;
@@ -89,6 +90,7 @@
   
   .filter-option:hover {
     accent-color: var(--item-primary);
+
   }
   
   .filter-option input[type="checkbox"] {
@@ -133,6 +135,7 @@
   
   .filter-actions .fbtn {
     flex: 1;
+
   }
   
   /* Buttons */
@@ -140,6 +143,7 @@
     display: inline-block;
     border-color:var(--actions-button-border);
     font-size:0.9rem;
+
     padding: 0.375rem 0.75rem;
     margin-bottom: 0;
     font-size: 1rem;
@@ -210,125 +214,158 @@
     border-radius: 0.25rem;
   }
   
-  /* ============================================================================= 
-     RESULTS LIST - CAROUSEL VIEW-ALL STYLE
-     ============================================================================= */
-  
+  /* Results List */
   .results-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.2rem;
   }
   
   .result-item {
-    display: flex !important;
-    background: var(--light);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px var(--box-shadow);
-    transition: all 0.3s ease;
-    border: 1px solid var(--list-border);
-    text-decoration: none !important;
-    color: inherit !important;
+    background: var(--list-result);
+    border: 1px solid var(--light-border);
+    border-radius: 0.2rem;
+    padding: 0.2rem;
+    transition: all 0.15s ease;
+    box-shadow: 0 0.125rem 0.25rem var(--box-shadow)
   }
   
   .result-item:hover {
-    box-shadow: 0 4px 16px var(--box-shadow);
-    border-color: var(--item-primary);
-    text-decoration: none !important;
-    color: inherit !important;
-    transform: translateY(-2px);
+    border: 2px solid var(--list-hover);
+    box-shadow: 0 0.125rem 0.25rem var(--box-shadow)
   }
   
-  .result-item-image {
-    width: 200px;
-    height: 120px;
+  .item-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .item-image {
     flex-shrink: 0;
-    position: relative;
-    overflow: hidden;
+   
+  
   }
   
-  .result-item-image .item-image {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .result-item-image .entity-image {
-    width: 100% !important;
-    height: 100% !important;
+  .entity-image {
+    width: 64px;
+    height: 64px;
     object-fit: cover;
-    transition: transform 0.3s ease;
-    display: block;
-    border-radius: 0;
+    border: 2px solid var(--light-border);
+    transition: border-color 0.15s ease;
   }
   
-  .result-item:hover .result-item-image .entity-image {
-    transform: scale(1.05);
+  .entity-image.rounded {
+    border-radius: 0!important; /*tolto arrotondamento immagine*/
   }
   
-  .result-item-content {
+  .entity-image.rounded-circle {
+    border-radius: 50%;
+  }
+  
+  .result-item:hover .entity-image {
+    border-color: var();
+  }
+  
+  .item-body {
     flex: 1;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    min-width: 0;
   }
   
-  .result-item-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--item-title);
-    line-height: 1.4;
-    margin: 0 0 0.5rem 0;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .result-item-description {
-    font-size: 0.9rem;
-    color: var(--body-text);
-    line-height: 1.4;
-    margin-bottom: 0.75rem;
-    flex: 1;
-  }
-  
-  .result-item-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.85rem;
-    color: var(--light-text);
-    margin-top: auto;
-  }
-  
-  .result-item-date {
-    font-style: italic;
-    color: var(--light-text);
-  }
-  
-  .result-item-type {
+  .item-title {
     font-weight: 500;
-    color: var(--body-text);
+    font-size:1.1rem;
+    color: var(--item-title);
   }
   
-  /* Focus States */
-  .result-item:focus {
-    outline: 2px solid var(--item-primary);
-    outline-offset: 2px;
+  .entity-link {
+
+    text-decoration: none;
+    transition: color 0.15s ease;
   }
   
-  /* ============================================================================= 
-     LEGACY STYLES - Manteniamo per compatibilità
-     ============================================================================= */
+  .entity-link:hover {
+
+    text-decoration: underline;
+  }
   
-  .item-meta {
-    font-size:0.8em;
-    color:var(--gray-text);
+  .item-description {
+    color: var(--ligh-text);
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+    font-size:0.9rem;
+  }
+  
+  /* Entity Metadata */
+  .entity-meta {
+    font-size: 0.875rem;
+    color: var(--gray-text);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+  }
+  
+  .meta-roles,
+  .meta-date,
+  .meta-author {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  
+  .meta-terms {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  
+  .term-badge {
+    background: var(--item-primary);
+    color: white;
+    padding: 0.125rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  
+  .term-badge.secondary {
+    background: var(--gray-text);
+  }
+  
+  .term-more {
+    color: var(--gray-text);
+    font-size: 0.75rem;
+  }
+  
+  /* No Results */
+  .no-results {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    text-align: center;
+  }
+  
+  .no-results-content {
+    max-width: 400px;
+  }
+  
+  .no-results-title {
+    font-size: 1.5rem;
+    color: var(--gray-text);
+    margin-bottom: 1rem;
+  }
+  
+  .no-results-text {
+    color: var(--gray-text);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+  }
+  
+  .no-results-actions .btn {
+    min-width: 150px;
   }
   
   /* Details State */
@@ -375,48 +412,11 @@
     background-size: 1rem;
   }
   
-  .century-select-group {
-    margin-bottom:1em;
+  .item-meta {
+    font-size:0.8em;
+    color:var(--gray-text);
   }
-  
-  .century-select-group label {
-    margin-bottom:0;
-    font-weight:bold;
-  }
-  
-  /* No Results */
-  .no-results {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 300px;
-    text-align: center;
-  }
-  
-  .no-results-content {
-    max-width: 500px;
-  }
-  
-  .no-results-title {
-    font-size: 1.5rem;
-    color: var(--light-text);
-    margin-bottom: 1rem;
-  }
-  
-  .no-results-text {
-    color: var(--light-text);
-    margin-bottom: 1.5rem;
-    line-height: 1.5;
-  }
-  
-  .no-results-actions .btn {
-    min-width: 150px;
-  }
-  
-  /* ============================================================================= 
-     RESPONSIVE DESIGN
-     ============================================================================= */
-  
+  /* Responsive */
   @media (max-width: 768px) {
     .teasearch-wrapper {
       flex-direction: column;
@@ -436,73 +436,32 @@
       flex: none;
     }
     
-    /* Results responsive */
-    .result-item {
+    
+    .item-content {
       flex-direction: column;
+      text-align: center;
     }
     
-    .result-item-image {
-      width: 100%;
-      height: 150px;
+    .entity-meta {
+      justify-content: center;
     }
     
-    .result-item-content {
-      padding: 0.75rem;
-    }
-    
-    .result-item-title {
-      font-size: 0.95rem;
-    }
-    
-    .result-item-meta {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.25rem;
+    .meta-terms {
+      justify-content: center;
     }
   }
 
-  @media (max-width: 480px) {
-    .result-item-image {
-      height: 120px;
-    }
-    
-    .result-item-content {
-      padding: 0.5rem;
-    }
-    
-    .result-item-title {
-      font-size: 0.9rem;
-    }
-    
-    .result-item-meta {
-      font-size: 0.8rem;
-    }
+  .century-select-group {
+    margin-bottom:1em;
   }
   
-  /* ============================================================================= 
-     ACCESSIBILITY AND PERFORMANCE
-     ============================================================================= */
-  
+  .century-select-group label {
+    margin-bottom:0;
+    font-weight:bold;
+  }
   /* Accessibility */
   @media (prefers-reduced-motion: reduce) {
-    .result-item,
-    .result-item-image .entity-image,
-    .fbtn,
-    .filter-option {
+    * {
       transition: none !important;
-    }
-  }
-  
-  /* Print styles */
-  @media print {
-    .result-item {
-      break-inside: avoid;
-      box-shadow: none;
-      border: 1px solid var(--body-text);
-      transform: none;
-    }
-    
-    .result-item-image .entity-image {
-      transform: none;
     }
   }

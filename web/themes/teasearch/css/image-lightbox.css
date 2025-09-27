@@ -1,0 +1,70 @@
+.teasearch-lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.teasearch-lightbox-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.teasearch-lightbox-content {
+  position: relative;
+  max-width: 95vw;
+  max-height: 95vh;
+  transform: scale(0.8);
+  transition: transform 0.3s ease;
+}
+
+.teasearch-lightbox-overlay.active .teasearch-lightbox-content {
+  transform: scale(1);
+}
+
+.teasearch-lightbox-image {
+  max-width: 100%;
+  max-height: 95vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.teasearch-lightbox-close {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  background: var(--light);
+  color: var(--body-text);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+}
+
+.teasearch-lightbox-close:hover {
+  background: var(--item-primary);
+  color: var(--light);
+}
+
+@media (max-width: 768px) {
+  .teasearch-lightbox-close {
+    top: 10px;
+    right: 10px;
+  }
+}

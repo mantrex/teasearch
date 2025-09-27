@@ -1,0 +1,445 @@
+{#
+  /**
+  * Template moderno per News/Eventi - Full view
+  */
+#}
+
+<article{{ attributes.addClass('node','node--type-news','node--view-mode-full') }}>
+
+  {# Header solo con titolo #}
+  <div class="news-header">
+    <div class="news-title-section">
+      <h1 class="news-main-title">
+        {{ label }}
+      </h1>
+
+      {# News type e data in evidenza #}
+      <div class="news-meta-primary">
+        {% if content.field_news_type %}
+          <span class="news-type-badge">
+            {{ content.field_news_type }}
+          </span>
+        {% endif %}
+        {% if content.field_date %}
+          <time class="news-event-date">
+            <i class="fas fa-calendar"></i>
+            {{ content.field_date }}
+          </time>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {# Contenuto principale con immagine dentro il riquadro bianco #}
+  <div class="news-content-wrapper">
+    <div class="container">
+      <div class="row">
+
+        {# Colonna principale #}
+        <div class="col-lg-8">
+
+          {# Immagine principale nel riquadro bianco #}
+          {% if content.field_image %}
+            <div class="news-main-image">
+              <div class="image-container" data-teasearch-lightbox>
+                {{ content.field_image }}
+              </div>
+            </div>
+          {% endif %}
+
+          {# Corpo del testo #}
+          {% if content.field_content %}
+            <div class="news-body-content">
+              {{ content.field_content }}
+            </div>
+          {% endif %}
+
+          {# Sezione evento (se ha dati evento) #}
+          {% if content.field_venue or content.field_address or content.field_location or content.field_organizer %}
+            <div class="news-event-details">
+              <h3 class="section-title">
+                <i class="fas fa-map-marker-alt"></i>
+                Dettagli Evento
+              </h3>
+              <div class="event-info-grid">
+
+                {% if content.field_venue %}
+                  <div class="event-info-item">
+                    <label>
+                      Venue:
+                    </label>
+                    <div class="info-value">
+                      {{ content.field_venue }}
+                    </div>
+                  </div>
+                {% endif %}
+
+                {% if content.field_address %}
+                  <div class="event-info-item">
+                    <label>
+                      Indirizzo:
+                    </label>
+                    <div class="info-value">
+                      {{ content.field_address }}
+                    </div>
+                  </div>
+                {% endif %}
+
+                {% if content.field_location %}
+                  <div class="event-info-item">
+                    <label>
+                      Città:
+                    </label>
+                    <div class="info-value">
+                      {{ content.field_location }}
+                    </div>
+                  </div>
+                {% endif %}
+
+                {% if content.field_organizer %}
+                  <div class="event-info-item">
+                    <label>
+                      Organizzatore:
+                    </label>
+                    <div class="info-value">
+                      {{ content.field_organizer }}
+                    </div>
+                  </div>
+                {% endif %}
+
+                {% if content.field_contacts %}
+                  <div class="event-info-item">
+                    <label>
+                      Contatti:
+                    </label>
+                    <div class="info-value">
+                      {{ content.field_contacts }}
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+
+          {# Link esterni #}
+          {% if content.field_links %}
+            <div class="news-external-links">
+              <h3 class="section-title">
+                <i class="fas fa-external-link-alt"></i>
+                Link Esterni
+              </h3>
+              <div class="external-links-list">
+                {{ content.field_links }}
+              </div>
+            </div>
+          {% endif %}
+
+        </div>
+
+        {# Sidebar #}
+        <div class="col-lg-4">
+          <div class="news-sidebar">
+
+            {# Paesi #}
+            {% if content.field_countries %}
+              <div class="sidebar-section">
+                <h4 class="sidebar-title">
+                  <i class="fas fa-globe"></i>
+                  Paesi
+                </h4>
+                <div class="taxonomy-tags">
+                  {{ content.field_countries }}
+                </div>
+              </div>
+            {% endif %}
+
+            {# Temi/Subjects #}
+            {% if content.field_subjects %}
+              <div class="sidebar-section">
+                <h4 class="sidebar-title">
+                  <i class="fas fa-tags"></i>
+                  Temi
+                </h4>
+                <div class="taxonomy-tags">
+                  {{ content.field_subjects }}
+                </div>
+              </div>
+            {% endif %}
+
+            {# Keywords #}
+            {% if content.field_keywords %}
+              <div class="sidebar-section">
+                <h4 class="sidebar-title">
+                  <i class="fas fa-key"></i>
+                  Parole Chiave
+                </h4>
+                <div class="keywords-text">
+                  {{ content.field_keywords }}
+                </div>
+              </div>
+            {% endif %}
+
+            {# Contributors #}
+            {% if content.field_teasearch_contributors %}
+              <div class="sidebar-section">
+                <h4 class="sidebar-title">
+                  <i class="fas fa-users"></i>
+                  Contributi
+                </h4>
+                <div class="contributors-list">
+                  {{ content.field_teasearch_contributors }}
+                </div>
+              </div>
+            {% endif %}
+
+            {# Risorse correlate #}
+            {% if content.field_teasearch_references %}
+              <div class="sidebar-section">
+                <h4 class="sidebar-title">
+                  <i class="fas fa-link"></i>
+                  Risorse Correlate
+                </h4>
+                <div class="related-resources">
+                  {{ content.field_teasearch_references }}
+                </div>
+              </div>
+            {% endif %}
+
+            {# Altre risorse #}
+            {% if content.field_teaserch_resources %}
+              <div class="sidebar-section">
+                <h4 class="sidebar-title">
+                  <i class="fas fa-folder"></i>
+                  Altre Risorse
+                </h4>
+                <div class="other-resources">
+                  {{ content.field_teaserch_resources }}
+                </div>
+              </div>
+            {% endif %}
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</article>
+
+{# Allega la libreria lightbox #}
+{{ attach_library('teasearch/image-lightbox') }}
+
+<style>
+.news-header {
+  margin-bottom: 2rem;
+}
+
+.news-main-title {
+  color: var(--item-title);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.news-meta-primary {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.news-type-badge {
+  background: var(--item-primary);
+  color: var(--light);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.news-event-date {
+  color: var(--item-title);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.news-event-date i {
+  margin-right: 0.5rem;
+}
+
+.news-content-wrapper {
+  background: var(--light);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px var(--box-shadow);
+}
+
+/* Immagine principale nel contenuto */
+.news-main-image {
+  margin-bottom: 2rem;
+}
+
+.image-container {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.image-container:hover {
+  transform: scale(1.02);
+}
+
+.image-container img {
+  width: 100%;
+  height: auto;
+  max-height: 500px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid var(--light-border);
+}
+
+.image-container::after {
+  content: "🔍 Clicca per ingrandire";
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.image-container:hover::after {
+  opacity: 1;
+}
+
+.news-body-content {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+.news-event-details {
+  background: var(--filter-group-open);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  color: var(--item-title);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.event-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.event-info-item label {
+  font-weight: 600;
+  color: var(--item-secondary);
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.info-value {
+  color: var(--body-text);
+}
+
+.news-external-links {
+  margin-top: 2rem;
+}
+
+.external-links-list a {
+  color: var(--item-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.external-links-list a:hover {
+  color: var(--item-secondary);
+}
+
+.news-sidebar {
+  background: var(--light);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px var(--box-shadow);
+}
+
+.sidebar-section {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--light-border);
+}
+
+.sidebar-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.sidebar-title {
+  color: var(--item-title);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.taxonomy-tags .field__item {
+  display: inline-block;
+  background: var(--filter-group-hover);
+  color: var(--item-secondary);
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  margin: 0.2rem;
+  font-weight: 500;
+}
+
+.keywords-text {
+  font-style: italic;
+  color: var(--body-text);
+}
+
+.contributors-list .field__item,
+.related-resources .field__item,
+.other-resources .field__item {
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .news-main-title {
+    font-size: 2rem;
+  }
+  
+  .news-meta-primary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .event-info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .news-content-wrapper {
+    padding: 1rem;
+  }
+}
+</style>
