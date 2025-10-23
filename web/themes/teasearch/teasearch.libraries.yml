@@ -28,3 +28,7 @@ image-lightbox:
     js/image-lightbox.js: {}
   dependencies:
     - core/drupal
+detail-page:
+  css:
+    theme:
+      css/detail-page.css: {}

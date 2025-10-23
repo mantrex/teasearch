@@ -261,6 +261,7 @@
   
   .entity-image.rounded-circle {
     border-radius: 50%;
+   
   }
   
   .result-item:hover .entity-image {

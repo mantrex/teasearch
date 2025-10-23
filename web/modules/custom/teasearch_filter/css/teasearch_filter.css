@@ -20,6 +20,10 @@
     min-width: 0;
   }
   
+  .rounded-circle {
+    max-width:92px !important;
+    max-height:92px;
+  }
   /* Filters Container */
   .teasearch-filters {
     background: var(--light);
@@ -246,9 +250,13 @@
     flex-shrink: 0;
     position: relative;
     overflow: hidden;
+    display:flex;
+      justify-content: center; /* centra orizzontalmente */
+  align-items: center; 
   }
   
-  .result-item-image .item-image {
+  .result-item-image .item-image:not(:has(.rounded-circle)) {
+
     width: 100%;
     height: 100%;
     margin: 0;

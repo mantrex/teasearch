@@ -1,0 +1,215 @@
+/**
+ * @file
+ * Stili per le pagine di dettaglio dei content type.
+ */
+
+/* === HEADER === */
+.detail-header {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 0;
+  align-items: stretch;
+}
+
+/* Icona */
+.detail-header__icon {
+  flex-shrink: 0;
+  width: 180px;
+  height: 180px;
+  border: 3px solid var(--details-border);
+  padding: 8px;
+  background-color: var(--light);
+  box-sizing: border-box;
+}
+
+.detail-header__icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+/* Sezione titolo verde */
+.detail-header__title-section {
+  flex: 1;
+  background-color: var(--details-bg);
+  padding: 16px 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: top;
+  min-height: 180px;
+}
+
+.detail-header__content-type {
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--body-text);
+  text-transform: uppercase;
+  font-weight: 400;;
+}
+
+.detail-header__main-title {
+  font-size: 36px;
+  font-weight: 400;
+  margin: 0;
+  color: var(--body-text);
+  line-height: 1.2;
+}
+
+/* === BODY - TABELLA === */
+.detail-body {
+  margin-top: 0;
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--light);
+}
+
+.detail-table tbody tr {
+  border-bottom: 1px solid var(--details-border);
+}
+
+.detail-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+/* Label (colonna sinistra) */
+.detail-field__label {
+  width: 200px;
+  padding: 15px 20px;
+  background-color: #e8e8e8;
+  font-weight: 700;
+  vertical-align: top;
+  text-transform: uppercase;
+  font-size: 0.8em;
+  color: var(--body-text);
+  line-height: 1.4;
+}
+
+.detail-field__label--empty {
+  background-color: transparent;
+}
+
+/* Contenuto (colonna destra) */
+.detail-field__content {
+  padding: 15px 25px;
+  background-color: var(--light);
+  color: var(--body-text);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.detail-field__content a {
+  color: var(--details-link);
+  text-decoration: none;
+}
+
+.detail-field__content a:hover {
+  text-decoration: underline;
+}
+
+/* Stili per rich text nel contenuto */
+.detail-field__content p {
+  margin: 0 0 10px 0;
+}
+
+.detail-field__content p:last-child {
+  margin-bottom: 0;
+}
+
+.detail-field__content ul,
+.detail-field__content ol {
+  margin: 10px 0;
+  padding-left: 25px;
+}
+
+.detail-field__content li {
+  margin-bottom: 5px;
+}
+
+/* === SEPARATORE === */
+.detail-separator td {
+  padding: 0;
+  border: none;
+}
+
+.detail-separator__content {
+  background-color: var(--details-bg);
+  padding: 10px 10px;
+  font-weight: 700;
+  font-size: 1.2em;
+  letter-spacing: 0.8px;
+  border-top: 1px solid var(--details-border);
+  border-bottom: 1px solid var(--details-border);
+  color: var(--body-text);
+  text-transform: uppercase;
+}
+
+/* Prima riga dopo separatore - rimuovi margin top */
+.detail-separator + tr {
+  border-top: none;
+}
+
+.detail-separator + tr .detail-field__label,
+.detail-separator + tr .detail-field__content {
+  padding-top: 15px;
+}
+
+/* === CAMPI SPECIALI === */
+
+/* Campo NAME - con bold per il nome originale */
+.detail-field--name .detail-field__content strong {
+  font-weight: 700;
+}
+
+/* Taxonomy terms - colore verde se link  */
+.detail-field--type-taxonomy .detail-field__content a {
+  color: var(--details-link);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .detail-header {
+    flex-direction: column;
+  }
+  
+  .detail-header__icon {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+  }
+  
+  .detail-header__title-section {
+    min-height: auto;
+    text-align: center;
+  }
+  
+  .detail-header__main-title {
+    font-size: 28px;
+  }
+  
+  .detail-table {
+    display: block;
+  }
+  
+  .detail-table tbody,
+  .detail-table tr,
+  .detail-table td {
+    display: block;
+    width: 100%;
+  }
+  
+  .detail-field__label {
+    width: 100%;
+    padding: 12px 15px;
+    border-bottom: none;
+  }
+  
+  .detail-field__content {
+    padding: 12px 15px;
+  }
+}

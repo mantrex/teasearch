@@ -1,0 +1,139 @@
+{#
+  /**
+  * @file
+  * Template generico per la visualizzazione dettaglio di tutti i content type.
+  *
+  * Questo template viene utilizzato per qualsiasi content type che ha uno schema
+  * definito in detail_schemas.inc
+  *
+  * Variabili disponibili:
+  * - detail_icon: Immagine icona (se presente)
+  * - detail_fields: Array di campi renderizzati
+  * - node: Il nodo completo
+  * - content_type_label: Label del content type (es. "PEOPLE", "ARTICLE", etc.)
+  */
+#}
+
+{# DEBUG - RIMUOVI DOPO #}
+<div style="background: yellow; padding: 20px; margin: 20px;">
+  <h3>
+    DEBUG INFO
+  </h3>
+  <p>
+    Content Type:
+    {{ node.bundle }}
+  </p>
+  <p>
+    Content Type Label:
+    {{ content_type_label }}
+  </p>
+  <p>
+    Has Icon:
+    {{ detail_icon ? 'YES' : 'NO' }}
+  </p>
+  <p>
+    Fields count:
+    {{ detail_fields|length }}
+  </p>
+
+  <h4>
+    Fields:
+  </h4>
+  <ul>
+    {% for field_id, field in detail_fields %}
+      <li>
+        <strong>
+          {{ field_id }}
+        </strong>
+        :
+        type=
+        {{ field.type }}
+        ,
+        label=
+        {{ field.label|default('NO LABEL') }}
+        ,
+        has_content=
+        {{ field.content ? 'YES' : 'NO' }}
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{# FINE DEBUG #}
+
+
+
+
+<article{{ attributes.addClass('node','node--type-'~node.bundle|clean_class,'node--view-mode-'~view_mode|clean_class,'node--detail') }}>
+
+  {# Header con icona e titolo principale #}
+  <div class="detail-header">
+    {# Icona a sinistra (se presente) #}
+    {% if detail_icon %}
+      <div class="detail-header__icon">
+        {{ detail_icon | raw }}
+      </div>
+    {% endif %}
+
+    {# Sezione verde con content type label e titolo principale #}
+    <div class="detail-header__title-section">
+      {# Label del content type (es. PEOPLE, ARTICLE, etc.) #}
+      {% if content_type_label %}
+        <div class="detail-header__content-type">
+          {{ content_type_label|upper }}
+        </div>
+      {% endif %}
+
+      {# Titolo principale (maintitle se esiste) #}
+      {% if detail_fields.maintitle %}
+        <h1 class="detail-header__main-title">
+          {{ detail_fields.maintitle.content|raw }}
+        </h1>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Corpo con i campi in formato tabella #}
+  <div class="detail-body">
+    <table class="detail-table">
+      <tbody>
+        {% for field_id, field in detail_fields %}
+
+          {# Salta il maintitle perché già mostrato nell'header #}
+          {% if field_id == 'maintitle' %}
+            {# Non fare nulla, già mostrato sopra #}
+
+              {# Separatore (es. PROFILE, DETAILS, etc.) #}
+              {% elseif field.type == 'separator' %}
+                <tr class="detail-separator"> <td colspan="2">
+                  <div class="detail-separator__content">
+                    {{ field.content }}
+                  </div>
+                </td>
+              </tr>
+
+            {# Campo normale con label e contenuto #}
+              {% else %}
+              <tr class="detail-field detail-field--{{ field_id|clean_class }} detail-field--type-{{ field.type|clean_class }} {{ field.wrapper_class }}">
+                {# Label a sinistra #}
+                {% if field.label %}
+                  <td class="detail-field__label">
+                    {{ field.label }}
+                  </td>
+                {% else %}
+                  <td class="detail-field__label detail-field__label--empty"></td>
+                {% endif %}
+
+                {# Contenuto a destra #}
+                <td class="detail-field__content">
+                  {{ field.content|raw }}
+                </td>
+              </tr>
+            {% endif %}
+
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </article>
+  

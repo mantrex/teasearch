@@ -31,6 +31,9 @@
   --actions-button-border: #59781c; /* tutti i tasti bordo */
   --box-shadow:#28a74526;
   --form-color:grey; /* tasto per la newsletter - da fare */
+ --details-bg: #dae6bc;
+  --details-link: #6b8e23;
+  --details-border: #d8d8d8;
 }
 
 body {
