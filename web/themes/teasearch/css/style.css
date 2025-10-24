@@ -33,7 +33,8 @@
   --form-color:grey; /* tasto per la newsletter - da fare */
  --details-bg: #dae6bc;
   --details-link: #6b8e23;
-  --details-border: #d8d8d8;
+  --details-border: #e6e5e5;
+  --details-field-label:#dfdbd8;
 }
 
 body {

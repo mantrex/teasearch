@@ -81,7 +81,7 @@
 .detail-field__label {
   width: 200px;
   padding: 15px 20px;
-  background-color: #e8e8e8;
+  background-color: var(--details-field-label);
   font-weight: 700;
   vertical-align: top;
   text-transform: uppercase;
