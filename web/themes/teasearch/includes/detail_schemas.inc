@@ -160,7 +160,90 @@ function teasearch_get_detail_schemas()
       "field_online_links"=>[
         "label" => "Online Presence",
       ],
-      "paragraph5"=> "Dettagli",
+      "paragraph3" => "Tea Related Publications",
+      "books"=>[
+        "label"=>"books",
+        "type"=>"publib",
+        "pubtype"=>"book",
+      ],
+      "book_chapters" => [
+        "label" => "book chapters",
+        "type" => "publib",
+        "pubtype" => "book_chapters",
+      ],
+      "journal_articles" => [
+        "label" => "Journal Articles",
+        "type" => "publib",
+        "pubtype" => "journal_article",
+      ],
+      "dissertation" => [
+        "label" => "dissertation",
+        "type" => "publib",
+        "pubtype" => "dissertation",
+      ],
+      "book_review" => [
+        "label" => "Book review",
+        "type" => "publib",
+        "pubtype" => "book_review",
+      ],
+      "reviews" => [
+        "label" => "Reviews",
+        "type" => "publib",
+        "pubtype" => "reviews",
+      ],
+      "conference_proceedings" => [
+        "label" => "Conference Proceedings",
+        "type" => "publib",
+        "pubtype" => "conference_proceedings",
+      ],
+      "patents" => [
+        "label" => "Patents",
+        "type" => "publib",
+        "pubtype" => "patents",
+      ],
+
+      "legal_and_policy" => [
+        "label" => "Legal & Policy Documents",
+        "type" => "publib",
+        "pubtype" => "legal_and_policy",
+      ],
+      "standard" => [
+        "label" => "Standard",
+        "type" => "publib",
+        "pubtype" => "standard",
+      ],
+      "datasets" => [
+        "label" => "Datasets",
+        "type" => "publib",
+        "pubtype" => "datasets",
+      ],
+      "periodicals" => [
+        "label" => "Periodical Titles",
+        "type" => "publib",
+        "pubtype" => "periodicals",
+      ],
+      "newspaper_articles" => [
+        "label" => "Newspaper articles",
+        "type" => "publib",
+        "pubtype" => "newspaper_articles",
+      ],
+      "webpages" => [
+        "label" => "Webpages / online contents",
+        "type" => "publib",
+        "pubtype" => "webpages",
+      ],
+      "reference_works" => [
+        "label" => "Reference works",
+        "type" => "publib",
+        "pubtype" => "reference_works",
+      ],
+      "other_documents" => [
+        "label" => "Other",
+        "type" => "publib",
+        "pubtype" => "other",
+      ],
+
+      "paragraph5"=> "Details",
       "systemdate"=> [
         "type"=>"systemdate",
         "label" => "Dates",

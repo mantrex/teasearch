@@ -30,6 +30,7 @@ function teasearch_get_field_type_registry()
     'location' => 'teasearch_render_location',
     'record_data' => 'teasearch_render_field_record_data',
     'systemdate' => 'teasearch_render_field_systemdate',
+    'publib'=>'teasearch_render_field_publib'
   ];
 }
 /**
@@ -336,4 +337,9 @@ function teasearch_render_field_systemdate($node, $field_config, $field_identifi
 
     return 'First created on: ' . $created_formatted . ' – Last updated on: ' . $changed_formatted;
   }
+}
+
+
+function teasearch_render_field_publib($node, $field_config, $field_identifier) {
+  $field = teasearch_get_field_value($node, $field_identifier);
 }
