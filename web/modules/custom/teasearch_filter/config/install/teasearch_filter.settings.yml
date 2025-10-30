@@ -76,8 +76,7 @@ content_types:
   bibliography:
     machine_name: bibliography
     results:
-      mainfield: title
-      subfield: field_bio
+      function: format_bibliography_display
       image: field_image
     filters:
       subjects:

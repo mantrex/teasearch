@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Drupal\teasearch_filter\Helper\CustomFieldHelper;
 
 /**
  * Search controller for teasearch_filter module.
@@ -122,6 +123,7 @@ class SearchController extends ControllerBase
     $century_data = $this->prepareCenturyData($filters, $content_type_config, $request);
     $date_data = $this->prepareDateData($filters, $content_type_config, $request);
 
+
     // Search entities
     $entity_type = $content_type_config['type'] ?? 'node';
     if ($entity_type === 'user') {
@@ -129,6 +131,11 @@ class SearchController extends ControllerBase
       $total = count($entities);
     } else {
       list($entities, $total) = $this->searchNodes($content_type_config, $request);
+    }
+
+    // Process entities for display with custom functions support
+    foreach ($entities as &$entity) {
+      $entity = $this->processEntityForDisplay($entity, $content_type_config);
     }
 
     // Build render array
@@ -962,6 +969,7 @@ class SearchController extends ControllerBase
       }
 
       // Aggiungi label del content type agli entity per il template
+      /*
       foreach ($entities as &$entity) {
         $entity->teasearch_content_type_label = $content_type_config['label'] ?? ucfirst($content_type_key);
 
@@ -969,6 +977,11 @@ class SearchController extends ControllerBase
         if ($entity_type === 'node') {
           $entity->teasearch_processed_content = $this->getProcessedContentForEntity($entity, $content_type_config);
         }
+      }*/
+
+      foreach ($entities as &$entity) {
+        $entity->teasearch_content_type_label = $content_type_config['label'] ?? ucfirst($content_type_key);
+        $entity = $this->processEntityForDisplay($entity, $content_type_config);
       }
 
       $all_entities = array_merge($all_entities, $entities);
@@ -1075,19 +1088,9 @@ class SearchController extends ControllerBase
     if (!empty($results_config['function'])) {
       $function_name = $results_config['function'];
 
-      /** @var \Drupal\teasearch_filter\Service\CustomFieldFunctionService $function_service */
-      $function_service = \Drupal::service('teasearch_filter.custom_field_functions');
-
-      if ($function_service->hasFunction($function_name)) {
-        // Execute custom function and store result
-        $entity->teasearch_custom_content = $function_service->executeFunction($function_name, $entity);
-        $entity->teasearch_uses_function = TRUE;
-      } else {
-        \Drupal::logger('teasearch_filter')->warning('Custom function @name not found for content type', [
-          '@name' => $function_name,
-        ]);
-        $entity->teasearch_uses_function = FALSE;
-      }
+      // Usa l'helper direttamente
+      $entity->teasearch_custom_content = CustomFieldHelper::execute($function_name, $entity);
+      $entity->teasearch_uses_function = TRUE;
     } else {
       // Standard processing with mainfield/subfield
       $entity->teasearch_uses_function = FALSE;

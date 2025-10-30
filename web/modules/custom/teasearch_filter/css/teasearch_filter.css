@@ -289,8 +289,8 @@
     font-weight: 600;
     color: var(--item-title);
     line-height: 1.4;
-    margin: 0 0 0.5rem 0;
-    display: -webkit-box;
+
+
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     overflow: hidden;

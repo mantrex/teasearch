@@ -49,10 +49,12 @@
           {# CONTENUTO - Sezione principale a destra #}
           <div class="result-item-content">
 
-            {# Titolo #}
-            <h3 class="result-item-title">
-              {{ entity.label }}
-            </h3>
+          
+            {# Titolo - NON mostrare se si usa una funzione custom #}
+              {% if not entity.teasearch_uses_function %}
+                <h3 class="result-item-title"> {{ entity.label }}
+              </h3>
+            {% endif %}
 
             {# Descrizione/sommario - Check if using custom function #}
             {% if entity.teasearch_uses_function %}
