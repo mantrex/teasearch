@@ -1,0 +1,3 @@
+services:
+  teasearch_filter.custom_field_functions:
+    class: Drupal\teasearch_filter\Service\CustomFieldFunctionService

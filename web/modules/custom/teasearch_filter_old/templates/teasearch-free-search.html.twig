@@ -1,0 +1,308 @@
+{#
+  /**
+  * @file
+  * Teasearch free search results template.
+  *
+  * Variables:
+  * - entities: Array of search results
+  * - search_query: The search query
+  * - content_type_filter: Selected content type filter
+  * - total_results: Total number of results
+  * - page_title: Page title
+  * - module_path: Module path for images
+  */
+#}
+
+<div class="teasearch-free-search-wrapper">
+
+  {# Search Header #}
+  <header class="search-results-header">
+    <h1 class="search-results-title">
+      {{ page_title }}
+      {% if total_results %}
+        <span class="results-count">
+          (
+          {{ total_results }}
+          )
+        </span>
+      {% endif %}
+    </h1>
+
+    {% if search_query %}
+      <div class="search-meta">
+        <span class="search-query-display">
+          {{ 'Search term:'|t }}
+          <strong>
+            "
+            {{ search_query }}
+            "
+          </strong>
+        </span>
+        {% if content_type_filter and content_type_filter != 'all' %}
+          <span class="content-type-filter">
+            |
+            {{ 'Content type:'|t }}
+            <strong>
+              {{ content_type_filter|title }}
+            </strong>
+          </span>
+        {% endif %}
+      </div>
+    {% endif %}
+  </header>
+
+  {# Results #}
+  {% if entities %}
+    <div class="search-results-list">
+      {% for entity in entities %}
+        <article class="search-result-item">
+          <div class="search-item-content">
+
+            {# Title and content type badge #}
+            <div class="search-item-header">
+              <h2 class="search-item-title">
+                <a href="{{ path('entity.node.canonical', {'node': entity.nid.value}) }}" class="entity-link">
+                  {{ entity.label }}
+                </a>
+              </h2>
+
+              {% if entity.teasearch_content_type_label %}
+                <span class="content-type-badge">
+                  {{ entity.teasearch_content_type_label }}
+                </span>
+              {% endif %}
+            </div>
+
+            {# Description #}
+            {% if entity.teasearch_processed_content %}
+              <div class="search-item-description">
+                {{ entity.teasearch_processed_content|striptags|slice(0, 300) }}
+                {% if entity.teasearch_processed_content|length > 300 %}
+                  …
+                {% endif %}
+              </div>
+            {% endif %}
+
+            {# Meta information #}
+            <div class="search-item-meta">
+              {% if entity.created and entity.created.value %}
+                <span class="item-date">
+                  {{ entity.created.value|format_date('medium') }}
+                </span>
+              {% endif %}
+
+              {% if entity.uid and entity.uid.entity %}
+                <span class="item-author">
+                  |
+                  {{ 'by'|t }}
+                  {{ entity.uid.entity.label }}
+                </span>
+              {% endif %}
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+
+  {# Pagination could be added here if needed #}
+
+    {% else %}
+    <div class="no-search-results">
+      <div class="no-results-content">
+        {% if search_query %}
+          <h2 class="no-results-title">
+            {{ 'No results found'|t }}
+          </h2>
+          <p class="no-results-text">
+            {{ 'Sorry, no content was found matching your search for "%query%".'|t({'%query%': search_query}) }}
+          </p>
+          <p class="search-suggestions">
+            {{ 'Try:'|t }}
+          </p>
+          <ul class="search-tips">
+            <li>
+              {{ 'Using different keywords'|t }}
+            </li>
+            <li>
+              {{ 'Checking your spelling'|t }}
+            </li>
+            <li>
+              {{ 'Using more general terms'|t }}
+            </li>
+            <li>
+              {{ 'Selecting "All Content" instead of a specific type'|t }}
+            </li>
+          </ul>
+        {% else %}
+          <h2 class="no-results-title">
+            {{ 'Enter a search term'|t }}
+          </h2>
+          <p class="no-results-text">
+            {{ 'Please enter a search term to find content.'|t }}
+          </p>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+{# CSS for free search styling #}
+<style>
+.teasearch-free-search-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.search-results-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.search-results-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #212529;
+  margin: 0 0 0.5rem 0;
+}
+
+.results-count {
+  font-weight: normal;
+  color: #6c757d;
+  font-size: 1.25rem;
+}
+
+.search-meta {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.search-query-display strong,
+.content-type-filter strong {
+  color: #495057;
+}
+
+.search-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.search-result-item {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  transition: all 0.15s ease;
+}
+
+.search-result-item:hover {
+  border-color: #28a745;
+  box-shadow: 0 0.125rem 0.25rem rgba(40, 167, 69, 0.15);
+}
+
+.search-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  gap: 1rem;
+}
+
+.search-item-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.3;
+  flex: 1;
+}
+
+.entity-link {
+  color: #28a745;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.entity-link:hover {
+  color: #1e7e34;
+  text-decoration: underline;
+}
+
+.content-type-badge {
+  background: #6c757d;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.search-item-description {
+  color: #6c757d;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.search-item-meta {
+  font-size: 0.875rem;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.no-search-results {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  text-align: center;
+}
+
+.no-results-content {
+  max-width: 500px;
+}
+
+.no-results-title {
+  font-size: 1.5rem;
+  color: #6c757d;
+  margin-bottom: 1rem;
+}
+
+.no-results-text {
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.search-suggestions {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #495057;
+}
+
+.search-tips {
+  text-align: left;
+  color: #6c757d;
+  line-height: 1.6;
+}
+
+.search-tips li {
+  margin-bottom: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .search-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .content-type-badge {
+    align-self: flex-start;
+  }
+}
+</style>

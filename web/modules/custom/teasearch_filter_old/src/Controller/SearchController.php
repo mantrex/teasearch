@@ -1058,87 +1058,24 @@ class SearchController extends ControllerBase
     return $this->entityTypeManager->getStorage('user')->loadMultiple($ids);
   }
 
-
-
-
-
-
-
-
-
-
-  protected function processEntityForDisplay($entity, array $config)
+  /**
+   * Get processed content for entity description.
+   */
+  private function getProcessedContentForEntity($entity, $config)
   {
     $results_config = $config['results'] ?? [];
+    $subfield = $results_config['subfield'] ?? 'body';
 
-    // Check if custom function is specified
-    if (!empty($results_config['function'])) {
-      $function_name = $results_config['function'];
-
-      /** @var \Drupal\teasearch_filter\Service\CustomFieldFunctionService $function_service */
-      $function_service = \Drupal::service('teasearch_filter.custom_field_functions');
-
-      if ($function_service->hasFunction($function_name)) {
-        // Execute custom function and store result
-        $entity->teasearch_custom_content = $function_service->executeFunction($function_name, $entity);
-        $entity->teasearch_uses_function = TRUE;
-      } else {
-        \Drupal::logger('teasearch_filter')->warning('Custom function @name not found for content type', [
-          '@name' => $function_name,
-        ]);
-        $entity->teasearch_uses_function = FALSE;
-      }
-    } else {
-      // Standard processing with mainfield/subfield
-      $entity->teasearch_uses_function = FALSE;
-
-      // Process subfield for description (existing logic)
-      $entity->teasearch_processed_content = $this->getProcessedContentForEntity($entity, $config);
+    if (!$entity->hasField($subfield) || $entity->get($subfield)->isEmpty()) {
+      return '';
     }
 
-    return $entity;
-  }
-
-  protected function getProcessedContentForEntity($entity, array $config)
-  {
-    $results_config = $config['results'] ?? [];
-    $sub_field = $results_config['subfield'] ?? NULL;
-
-    if (!$sub_field) {
-      return NULL;
+    $field_data = $entity->get($subfield);
+    if ($field_data->first()) {
+      $value = $field_data->first()->value ?? '';
+      return strip_tags($value);
     }
 
-    // Support comma-separated fallback fields
-    $fields = array_map('trim', explode(',', $sub_field));
-
-    foreach ($fields as $field_name) {
-      if (!$entity->hasField($field_name) || $entity->get($field_name)->isEmpty()) {
-        continue;
-      }
-
-      $field_data = $entity->get($field_name);
-      $first_item = $field_data->first();
-
-      if (!$first_item) {
-        continue;
-      }
-
-      // Try different property access patterns
-      if ($first_item->__isset('summary') && !empty($first_item->summary)) {
-        return $first_item->summary;
-      }
-
-      if ($first_item->__isset('value') && !empty($first_item->value)) {
-        return $first_item->value;
-      }
-
-      // Try direct value access
-      $value = $first_item->getValue();
-      if (isset($value['value']) && !empty($value['value'])) {
-        return $value['value'];
-      }
-    }
-
-    return NULL;
+    return '';
   }
 }

@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the scanner module.
+ */
+
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Core\Entity\EntityStorageException;
+
+/**
+ * Resave all content types.
+ */
+function node_save_redirect_update_20001(): void {
+  try {
+    foreach (\Drupal::entityTypeManager()->getStorage('node_type')->loadMultiple() as $entity) {
+      $entity->save();
+    }
+  }
+  catch (InvalidPluginDefinitionException | PluginNotFoundException | EntityStorageException $e) {
+    \Drupal::messenger()->addMessage($e->getMessage());
+  }
+}

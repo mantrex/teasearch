@@ -1,7 +1,7 @@
 {#
   /**
   * @file
-  * Results list template - Updated with custom function support
+  * Results list template - Adapted for carousel-view-all layout
   */
 #}
 
@@ -54,54 +54,58 @@
               {{ entity.label }}
             </h3>
 
-            {# Descrizione/sommario - Check if using custom function #}
-            {% if entity.teasearch_uses_function %}
-              {# Use custom function result #}
-              {% if entity.teasearch_custom_content %}
+            {# Descrizione/sommario #}
+            {% if sub_field %}
+              {% set field_data = attribute(entity, sub_field) %}
+              {% if field_data and field_data.0 %}
                 <div class="result-item-description">
-                  {{ entity.teasearch_custom_content|raw }}
+                  {% set description = null %}
+
+                  {# Priority 1: Use processed content from fallback system #}
+                  {% if entity.teasearch_processed_content %}
+                    {% set description = entity.teasearch_processed_content %}
+
+                  {# Priority 2: Fallback to old system for compatibility #}
+                    {% elseif sub_field %}
+                    {% set field_data = attribute(entity, sub_field) %}
+                    {% if field_data and field_data.0 %}
+                      {# Gestione diversi tipi di campo per la descrizione #}
+                      {% if field_data.0.summary %}
+                        {% set description = field_data.0.summary %}
+                      {% elseif field_data.0.value %}
+                        {% set description = field_data.0.value %}
+                      {% elseif field_data.value %}
+                        {% set description = field_data.value %}
+                      {% endif %}
+                    {% endif %}
+                  {% endif %}
+
+                  {% if description %}
+                    {{ description|striptags|slice(0, 200) }}
+                    {% if description|length > 200 %}
+                      …
+                    {% endif %}
+                  {% endif %}
                 </div>
-              {% endif %}
-            {% else %}
-              {# Standard field processing #}
-              {% if sub_field %}
-                {% set field_data = attribute(entity, sub_field) %}
-                {% if field_data and field_data.0 %}
-                  <div class="result-item-description">
-                    {% set description = null %}
-
-                    {# Priority 1: Use processed content from fallback system #}
-                    {% if entity.teasearch_processed_content %}
-                      {% set description = entity.teasearch_processed_content %}
-
-                    {# Priority 2: Fallback to old system for compatibility #}
-                      {% elseif sub_field %}
-                      {% set field_data = attribute(entity, sub_field) %}
-                      {% if field_data and field_data.0 %}
-                        {# Gestione diversi tipi di campo per la descrizione #}
-                        {% if field_data.0.summary %}
-                          {% set description = field_data.0.summary %}
-                        {% elseif field_data.0.value %}
-                          {% set description = field_data.0.value %}
-                        {% elseif field_data.value %}
-                          {% set description = field_data.value %}
-                        {% endif %}
-                      {% endif %}
-                    {% endif %}
-
-                    {% if description %}
-                      {{ description|striptags|slice(0, 200) }}
-                      {% if description|length > 200 %}
-                        …
-                      {% endif %}
-                    {% endif %}
-                  </div>
-                {% endif %}
               {% endif %}
             {% endif %}
 
-          </div>
+            {# Metadati - nella parte inferiore #}
+            <div class="result-item-meta">
+              {% if entity.created and entity.created.value %}
+                <span class="result-item-date">
+                  {{ entity.created.value|format_date('medium') }}
+                </span>
+              {% endif %}
 
+              {% if entity.type and entity.type.entity %}
+                <span class="result-item-type">
+                  {{ entity.type.entity.label }}
+                </span>
+              {% endif %}
+            </div>
+
+          </div>
         </a>
       {% endfor %}
     </div>

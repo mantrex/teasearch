@@ -1,0 +1,87 @@
+teasearch_filter.settings:
+  type: config_object
+  label: 'Teasearch Filter Settings'
+  mapping:
+    content_types:
+      type: mapping
+      label: 'Content types'
+      mapping:
+        '*':
+          type: mapping
+          label: 'Single content type'
+          mapping:
+            machine_name:
+              type: string
+              label: 'Machine name'
+            type:
+              type: string
+              label: 'Entity type (node/user)'
+            label:
+              type: string
+              label: 'Display label'
+              translatable: true
+            where:
+              type: string
+              label: 'WHERE conditions (JSON)'
+            results:
+              type: mapping
+              label: 'Results configuration'
+              mapping:
+                mainfield:
+                  type: string
+                  label: 'Main field'
+                subfield:
+                  type: string
+                  label: 'Sub field'
+                image:
+                  type: string
+                  label: 'Image field'
+                altimage:
+                  type: string
+                  label: 'Alternative image field'
+                image_format:
+                  type: string
+                  label: 'Image format'
+                fullname:
+                  type: string
+                  label: 'Fullname handling'
+            filters:
+              type: mapping
+              label: 'Filters'
+              mapping:
+                '*':
+                  type: mapping
+                  label: 'Single filter'
+                  mapping:
+                    type:
+                      type: string
+                      label: 'Filter type'
+                    vocabulary:
+                      type: string
+                      label: 'Vocabulary (taxonomy only)'
+                    label:
+                      type: string
+                      label: 'Displayed label'
+                      translatable: true
+                    from:
+                      type: string
+                      label: 'From field (date/century selectors)'
+                    to:
+                      type: string
+                      label: 'To field (date/century selectors)'
+                    display:
+                      type: string
+                      label: 'Display mode'
+                    min_year:
+                      type: integer
+                      label: 'Minimum year'
+                    max_year:
+                      type: integer
+                      label: 'Maximum year'
+    legacy_mappings:
+      type: mapping
+      label: 'Legacy URL mappings'
+      mapping:
+        '*':
+          type: string
+          label: 'New content type'

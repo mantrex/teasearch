@@ -1,0 +1,38 @@
+node.type.*.third_party.node_save_redirect:
+  type: mapping
+  label: 'Node save redirect radio buttons'
+  mapping:
+    save_type:
+      type: integer
+      label: 'Save type'
+      constraints:
+        Choice:
+          choices:
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+    save_location:
+      type: string
+      label: 'Save location'
+    save_destination:
+      type: boolean
+      label: 'Ignore destination parameter in URLS'
+    edit_type:
+      type: integer
+      label: 'Edit type'
+      constraints:
+        Choice:
+          choices:
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+    edit_location:
+      type: string
+      label: 'Edit location'
+    edit_destination:
+      type: boolean
+      label: 'Ignore destination parameter in URLS'

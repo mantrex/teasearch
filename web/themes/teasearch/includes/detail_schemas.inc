@@ -174,7 +174,7 @@ function teasearch_get_detail_schemas()
       "journal_articles" => [
         "label" => "Journal Articles",
         "type" => "publib",
-        "pubtype" => "journal_article",
+        "pubtype" => "journal_articles",
       ],
       "dissertation" => [
         "label" => "dissertation",
@@ -242,8 +242,42 @@ function teasearch_get_detail_schemas()
         "type" => "publib",
         "pubtype" => "other",
       ],
+      "paragraph4" => "Teasearch content contributions",
+      "essentials"=> [
+        "label"=>"Essentials",
+        "type"=>"contrib",
+        "content_type"=> "first_reference",
+      
+      ],
+      "texts" => [
+        "label" => "Texts",
+        "type" => "contrib",
+        "content_type" => "primary_sources",
+    
+
+      ],
+      "videos" => [
+        "label" => "Videos",
+        "type" => "contrib",
+        "content_type"=>"videos",
+      ],
+      "images" => [
+        "label" => "Images",
+        "type" => "contrib",
+        "content_type" => "images",
+      ],
+
+      "bibliography" => [
+        "label" => "Bibliography",
+        "type" => "contrib",
+        "content_type" => "bibilography",
+
+      ],
 
       "paragraph5"=> "Details",
+      "field_license"=> [
+        "label"=>"License",
+      ],
       "systemdate"=> [
         "type"=>"systemdate",
         "label" => "Dates",

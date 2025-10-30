@@ -1,0 +1,109 @@
+{#
+  /**
+  * @file
+  * Results list template - Clean version
+  */
+#}
+
+<div class="results-list">
+  {% for entity in entities %}
+    {% set entity_config = content_type_config.results %}
+    {% set main_field = entity_config.mainfield|default('title') %}
+    {% set sub_field = entity_config.subfield %}
+    {% set image_field = entity_config.image %}
+    {% set alt_image_field = entity_config.altimage %}
+    {% set image_format = entity_config.image_format|default('square') %}
+
+    <article class="result-item">
+      <div class="item-content">
+
+        {# IMMAGINE - gestita tramite partial #}
+        {% if image_field %}
+          {% include 'modules/custom/teasearch_filter/templates/partials/entity-image.html.twig' with {
+						'entity': entity,
+						'entity_type': entity_type,
+						'image_field': image_field,
+						'image_format': image_format,
+						'module_path': module_path
+					} %}
+        {% endif %}
+
+        {# CONTENUTO #}
+        <div class="item-body">
+          <div class="item-title">
+            {% if entity_type == 'user' %}
+              <a href="{{ path('entity.user.canonical', {'user': entity.uid.value}) }}" class="entity-link">
+                {{ entity.label }}
+              </a>
+            {% else %}
+              <a href="{{ path('entity.node.canonical', {'node': entity.nid.value}) }}" class="entity-link">
+                {{ entity.label }}
+              </a>
+            {% endif %}
+          </div>
+
+          {# Descrizione/sommario #}
+          {% if sub_field %}
+            {% set field_data = attribute(entity, sub_field) %}
+            {% if field_data and field_data.0 %}
+              <div class="item-description">
+                {% set description = null %}
+
+                {# Priority 1: Use processed content from fallback system #}
+                {% if entity.teasearch_processed_content %}
+                  {% set description = entity.teasearch_processed_content %}
+
+                {# Priority 2: Fallback to old system for compatibility #}
+                  {% elseif sub_field %}
+                  {% set field_data = attribute(entity, sub_field) %}
+                  {% if field_data and field_data.0 %}
+                    {# Gestione diversi tipi di campo per la descrizione #}
+                    {% if field_data.0.summary %}
+                      {% set description = field_data.0.summary %}
+                    {% elseif field_data.0.value %}
+                      {% set description = field_data.0.value %}
+                    {% elseif field_data.value %}
+                      {% set description = field_data.value %}
+                    {% endif %}
+                  {% endif %}
+                {% endif %}
+
+                {% if description %}
+                  {{ description|striptags|slice(0, 200) }}
+                  {% if description|length > 200 %}
+                    …
+                  {% endif %}
+                {% endif %}
+              </div>
+            {% endif %}
+          {% endif %}
+
+          {# Metadati #}
+          <div class="item-meta">
+            {% if entity.created and entity.created.value %}
+              <span class="item-date">
+                {{ entity.created.value|format_date('medium') }}
+              </span>
+            {% endif %}
+            {#
+            {% if entity.uid and entity.uid.entity and entity_type != 'user' %}
+              <span class="item-author">
+                |
+                {{ 'by'|t }}
+                {{ entity.uid.entity.label }}
+              </span>
+            {% endif %}
+            #}
+
+            {% if entity.type and entity.type.entity %}
+              <span class="item-type">
+                |
+                {{ entity.type.entity.label }}
+              </span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </article>
+  {% endfor %}
+</div>

@@ -58,7 +58,9 @@ content_types:
     label: 'Contributors'
     #where: '[{"field_roles.target_id":"contributors"}]'
     results:
-      function: format_people_display
+      mainfield: title
+      subfield: field_bio
+      fullname: dynamic
       image: field_avatar
       image_format: rounded # significa che diventa un cerchio
     filters:
