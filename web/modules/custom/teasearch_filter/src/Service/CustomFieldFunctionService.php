@@ -150,7 +150,7 @@ class CustomFieldFunctionService
                 $given_name_latin = $field_firstname->value;
               }
             }
-
+ 
             // field_fullname
             if ($author_paragraph->hasField('field_fullname')) {
               $field_fullname = $author_paragraph->get('field_fullname');
