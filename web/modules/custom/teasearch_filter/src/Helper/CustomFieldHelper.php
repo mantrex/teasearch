@@ -450,7 +450,7 @@ class CustomFieldHelper
     }
 
     // =============================================================================
-    // PARTE 3: TYPE + LANGUAGE
+    // PARTE 3: TYPE + LANGUAGE + ICONA BIBLIOGRAFIA
     // =============================================================================
 
     $type_lang_parts = [];
@@ -462,6 +462,23 @@ class CustomFieldHelper
         $field_pubtype = $pubtype_field->entity;
         if ($field_pubtype) {
           $type_lang_parts[] = $field_pubtype->getName();
+
+          // =============================================================================
+          // GESTIONE ICONA BIBLIOGRAFIA
+          // =============================================================================
+          // Estrai field_icon_name dalla taxonomy term publication_types
+          if ($field_pubtype->hasField('field_icon_name') && !$field_pubtype->get('field_icon_name')->isEmpty()) {
+            $icon_name_value = $field_pubtype->get('field_icon_name')->value;
+
+            if (!empty($icon_name_value)) {
+              // Costruisci il path completo dell'icona
+              $theme_path = \Drupal::service('extension.list.theme')->getPath('teasearch');
+              $icon_path = '../../' . $theme_path . '/images/bibicons/' . $icon_name_value.".png";
+
+              // Aggiungi la proprietà all'entità per l'uso nel template
+              $entity->teasearch_bibliography_icon = $icon_path;
+            }
+          }
         }
       }
     }

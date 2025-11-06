@@ -514,3 +514,28 @@
       transform: none;
     }
   }
+
+.item-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+  /* Stile specifico per le icone bibliografia */
+.entity-image.bibliography-icon {
+  display:block;
+  width: 100px !important;  /* Ridimensiona come preferisci */
+  height: 100px !important;
+  object-fit: contain;     /* Mantiene le proporzioni */
+  border-radius: 4px;      /* Angoli leggermente arrotondati */
+  background-color: #f5f5f5; /* Sfondo grigio chiaro opzionale */
+  padding: 8px;  
+  margin-top:8px;          /* Padding interno opzionale */
+  border: 1px solid #e0e0e0; /* Bordo opzionale */
+}
+
+/* Oppure se vuoi mantenere la forma quadrata standard */
+.entity-image.bibliography-icon.rounded {
+  border-radius: 4px; /* Sovrascrive il rounded di default */
+}

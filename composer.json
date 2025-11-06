@@ -50,7 +50,7 @@
     "drupal/time_field": "^2.2",
     "drupal/updated": "^2.0",
     "drupal/vani": "^11.0",
-    "drush/drush": "*",
+    "drush/drush": "^13.6",
     "google/apiclient": "^2.18",
     "npm-asset/choices.js": "^11.1",
     "npm-asset/select2": "^4.0",

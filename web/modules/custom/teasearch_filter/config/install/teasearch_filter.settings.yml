@@ -77,7 +77,7 @@ content_types:
     machine_name: bibliography
     results:
       function: format_bibliography_display
-      image: field_image
+     
     filters:
       subjects:
         type: taxonomy

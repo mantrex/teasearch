@@ -32,3 +32,5 @@ nbproject
 
 core/node_modules
 /vendor
+
+/config/sync

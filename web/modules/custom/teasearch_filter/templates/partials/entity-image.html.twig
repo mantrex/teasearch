@@ -17,8 +17,15 @@
   {% set image_url = null %}
   {% set current_image_field = null %}
 
-  {# Gestione immagini per utenti #}
-  {% if entity_type == 'user' %}
+  {# PRIORITÀ 1: Controlla se esiste l'icona bibliografia custom #}
+  {% if entity.teasearch_bibliography_icon is defined and entity.teasearch_bibliography_icon %}
+    {% set image_url = entity.teasearch_bibliography_icon %}
+
+    {% set current_image_field = 'bibliography_icon' %}
+  {% endif %}
+
+  {# PRIORITÀ 2: Gestione immagini per utenti #}
+  {% if not image_url and entity_type == 'user' %}
     {% if image_field == 'user_picture' and entity.user_picture.0 %}
       {% if entity.user_picture.0.entity and entity.user_picture.0.entity.fileuri %}
         {% set image_url = file_url(entity.user_picture.0.entity.fileuri) %}
@@ -37,8 +44,10 @@
         {% endif %}
       {% endif %}
     {% endif %}
-  {% else %}
-    {# Gestione immagini per nodi - prova prima image_field #}
+  {% endif %}
+
+  {# PRIORITÀ 3: Gestione immagini per nodi - prova prima image_field #}
+  {% if not image_url and entity_type != 'user' %}
     {% set field_data = attribute(entity, image_field) %}
     {% if field_data and field_data.0 %}
       {# Approccio 1: entity.fileuri (più comune per campi immagine) #}
@@ -87,5 +96,9 @@
   {% endif %}
 
   {# Rendering dell'immagine con debug info #}
-  <img src="{{ image_url }}" alt="{{ entity.label }}" class="entity-image {{ image_format == 'rounded' ? 'rounded-circle' : 'rounded' }}" width="64" height="64" loading="lazy" onerror="this.src='{{ module_path }}/images/placeholder.png'; this.onerror=null;" data-field-used="{{ current_image_field }}" title="Using: {{ current_image_field }}"></div>
+  <img src="{{ image_url }}" alt="{{ entity.label }}" class="entity-image {{ current_image_field == 'bibliography_icon' ? 'bibliography-icon' : '' }} {{ image_format == 'rounded' ? 'rounded-circle' : 'rounded' }}" 
+width="64" 
+height="64"
+ loading="lazy" 
+onerror="this.src='{{ module_path }}/images/placeholder.png'; this.onerror=null;" data-field-used="{{ current_image_field }}" title="Using: {{ current_image_field }}"></div>
   
