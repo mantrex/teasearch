@@ -1,6 +1,6 @@
 library:
   js:
-      /libraries/choices.js/public/assets/scripts/choices.min.js:  { minified: true }
+    /libraries/choices.js/public/assets/scripts/choices.min.js:  { minified: true }
   css:
     component:
       /libraries/choices.js/public/assets/styles/choices.min.css: {}

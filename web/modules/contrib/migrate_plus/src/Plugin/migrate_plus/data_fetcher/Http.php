@@ -1,10 +1,11 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus\Plugin\migrate_plus\data_fetcher;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\migrate_plus\AuthenticationPluginManager;
 use GuzzleHttp\Client;
 use Drupal\migrate_plus\AuthenticationPluginInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -12,6 +13,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate_plus\DataFetcherPluginBase;
 use GuzzleHttp\Exception\RequestException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Retrieve data over an HTTP connection for migration.
@@ -26,7 +28,7 @@ use GuzzleHttp\Exception\RequestException;
  *     Accept: application/json
  *     User-Agent: Internet Explorer 6
  *     Authorization-Key: secret
- *     Arbitrary-Header: foobarbaz
+ *     Arbitrary-Header: fooBarBaz
  *   # Guzzle request options can be added.
  *   # See https://docs.guzzlephp.org/en/stable/request-options.html
  *   request_options:
@@ -52,16 +54,19 @@ class Http extends DataFetcherPluginBase implements ContainerFactoryPluginInterf
   protected array $headers = [];
 
   /**
+   * The authentication plugin manager.
+   */
+  protected AuthenticationPluginManager $authenticationPluginManager;
+
+  /**
    * The data retrieval client.
    */
   protected AuthenticationPluginInterface $authenticationPlugin;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, Client $client, AuthenticationPluginManager $auth_plugin_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->httpClient = \Drupal::httpClient();
+    $this->httpClient = $client;
+    $this->authenticationPluginManager = $auth_plugin_manager;
 
     // Ensure there is a 'headers' key in the configuration.
     $configuration += ['headers' => []];
@@ -72,13 +77,26 @@ class Http extends DataFetcherPluginBase implements ContainerFactoryPluginInterf
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('http_client'),
+      $container->get('plugin.manager.migrate_plus.authentication',)
+    );
+  }
+
+  /**
    * Returns the initialized authentication plugin.
    *
    *   The authentication plugin.
    */
   public function getAuthenticationPlugin(): AuthenticationPluginInterface {
     if (!isset($this->authenticationPlugin)) {
-      $this->authenticationPlugin = \Drupal::service('plugin.manager.migrate_plus.authentication')->createInstance($this->configuration['authentication']['plugin'], $this->configuration['authentication']);
+      $this->authenticationPlugin = $this->authenticationPluginManager->createInstance($this->configuration['authentication']['plugin'], $this->configuration['authentication']);
     }
     return $this->authenticationPlugin;
   }
@@ -104,7 +122,7 @@ class Http extends DataFetcherPluginBase implements ContainerFactoryPluginInterf
     try {
       $options = ['headers' => $this->getRequestHeaders()];
       if (!empty($this->configuration['authentication'])) {
-        $options = NestedArray::mergeDeep($options, $this->getAuthenticationPlugin()->getAuthenticationOptions());
+        $options = NestedArray::mergeDeep($options, $this->getAuthenticationPlugin()->getAuthenticationOptions($url));
       }
       if (!empty($this->configuration['request_options'])) {
         $options = NestedArray::mergeDeep($options, $this->configuration['request_options']);

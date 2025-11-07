@@ -2,20 +2,21 @@
 
 namespace Drupal\address_suggestion\Plugin\AddressProvider;
 
-use Drupal\address_suggestion\AddressProviderBase;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\address_suggestion\AddressProviderBase;
+use Drupal\address_suggestion\Attribute\AddressProvider;
 
 /**
  * Defines a DistanceMatrix plugin for address_suggestion.
  *
  * @package Drupal\address_suggestion\Plugin\AddressProvider
- *
- * @AddressProvider(
- *   id = "distance_matrix",
- *   label = @Translation("Distance Matrix"),
- *   api = "https://api.distancematrix.ai/maps/api/geocode/json",
- * )
  */
+#[AddressProvider(
+  id: 'distance_matrix',
+  label: new TranslatableMarkup('Distance Matrix'),
+  api: 'https://api.distancematrix.ai/maps/api/geocode/json',
+)]
 class DistanceMatrix extends AddressProviderBase {
 
   /**

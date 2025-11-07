@@ -1,16 +1,16 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus\Plugin\migrate\destination;
 
+use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Event\ImportAwareInterface;
 use Drupal\migrate\Event\MigrateImportEvent;
 use Drupal\migrate\MigrateException;
-use Drupal\migrate\MigrateSkipProcessException;
 use Drupal\migrate\Plugin\migrate\destination\DestinationBase;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
@@ -51,7 +51,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @endcode
  *
  * For numeric id fields, migrate can generate the values on-the-fly, by
- * enabling use_auto_increment; in such case, the id field may be ommitted from
+ * enabling use_auto_increment; in such case, the id field may be omitted from
  * the 'fields' section:
  *
  * @code
@@ -89,6 +89,9 @@ class Table extends DestinationBase implements ContainerFactoryPluginInterface, 
    */
   protected array $fields;
 
+  /**
+   * The DB connection.
+   */
   protected Connection $dbConnection;
 
   /**
@@ -137,7 +140,7 @@ class Table extends DestinationBase implements ContainerFactoryPluginInterface, 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL): self {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL): self {
     $db_key = !empty($configuration['database_key']) ? $configuration['database_key'] : NULL;
     return new static(
       $configuration,
@@ -161,7 +164,7 @@ class Table extends DestinationBase implements ContainerFactoryPluginInterface, 
   /**
    * {@inheritdoc}
    */
-  public function fields(MigrationInterface $migration = NULL): array {
+  public function fields(?MigrationInterface $migration = NULL): array {
     return $this->fields;
   }
 
@@ -177,7 +180,7 @@ class Table extends DestinationBase implements ContainerFactoryPluginInterface, 
         $ids[$field] = $row->getDestinationProperty($field);
       }
       elseif (!$row->hasDestinationProperty($field) && empty($fieldInfo['use_auto_increment'])) {
-        throw new MigrateSkipProcessException('All the id fields are required for a table migration.');
+        throw new InvalidPluginDefinitionException($this->getPluginId(), 'All the id fields are required for a table migration.');
       }
       // When batching, we do the auto-incrementing ourselves.
       elseif ($batch_inserts && $fieldInfo['use_auto_increment']) {

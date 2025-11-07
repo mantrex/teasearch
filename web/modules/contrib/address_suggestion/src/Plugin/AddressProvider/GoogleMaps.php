@@ -2,20 +2,21 @@
 
 namespace Drupal\address_suggestion\Plugin\AddressProvider;
 
-use Drupal\address_suggestion\AddressProviderBase;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\address_suggestion\AddressProviderBase;
+use Drupal\address_suggestion\Attribute\AddressProvider;
 
 /**
  * Defines a GoogleMaps plugin for address_suggestion.
  *
  * @package Drupal\address_suggestion\Plugin\AddressProvider
- *
- * @AddressProvider(
- *   id = "google_maps",
- *   label = @Translation("Google Maps - obsolete"),
- *   api = "https://maps.googleapis.com/maps/api/geocode/json",
- * )
  */
+#[AddressProvider(
+  id: 'google_maps',
+  label: new TranslatableMarkup('Google Maps - obsolete'),
+  api: 'https://maps.googleapis.com/maps/api/geocode/json',
+)]
 class GoogleMaps extends AddressProviderBase {
 
   /**
@@ -30,10 +31,11 @@ class GoogleMaps extends AddressProviderBase {
     if (empty($string) && empty($settings['api_key'])) {
       return $results;
     }
+    $lang = $this->languageManager->getCurrentLanguage()->getId();
     $query = [
       'key' => $settings['api_key'],
       'address' => $string,
-      'language' => $this->languageManager->getCurrentLanguage()->getId(),
+      'language' => $lang,
     ];
     if (!empty($settings['countryName'])) {
       $query['components'] = 'country:' . $settings['countryName'];
@@ -54,13 +56,13 @@ class GoogleMaps extends AddressProviderBase {
 
     $content = Json::decode($response->getBody());
     if (!empty($content['predictions'])) {
+      $url = "https://maps.googleapis.com/maps/api/place/details/json";
       foreach ($content['predictions'] as $prediction) {
         $query = [
           'key' => $settings['api_key'],
           'placeid' => $prediction['place_id'],
-          'language' => $this->languageManager->getCurrentLanguage()->getId(),
+          'language' => $lang,
         ];
-        $url = "https://maps.googleapis.com/maps/api/place/details/json";
         $response = $this->client->request('GET', $url, [
           'query' => $query,
         ]);

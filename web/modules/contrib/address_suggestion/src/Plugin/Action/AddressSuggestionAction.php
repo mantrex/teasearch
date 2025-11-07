@@ -2,21 +2,21 @@
 
 namespace Drupal\address_suggestion\Plugin\Action;
 
+use Drupal\Core\Action\Attribute\Action;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views_bulk_operations\Action\ViewsBulkOperationsActionBase;
 
 /**
  * Action description.
- *
- * @Action(
- *   id = "address_suggestion_action",
- *   label = @Translation("Address suggestion action"),
- *   description = @Translation("Address suggestion update geolocation field"),
- *   type = ""
- * )
  */
+#[Action(
+  id: 'address_suggestion_action',
+  label: new TranslatableMarkup('Address suggestion action'),
+  action_label: new TranslatableMarkup('Address suggestion update geolocation field'),
+)]
 class AddressSuggestionAction extends ViewsBulkOperationsActionBase {
 
   use StringTranslationTrait;
@@ -130,7 +130,7 @@ class AddressSuggestionAction extends ViewsBulkOperationsActionBase {
   /**
    * {@inheritdoc}
    */
-  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     return $object->access('update', $account, $return_as_object);
   }
 

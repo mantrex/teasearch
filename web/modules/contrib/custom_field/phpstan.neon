@@ -8,8 +8,6 @@ parameters:
   reportUnmatchedIgnoredErrors: false
   excludePaths:
     - '*/tests/*.php'
-    # Exclude tokens.inc until we refactor.
-    - custom_field.tokens.inc
   scanDirectories:
     - ../../../../vendor/drush/drush/src-symfony-compatibility
   ignoreErrors:

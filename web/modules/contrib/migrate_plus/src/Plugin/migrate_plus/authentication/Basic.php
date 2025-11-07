@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus\Plugin\migrate_plus\authentication;
 
@@ -20,7 +20,7 @@ class Basic extends AuthenticationPluginBase implements ContainerFactoryPluginIn
   /**
    * {@inheritdoc}
    */
-  public function getAuthenticationOptions(): array {
+  public function getAuthenticationOptions($url): array {
     return [
       'auth' => [
         $this->configuration['username'],

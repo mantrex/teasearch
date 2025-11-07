@@ -102,7 +102,7 @@ drush mr --group=beer  # Abbreviation for migrate-rollback
 # You can import specific migrations.
 drush mi beer_term,beer_user
 # At this point, go look at your content listing - you'll see beer nodes named
-# "Stub", generated from the user's favbeers references.
+# "Stub", generated from the user's favorite_beers references.
 
 drush mi beer_node,beer_comment
 # Refresh your content listing - the stub nodes have been filled with real beer!

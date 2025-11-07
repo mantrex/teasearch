@@ -67,8 +67,8 @@ class CustomInlineFormatter extends BaseFormatter {
     ];
     foreach ($this->getCustomFieldItems() as $name => $item) {
       // Remove non-applicable settings.
-      unset($form['fields'][$name]['formatter_settings']['label_display']);
-      unset($form['fields'][$name]['wrappers']);
+      unset($form['fields'][$name]['content']['formatter_settings']['label_display']);
+      unset($form['fields'][$name]['content']['wrappers']);
     }
 
     return $form;

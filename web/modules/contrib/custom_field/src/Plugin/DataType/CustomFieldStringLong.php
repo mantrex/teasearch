@@ -69,31 +69,31 @@ class CustomFieldStringLong extends CustomFieldDataTypeBase implements Cacheable
    */
   protected function getFormat(): mixed {
     $parent = $this->getParent();
-    $field_settings = $parent->getFieldDefinition()->getSetting('field_settings')[$this->name];
+    $field_settings = $parent->getFieldDefinition()->getSetting('field_settings')[$this->name] ?? [];
     $settings = $field_settings ? $field_settings['widget_settings']['settings'] : [];
 
-    return $settings['formatted'] ? $settings['default_format'] : NULL;
+    return ($settings['formatted'] ?? FALSE) ? $settings['default_format'] : NULL;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheContexts(): array {
-    return $this->processed->getCacheContexts();
+    return ($this->processed) ? $this->processed->getCacheContexts() : [];
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheTags(): array {
-    return $this->processed->getCacheTags();
+    return ($this->processed) ? $this->processed->getCacheTags() : [];
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheMaxAge(): int {
-    return $this->processed->getCacheMaxAge();
+    return ($this->processed) ? $this->processed->getCacheMaxAge() : 0;
   }
 
   /**

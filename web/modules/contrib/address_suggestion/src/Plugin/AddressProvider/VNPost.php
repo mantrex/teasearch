@@ -2,19 +2,21 @@
 
 namespace Drupal\address_suggestion\Plugin\AddressProvider;
 
-use Drupal\address_suggestion\AddressProviderBase;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\address_suggestion\AddressProviderBase;
+use Drupal\address_suggestion\Attribute\AddressProvider;
 
 /**
  * Defines a Vietnam post plugin for address_suggestion.
  *
  * @package Drupal\address_suggestion\Plugin\AddressProvider
- * @AddressProvider(
- *   id = "vnpost",
- *   label = @Translation("Vietnam post"),
- *   api = "https://maps.vnpost.vn/api/autocomplete",
- * )
  */
+#[AddressProvider(
+  id: 'vnpost',
+  label: new TranslatableMarkup('Vietnam post'),
+  api: 'https://maps.vnpost.vn/api/autocomplete',
+)]
 class VNPost extends AddressProviderBase {
 
   /**

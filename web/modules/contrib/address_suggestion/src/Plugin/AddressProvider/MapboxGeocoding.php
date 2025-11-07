@@ -2,19 +2,21 @@
 
 namespace Drupal\address_suggestion\Plugin\AddressProvider;
 
-use Drupal\address_suggestion\AddressProviderBase;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\address_suggestion\AddressProviderBase;
+use Drupal\address_suggestion\Attribute\AddressProvider;
 
 /**
  * Defines a Mapbox Geocoding plugin for address_suggestion.
  *
  * @package Drupal\address_suggestion\Plugin\AddressProvider
- * @AddressProvider(
- *   id = "mapbox_geocoding",
- *   label = @Translation("Mapbox Geocoding"),
- *   api = "https://api.mapbox.com/geocoding/v5/mapbox.places/",
- * )
  */
+#[AddressProvider(
+  id: 'mapbox_geocoding',
+  label: new TranslatableMarkup('Mapbox Geocoding'),
+  api: 'https://api.mapbox.com/geocoding/v5/mapbox.places/',
+)]
 class MapboxGeocoding extends AddressProviderBase {
 
   /**

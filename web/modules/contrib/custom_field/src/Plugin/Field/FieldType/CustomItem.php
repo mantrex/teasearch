@@ -16,9 +16,11 @@ use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Plugin\CustomField\FieldType\DateTimeType;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface;
 use Drupal\field\Entity\FieldConfig;
@@ -191,7 +193,12 @@ class CustomItem extends FieldItemBase {
     /** @var \Drupal\custom_field\Plugin\Field\FieldType\CustomFieldItemListInterface<\Drupal\custom_field\Plugin\Field\FieldType\CustomItem>[] $original_fields */
     $original_fields = $original_entity->get($field_name);
     foreach ($original_fields as $delta => $original_field) {
+
       $current_field = $entity->get($field_name)->get($delta);
+      if (!$current_field instanceof CustomItem) {
+        continue;
+      }
+
       foreach ($custom_items as $name => $custom_item) {
         $field_type = $custom_item->getDataType();
         $is_subfield_translatable = $custom_item->getWidgetSetting('translatable') ?? FALSE;
@@ -219,6 +226,10 @@ class CustomItem extends FieldItemBase {
               $options = $original_field->{$name . self::SEPARATOR . 'options'};
               $current_field->{$name . self::SEPARATOR . 'title'} = $title;
               $current_field->{$name . self::SEPARATOR . 'options'} = $options;
+            }
+            if ($field_type === 'daterange') {
+              $end = $original_field->{$name . self::SEPARATOR . 'end'};
+              $current_field->{$name . self::SEPARATOR . 'end'} = $end;
             }
           }
         }
@@ -263,6 +274,9 @@ class CustomItem extends FieldItemBase {
             break;
 
           case 'image':
+            if (is_array($subfield_value) && isset($subfield_value['target_id'])) {
+              $subfield_value = $subfield_value['target_id'];
+            }
             if (!empty($subfield_value)) {
               $width = $current_field->get($name . self::SEPARATOR . 'width')->getValue();
               $height = $current_field->get($name . self::SEPARATOR . 'height')->getValue();
@@ -304,7 +318,6 @@ class CustomItem extends FieldItemBase {
   public function storageSettingsForm(array &$form, FormStateInterface $form_state, $has_data): array {
     assert($form_state instanceof SubformStateInterface);
     $form_state = $form_state->getCompleteFormState();
-    $wrapper_id = 'custom-field-storage-wrapper';
     $parents = ['field_storage', 'subform', 'settings'];
     $storage = $form_state->getStorage();
     $settings = $this->getSettings();
@@ -312,17 +325,21 @@ class CustomItem extends FieldItemBase {
     $field_name = $this->getFieldDefinition()->getName();
     // Calculate a safe max column length to coincide with SQL column limit.
     $max_name_length = 64 - strlen($field_name) - 12;
+    $is_cloning = FALSE;
     if (empty($current_settings)) {
       $form_state->set('current_settings', $this->getSettings());
     }
 
     if ($form_state->isRebuilding()) {
       $settings['items'] = $form_state->getValue([...$parents, 'items']) ?? $current_settings['columns'];
+      $is_cloning = !empty($form_state->getValue([...$parents, 'clone']));
       $field_settings = $form_state->getValue(['settings', 'field_settings']) ?? $current_settings['field_settings'];
       $current_columns = $current_settings['columns'];
       $columns = $settings['items'];
       $user_input = $form_state->getUserInput();
       $input = NestedArray::getValue($user_input, [...$parents, 'items']);
+      $widget_input = NestedArray::getValue($user_input, ['settings', 'field_settings']);
+      $default_value_input = NestedArray::getValue($user_input, ['default_value_input', $field_name]);
       $reset_input = FALSE;
       foreach ($settings['items'] as $name => $item) {
         unset($item['remove']);
@@ -334,6 +351,15 @@ class CustomItem extends FieldItemBase {
           if (isset($field_settings[$name])) {
             unset($field_settings[$name]);
           }
+          // Clear out existing input.
+          if (isset($input[$name])) {
+            unset($input[$name]);
+          }
+          // Clear out existing widget input.
+          if (isset($widget_input[$name])) {
+            unset($widget_input[$name]);
+          }
+          $reset_input = TRUE;
         }
         elseif (isset($current_columns[$name])) {
           $diffs = array_diff($item, $current_columns[$name]);
@@ -344,14 +370,43 @@ class CustomItem extends FieldItemBase {
             }
           }
           if ($item['type'] !== $current_columns[$name]['type']) {
+            // Clear out existing widget.
             if (isset($field_settings[$name])) {
               unset($field_settings[$name]);
             }
-            if (in_array($item['type'], ['string', 'telephone'])) {
-              $input[$name]['length'] = NULL;
-              $settings['items'][$name]['length'] = NULL;
+            // Clear out existing widget input.
+            if (isset($widget_input[$name])) {
+              unset($widget_input[$name]);
               $reset_input = TRUE;
             }
+            // Clear out default value input.
+            foreach ($default_value_input as $delta => $default_value) {
+              if (isset($default_value[$name])) {
+                unset($default_value_input[$delta][$name]);
+                $reset_input = TRUE;
+              }
+            }
+
+            if (isset($item['length'])) {
+              // Unset length.
+              if (!in_array($item['type'], ['string', 'telephone'])) {
+                unset($item['length']);
+                if (isset($input[$name]['length'])) {
+                  unset($input[$name]['length']);
+                }
+              }
+              // Reset length.
+              else {
+                $item['length'] = NULL;
+                if (isset($input[$name]['length'])) {
+                  $input[$name]['length'] = NULL;
+                }
+              }
+              $columns[$name] = $item;
+              $settings['items'][$name] = $item;
+              $reset_input = TRUE;
+            }
+
             if ($item['type'] === 'entity_reference') {
               $settings['items'][$name]['target_type'] = NULL;
               // Force the selection of target type.
@@ -373,6 +428,9 @@ class CustomItem extends FieldItemBase {
       if ($reset_input) {
         $user_input = $form_state->getUserInput();
         NestedArray::setValue($user_input, [...$parents, 'items'], $input);
+        NestedArray::setValue($user_input, ['settings', 'field_settings'], $widget_input);
+        NestedArray::setValue($user_input, ['default_value_input', $field_name], $default_value_input);
+        $form_state->setUserInput($user_input);
       }
     }
     else {
@@ -390,8 +448,6 @@ class CustomItem extends FieldItemBase {
         '#type' => 'container',
         '#parents' => [...$parents, 'items'],
         '#title' => $this->t('Custom field items'),
-        '#prefix' => '<div id="' . $wrapper_id . '">',
-        '#suffix' => '</div>',
         '#attributes' => [
           'style' => 'display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem;',
         ],
@@ -458,7 +514,7 @@ class CustomItem extends FieldItemBase {
       ];
       $element['items'][$i]['name'] = [
         '#type' => 'machine_name',
-        '#description' => $this->t('A unique machine-readable name containing only letters, numbers, or underscores.'),
+        '#description' => $this->t('A unique machine-readable name containing only letters, numbers, or single underscores.'),
         '#default_value' => $item['name'],
         '#disabled' => $has_data,
         '#machine_name' => [
@@ -466,10 +522,14 @@ class CustomItem extends FieldItemBase {
           'exists' => [$this, 'machineNameExists'],
           'label' => $this->t('Machine-readable name'),
           'standalone' => FALSE,
+          'error' => $this->t('The machine-readable name must contain only letters, numbers, or single underscores'),
         ],
         '#maxlength' => $max_name_length,
         '#size' => 20,
       ];
+      if (!$has_data) {
+        $element['items'][$i]['name']['#machine_name']['replace_pattern'] = '[^a-zA-Z0-9_]+|__';
+      }
       $element['items'][$i]['type'] = [
         '#type' => 'select',
         '#title' => $this->t('Type'),
@@ -543,17 +603,18 @@ class CustomItem extends FieldItemBase {
         ];
       }
       // Datetime field extra settings.
-      if ($type === 'datetime') {
+      if ($type === 'datetime' || $type === 'daterange') {
+        $datetime_type_options = [
+          DateTimeType::DATETIME_TYPE_DATETIME => $this->t('Date and time'),
+          DateTimeType::DATETIME_TYPE_DATE => $this->t('Date only'),
+        ];
         $element['items'][$i]['datetime_type'] = [
           '#type' => 'select',
           '#title' => $this->t('Date type'),
           '#description' => $this->t('Choose the type of date to create.'),
-          '#default_value' => $item['datetime_type'] ?? CustomFieldTypeInterface::DATETIME_TYPE_DATETIME,
+          '#default_value' => $item['datetime_type'] ?? DateTimeType::DATETIME_TYPE_DATETIME,
           '#disabled' => $has_data,
-          '#options' => [
-            CustomFieldTypeInterface::DATETIME_TYPE_DATETIME => $this->t('Date and time'),
-            CustomFieldTypeInterface::DATETIME_TYPE_DATE => $this->t('Date only'),
-          ],
+          '#options' => $datetime_type_options,
           '#required' => TRUE,
         ];
       }
@@ -608,27 +669,25 @@ class CustomItem extends FieldItemBase {
         '#type' => 'submit',
         '#value' => $this->t('Remove'),
         '#submit' => [get_class($this) . '::removeSubmit'],
-        '#name' => 'remove:' . $i,
+        '#name' => 'remove_' . $i,
         '#delta' => $i,
         '#access' => !($has_data || $items_count === 1),
-        '#attributes' => [
-          'id' => 'remove_' . $i,
-        ],
         '#ajax' => [
           'callback' => [$this, 'actionCallback'],
-          'wrapper' => $wrapper_id,
+          'wrapper' => 'field-combined',
         ],
       ];
     }
 
-    if (!$has_data) {
+    if (!$has_data && !$is_cloning) {
       $element['actions']['add'] = [
         '#type' => 'submit',
         '#value' => $this->t('Add sub-field'),
         '#submit' => [get_class($this) . '::addSubmit'],
+        '#name' => 'custom_field_add_item',
         '#ajax' => [
           'callback' => [$this, 'actionCallback'],
-          'wrapper' => $wrapper_id,
+          'wrapper' => 'field-combined',
         ],
         '#attributes' => [
           'class' => [
@@ -636,13 +695,6 @@ class CustomItem extends FieldItemBase {
           ],
         ],
       ];
-      if (!empty($sources)) {
-        $element['actions']['add']['#states'] = [
-          'visible' => [
-            'select[data-id="custom-field-storage-clone"]' => ['value' => ''],
-          ],
-        ];
-      }
     }
 
     $form_state->setCached(FALSE);
@@ -753,11 +805,25 @@ class CustomItem extends FieldItemBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function onChange($property_name, $notify = TRUE): void {
+    $settings = $this->getSettings();
+    $custom_items = $this->getCustomFieldManager()->getCustomFieldItems($settings);
+    foreach ($custom_items as $name => $custom_item) {
+      if ($property_name === $name) {
+        $custom_item->onChange($property_name, $notify, $this);
+      }
+    }
+    parent::onChange($property_name, $notify);
+  }
+
+  /**
    * Callback for both ajax-enabled buttons in storage form.
    *
    * Selects and returns the fieldset with the names in it.
    *
-   * @param array<string, mixed> $form
+   * @param array $form
    *   The form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
@@ -777,7 +843,15 @@ class CustomItem extends FieldItemBase {
     }
 
     $response = new AjaxResponse();
-    $response->addCommand(new InvokeCommand('input[name="field_storage_submit"]', 'click'));
+    $response->addCommand(new ReplaceCommand('#field-combined', $form));
+    if ($trigger['#name'] === 'custom_field_add_item') {
+      $sliced_parents = array_slice($trigger['#parents'], 0, -2);
+      $items = Element::children(NestedArray::getValue($form, $sliced_parents)['items']);
+      $last_item = end($items);
+      $input = 'field_storage[subform][settings][items][' . $last_item . '][name]';
+      // Set the focus to the name field for the last item added.
+      $response->addCommand(new InvokeCommand('input[name="' . $input . '"]', 'focus'));
+    }
 
     return $response;
   }

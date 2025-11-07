@@ -1,14 +1,14 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_plus\Unit\process;
 
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Utility\Html;
+use Drupal\Tests\migrate\Unit\process\MigrateProcessTestCase;
 use Drupal\migrate\MigrateSkipRowException;
 use Drupal\migrate_plus\Plugin\migrate\process\DomStrReplace;
-use Drupal\Tests\migrate\Unit\process\MigrateProcessTestCase;
 
 /**
  * Tests the dom_str_replace process plugin.
@@ -44,14 +44,14 @@ final class DomStrReplaceTest extends MigrateProcessTestCase {
     $this->expectException(InvalidPluginDefinitionException::class);
     $this->expectExceptionMessage($message);
     (new DomStrReplace($configuration, 'dom_str_replace', []))
-      ->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+      ->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
   }
 
   /**
-   * Dataprovider for testConfigValidation().
+   * Data provider for testConfigValidation().
    */
   public static function providerTestConfigEmpty(): array {
-    $cases = [
+    return [
       'xpath-null' => [
         ['xpath' => NULL],
         "Configuration option 'xpath' is required.",
@@ -62,7 +62,7 @@ final class DomStrReplaceTest extends MigrateProcessTestCase {
       ],
       'mode-invalid' => [
         ['mode' => 'invalid'],
-        'Configuration option "mode" only accepts the following values: attribute, element.',
+        'Configuration option "mode" only accepts the following values: attribute, element, text.',
       ],
       'attribute_options-null' => [
         ['attribute_options' => NULL],
@@ -77,8 +77,6 @@ final class DomStrReplaceTest extends MigrateProcessTestCase {
         "Configuration option 'replace' is required.",
       ],
     ];
-
-    return $cases;
   }
 
   /**
@@ -96,9 +94,9 @@ final class DomStrReplaceTest extends MigrateProcessTestCase {
     ];
     $value = 'string';
     $this->expectException(MigrateSkipRowException::class);
-    $this->expectExceptionMessage('The dom_str_replace plugin in the destinationproperty process pipeline requires a \DOMDocument object. You can use the dom plugin to convert a string to \DOMDocument.');
+    $this->expectExceptionMessage('The dom_str_replace plugin in the destinationProperty process pipeline requires a \DOMDocument object. You can use the dom plugin to convert a string to \DOMDocument.');
     (new DomStrReplace($configuration, 'dom_str_replace', []))
-      ->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+      ->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
   }
 
   /**
@@ -109,13 +107,13 @@ final class DomStrReplaceTest extends MigrateProcessTestCase {
   public function testTransform(string $input_string, array $configuration, string $output_string): void {
     $value = Html::load($input_string);
     $document = (new DomStrReplace($configuration, 'dom_str_replace', []))
-      ->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+      ->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertTrue($document instanceof \DOMDocument);
     $this->assertEquals($output_string, Html::serialize($document));
   }
 
   /**
-   * Dataprovider for testTransform().
+   * Data provider for testTransform().
    */
   public static function providerTestTransform(): array {
     $cases = [
@@ -138,6 +136,16 @@ final class DomStrReplaceTest extends MigrateProcessTestCase {
           'regex' => TRUE,
         ] + self::$exampleConfiguration,
         '<a href="/fbar/Fbar/fbar">text</a>',
+      ],
+      'mode-text' => [
+        '<a href="/foo/Foo/foo">foo</a>',
+        [
+          'mode' => 'text',
+          'xpath' => '//a',
+          'search' => 'foo',
+          'replace' => 'bar',
+        ],
+        '<a href="/foo/Foo/foo">bar</a>',
       ],
     ];
 

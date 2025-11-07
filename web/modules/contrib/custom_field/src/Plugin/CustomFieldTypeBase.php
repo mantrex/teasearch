@@ -9,6 +9,7 @@ use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
+use Drupal\custom_field\Plugin\CustomField\FieldType\DateTimeType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -196,7 +197,7 @@ abstract class CustomFieldTypeBase extends PluginBase implements CustomFieldType
    * {@inheritdoc}
    */
   public function getDatetimeType(): string {
-    return $this->settings['datetime_type'] ?? static::DATETIME_TYPE_DATETIME;
+    return $this->settings['datetime_type'] ?? DateTimeType::DATETIME_TYPE_DATETIME;
   }
 
   /**
@@ -326,5 +327,10 @@ abstract class CustomFieldTypeBase extends PluginBase implements CustomFieldType
   public static function isApplicable(): bool {
     return TRUE;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function onChange(string $property_name, bool $notify, FieldItemInterface $item): void {}
 
 }

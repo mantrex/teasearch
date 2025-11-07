@@ -25,13 +25,6 @@ use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
 class TextareaWidget extends CustomFieldWidgetBase {
 
   /**
-   * The field type.
-   *
-   * @var \Drupal\custom_field\Plugin\CustomFieldTypeInterface
-   */
-  protected CustomFieldTypeInterface $field;
-
-  /**
    * {@inheritdoc}
    */
   public static function defaultSettings(): array {
@@ -62,10 +55,10 @@ class TextareaWidget extends CustomFieldWidgetBase {
     $type = isset($settings['formatted']) && $settings['formatted'] ? 'text_format' : 'textarea';
 
     if (isset($settings['formatted']) && $settings['formatted'] && !empty($settings['default_format'])) {
-      $this->field = $field;
       $element['#format'] = $settings['default_format'];
       $element['#allowed_formats'] = [$settings['default_format']];
-      $element['#after_build'][] = [$this, 'callUnsetFilters'];
+      $element['#after_build'][] = [static::class, 'unsetFilters'];
+      $element['#after_build_data'] = $settings;
     }
 
     if (isset($settings['maxlength'])) {
@@ -180,35 +173,19 @@ class TextareaWidget extends CustomFieldWidgetBase {
   }
 
   /**
-   * Closure function to pass arguments to unsetFilters().
-   *
-   * @param array<string, mixed> $element
-   *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state.
-   *
-   * @return array<string, mixed>
-   *   The field settings.
-   */
-  public function callUnsetFilters(array $element, FormStateInterface $form_state): array {
-    $settings = $this->field->getWidgetSetting('settings');
-    return static::unsetFilters($element, $form_state, $settings);
-  }
-
-  /**
    * Helper function to modify filter settings output.
    *
    * @param array<string, mixed> $element
    *   The form element.
    * @param \Drupal\Core\Form\FormStateInterface $formState
    *   The form state.
-   * @param array<string, mixed> $settings
-   *   The field settings.
    *
    * @return array<string, mixed>
    *   The modified form element.
    */
-  public static function unsetFilters(array $element, FormStateInterface $formState, array $settings): array {
+  public static function unsetFilters(array $element, FormStateInterface $formState): array {
+    // Retrieve settings from #after_build_data.
+    $settings = $element['#after_build_data'] ?? static::defaultSettings()['settings'];
     $hide_guidelines = FALSE;
     $hide_help = FALSE;
     if (!$settings['format']['guidelines']) {

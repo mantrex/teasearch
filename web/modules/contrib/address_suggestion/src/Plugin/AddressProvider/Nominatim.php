@@ -2,20 +2,22 @@
 
 namespace Drupal\address_suggestion\Plugin\AddressProvider;
 
-use Drupal\address_suggestion\AddressProviderBase;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\address_suggestion\AddressProviderBase;
+use Drupal\address_suggestion\Attribute\AddressProvider;
 
 /**
  * Defines a Nominatim plugin for address_suggestion.
  *
  * @package Drupal\address_suggestion\Plugin\AddressProvider
- * @AddressProvider(
- *   id = "nominatim",
- *   label = @Translation("Nominatim Openstreetmap"),
- *   api = "https://nominatim.openstreetmap.org/search",
- *   nokey = "TRUE",
- * )
  */
+#[AddressProvider(
+  id: 'nominatim',
+  label: new TranslatableMarkup('Nominatim Openstreetmap'),
+  api: 'https://nominatim.openstreetmap.org/search',
+  nokey: TRUE
+)]
 class Nominatim extends AddressProviderBase {
 
   /**

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus\Plugin\migrate\process;
 
@@ -16,7 +16,14 @@ use Drupal\migrate\ProcessPluginBase;
  */
 abstract class DomProcessBase extends ProcessPluginBase {
 
+  /**
+   * The DOM document.
+   */
   protected ?\DOMDocument $document = NULL;
+
+  /**
+   * The DOM xpath.
+   */
   protected ?\DOMXPath $xpath = NULL;
 
   /**

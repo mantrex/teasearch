@@ -152,35 +152,23 @@ class MediaLibraryWidget extends EntityReferenceWidgetBase implements TrustedCal
    */
   public function widget(FieldItemListInterface $items, int $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
+    $field_parents = $element['#field_parents'];
     $view_builder = $this->entityTypeManager->getViewBuilder('media');
     $field_name = $items->getFieldDefinition()->getName();
     $sub_field_name = $field->getName();
-    $parents = $form['#parents'];
-    // Create an ID suffix from the parents to make sure each widget is unique.
-    $id_suffix = $parents ? '-' . implode('-', $parents) : '';
-    $field_widget_id = implode(':', array_filter([$field_name . $delta . '_' . $sub_field_name, $id_suffix]));
+    $field_widget_id = implode(':', $field_parents);
     $wrapper_id = $this->getUniqueElementId($form, $field_name, $delta, $field->getName());
     $name_key = str_replace('-', '_', $wrapper_id);
-    $limit_validation_errors = [array_merge($parents, [$sub_field_name])];
+    $limit_validation_errors = [$field_parents];
     $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
     $item = $items[$delta];
     $input = $form_state->getUserInput();
     $referenced_entity = NULL;
-    $id = NULL;
+    $id = $item->{$sub_field_name};
 
-    if (!$input) {
-      $id = $item->{$sub_field_name};
-    }
-    else {
-      if (!empty($parents)) {
-        // Look for the value again if the field is in a closed subform.
-        $id = $item->{$sub_field_name};
-        $field_path = array_merge($parents, [$field_name, $delta, $sub_field_name]);
-      }
-      else {
-        $field_path = [$field_name, $delta, $sub_field_name];
-      }
-      if ($selection = NestedArray::getValue($input, $field_path)) {
+    if ($input) {
+      $selection = NestedArray::getValue($input, $field_parents);
+      if (!empty($selection)) {
         $target_id = $selection['selection'][0]['target_id'] ?? NULL;
         $selected_id = $selection['media_library_selection'] ?? NULL;
         $id = $target_id ?? $selected_id;

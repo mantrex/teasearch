@@ -3,20 +3,19 @@
 namespace Drupal\address_suggestion\Plugin\Field\FieldWidget;
 
 use Drupal\address\Plugin\Field\FieldWidget\CountryDefaultWidget;
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Plugin implementation of the 'continent_country' widget.
- *
- * @FieldWidget(
- *   id = "country_continent",
- *   label = @Translation("Continent filter country"),
- *   field_types = {
- *     "address_country"
- *   },
- * )
  */
+#[FieldWidget(
+  id: "country_continent",
+  label: new TranslatableMarkup('Continent filter country'),
+  field_types: ['address_country']
+)]
 final class CountryContinentWidget extends CountryDefaultWidget {
 
   /**

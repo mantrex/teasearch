@@ -21,18 +21,22 @@
 
         // eslint-disable-next-line func-names
         $widgetLinks.each(function (key, link) {
-          const $link = $(link);
-          const value = link.querySelector('.facet-item__value').textContent;
-          const count = link.querySelector('.facet-item__count').textContent;
+          const href = link.getAttribute('href');
+          const valueEl = link.querySelector('.facet-item__value');
+          const value = valueEl ? valueEl.textContent.trim() : '';
+          const countEl = link.querySelector('.facet-item__count');
+          const count = countEl ? countEl.textContent.trim() : null;
+
           // Create whitelist for Tagify suggestions with values coming from links.
           $whitelist.push({
-            value: $link.attr('href'),
-            text: `${value.trim()} ${count.trim()}`,
+            value: href,
+            text: count ? `${value} ${count}` : value,
           });
+
           // If link is active, add to the input (which will be used on Tagify).
-          if ($link.hasClass('is-active')) {
+          if (link.classList.contains('is-active')) {
             $selected.push({
-              value: $link.attr('href'),
+              value: href,
               text: value,
               count,
             });
@@ -81,7 +85,9 @@
           const entityIdDiv =
             parseInt(input.dataset.showEntityId, 10) && tagData.entity_id
               ? `<div id="tagify__tag-items" class="tagify__tag_with-entity-id"><div class='tagify__tag__entity-id-wrap'><span class='tagify__tag-entity-id'>${tagData.entity_id}</span></div><span class='tagify__tag-text'>${tagData.value}</span></div>`
-              : `<div id="tagify__tag-items"><span class='tagify__tag-facets-text'>${tagData.text}</span><span class="tagify__tag-facets-count"> ${tagData.count}<span></div>`;
+              : `<div id="tagify__tag-items"><span class='tagify__tag-facets-text'>${tagData.text}</span>
+                    ${tagData.count ? `<span class="tagify__tag-facets-count"> ${tagData.count}</span>` : ''}
+                 </div>`;
 
           return `<tag title="${tagData.text}"
             contenteditable='false'
@@ -153,7 +159,8 @@
 
         // eslint-disable-next-line func-names
         tagify.on('add', function (e) {
-          const { value } = e.detail.data;
+          const value = e.detail?.data?.value;
+          if (!value) return;
           e.preventDefault();
           $widget.trigger('facets_filter', [value]);
         });
@@ -164,7 +171,8 @@
 
         // eslint-disable-next-line func-names
         tagify.on('remove', function (e) {
-          const { value } = e.detail.data;
+          const value = e.detail?.data?.value;
+          if (!value) return;
           e.preventDefault();
           $widget.trigger('facets_filter', [value]);
         });

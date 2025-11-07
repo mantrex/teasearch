@@ -8,7 +8,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
-use Drupal\custom_field\Plugin\CustomField\DateTimeWidgetBase;
+use Drupal\custom_field\Plugin\CustomField\FieldType\DateTimeType;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
@@ -33,15 +33,21 @@ class DateTimeDefaultWidget extends DateTimeWidgetBase {
     $datetime_type = $field->getDatetimeType();
 
     // Wrap date and time elements with a fieldset.
-    if ($datetime_type === 'datetime') {
-      $element['#theme_wrappers'][] = 'fieldset';
+    if ($datetime_type === DateTimeType::DATETIME_TYPE_DATETIME) {
+      $element['#title'] = $element['value']['#title'];
+      $element['value']['#type'] = 'custom_field_datetime';
+      $element['value']['#theme_wrappers'] = [];
+      $element['#theme_wrappers'] = ['container', 'fieldset', 'container'];
+      $element['#attributes']['class'][] = 'custom-field-datetime-grid';
+    }
+    else {
+      $element['value']['#type'] = 'custom_field_datetime_date';
     }
 
     // Identify the type of date and time elements to use.
-    $date_type = 'date';
     $date_format = $date_storage->load('html_date')->getPattern();
     switch ($datetime_type) {
-      case CustomFieldTypeInterface::DATETIME_TYPE_DATE:
+      case DateTimeType::DATETIME_TYPE_DATE:
         $time_type = 'none';
         $time_format = '';
         break;
@@ -52,9 +58,9 @@ class DateTimeDefaultWidget extends DateTimeWidgetBase {
         break;
     }
 
-    $element += [
+    $element['value'] += [
       '#date_date_format' => $date_format,
-      '#date_date_element' => $date_type,
+      '#date_date_element' => 'date',
       '#date_date_callbacks' => [],
       '#date_time_format' => $time_format,
       '#date_time_element' => $time_type,

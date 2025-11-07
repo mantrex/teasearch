@@ -2,34 +2,33 @@
  * @file
  * Attaches behaviors for the Choices module on choices_widgets.
  */
-
- (function (Drupal, Choices) {
-
-  'use strict';
-
+/* global Choices */
+// eslint-disable-next-line func-names
+(function (Drupal, Choices) {
   Drupal.behaviors.choices_widget = {
     /**
      * Drupal attach behavior.
      */
-    attach: function (context, settings) {
+    attach(context, settings) {
       if (settings.choices.widget.fields) {
-        let choicesWidgetFields = settings.choices.widget.fields;
+        const choicesWidgetFields = settings.choices.widget.fields;
         Object.entries(choicesWidgetFields).forEach(([fieldName, value]) => {
-          let selects = context.querySelectorAll('select[name="' + fieldName + '"],select[name="' + fieldName + '[]"]');
+          const selects = context.querySelectorAll(
+            `select[name="${fieldName}"],select[name="${fieldName}[]"]`,
+          );
           if (selects.length > 0) {
-            let configuration_options = {};
+            let configurationOptions = {};
             // If choices widget configuration_options is set use them:
             if (value.configurationOptions) {
-              configuration_options = value.configurationOptions;
+              configurationOptions = value.configurationOptions;
             }
-            selects.forEach(function (select) {
-              new Choices(select, configuration_options);
+            selects.forEach((select) => {
+              // eslint-disable-next-line no-new
+              new Choices(select, configurationOptions);
             });
           }
         });
-
       }
-    }
-  }
-
+    },
+  };
 })(Drupal, Choices);

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus\Plugin\migrate\process;
 
@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   when mode is attribute. The keys can be:
  *   - name: Name of the attribute to match and modify.
  * - search: Regular expression to use. It should contain at least one
- *   parenthesized subpattern which will be used as the ID passed to
+ *   parenthesized sub pattern which will be used as the ID passed to
  *   migration_lookup process plugin.
  * - replace: Default value to use for replacements on migrations, if not
  *   specified on the migration. It should contain the '[mapped-id]' string
@@ -69,7 +69,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class DomMigrationLookup extends DomStrReplace implements ContainerFactoryPluginInterface {
 
+  /**
+   * The migration.
+   */
   protected MigrationInterface $migration;
+
+  /**
+   * The migrate plugin manager.
+   */
   protected MigratePluginManagerInterface $processPluginManager;
 
   /**
@@ -125,7 +132,7 @@ class DomMigrationLookup extends DomStrReplace implements ContainerFactoryPlugin
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL): self {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL): self {
     return new static(
       $configuration,
       $plugin_id,

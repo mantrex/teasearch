@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus\Plugin;
 
@@ -16,7 +16,7 @@ class MigrationConfigDeriver extends DeriverBase {
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($base_plugin_definition): array {
-    // Always rederive from scratch, because changes may have been made without
+    // Always re-derive from scratch, because changes may have been made without
     // clearing our internal cache.
     $this->derivatives = [];
     $migrations = Migration::loadMultiple();

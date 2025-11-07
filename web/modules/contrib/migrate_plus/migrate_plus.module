@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types = 1);
-
 /**
  * @file
  * Provides enhancements for implementing and managing migrations.
  */
+
+declare(strict_types=1);
 
 use Drupal\migrate\Plugin\MigrateSourceInterface;
 use Drupal\migrate\Plugin\Migration;
@@ -23,6 +23,11 @@ function migrate_plus_migration_plugins_alter(array &$migrations): void {
     // Add the default class where empty.
     if (empty($migrations[$id]['class'])) {
       $migrations[$id]['class'] = Migration::class;
+    }
+
+    // Convert null idMap to an empty array.
+    if (empty($migrations[$id]['idMap'])) {
+      $migrations[$id]['idMap'] = [];
     }
 
     // For derived configuration entity-based migrations, strip the deriver
@@ -86,4 +91,16 @@ function migrate_plus_migration_plugins_alter(array &$migrations): void {
  */
 function migrate_plus_migrate_prepare_row(Row $row, MigrateSourceInterface $source, MigrationInterface $migration): void {
   \Drupal::service('event_dispatcher')->dispatch(new MigratePrepareRowEvent($row, $source, $migration), MigrateEvents::PREPARE_ROW);
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function migrate_plus_module_implements_alter(array &$implementations, string $hook): void {
+  // Merge shared_configuration early so it is available in other
+  // migration_plugins_alters.
+  if ($hook === 'migration_plugins_alter') {
+    unset($implementations['migrate_plus']);
+    $implementations = array_merge(['migrate_plus' => FALSE], $implementations);
+  }
 }

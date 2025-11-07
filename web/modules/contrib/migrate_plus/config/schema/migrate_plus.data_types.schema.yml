@@ -54,6 +54,10 @@ migrate_source:
       type: string
       label: 'XPath selector'
 
+migrate_id_map:
+  type: migrate_plugin
+  label: 'Id Map'
+
 migrate_process:
   type: migrate_plugin
   label: 'Process'

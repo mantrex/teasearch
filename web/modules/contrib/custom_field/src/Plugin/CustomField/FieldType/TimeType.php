@@ -19,7 +19,7 @@ use Drupal\custom_field\Time;
   id: 'time',
   label: new TranslatableMarkup('Time'),
   description: new TranslatableMarkup('A field containing a Time.'),
-  category: new TranslatableMarkup('General'),
+  category: new TranslatableMarkup('Date/Time'),
   default_widget: 'time_widget',
   default_formatter: 'time',
   constraints: [

@@ -1,22 +1,25 @@
 {
-  "name": "drupal/choices",
-  "description": "Makes select elements more friendly using the Choices plugin",
-  "type": "drupal-module",
-  "license": "GPL-2.0+",
-  "support": {
-    "issues": "https://drupal.org/project/issues/choices",
-    "source": "https://drupal.org/project/choices"
-  },
-  "keywords": [
-    "Drupal",
-    "Choices",
-    "Facets"
-  ],
-  "require": {
-    "justinrainbow/json-schema": "^5.2"
-  },
-  "suggest": {
-    "bower-asset/choices.js": "Required to use drupal/choices."
-  }
-
+    "name": "drupal/choices",
+    "description": "Makes select elements more friendly using the Choices plugin",
+    "type": "drupal-module",
+    "license": "GPL-2.0+",
+    "support": {
+        "issues": "https://drupal.org/project/issues/choices",
+        "source": "https://drupal.org/project/choices"
+    },
+    "keywords": [
+        "Drupal",
+        "Choices",
+        "Facets"
+    ],
+    "require": {
+        "justinrainbow/json-schema": "^5.2 || ^6.6"
+    },
+    "require-dev": {
+        "drupal/facets": "^2.0"
+    },
+    "suggest": {
+        "drupal/facets": "Needed for submodule",
+        "bower-asset/choices.js": "Required to use drupal/choices."
+    }
 }

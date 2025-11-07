@@ -40,6 +40,7 @@ service in an update hook from your custom module.
 - custom_field_search_api - Enhances [Search API](https://www.drupal.org/project/search_api)
   integration.
 - custom_field_viewfield - Provides the ability to reference and display views.
+- custom_field_jsonapi - Provides normalizers for jsonapi integration.
 
 ## Field types, widgets & formatters
 

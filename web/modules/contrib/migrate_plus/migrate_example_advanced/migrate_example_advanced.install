@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types = 1);
-
 /**
  * @file
  * Install, update and uninstall functions for migrate_example_advanced module.
  */
+
+declare(strict_types=1);
 
 use Drupal\migrate_plus\Entity\Migration;
 

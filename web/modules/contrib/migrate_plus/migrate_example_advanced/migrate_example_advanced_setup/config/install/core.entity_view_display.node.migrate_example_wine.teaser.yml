@@ -6,10 +6,10 @@ dependencies:
     - field.field.node.migrate_example_wine.body
     - field.field.node.migrate_example_wine.field_migrate_example_comments
     - field.field.node.migrate_example_wine.field_migrate_example_adv_image
-    - field.field.node.migrate_example_wine.field_migrate_example_top_vintag
+    - field.field.node.migrate_example_wine.migrate_example_top_vintage
     - field.field.node.migrate_example_wine.field_migrate_example_wine_best
-    - field.field.node.migrate_example_wine.field_migrate_example_wine_ratin
-    - field.field.node.migrate_example_wine.field_migrate_example_wine_regio
+    - field.field.node.migrate_example_wine.migrate_example_wine_rating
+    - field.field.node.migrate_example_wine.migrate_example_wine_region
     - field.field.node.migrate_example_wine.field_migrate_example_wine_var
     - node.type.migrate_example_wine
   module:
@@ -32,8 +32,8 @@ content:
 hidden:
   field_migrate_example_comments: true
   field_migrate_example_adv_image: true
-  field_migrate_example_top_vintag: true
+  migrate_example_top_vintage: true
   field_migrate_example_wine_best: true
-  field_migrate_example_wine_ratin: true
-  field_migrate_example_wine_regio: true
+  migrate_example_wine_rating: true
+  migrate_example_wine_region: true
   field_migrate_example_wine_var: true

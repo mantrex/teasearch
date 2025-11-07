@@ -151,7 +151,7 @@ class ChoicesGlobalFunctionalJsTest extends WebDriverTestBase {
   }
 
   /**
-   * Tests if the select is modified by choices inside a inetger list field.
+   * Tests if the select is modified by choices inside an integer list field.
    */
   public function testChoicesAppliedOnFieldSelectListInteger() {
     $session = $this->assertSession();
@@ -277,14 +277,7 @@ class ChoicesGlobalFunctionalJsTest extends WebDriverTestBase {
   public function testChoicesOnlyOnAdminPages() {
     $session = $this->assertSession();
     $this->config('choices.settings')->set('include', ConfigForm::CHOICES_INCLUDE_ADMIN)->save();
-    // See if choices does not apply on article creation nor view:
-    $this->drupalGet('/node/add/article');
-    // See if js and css are not present:
-    $session->elementNotExists('css', 'script[src*="choices.min.js"]');
-    $session->elementNotExists('css', 'link[href*="choices.min.css"]');
-    // See if choices is not applied:
-    $session->elementNotExists('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices select#edit-test-global-select');
-
+    // See if choices does not apply on article view:
     $this->drupalGet('/test-select-view');
     // See if js and css are not present:
     $session->elementNotExists('css', 'script[src*="choices.min.js"]');
@@ -307,15 +300,7 @@ class ChoicesGlobalFunctionalJsTest extends WebDriverTestBase {
   public function testChoicesOnlyOnFrontendPages() {
     $session = $this->assertSession();
     $this->config('choices.settings')->set('include', ConfigForm::CHOICES_INCLUDE_NO_ADMIN)->save();
-    // See if choices does not apply on article creation nor view:
-    $this->drupalGet('/node/add/article');
-    // See if js and css are present:
-    $session->elementExists('css', 'script[src*="choices.min.js"]');
-    $session->elementExists('css', 'link[href*="choices.min.css"]');
-    // See if choices is applied:
-    $session->elementExists('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices');
-    $session->elementAttributeContains('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices select#edit-test-global-select', 'class', 'choices__input');
-
+    // See if choices does not apply on article view:
     $this->drupalGet('/test-select-view');
     // See if js and css are not present:
     $session->elementExists('css', 'script[src*="choices.min.js"]');
@@ -347,6 +332,7 @@ class ChoicesGlobalFunctionalJsTest extends WebDriverTestBase {
       }');
     // Save the config and see, if it applies:
     $page->pressButton('edit-submit');
+    $this->assertTrue($session->waitForText('The configuration options have been saved.'));
     $session->pageTextNotContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
     $this->drupalGet('/node/add/article');
     $session->elementExists('css', 'script[src*="choices.min.js"]');
@@ -369,62 +355,63 @@ class ChoicesGlobalFunctionalJsTest extends WebDriverTestBase {
       }');
     // Save the config and see, if it fails to apply:
     $page->pressButton('edit-submit');
-    $session->pageTextContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
+    $this->assertTrue($session->waitForText('You have to enter a correct JSON object definition or leave the field empty to use default settings.'));
 
     // Go to config page and set a 0 as json setting:
     $this->drupalGet('/admin/config/user-interface/choices');
     $page->fillField('edit-configuration-options', '0');
     // Save the config and see, if it fails to apply:
     $page->pressButton('edit-submit');
-    $session->pageTextContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
+    $this->assertTrue($session->waitForText('You have to enter a correct JSON object definition or leave the field empty to use default settings.'));
 
     // Go to config page and set "blank" as json setting:
     $this->drupalGet('/admin/config/user-interface/choices');
     $page->fillField('edit-configuration-options', 'blank');
     // Save the config and see, if it fails to apply:
     $page->pressButton('edit-submit');
-    $session->pageTextContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
+    $this->assertTrue($session->waitForText('You have to enter a correct JSON object definition or leave the field empty to use default settings.'));
 
     // Go to config page and set "'" as json setting:
     $this->drupalGet('/admin/config/user-interface/choices');
     $page->fillField('edit-configuration-options', "'");
     // Save the config and see, if it fails to apply:
     $page->pressButton('edit-submit');
-    $session->pageTextContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
+    $this->assertTrue($session->waitForText('You have to enter a correct JSON object definition or leave the field empty to use default settings.'));
 
     // Go to config page and set '"' as json setting:
     $this->drupalGet('/admin/config/user-interface/choices');
     $page->fillField('edit-configuration-options', '"');
     // Save the config and see, if it fails to apply:
     $page->pressButton('edit-submit');
-    $session->pageTextContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
+    $this->assertTrue($session->waitForText('You have to enter a correct JSON object definition or leave the field empty to use default settings.'));
 
     // Go to config page and set '[]' as json setting:
     $this->drupalGet('/admin/config/user-interface/choices');
     $page->fillField('edit-configuration-options', '[]');
     // Save the config and see, if it fails to apply:
     $page->pressButton('edit-submit');
-    $session->pageTextContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
+    $this->assertTrue($session->waitForText('You have to enter a correct JSON object definition or leave the field empty to use default settings.'));
 
     // Go to config page and set '{' as json setting:
     $this->drupalGet('/admin/config/user-interface/choices');
     $page->fillField('edit-configuration-options', '{');
     // Save the config and see, if it fails to apply:
     $page->pressButton('edit-submit');
-    $session->pageTextContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
+    $this->assertTrue($session->waitForText('You have to enter a correct JSON object definition or leave the field empty to use default settings.'));
 
     // Go to config page and set '}' as json setting:
     $this->drupalGet('/admin/config/user-interface/choices');
     $page->fillField('edit-configuration-options', '}');
     // Save the config and see, if it fails to apply:
     $page->pressButton('edit-submit');
-    $session->pageTextContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
+    $this->assertTrue($session->waitForText('You have to enter a correct JSON object definition or leave the field empty to use default settings.'));
 
     // Go to config page and set '' as json setting:
     $this->drupalGet('/admin/config/user-interface/choices');
     $page->fillField('edit-configuration-options', '');
     // Save the config and see, if it applies successfully:
     $page->pressButton('edit-submit');
+    $this->assertTrue($session->waitForText('The configuration options have been saved.'));
     $session->pageTextNotContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
 
     // Go to config page and set '{}' as json setting:
@@ -432,6 +419,7 @@ class ChoicesGlobalFunctionalJsTest extends WebDriverTestBase {
     $page->fillField('edit-configuration-options', '{}');
     // Save the config and see, if it applies successfully:
     $page->pressButton('edit-submit');
+    $this->assertTrue($session->waitForText('The configuration options have been saved.'));
     $session->pageTextNotContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
   }
 

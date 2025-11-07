@@ -2,20 +2,21 @@
 
 namespace Drupal\address_suggestion\Plugin\AddressProvider;
 
-use Drupal\address_suggestion\AddressProviderBase;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\address_suggestion\AddressProviderBase;
+use Drupal\address_suggestion\Attribute\AddressProvider;
 
 /**
  * Defines a Tomtom plugin for address_suggestion.
  *
  * @package Drupal\address_suggestion\Plugin\AddressProvider
- *
- * @AddressProvider(
- *   id = "tomtom",
- *   label = @Translation("Tomtom api"),
- *   api = "https://api.tomtom.com/search/2/geocode/"
- * )
  */
+#[AddressProvider(
+  id: 'tomtom',
+  label: new TranslatableMarkup('Tomtom api'),
+  api: 'https://api.tomtom.com/search/2/geocode/',
+)]
 class TomTom extends AddressProviderBase {
 
   /**

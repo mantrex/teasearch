@@ -2,18 +2,15 @@
  * @file
  * Attaches behaviors for the Choices module.
  */
-
+/* global Choices */
+// eslint-disable-next-line func-names
 (function (Drupal, Choices) {
-
-  'use strict';
-
   Drupal.behaviors.choices = {
-
     /**
      * Drupal attach behavior.
      */
-    attach: function (context, settings) {
-      var selector = settings.choices.global.cssSelector;
+    attach(context, settings) {
+      let selector = settings.choices.global.cssSelector;
       if (settings.choices.facets && settings.choices.facets.hasFacetsWidget) {
         // Also initialize on .js-facets-choices
         selector += ',.js-facets-choices';
@@ -21,23 +18,29 @@
       if (!selector.length) {
         return;
       }
-      var selects = context.querySelectorAll(selector);
+      let selects = context.querySelectorAll(selector);
       // Exclude .field--widget-choices-widget, which has its own implementation.
       // Exclude select inputs that are part of Drupal core table drag rows.
-      selects = [...selects].filter(element => {
-        return !element.closest('.field--widget-choices-widget') && !element.parentNode.closest('.draggable');
+      selects = [...selects].filter((element) => {
+        return (
+          !element.closest('.field--widget-choices-widget') &&
+          !element.parentNode.closest('.draggable')
+        );
       });
       if (selects.length > 0) {
-        var configuration_options = {};
+        let configurationOptions = {};
         // If choices widget configuration_options is set use them:
-        if (settings.choices.global && settings.choices.global.configurationOptions) {
-          configuration_options = settings.choices.global.configurationOptions;
+        if (
+          settings.choices.global &&
+          settings.choices.global.configurationOptions
+        ) {
+          configurationOptions = settings.choices.global.configurationOptions;
         }
-        selects.forEach(function (select) {
-          new Choices(select, configuration_options);
+        selects.forEach((select) => {
+          // eslint-disable-next-line no-new
+          new Choices(select, configurationOptions);
         });
       }
     },
-  }
-
+  };
 })(Drupal, Choices);

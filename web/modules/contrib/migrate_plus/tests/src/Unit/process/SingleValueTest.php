@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_plus\Unit\process;
 
@@ -26,7 +26,7 @@ final class SingleValueTest extends MigrateProcessTestCase {
    */
   public function testTreatAsSingle(): void {
     $value = ['v1', 'v2', 'v3'];
-    $output = $this->plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+    $output = $this->plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertSame($output, $value);
     $this->assertFalse($this->plugin->multiple());
   }

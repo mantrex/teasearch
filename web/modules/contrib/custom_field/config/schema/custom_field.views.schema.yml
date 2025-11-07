@@ -21,6 +21,16 @@ views.argument.custom_field_datetime_year_month:
 
 views.filter.custom_field_datetime:
   type: views.filter.date
+  mapping:
+    expose:
+      mapping:
+        filter_type:
+          type: string
+          label: 'Filter type'
+
+views.filter.custom_field_entity_reference:
+  type: views.filter.entity_reference
+  label: 'Entity reference'
 
 views.filter_value.custom_field_datetime:
   type: views.filter_value.date
@@ -30,3 +40,6 @@ views.sort.custom_field_datetime:
 
 views.sort_expose.custom_field_datetime:
   type: views.sort_expose.date
+
+views.field.custom_field:
+  type: views.field.field

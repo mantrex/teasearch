@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus\Plugin\migrate\process;
 
@@ -65,6 +65,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class DomApplyStyles extends DomProcessBase implements ContainerFactoryPluginInterface {
 
+  /**
+   * The config factory.
+   */
   protected ConfigFactory $configFactory;
 
   /**
@@ -86,7 +89,7 @@ class DomApplyStyles extends DomProcessBase implements ContainerFactoryPluginInt
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL): self {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL): self {
     return new static(
       $configuration,
       $plugin_id,
@@ -135,7 +138,7 @@ class DomApplyStyles extends DomProcessBase implements ContainerFactoryPluginInt
         }
       }
     }
-    else if ($editor_config->get('editor') === 'ckeditor5') {
+    elseif ($editor_config->get('editor') === 'ckeditor5') {
       $editor_styles = $editor_config->get('settings.plugins.ckeditor5_style.styles') ?? [];
       foreach ($editor_styles as $editor_style) {
         if (preg_match('/<(.*) class="(.*)">/', $editor_style['element'], $matches)) {

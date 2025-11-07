@@ -27,17 +27,17 @@ claro:
 
 tagify:
   remote: https://github.com/yairEO/tagify
-  version: 4.32.2
+  version: 4.35.4
   license:
     name: MIT
     url: https://github.com/yairEO/tagify/blob/master/LICENSE
     gpl-compatible: true
   js:
-    //cdnjs.cloudflare.com/ajax/libs/tagify/4.32.2/tagify.min.js:
+    //cdnjs.cloudflare.com/ajax/libs/tagify/4.35.4/tagify.min.js:
       { type: external, minified: true }
   css:
     component:
-      //cdnjs.cloudflare.com/ajax/libs/tagify/4.26.0/tagify.min.css:
+      //cdnjs.cloudflare.com/ajax/libs/tagify/4.35.4/tagify.min.css:
         { type: external, minified: true }
   dependencies:
     - core/jquery
@@ -48,13 +48,13 @@ tagify:
 
 tagify_polyfils:
   remote: https://github.com/yairEO/tagify
-  version: 4.32.2
+  version: 4.35.4
   license:
     name: MIT
     url: https://github.com/yairEO/tagify/blob/master/LICENSE
     gpl-compatible: true
   js:
-    //cdnjs.cloudflare.com/ajax/libs/tagify/4.32.2/tagify.polyfills.min.js:
+    //cdnjs.cloudflare.com/ajax/libs/tagify/4.35.4/tagify.polyfills.min.js:
       { type: external, minified: true }
   dependencies:
     - core/jquery

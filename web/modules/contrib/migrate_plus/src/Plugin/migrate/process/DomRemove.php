@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus\Plugin\migrate\process;
 
@@ -94,6 +94,7 @@ class DomRemove extends DomProcessBase {
         case 'attribute':
           $node->removeAttribute($this->configuration['attribute']);
           break;
+
         case 'element':
           $node->parentNode->removeChild($node);
           break;

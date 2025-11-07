@@ -6,69 +6,87 @@
  */
 
 use Drupal\Component\Utility\Html;
-use Drupal\Core\Field\FieldTypeCategoryManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Template\Attribute;
-use Drupal\custom_field\Plugin\Field\FieldType\CustomFieldItemListInterface;
+use Drupal\custom_field\Hook\FormHooks;
+use Drupal\custom_field\Hook\GeneralHooks;
+use Drupal\custom_field\Hook\ThemeHooks;
+use Drupal\custom_field\Hook\TokenHooks;
+use Drupal\custom_field\Hook\ViewsHooks;
 use Drupal\custom_field\TagManagerInterface;
+use Drupal\field\FieldStorageConfigInterface;
 
 /**
  * Implements hook_help().
  */
-function custom_field_help(string $route_name, RouteMatchInterface $route_match): string {
-  switch ($route_name) {
-    case 'help.page.custom_field':
-      $output = '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('Create simple, but flexible, multivalue fields without the hassle of entity references.') . '</p>';
-      return $output;
-
-    default:
-  }
-
-  return '';
+// @phpstan-ignore-next-line
+#[LegacyHook]
+// phpcs:ignore Squiz.WhiteSpace.FunctionSpacing.Before
+function custom_field_help(string $route_name, RouteMatchInterface $route_match) {
+  return \Drupal::service(GeneralHooks::class)->help($route_name, $route_match);
 }
 
 /**
  * Implements hook_theme().
  */
+// @phpstan-ignore-next-line
+#[LegacyHook]
+// phpcs:ignore Squiz.WhiteSpace.FunctionSpacing.Before
 function custom_field_theme(): array {
-  $item = ['render element' => 'elements'];
-  return [
-    'custom_field' => $item,
-    'custom_field_item' => $item,
-    'custom_field_hierarchical_formatter' => [
-      'variables' => [
-        'terms' => [],
-        'wrapper' => '',
-        'separator' => ' » ',
-        'link' => FALSE,
-      ],
-      'file' => 'custom_field_hierarchical_formatter.theme.inc',
-    ],
-  ];
+  return \Drupal::service(ThemeHooks::class)->theme();
 }
 
 /**
  * Implements hook_theme_suggestions_HOOK().
  */
+// @phpstan-ignore-next-line
+#[LegacyHook]
+// phpcs:ignore Squiz.WhiteSpace.FunctionSpacing.Before
 function custom_field_theme_suggestions_custom_field(array $variables): array {
-  return [
-    'custom_field__' . $variables['elements']['#field_name'],
-  ];
+  return \Drupal::service(ThemeHooks::class)->themeSuggestionsCustomField($variables);
 }
 
 /**
  * Implements hook_theme_suggestions_HOOK().
  */
+// @phpstan-ignore-next-line
+#[LegacyHook]
+// phpcs:ignore Squiz.WhiteSpace.FunctionSpacing.Before
 function custom_field_theme_suggestions_custom_field_item(array $variables): array {
-  $hook = 'custom_field_item';
-  return [
-    $hook . '__' . $variables['elements']['#field_name'],
-    $hook . '__' . $variables['elements']['#field_name'] . '__' . $variables['elements']['#type'],
-    $hook . '__' . $variables['elements']['#field_name'] . '__' . $variables['elements']['#type'] . '__' . $variables['elements']['#name'],
-    $hook . '__' . $variables['elements']['#field_name'] . '__' . $variables['elements']['#name'],
-  ];
+  return \Drupal::service(ThemeHooks::class)->themeSuggestionsCustomFieldItem($variables);
+}
+
+/**
+ * Implements hook_token_info().
+ */
+// @phpstan-ignore-next-line
+#[LegacyHook]
+// phpcs:ignore Squiz.WhiteSpace.FunctionSpacing.Before
+function custom_field_token_info(): array {
+  return \Drupal::service(TokenHooks::class)->tokenInfo();
+}
+
+/**
+ * Implements hook_tokens().
+ */
+// @phpstan-ignore-next-line
+#[LegacyHook]
+// phpcs:ignore Squiz.WhiteSpace.FunctionSpacing.Before
+function custom_field_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata): array {
+  return \Drupal::service(TokenHooks::class)->tokens($type, $tokens, $data, $options, $bubbleable_metadata);
+}
+
+/**
+ * Implements hook_field_views_data().
+ */
+// @phpstan-ignore-next-line
+#[LegacyHook]
+// phpcs:ignore Squiz.WhiteSpace.FunctionSpacing.Before
+function custom_field_field_views_data(FieldStorageConfigInterface $field_storage): array {
+  return \Drupal::service(ViewsHooks::class)->fieldViewsData($field_storage);
 }
 
 /**
@@ -135,33 +153,43 @@ function template_preprocess_custom_field_item(array &$variables): void {
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
  */
+// @phpstan-ignore-next-line
+#[LegacyHook]
+// phpcs:ignore Squiz.WhiteSpace.FunctionSpacing.Before
 function custom_field_form_field_config_edit_form_alter(array &$form, FormStateInterface $form_state, string $form_id): void {
-  if (($field_config = $form_state->get('field_config')) && $field_config->get('field_type') == 'custom') {
-    array_unshift(
-      $form['actions']['submit']['#submit'],
-      'Drupal\custom_field\Plugin\Field\FieldType\CustomItem::submitStorageConfigEditForm'
-    );
-  }
+  \Drupal::service(FormHooks::class)->formFieldConfigEditFormAlter($form, $form_state, $form_id);
 }
 
 /**
  * Implements hook_field_type_category_info_alter().
  */
+// @phpstan-ignore-next-line
+#[LegacyHook]
+// phpcs:ignore Squiz.WhiteSpace.FunctionSpacing.Before
 function custom_field_field_type_category_info_alter(array &$definitions): void {
-  // The `custom` field type belongs in the `general` category, so the libraries
-  // need to be attached using an alter hook.
-  $definitions[FieldTypeCategoryManagerInterface::FALLBACK_CATEGORY]['libraries'][] = 'custom_field/drupal.custom-icon';
+  \Drupal::service(GeneralHooks::class)->fieldTypeCategoryInfoAlter($definitions);
 }
 
 /**
  * Implements hook_field_widget_complete_form_alter().
  */
+// @phpstan-ignore-next-line
+#[LegacyHook]
+// phpcs:ignore Squiz.WhiteSpace.FunctionSpacing.Before
 function custom_field_field_widget_complete_form_alter(array &$element, FormStateInterface $form_state, array $context): void {
-  $items = $context['items'];
-  if ($items instanceof CustomFieldItemListInterface) {
-    $add_more_label = $items->getItemDefinition()->getSetting('add_more_label') ?? '';
-    if (isset($element['widget']['add_more']) && !empty(trim($add_more_label))) {
-      $element['widget']['add_more']['#value'] = $add_more_label;
-    }
-  }
+  \Drupal::service(FormHooks::class)->fieldWidgetCompleteFormAlter($element, $form_state, $context);
+}
+
+/**
+ * Implements hook_sam_allowed_widget_types_alter().
+ *
+ * Allows custom fields to work with the Simple Add More module.
+ *
+ * @see https://www.drupal.org/project/sam
+ */
+// @phpstan-ignore-next-line
+#[LegacyHook]
+// phpcs:ignore Squiz.WhiteSpace.FunctionSpacing.Before
+function custom_field_sam_allowed_widget_types_alter(array &$widget_types): void {
+  \Drupal::service(GeneralHooks::class)->samAllowedWidgetTypesAlter($widget_types);
 }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_plus\Unit\process;
 
@@ -24,12 +24,12 @@ final class StrReplaceTest extends MigrateProcessTestCase {
     $configuration['search'] = 'et';
     $configuration['replace'] = 'that';
     $plugin = new StrReplace($configuration, 'str_replace', []);
-    $actual = $plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+    $actual = $plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertSame('vero eos that accusam that justo vero', $actual);
 
   }
 
-   /**
+  /**
    * Test for a simple str_replace given NULL.
    */
   public function testStrReplaceNull(): void {
@@ -38,12 +38,12 @@ final class StrReplaceTest extends MigrateProcessTestCase {
     $configuration['search'] = '';
     $configuration['replace'] = 'that';
     $plugin = new StrReplace($configuration, 'str_replace', []);
-    $actual = $plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+    $actual = $plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertSame('', $actual);
 
   }
 
-   /**
+  /**
    * Test for a simple str_replace given int 1.
    */
   public function testStrReplaceInt(): void {
@@ -52,13 +52,12 @@ final class StrReplaceTest extends MigrateProcessTestCase {
     $configuration['search'] = '1';
     $configuration['replace'] = 'that';
     $plugin = new StrReplace($configuration, 'str_replace', []);
-    $actual = $plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+    $actual = $plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertSame('that', $actual);
 
   }
 
-
-   /**
+  /**
    * Test for a simple str_replace given TRUE.
    */
   public function testStrReplaceTrue(): void {
@@ -67,13 +66,12 @@ final class StrReplaceTest extends MigrateProcessTestCase {
     $configuration['search'] = '1';
     $configuration['replace'] = 'that';
     $plugin = new StrReplace($configuration, 'str_replace', []);
-    $actual = $plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+    $actual = $plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertSame('that', $actual);
 
   }
 
-
-   /**
+  /**
    * Test for a simple str_replace given FALSE.
    */
   public function testStrReplaceFalse(): void {
@@ -82,7 +80,7 @@ final class StrReplaceTest extends MigrateProcessTestCase {
     $configuration['search'] = '';
     $configuration['replace'] = 'that';
     $plugin = new StrReplace($configuration, 'str_replace', []);
-    $actual = $plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+    $actual = $plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertSame('', $actual);
 
   }
@@ -97,7 +95,7 @@ final class StrReplaceTest extends MigrateProcessTestCase {
     $configuration['replace'] = 'that';
     $configuration['case_insensitive'] = TRUE;
     $plugin = new StrReplace($configuration, 'str_replace', []);
-    $actual = $plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+    $actual = $plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertSame('that eos et accusam et justo that', $actual);
 
   }
@@ -112,7 +110,7 @@ final class StrReplaceTest extends MigrateProcessTestCase {
     $configuration['replace'] = 'the';
     $configuration['regex'] = TRUE;
     $plugin = new StrReplace($configuration, 'str_replace', []);
-    $actual = $plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+    $actual = $plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertSame('vero eos et the accusam et justo the duo', $actual);
   }
 
@@ -155,7 +153,7 @@ final class StrReplaceTest extends MigrateProcessTestCase {
     $configuration['search'] = 'et';
     $configuration['replace'] = 'that';
     $plugin = new StrReplace($configuration, 'str_replace', []);
-    $actual = $plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+    $actual = $plugin->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertSame($expected, $actual);
 
     $this->assertTrue($plugin->multiple());

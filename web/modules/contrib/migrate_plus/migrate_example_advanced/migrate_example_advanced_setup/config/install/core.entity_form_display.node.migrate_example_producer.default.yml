@@ -3,7 +3,7 @@ status: true
 dependencies:
   config:
     - field.field.node.migrate_example_producer.body
-    - field.field.node.migrate_example_producer.field_migrate_example_wine_regio
+    - field.field.node.migrate_example_producer.migrate_example_wine_region
     - node.type.migrate_example_producer
   module:
     - path
@@ -26,7 +26,7 @@ content:
     weight: 10
     settings: {  }
     third_party_settings: {  }
-  field_migrate_example_wine_regio:
+  migrate_example_wine_region:
     weight: 32
     settings:
       match_operator: CONTAINS

@@ -37,7 +37,7 @@ Use one of the options below, for locally served script files.
 ### Option 1 - Download required libraries (optional installation)
 
 1. Download the required libraries.
-   - https://github.com/yairEO/tagify/releases/tag/v4.32.2
+   - https://github.com/yairEO/tagify/releases/tag/v4.35.4
 1. Extract the libraries into their corresponding folders.
    - libraries/tagify
 1. Enable the Tagify module.
@@ -52,10 +52,10 @@ Use one of the options below, for locally served script files.
           "type": "package",
           "package": {
             "name": "yaireo/tagify",
-            "version": "4.32.2",
+            "version": "4.35.4",
             "type": "drupal-library",
             "dist": {
-              "url": "https://github.com/yaireo/tagify/archive/refs/tags/v4.32.2.zip",
+              "url": "https://github.com/yaireo/tagify/archive/refs/tags/v4.35.4.zip",
               "type": "zip"
             }
           }
@@ -78,7 +78,7 @@ Use one of the options below, for locally served script files.
 
 ## Code Quality (JS)
 
-You have the capability to execute ESLint and Prettier on this module. Simply 
+You have the capability to execute ESLint and Prettier on this module. Simply
 follow these steps:
 
 - Install the needed packages

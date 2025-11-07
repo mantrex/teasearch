@@ -29,7 +29,7 @@ source:
     -
       name: machine_name
       label: 'Unique position identifier'
-      selector: sourceid
+      selector: sourceId
     -
       name: friendly_name
       label: 'Position name'

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus\Plugin\migrate\process;
 
@@ -79,6 +79,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     operator: STARTS_WITH
  * @endcode
  *
+ * While many entity types can work with minimal settings, some have specific
+ * requirements in order for them to work correctly.
+ *
+ * entity_type: taxonomy_term
+ * - In order to match the vocabulary both the "bundle" and "bundle_key" values
+ *   must be defined, per the example above; if the "bundle_key" value is not
+ *   defined it will ignore the vocabulary/bundle and just pick the first term
+ *   that matches based on the name.
+ *
  * @codingStandardsIgnoreEnd
  *
  * @see \Drupal\Core\Entity\Query\QueryInterface::condition()
@@ -90,23 +99,70 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class EntityLookup extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
+  /**
+   * The entity type manager.
+   */
   protected ?EntityTypeManagerInterface $entityTypeManager;
+
+  /**
+   * The field manager.
+   */
   protected EntityFieldManagerInterface $entityFieldManager;
+
+  /**
+   * The migration.
+   */
   protected MigrationInterface $migration;
+
+  /**
+   * The selection plugin manager.
+   */
   protected SelectionPluginManagerInterface $selectionPluginManager;
+
+  /**
+   * The destination entity type.
+   */
   protected ?string $destinationEntityType;
+
+  /**
+   * The destination bundle key.
+   */
   protected ?string $destinationBundleKey = NULL;
+
+  /**
+   * The lookup value.
+   */
   protected ?string $lookupValueKey = NULL;
+
+  /**
+   * The bundle key.
+   */
   protected ?string $lookupBundleKey = NULL;
-  protected $lookupBundle = NULL;
+
+  /**
+   * The lookup bundle.
+   */
+  protected string|array $lookupBundle = [];
+
+  /**
+   * The lookup entity type.
+   */
   protected ?string $lookupEntityType = NULL;
+
+  /**
+   * The destination property.
+   */
   protected ?string $destinationProperty;
+
+  /**
+   * Is access check required.
+   */
   protected bool $accessCheck = TRUE;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition, ?MigrationInterface $migration = NULL) {
     $instance = new static(
       $configuration,
       $pluginId,
@@ -201,7 +257,9 @@ class EntityLookup extends ProcessPluginBase implements ContainerFactoryPluginIn
             break;
 
           default:
-            throw new MigrateException(sprintf('Destination field type %s is not a recognized reference type.', $fieldConfig->getType()));
+            if (empty($this->lookupValueKey) || empty($this->lookupEntityType)) {
+              throw new MigrateException(sprintf('Destination field type %s is not a recognized reference type.', $fieldConfig->getType()));
+            }
         }
       }
     }
@@ -232,6 +290,9 @@ class EntityLookup extends ProcessPluginBase implements ContainerFactoryPluginIn
     return $this->processResults($query->execute(), $value);
   }
 
+  /**
+   * Actually get the query.
+   */
   private function doGetQuery($value): QueryInterface {
     $operator = !empty($this->configuration['operator']) ? $this->configuration['operator'] : '=';
     $multiple = is_array($value);
@@ -257,6 +318,9 @@ class EntityLookup extends ProcessPluginBase implements ContainerFactoryPluginIn
     return $query;
   }
 
+  /**
+   * Process results.
+   */
   private function processResults($results, $original_value) {
     if (empty($results)) {
       return NULL;
@@ -296,7 +360,15 @@ class EntityLookup extends ProcessPluginBase implements ContainerFactoryPluginIn
       });
     }
 
-    return $multiple ? array_values($results) : reset($results);
+    if ($multiple) {
+      return array_values($results);
+    }
+
+    if (empty($results)) {
+      return NULL;
+    }
+
+    return reset($results);
   }
 
 }

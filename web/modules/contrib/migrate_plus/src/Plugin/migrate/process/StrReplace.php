@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus\Plugin\migrate\process;
 
@@ -125,8 +125,8 @@ class StrReplace extends ProcessPluginBase {
     if ($this->configuration['regex']) {
       $function = 'preg_replace';
     }
-    if($this->multiple) {
-      foreach($value as $key => $item) {
+    if ($this->multiple) {
+      foreach ($value as $key => $item) {
         $item = (string) $item;
         $value[$key] = $function($this->configuration['search'], $this->configuration['replace'], $item);
       }

@@ -158,6 +158,7 @@ class UrlWidgetBase extends CustomFieldWidgetBase {
       //   in https://www.drupal.org/node/2423093.
       $element['uri']['#target_type'] = 'node';
       // Disable autocompletion when the first character is '/', '#' or '?'.
+      // cspell:ignore blacklist
       $element['uri']['#attributes']['data-autocomplete-first-character-blacklist'] = '/#?';
 
       // The link widget is doing its own processing in

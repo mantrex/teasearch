@@ -23,7 +23,13 @@ class StringTarget extends BaseTarget {
   public function prepareValue(mixed $value, array $configuration, string $langcode): ?string {
     $value = parent::prepareValue($value, $configuration, $langcode);
 
-    return !empty($value) ? $value : NULL;
+    // Check if the value is a string, trim it, and return NULL if empty.
+    if (is_string($value)) {
+      $value = trim($value);
+      return $value !== '' ? $value : NULL;
+    }
+
+    return $value;
   }
 
 }

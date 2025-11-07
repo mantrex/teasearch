@@ -1,5 +1,5 @@
 import { View, LabeledFieldView, ListView, ListItemView, createLabeledInputText, ButtonView, submitHandler} from 'ckeditor5/src/ui';
-import {icons} from 'ckeditor5/src/core';
+import { IconCheck, IconCancel } from '@ckeditor/ckeditor5-icons';
 
 /**
  * A class rendering the information required from user input.
@@ -62,11 +62,11 @@ export default class AddressSuggestionIconView extends View {
     });
     // Create the save and cancel buttons.
     this.saveButtonView = this._createButton(
-      editor.t('Save'), icons.check, 'ck-button-save'
+      editor.t('Save'), IconCheck, 'ck-button-save'
     );
     this.saveButtonView.type = 'submit';
     this.cancelButtonView = this._createButton(
-      editor.t('Cancel'), icons.cancel, 'ck-button-cancel'
+      editor.t('Cancel'), IconCancel, 'ck-button-cancel'
     );
     // Delegate ButtonView#execute to FormView#cancel.
     this.cancelButtonView.delegate('execute').to(this, 'cancel');
@@ -118,8 +118,8 @@ export default class AddressSuggestionIconView extends View {
     const button = new ButtonView();
 
     button.set({
-      label,
-      icon,
+      label: label,
+      icon: icon,
       tooltip: true,
       class: className,
     });

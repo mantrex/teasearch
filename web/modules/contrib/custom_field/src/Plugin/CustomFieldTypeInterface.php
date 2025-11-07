@@ -26,31 +26,6 @@ interface CustomFieldTypeInterface extends PluginInspectionInterface {
   const LINK_GENERIC = 0x11;
 
   /**
-   * Value for the 'datetime_type' setting: store only a date.
-   */
-  const DATETIME_TYPE_DATE = 'date';
-
-  /**
-   * Value for the 'datetime_type' setting: store a date and time.
-   */
-  const DATETIME_TYPE_DATETIME = 'datetime';
-
-  /**
-   * Defines the timezone that dates should be stored in.
-   */
-  const STORAGE_TIMEZONE = 'UTC';
-
-  /**
-   * Defines the format that date and time should be stored in.
-   */
-  const DATETIME_STORAGE_FORMAT = 'Y-m-d\TH:i:s';
-
-  /**
-   * Defines the format that dates should be stored in.
-   */
-  const DATE_STORAGE_FORMAT = 'Y-m-d';
-
-  /**
    * Defines the widget settings for this plugin.
    *
    * @return array<string, mixed>
@@ -310,5 +285,19 @@ interface CustomFieldTypeInterface extends PluginInspectionInterface {
    *   TRUE if the formatter can be used, FALSE otherwise.
    */
   public static function isApplicable(): bool;
+
+  /**
+   * React to changes to a child property or item.
+   *
+   * @param string $property_name
+   *   The name of the property.
+   * @param bool $notify
+   *   (optional) Whether to forward the notification to the parent. Defaults to
+   *   TRUE. By passing FALSE, overrides of this method can re-use the logic
+   *   of parent classes without triggering notification.
+   * @param \Drupal\Core\Field\FieldItemInterface $item
+   *   The field item.
+   */
+  public function onChange(string $property_name, bool $notify, FieldItemInterface $item): void;
 
 }

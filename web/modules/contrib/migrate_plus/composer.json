@@ -31,7 +31,10 @@
         "preferred-install": "dist"
     },
     "require": {
-        "php": ">=7.4",
-        "drupal/core": ">=9.1"
+        "php": ">=8.2",
+        "drupal/core": "^10.3 || ^11"
+    },
+    "require-dev": {
+        "sainsburys/guzzle-oauth2-plugin": "^3"
     }
 }

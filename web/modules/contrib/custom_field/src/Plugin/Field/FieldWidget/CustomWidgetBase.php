@@ -121,19 +121,16 @@ abstract class CustomWidgetBase extends WidgetBase {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state): array {
     $element['#attached']['library'][] = 'custom_field/custom-field-widget';
+    $element['#attributes']['class'][] = 'custom-field-widget-wrapper';
+    $element['#type'] = 'container';
     if ($this->getSetting('label')) {
-      switch ($this->getSetting('wrapper')) {
-        case 'fieldset':
-          $element['#type'] = 'fieldset';
-          break;
-
-        case 'details':
-          $element['#type'] = 'details';
-          $element['#open'] = $this->getSetting('open');
-          break;
-
-        default:
-          $element['#type'] = 'item';
+      $wrapper = $this->getSetting('wrapper');
+      if ($wrapper === 'fieldset') {
+        $element['#type'] = 'fieldset';
+      }
+      elseif ($wrapper === 'details') {
+        $element['#type'] = 'details';
+        $element['#open'] = $this->getSetting('open');
       }
     }
 

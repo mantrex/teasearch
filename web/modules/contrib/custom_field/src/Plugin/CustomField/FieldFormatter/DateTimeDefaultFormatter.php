@@ -33,9 +33,14 @@ class DateTimeDefaultFormatter extends DateTimeFormatterBase {
   /**
    * {@inheritdoc}
    */
-  protected function formatDate($date): string {
+  protected function formatDate($date, ?string $timezone): string {
     $format_type = $this->getSetting('format_type');
-    $timezone = $this->getSetting('timezone_override') ?: $date->getTimezone()->getName();
+    if ($this->getSetting('timezone_override')) {
+      $timezone = $this->getSetting('timezone_override');
+    }
+    if (empty($timezone)) {
+      $timezone = $date->getTimezone()->getName();
+    }
     return $this->dateFormatter->format($date->getTimestamp(), $format_type, '', $timezone != '' ? $timezone : NULL);
   }
 

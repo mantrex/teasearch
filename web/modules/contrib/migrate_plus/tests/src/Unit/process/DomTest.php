@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_plus\Unit\process;
 
@@ -26,7 +26,7 @@ final class DomTest extends MigrateProcessTestCase {
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('The "method" must be set.');
     (new Dom($configuration, 'dom', []))
-      ->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+      ->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
   }
 
   /**
@@ -39,7 +39,7 @@ final class DomTest extends MigrateProcessTestCase {
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('The "method" must be "import" or "export".');
     (new Dom($configuration, 'dom', []))
-      ->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+      ->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
   }
 
   /**
@@ -61,7 +61,7 @@ final class DomTest extends MigrateProcessTestCase {
     $configuration['method'] = 'import';
     $value = '<p>A simple paragraph.</p>';
     $document = (new Dom($configuration, 'dom', []))
-      ->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+      ->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertTrue($document instanceof \DOMDocument);
   }
 
@@ -73,7 +73,7 @@ final class DomTest extends MigrateProcessTestCase {
     $configuration['import_method'] = 'html5';
     $value = '<p>A simple paragraph.</p>';
     $document = (new Dom($configuration, 'dom', []))
-      ->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+      ->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertTrue($document instanceof \DOMDocument);
   }
 
@@ -85,7 +85,7 @@ final class DomTest extends MigrateProcessTestCase {
     $configuration['import_method'] = 'xml';
     $value = '<item><value>A simple paragraph.</value></item>';
     $document = (new Dom($configuration, 'dom', []))
-      ->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+      ->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertTrue($document instanceof \DOMDocument);
   }
 
@@ -99,7 +99,7 @@ final class DomTest extends MigrateProcessTestCase {
     $this->expectException(MigrateException::class);
     $this->expectExceptionMessage('Cannot import a non-string value.');
     (new Dom($configuration, 'dom', []))
-      ->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+      ->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
   }
 
   /**
@@ -111,7 +111,7 @@ final class DomTest extends MigrateProcessTestCase {
     $partial = '<p>A simple paragraph.</p>';
     $document = Html::load($partial);
     $value = (new Dom($configuration, 'dom', []))
-      ->transform($document, $this->migrateExecutable, $this->row, 'destinationproperty');
+      ->transform($document, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertEquals($value, $partial);
   }
 
@@ -124,7 +124,7 @@ final class DomTest extends MigrateProcessTestCase {
     $this->expectException(MigrateException::class);
     $this->expectExceptionMessage('Cannot export a "string".');
     (new Dom($configuration, 'dom', []))
-      ->transform('string is not DOMDocument', $this->migrateExecutable, $this->row, 'destinationproperty');
+      ->transform('string is not DOMDocument', $this->migrateExecutable, $this->row, 'destinationProperty');
   }
 
 }

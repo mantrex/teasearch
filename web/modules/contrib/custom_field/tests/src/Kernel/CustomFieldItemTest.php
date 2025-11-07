@@ -5,8 +5,8 @@ namespace Drupal\Tests\custom_field\Kernel;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\custom_field\Plugin\CustomField\FieldType\DateTimeTypeInterface;
 use Drupal\Tests\field\Kernel\FieldKernelTestBase;
-use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 
@@ -472,7 +472,7 @@ class CustomFieldItemTest extends FieldKernelTestBase {
     $this->assertEquals($map_string, $entity->{$this->fieldName}[0]->map_string_test);
     $this->assertEquals($datetime, $entity->{$this->fieldName}->datetime_test);
     $this->assertEquals($datetime, $entity->{$this->fieldName}[0]->datetime_test);
-    $this->assertEquals(CustomFieldTypeInterface::STORAGE_TIMEZONE, $entity->{$this->fieldName}[0]->getProperties()['datetime_test']->getDateTime()->getTimeZone()->getName());
+    $this->assertEquals(DateTimeTypeInterface::STORAGE_TIMEZONE, $entity->{$this->fieldName}[0]->getProperties()['datetime_test']->getDateTime()->getTimeZone()->getName());
     $this->assertEquals($time, $entity->{$this->fieldName}->time_test);
     $this->assertEquals($time, $entity->{$this->fieldName}[0]->time_test);
     $this->assertEquals($uri_external, $entity->{$this->fieldName}->link_test);
@@ -535,7 +535,7 @@ class CustomFieldItemTest extends FieldKernelTestBase {
     $this->assertEquals($new_map_string, $entity->{$this->fieldName}[0]->map_string_test);
     $entity->{$this->fieldName}->datetime_test = $new_datetime;
     $this->assertEquals($new_datetime, $entity->{$this->fieldName}[0]->datetime_test);
-    $this->assertEquals(CustomFieldTypeInterface::STORAGE_TIMEZONE, $entity->{$this->fieldName}[0]->getProperties()['datetime_test']->getDateTime()->getTimeZone()->getName());
+    $this->assertEquals(DateTimeTypeInterface::STORAGE_TIMEZONE, $entity->{$this->fieldName}[0]->getProperties()['datetime_test']->getDateTime()->getTimeZone()->getName());
     $entity->{$this->fieldName}->time_test = $new_time;
     $this->assertEquals($new_time, $entity->{$this->fieldName}[0]->time_test);
     $entity->{$this->fieldName}->link_test = $new_uri_external;
@@ -559,7 +559,7 @@ class CustomFieldItemTest extends FieldKernelTestBase {
     $this->assertEquals($new_map, $entity->{$this->fieldName}[0]->map_test);
     $this->assertEquals($new_map_string, $entity->{$this->fieldName}[0]->map_string_test);
     $this->assertEquals($new_datetime, $entity->{$this->fieldName}[0]->datetime_test);
-    $this->assertEquals(CustomFieldTypeInterface::STORAGE_TIMEZONE, $entity->{$this->fieldName}[0]->getProperties()['datetime_test']->getDateTime()->getTimeZone()->getName());
+    $this->assertEquals(DateTimeTypeInterface::STORAGE_TIMEZONE, $entity->{$this->fieldName}[0]->getProperties()['datetime_test']->getDateTime()->getTimeZone()->getName());
     $this->assertEquals($new_time, $entity->{$this->fieldName}[0]->time_test);
     $this->assertEquals($new_uri_external, $entity->{$this->fieldName}[0]->link_test);
     $this->assertEquals($new_link_title, $entity->{$this->fieldName}[0]->{$link_title_field});
@@ -600,7 +600,7 @@ class CustomFieldItemTest extends FieldKernelTestBase {
     $this->assertInstanceOf(FieldItemInterface::class, $entity->{$this->fieldName}[0]);
     $this->assertEquals($date, $entity->{$this->fieldName}->datetime_test);
     $this->assertEquals($date, $entity->{$this->fieldName}[0]->datetime_test);
-    $this->assertEquals(CustomFieldTypeInterface::STORAGE_TIMEZONE, $entity->{$this->fieldName}[0]->getProperties()['datetime_test']->getDateTime()->getTimeZone()->getName());
+    $this->assertEquals(DateTimeTypeInterface::STORAGE_TIMEZONE, $entity->{$this->fieldName}[0]->getProperties()['datetime_test']->getDateTime()->getTimeZone()->getName());
     /** @var \Drupal\Core\Datetime\DrupalDateTime $date_object */
     $date_object = $entity->{$this->fieldName}[0]->getProperties()['datetime_test']->getDateTime();
     $this->assertEquals('00:00:00', $date_object->format('H:i:s'));

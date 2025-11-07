@@ -1,11 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus\Plugin\migrate\source;
 
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate_plus\DataParserPluginInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
+use Drupal\migrate_plus\DataParserPluginManager;
 
 /**
  * Source plugin for retrieving data via URLs.
@@ -14,7 +16,7 @@ use Drupal\migrate\Plugin\MigrationInterface;
  *   id = "url"
  * )
  */
-class Url extends SourcePluginExtension {
+class Url extends SourcePluginExtension implements ContainerFactoryPluginInterface {
 
   /**
    * The source URLs to retrieve.
@@ -33,13 +35,32 @@ class Url extends SourcePluginExtension {
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    MigrationInterface $migration,
+    protected DataParserPluginManager $parserPluginManager,
+  ) {
     if (!is_array($configuration['urls'])) {
       $configuration['urls'] = [$configuration['urls']];
     }
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
 
     $this->sourceUrls = $configuration['urls'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create($container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $migration,
+      $container->get('plugin.manager.migrate_plus.data_parser'),
+    );
   }
 
   /**
@@ -61,7 +82,7 @@ class Url extends SourcePluginExtension {
    */
   public function getDataParserPlugin(): DataParserPluginInterface {
     if (!isset($this->dataParserPlugin)) {
-      $this->dataParserPlugin = \Drupal::service('plugin.manager.migrate_plus.data_parser')->createInstance($this->configuration['data_parser_plugin'], $this->configuration);
+      $this->dataParserPlugin = $this->parserPluginManager->createInstance($this->configuration['data_parser_plugin'], $this->configuration);
     }
     return $this->dataParserPlugin;
   }

@@ -92,8 +92,9 @@ class ChoicesMixedFunctionalJsTest extends WebDriverTestBase {
     // Set the global setting:
     $this->config('choices.settings')->set('configuration_options', '{
       "classNames": {
-        "containerOuter": "choices global-choices"
-      }
+        "containerOuter": ["choices", "global-choices"]
+      },
+      "removeItemButton": false
 }')->save();
     // Set the widget setting:
     $this->drupalGet('/admin/structure/types/manage/article/form-display');
@@ -101,8 +102,9 @@ class ChoicesMixedFunctionalJsTest extends WebDriverTestBase {
     $session->waitForElementVisible('css', 'textarea[id*=edit-fields-test-global-select-settings-edit-form-settings-configuration-options]');
     $page->fillField('fields[test_global_select][settings_edit_form][settings][configuration_options]', '{
       "classNames": {
-        "containerOuter": "choices widget-choices"
-      }
+        "containerOuter": ["choices", "widget-choices"]
+      },
+      "removeItemButton": true
 }');
     $page->pressButton('Update');
     // Save the config and see, if it fails to apply:
@@ -113,8 +115,9 @@ class ChoicesMixedFunctionalJsTest extends WebDriverTestBase {
     $session->elementExists('css', 'link[href*="choices.min.css"]');
     // Check if the widget options applied:
     $session->elementExists('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices.widget-choices');
-    // Check if the global setting is not applied anymore:
-    $session->elementNotExists('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices.global-choices');
+    $session->elementExists('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices.widget-choices > div.choices__inner  > div.choices__list  > div.choices__item  > button.choices__button');
+    // Check if the global setting is still applied after being deeply merged:
+    $session->elementExists('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices.global-choices');
     // Check that some choices default settings are also still present:
     $session->elementExists('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices.widget-choices > div.choices__inner > input.choices__input');
   }
@@ -129,8 +132,8 @@ class ChoicesMixedFunctionalJsTest extends WebDriverTestBase {
     // Set the global setting:
     $this->config('choices.settings')->set('configuration_options', '{
       "classNames": {
-        "containerOuter": "choices global-choices",
-        "containerInner": "choices__inner global-inner"
+        "containerOuter": ["choices", "global-choices"],
+        "containerInner": ["choices__inner", "global-inner"]
       }
 }')->save();
     // Set the widget setting:
@@ -139,7 +142,7 @@ class ChoicesMixedFunctionalJsTest extends WebDriverTestBase {
     $session->waitForElementVisible('css', 'textarea[id*=edit-fields-test-global-select-settings-edit-form-settings-configuration-options]');
     $page->fillField('fields[test_global_select][settings_edit_form][settings][configuration_options]', '{
       "classNames": {
-        "containerOuter": "choices widget-choices"
+        "containerOuter": ["choices", "widget-choices"]
       }
 }');
     $page->pressButton('Update');
@@ -153,8 +156,8 @@ class ChoicesMixedFunctionalJsTest extends WebDriverTestBase {
     $session->elementExists('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices.widget-choices');
     $session->elementExists('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices.widget-choices > div.choices__inner.global-inner > input.choices__input');
 
-    // Check if the global setting is not applied anymore:
-    $session->elementNotExists('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices.global-choices');
+    // Check if the global setting is still applied after being deeply merged:
+    $session->elementExists('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices.global-choices');
     // Check that some choices default settings are also still present:
     $session->elementExists('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices.widget-choices > div.choices__inner.global-inner > input.choices__input');
   }
@@ -169,7 +172,7 @@ class ChoicesMixedFunctionalJsTest extends WebDriverTestBase {
     // Set the global setting:
     $this->config('choices.settings')->set('configuration_options', '{
       "classNames": {
-        "containerOuter": "choices global-choices"
+        "containerOuter": ["choices", "global-choices"]
       }
 }')->save();
     // Set the widget setting:
@@ -178,8 +181,8 @@ class ChoicesMixedFunctionalJsTest extends WebDriverTestBase {
     $session->waitForElementVisible('css', 'textarea[id*=edit-fields-test-global-select-settings-edit-form-settings-configuration-options]');
     $page->fillField('fields[test_global_select][settings_edit_form][settings][configuration_options]', '{
       "classNames": {
-        "containerOuter": "choices widget-choices",
-        "containerInner": "choices__inner widget-inner"
+        "containerOuter": ["choices", "widget-choices"],
+        "containerInner": ["choices__inner", "widget-inner"]
       }
 }');
     $page->pressButton('Update');
@@ -193,8 +196,8 @@ class ChoicesMixedFunctionalJsTest extends WebDriverTestBase {
     $session->elementExists('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices.widget-choices');
     $session->elementExists('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices.widget-choices > div.choices__inner.widget-inner > input.choices__input');
 
-    // Check if the global setting is not applied anymore:
-    $session->elementNotExists('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices.global-choices');
+    // Check if the global setting is still applied after being deeply merged:
+    $session->elementExists('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices.global-choices');
     // Check that some choices default settings are also still present:
     $session->elementExists('css', 'div#edit-test-global-select-wrapper > div.form-item > div.choices.widget-choices > div.choices__inner.widget-inner > input.choices__input');
   }

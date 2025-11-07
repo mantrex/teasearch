@@ -116,7 +116,7 @@ class CustomFieldUpdateManagerTest extends KernelTestBase {
    */
   protected function setUpFieldAndNode(): NodeInterface {
     $fieldStorageConfig = FieldStorageConfig::loadByName($this->entityTypeId, $this->fieldName);
-    $columns = $this->filterColumns($fieldStorageConfig->getSetting('columns'));
+    $columns = $fieldStorageConfig->getSetting('columns');
     $fieldStorageConfig->setSetting('columns', $columns)->save();
 
     $fieldConfig = FieldConfig::loadByName($this->entityTypeId, $this->bundle, $this->fieldName);
@@ -132,25 +132,6 @@ class CustomFieldUpdateManagerTest extends KernelTestBase {
     $node->save();
 
     return $node;
-  }
-
-  /**
-   * Filters out columns that have extra properties.
-   *
-   * @param array $columns
-   *   The array of columns to filter.
-   *
-   * @return array
-   *   The filtered columns.
-   */
-  protected function filterColumns(array $columns): array {
-    $irrelevantColumns = [
-      'image_test',
-      'viewfield_test',
-      'link_test',
-      'uri_test',
-    ];
-    return array_diff_key($columns, array_flip($irrelevantColumns));
   }
 
   /**
@@ -197,7 +178,6 @@ class CustomFieldUpdateManagerTest extends KernelTestBase {
     $node->save();
     $node = Node::load($id);
     $field_value = $node->get($this->fieldName)->getValue();
-    // If restoreData() is commented out, this should fail. Why is it not?
     $this->assertNotEmpty($field_value, 'The field value is not empty.');
 
     // Call the addColumn method with a non-existent field.
@@ -248,7 +228,6 @@ class CustomFieldUpdateManagerTest extends KernelTestBase {
     $node->save();
     $node = Node::load($id);
     $field_value = $node->get($this->fieldName)->getValue();
-    // If restoreData() is commented out, this should fail. Why is it not?
     $this->assertNotEmpty($field_value, 'The field value is not empty.');
 
     // Reload columns and verify the new count.

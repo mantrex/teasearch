@@ -8,7 +8,6 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldWidget;
-use Drupal\custom_field\Plugin\CustomField\DateTimeWidgetBase;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
@@ -144,13 +143,15 @@ class DateTimeDatelistWidget extends DateTimeWidgetBase {
     }
 
     // Wrap all the select elements with a fieldset.
-    $element['#theme_wrappers'][] = 'fieldset';
-
-    return [
-      '#type' => 'datelist',
-      '#date_increment' => $increment,
+    $element['#theme_wrappers'] = ['container', 'fieldset', 'container'];
+    $element['#attributes']['class'][] = 'custom-field-datetime-grid';
+    $element['value']['#type'] = 'custom_field_datelist';
+    $element['value']['#date_increment'] = $increment;
+    $element['value'] += [
       '#date_part_order' => $date_part_order,
-    ] + $element;
+    ];
+
+    return $element;
   }
 
 }

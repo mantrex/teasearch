@@ -54,7 +54,7 @@ class CustomFieldViewfield extends GraphQLComposeFieldTypeBase implements FieldP
    * {@inheritdoc}
    */
   public function resolveFieldItem(FieldItemInterface $item, FieldContext $context) {
-    $property = $context->getContextValue('property_name');
+    $property = (string) $context->getContextValue('property_name');
     $view_id = $item->{$property};
     $display_id = $item->{$property . '__display'};
 

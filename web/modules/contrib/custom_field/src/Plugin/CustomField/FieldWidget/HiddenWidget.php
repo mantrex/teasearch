@@ -21,6 +21,7 @@ use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
   field_types: [
     'boolean',
     'color',
+    'daterange',
     'datetime',
     'decimal',
     'email',

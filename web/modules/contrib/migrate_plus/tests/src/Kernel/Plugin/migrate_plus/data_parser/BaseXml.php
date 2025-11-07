@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_plus\Kernel\Plugin\migrate_plus\data_parser;
 
@@ -52,7 +52,7 @@ abstract class BaseXml extends KernelTestBase {
     $this->configuration = [
       'plugin' => 'url',
       'data_fetcher_plugin' => 'file',
-      'data_parser_plugin' => 'simple_xml',
+      'data_parser_plugin' => $this->getDataParserPluginId(),
       'destination' => 'node',
       'urls' => [],
       'ids' => ['id' => ['type' => 'integer']],
@@ -109,7 +109,7 @@ abstract class BaseXml extends KernelTestBase {
   public function testReduceSingleValue(): void {
     $url = $this->path . '/tests/data/xml_reduce_single_value.xml';
     $this->configuration['urls'][0] = $url;
-    $this->assertResults($this->expected, $this->getParser());
+    $this->assertEquals($this->expected, $this->parseResults($this->getParser()));
   }
 
   /**
@@ -171,7 +171,7 @@ abstract class BaseXml extends KernelTestBase {
     $parser = $this->getParser();
     $parser->next();
 
-    // Transform SimpleXMLELements to arrays.
+    // Transform SimpleXMLElements to arrays.
     $item = json_decode(json_encode($parser->current()), TRUE);
     $sub_items1 = array_column($item['sub_items1'], 'Id');
     $this->assertEquals(['1', '2'], $sub_items1);
@@ -179,23 +179,87 @@ abstract class BaseXml extends KernelTestBase {
   }
 
   /**
-   * Parses and asserts the results match expectations.
+   * Tests that the item selector can traverse back up the node at the end.
    *
-   * @param array|string $expected
-   *   The expected results.
-   * @param \Traversable $parser
-   *   An iterable data result to parse.
+   * Traversals like these are redundant and highly inefficient, and filtering
+   * should be done before the final predicate is specified.
    */
-  protected function assertResults($expected, \Traversable $parser): void {
+  public function testParentTraversalMatch(): void {
+    $url = $this->path . '/tests/data/xml_items.xml';
+    $this->configuration['urls'][0] = $url;
+    $this->configuration['item_selector'] = '/items/item/values[value="Value 3"]/..';
+    $this->expected = [
+      ['Value 3'],
+    ];
+    $this->assertEquals($this->expected, $this->parseResults($this->getParser()));
+  }
+
+  /**
+   * Tests predicate matching.
+   *
+   * @dataProvider predicateMatchProvider
+   */
+  public function testPredicateMatch(string $item_selector, array $expected_items): void {
+    $url = $this->path . '/tests/data/xml_items.xml';
+    $this->configuration['urls'][0] = $url;
+    $this->configuration['item_selector'] = $item_selector;
+    $this->assertEquals($expected_items, $this->parseResults($this->getParser()));
+  }
+
+  /**
+   * Data provider for testPredicateMatch().
+   *
+   * @return array
+   *   An array containing input values and expected output values.
+   */
+  public static function predicateMatchProvider(): array {
+    return [
+      // Pick up items with the "odd" parity attribute.
+      'odd parity' => [
+        'item_selector' => '/items/item[@parity="odd"]',
+        'expected_items' => [
+          ['Value 1'],
+          ['Value 3'],
+        ],
+      ],
+      // Pick up items with the "even" parity attribute.
+      'even parity' => [
+        'item_selector' => '/items/item[@parity="even"]',
+        'expected_items' => [
+          ['Value 2'],
+        ],
+      ],
+      // Pick up items with the special attribute on the child.
+      'special attribute' => [
+        'item_selector' => '/items/item[condition[@special="true"]]',
+        'expected_items' => [
+          ['Special value'],
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Converts the results into a standardized data format to compare.
+   *
+   * @param \Traversable $results
+   *   An iterable data result to parse.
+   * @param string $property
+   *   The property of the result set.
+   *
+   * @return array
+   *   The results.
+   */
+  protected function parseResults(\Traversable $results, string $property = 'values'): array {
     $data = [];
-    foreach ($parser as $item) {
+    foreach ($results as $item) {
       $values = [];
-      foreach ($item['values'] as $value) {
+      foreach ($item[$property] as $value) {
         $values[] = (string) $value;
       }
       $data[] = $values;
     }
-    $this->assertEquals($expected, $data);
+    return $data;
   }
 
   /**
@@ -204,6 +268,16 @@ abstract class BaseXml extends KernelTestBase {
    * @return \Drupal\migrate_plus\DataParserPluginInterface
    *   Data parser object.
    */
-  abstract protected function getParser(): DataParserPluginInterface;
+  protected function getParser(): DataParserPluginInterface {
+    return $this->pluginManager->createInstance($this->getDataParserPluginId(), $this->configuration);
+  }
+
+  /**
+   * Returns the data parser plugin ID.
+   *
+   * @return string
+   *   The data parser plugin ID.
+   */
+  abstract protected function getDataParserPluginId(): string;
 
 }

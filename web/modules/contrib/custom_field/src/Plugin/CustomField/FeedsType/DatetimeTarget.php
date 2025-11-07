@@ -9,7 +9,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Datetime\TimeZoneFormHelper;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\custom_field\Attribute\CustomFieldFeedsType;
-use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
+use Drupal\custom_field\Plugin\CustomField\FieldType\DateTimeTypeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -84,9 +84,9 @@ class DatetimeTarget extends BaseTarget {
     $date = $this->convertDate((string) $value, $configuration['timezone']);
 
     if (isset($date) && !$date->hasErrors()) {
-      $storage_format = $datetime_type === 'date' ? CustomFieldTypeInterface::DATE_STORAGE_FORMAT : CustomFieldTypeInterface::DATETIME_STORAGE_FORMAT;
+      $storage_format = $datetime_type === 'date' ? DateTimeTypeInterface::DATE_STORAGE_FORMAT : DateTimeTypeInterface::DATETIME_STORAGE_FORMAT;
       return $date->format($storage_format, [
-        'timezone' => CustomFieldTypeInterface::STORAGE_TIMEZONE,
+        'timezone' => DateTimeTypeInterface::STORAGE_TIMEZONE,
       ]);
     }
 

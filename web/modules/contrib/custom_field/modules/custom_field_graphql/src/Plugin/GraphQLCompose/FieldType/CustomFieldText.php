@@ -26,7 +26,7 @@ class CustomFieldText extends GraphQLComposeFieldTypeBase implements FieldProduc
    * {@inheritdoc}
    */
   public function resolveFieldItem(FieldItemInterface $item, FieldContext $context) {
-    $property = $context->getContextValue('property_name');
+    $property = (string) $context->getContextValue('property_name');
     $settings = $context->getContextValue('settings');
     $format = $settings['default_format'] ?? filter_fallback_format();
     $processed = check_markup($item->{$property}, $format);

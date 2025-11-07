@@ -86,6 +86,14 @@ class TagifyWidgetTest extends WebDriverTestBase {
 
     $current_url = $this->getSession()->getCurrentUrl();
     $this->assertStringContainsString('f%5B0%5D=tag%3A1', $current_url);
+
+    // Test without show_numbers.
+    $facet->setWidget('tagify', [
+      'show_numbers' => FALSE,
+    ]);
+    $facet->save();
+    $this->drupalGet('/test-entity-view');
+    // @todo Improve assertions... refactor method??
   }
 
 }

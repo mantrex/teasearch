@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus\Plugin\migrate\process;
 
@@ -50,9 +50,24 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class EntityValue extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
+  /**
+   * The entity type manager.
+   */
   protected EntityTypeManagerInterface $entityTypeManager;
+
+  /**
+   * The field name.
+   */
   protected string $fieldName;
+
+  /**
+   * The language code reference.
+   */
   protected ?string $langCodeRef;
+
+  /**
+   * Entity storage.
+   */
   protected EntityStorageInterface $entityStorage;
 
   /**
@@ -80,7 +95,7 @@ class EntityValue extends ProcessPluginBase implements ContainerFactoryPluginInt
     array $configuration,
     $plugin_id,
     $plugin_definition,
-    EntityTypeManagerInterface $entity_type_manager
+    EntityTypeManagerInterface $entity_type_manager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 

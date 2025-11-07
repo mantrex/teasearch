@@ -12,7 +12,7 @@
   font-size: 1em;
 }
 
-/* Comments -> comment form. */
+/* Comments -> comment form */
 .comment-form-wrap {
   position: relative;
   margin: 2rem 0;
@@ -76,7 +76,9 @@
 }
 .single-comment-content-body .links.inline {
   display: flex;
+  list-style: none;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 .single-comment-content-body .links.inline a {
   padding: 4px 16px;

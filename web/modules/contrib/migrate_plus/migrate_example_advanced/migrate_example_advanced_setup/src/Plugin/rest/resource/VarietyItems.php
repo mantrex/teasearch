@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_example_advanced_setup\Plugin\rest\resource;
 
@@ -32,25 +32,25 @@ final class VarietyItems extends ResourceBase {
     $varieties = [
       'retsina' => [
         'name' => 'Retsina',
-        // The categoryid for 'white'.
+        // The categoryId for 'white'.
         'parent' => 1,
         'details' => 'Greek',
       ],
       'trebbiano' => [
         'name' => 'Trebbiano',
-        // The categoryid for 'white'.
+        // The categoryId for 'white'.
         'parent' => 1,
         'details' => 'Italian',
       ],
       'valpolicella' => [
         'name' => 'Valpolicella',
-        // The categoryid for 'red'.
+        // The categoryId for 'red'.
         'parent' => 3,
         'details' => 'Italian Venoto region',
       ],
       'bardolino' => [
         'name' => 'Bardolino',
-        // The categoryid for 'red'.
+        // The categoryId for 'red'.
         'parent' => 3,
         'details' => 'Italian Venoto region',
       ],

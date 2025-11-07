@@ -655,7 +655,8 @@
          */
         // eslint-disable-next-line func-names
         tagify.on('add', function (e) {
-          const { value } = e.detail.data;
+          const value = e.detail?.data?.value;
+          if (!value) return;
           const option = select.querySelector(`option[value="${value}"]`);
           if (option) {
             select.removeChild(option);
@@ -671,7 +672,8 @@
          */
         // eslint-disable-next-line func-names
         tagify.on('remove', function (e) {
-          const { value } = e.detail.data;
+          const value = e.detail?.data?.value;
+          if (!value) return;
           const option = select.querySelector(`option[value="${value}"]`);
           if (option) {
             option.selected = false;

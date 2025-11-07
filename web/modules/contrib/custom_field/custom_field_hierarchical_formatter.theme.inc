@@ -7,7 +7,6 @@
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Link;
-use Drupal\Core\Render\Markup;
 
 /**
  * Prepares term objects for Twig template.
@@ -36,7 +35,10 @@ function template_preprocess_custom_field_hierarchical_formatter(array &$variabl
         }
       }
 
-      $terms[] = Markup::create(implode('<span class="child-separator">, </span>', $group));
+      $terms[] = [
+        '#markup' => implode('<span class="child-separator">, </span>', $group),
+        '#allowed_tags' => ['span'],
+      ];
     }
     else {
       if ($variables['link']) {

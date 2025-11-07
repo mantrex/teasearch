@@ -2,11 +2,11 @@
 
 namespace Drupal\address_suggestion\Controller;
 
-use Drupal\address_suggestion\AddressProviderManager;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\State\StateInterface;
+use Drupal\address_suggestion\AddressProviderManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,6 +39,7 @@ class AddressSuggestion extends ControllerBase {
   public function handleAutocomplete(Request $request, $entity_type, $bundle, $field_name) {
     $results = [];
     $input = Xss::filter($request->query->get('q'));
+    $country = Xss::filter($request->query->get('country'));
 
     if (empty($input)) {
       return new JsonResponse($results);

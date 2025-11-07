@@ -4,6 +4,7 @@ namespace Drupal\choices\Form;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use JsonSchema\Validator;
@@ -27,8 +28,11 @@ class ConfigForm extends ConfigFormBase {
   /**
    * {@inheritDoc}
    */
-  public function __construct(ConfigFactoryInterface $config_factory) {
-    parent::__construct($config_factory);
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typed_config_manager,
+  ) {
+    parent::__construct($config_factory, $typed_config_manager);
     $this->jsonSchemaValidator = new Validator();
   }
 

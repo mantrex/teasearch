@@ -183,5 +183,61 @@ function custom_field_update_8005(): void {
     $field_storage_config->save();
     \Drupal::entityDefinitionUpdateManager()->updateFieldStorageDefinition($field_storage_config);
   }
+}
 
+/**
+ * Enable jsonapi integration module if jsonapi module is enabled.
+ */
+function custom_field_update_8006(): void {
+  $module_handler = \Drupal::moduleHandler();
+  if ($module_handler->moduleExists('jsonapi') &&
+    !$module_handler->moduleExists('custom_field_jsonapi')) {
+    \Drupal::service('module_installer')->install(['custom_field_jsonapi']);
+  }
+}
+
+/**
+ * Add extra timezone field to datetime fields.
+ */
+function custom_field_update_8007(): void {
+  $entity_type_manager = \Drupal::entityTypeManager();
+  // Clear cached definitions to ensure we work with the latest data.
+  $entity_type_manager->clearCachedDefinitions();
+  /** @var \Drupal\custom_field\CustomFieldUpdateManagerInterface $update_manager */
+  $update_manager = \Drupal::service('custom_field.update_manager');
+
+  $extra_columns = [
+    'timezone' => [
+      'description' => 'The preferred timezone.',
+      'type' => 'varchar',
+      'length' => 32,
+    ],
+  ];
+
+  // Load all field storage configs.
+  // Load all field storage configurations for the 'custom' field type.
+  /** @var \Drupal\field\FieldStorageConfigInterface[] $storages */
+  $storages = $entity_type_manager
+    ->getStorage('field_storage_config')
+    ->loadByProperties(['type' => 'custom']);
+
+  foreach ($storages as $storage) {
+    $entity_type_id = $storage->getTargetEntityTypeId();
+    $field_name = $storage->getName();
+    $columns = $storage->getSetting('columns');
+    foreach ($columns as $name => $column) {
+      if ($column['type'] == 'datetime') {
+        try {
+          $update_manager->addExtraColumns($entity_type_id, $field_name, $name, $extra_columns);
+        }
+        catch (\Throwable $e) {
+          \Drupal::logger('custom_field')->error('Failed to update @field on @entity: @message', [
+            '@field' => $field_name,
+            '@entity' => $entity_type_id,
+            '@message' => $e->getMessage(),
+          ]);
+        }
+      }
+    }
+  }
 }

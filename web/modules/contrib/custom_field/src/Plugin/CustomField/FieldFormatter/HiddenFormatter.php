@@ -18,6 +18,7 @@ use Drupal\custom_field\Plugin\CustomFieldFormatterBase;
   field_types: [
     'boolean',
     'color',
+    'daterange',
     'datetime',
     'file',
     'float',

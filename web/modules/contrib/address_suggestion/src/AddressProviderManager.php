@@ -2,6 +2,7 @@
 
 namespace Drupal\address_suggestion;
 
+use Drupal\address_suggestion\Attribute\AddressProvider;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
@@ -28,8 +29,8 @@ class AddressProviderManager extends DefaultPluginManager {
       $namespaces,
       $module_handler,
       'Drupal\address_suggestion\AddressProviderInterface',
-      'Drupal\Component\Annotation\Plugin',
-      ['Drupal\address_suggestion\Annotation']
+      AddressProvider::class,
+      'Drupal\address_suggestion\Annotation\AddressProvider',
     );
 
     $this->alterInfo('address_suggestion_provider_info');

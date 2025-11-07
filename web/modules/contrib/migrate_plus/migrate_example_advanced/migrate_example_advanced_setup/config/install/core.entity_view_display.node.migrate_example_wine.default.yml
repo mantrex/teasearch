@@ -5,10 +5,10 @@ dependencies:
     - field.field.node.migrate_example_wine.body
     - field.field.node.migrate_example_wine.field_migrate_example_comments
     - field.field.node.migrate_example_wine.field_migrate_example_adv_image
-    - field.field.node.migrate_example_wine.field_migrate_example_top_vintag
+    - field.field.node.migrate_example_wine.migrate_example_top_vintage
     - field.field.node.migrate_example_wine.field_migrate_example_wine_best
-    - field.field.node.migrate_example_wine.field_migrate_example_wine_ratin
-    - field.field.node.migrate_example_wine.field_migrate_example_wine_regio
+    - field.field.node.migrate_example_wine.migrate_example_wine_rating
+    - field.field.node.migrate_example_wine.migrate_example_wine_region
     - field.field.node.migrate_example_wine.field_migrate_example_wine_var
     - node.type.migrate_example_wine
   module:
@@ -42,7 +42,7 @@ content:
       image_link: ''
     third_party_settings: {  }
     type: image
-  field_migrate_example_top_vintag:
+  migrate_example_top_vintage:
     weight: 107
     label: inline
     settings:
@@ -57,7 +57,7 @@ content:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
-  field_migrate_example_wine_ratin:
+  migrate_example_wine_rating:
     weight: 106
     label: inline
     settings:
@@ -67,7 +67,7 @@ content:
       prefix_suffix: true
     third_party_settings: {  }
     type: number_decimal
-  field_migrate_example_wine_regio:
+  migrate_example_wine_region:
     weight: 103
     label: inline
     settings:

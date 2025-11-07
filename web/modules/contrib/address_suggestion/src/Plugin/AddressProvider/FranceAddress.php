@@ -2,21 +2,22 @@
 
 namespace Drupal\address_suggestion\Plugin\AddressProvider;
 
-use Drupal\address_suggestion\AddressProviderBase;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\address_suggestion\AddressProviderBase;
+use Drupal\address_suggestion\Attribute\AddressProvider;
 
 /**
  * Defines a France address plugin for address_suggestion.
  *
  * @package Drupal\address_suggestion\Plugin\AddressProvider
- *
- * @AddressProvider(
- *   id = "france_address",
- *   label = @Translation("France Address"),
- *   api = "https://api-adresse.data.gouv.fr/search",
- *   nokey = "TRUE"
- * )
  */
+#[AddressProvider(
+  id: 'france_address',
+  label: new TranslatableMarkup('France Address'),
+  api: 'https://api-adresse.data.gouv.fr/search',
+  nokey: TRUE
+)]
 class FranceAddress extends AddressProviderBase {
 
   /**

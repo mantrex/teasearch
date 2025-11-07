@@ -216,6 +216,7 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
    */
   public function widget(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
+    $field_parents = $element['#field_parents'];
     $settings = $field->getWidgetSetting('settings') + static::defaultSettings()['settings'];
     $allowed_views = $this->getAllowedViewsOptions($settings['allowed_views']);
     $token_module_installed = $this->moduleHandler->moduleExists('token');
@@ -232,22 +233,18 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
     if (!$this->isDefaultValueWidget($form_state) && $settings['force_default']) {
       $element['#access'] = FALSE;
     }
-    $parents = $form['#parents'] ?? [];
     $wrapper = $this->getUniqueElementId($form, $field_name, $delta, $name);
 
-    // Account for parents structure from paragraphs field if applicable.
-    $value_keys = array_merge($parents, [$field_name, $delta, $name]);
-
     // Create a condition string for states api.
-    $path_parts = [...$value_keys];
+    $path_parts = [...$field_parents];
     $base = array_shift($path_parts);
     $visibility_path = $base . '[' . implode('][', $path_parts) . ']';
 
-    $field_value = NestedArray::getValue($values, $value_keys);
+    $field_value = NestedArray::getValue($values, $field_parents);
     // If there are no processed values, use the input.
     if (empty($field_value)) {
       $user_input = $form_state->getUserInput();
-      $field_value = NestedArray::getValue($user_input, $value_keys);
+      $field_value = NestedArray::getValue($user_input, $field_parents);
     }
     if (!empty($field_value) && isset($field_value['target_id'])) {
       $target_id = $field_value['target_id'];
@@ -492,6 +489,9 @@ class ViewfieldSelectWidget extends CustomFieldWidgetBase {
    * {@inheritdoc}
    */
   public function massageFormValue(mixed $value, array $column): mixed {
+    if (isset($value['target_id']) && empty($value['target_id'])) {
+      return NULL;
+    }
     if (isset($value['view_options'])) {
       $value = array_merge($value, $value['view_options']);
       unset($value['view_options']);

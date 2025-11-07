@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_plus\Unit\process;
 
@@ -24,12 +24,12 @@ final class DomSelectTest extends MigrateProcessTestCase {
   public function testTransform(string $input_string, array $configuration, array $output_array): void {
     $value = Html::load($input_string);
     $elements = (new DomSelect($configuration, 'dom_select', []))
-      ->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+      ->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertEquals($output_array, $elements);
   }
 
   /**
-   * Dataprovider for testTransform().
+   * Data provider for testTransform().
    */
   public static function providerTestTransform(): array {
     $lists = '<ul><li>Item 1</li><li>Item 2</li><li><ul><li>Item 3.1</li><li>Item 3.2</li></ul></li><li>Item 4</li><li>Item 5</li></ul>';

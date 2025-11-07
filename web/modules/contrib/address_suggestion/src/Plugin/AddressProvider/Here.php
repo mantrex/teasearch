@@ -2,20 +2,21 @@
 
 namespace Drupal\address_suggestion\Plugin\AddressProvider;
 
-use Drupal\address_suggestion\AddressProviderBase;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\address_suggestion\AddressProviderBase;
+use Drupal\address_suggestion\Attribute\AddressProvider;
 
 /**
  * Defines a Here plugin for address_suggestion.
  *
  * @package Drupal\address_suggestion\Plugin\AddressProvider
- *
- * @AddressProvider(
- *   id = "here",
- *   label = @Translation("Here api"),
- *   api = "https://geocode.search.hereapi.com/v1/geocode"
- * )
  */
+#[AddressProvider(
+  id: 'here',
+  label: new TranslatableMarkup('Here api'),
+  api: 'https://geocode.search.hereapi.com/v1/geocode',
+)]
 class Here extends AddressProviderBase {
 
   /**

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_plus\Unit\process;
 
@@ -79,11 +79,11 @@ final class DomApplyStylesTest extends MigrateProcessTestCase {
     $this->expectException(InvalidPluginDefinitionException::class);
     $this->expectExceptionMessage($message);
     (new DomApplyStyles($configuration, 'dom_apply_styles', [], $this->configFactory))
-      ->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+      ->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
   }
 
   /**
-   * Dataprovider for testValidateRules().
+   * Data provider for testValidateRules().
    */
   public static function providerTestConfig(): array {
     $cases = [
@@ -122,9 +122,9 @@ final class DomApplyStylesTest extends MigrateProcessTestCase {
   public function testTransformInvalidInput(): void {
     $value = 'string';
     $this->expectException(MigrateSkipRowException::class);
-    $this->expectExceptionMessage('The dom_apply_styles plugin in the destinationproperty process pipeline requires a \DOMDocument object. You can use the dom plugin to convert a string to \DOMDocument.');
+    $this->expectExceptionMessage('The dom_apply_styles plugin in the destinationProperty process pipeline requires a \DOMDocument object. You can use the dom plugin to convert a string to \DOMDocument.');
     (new DomApplyStyles($this->exampleConfiguration, 'dom_apply_styles', [], $this->configFactory))
-      ->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+      ->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
   }
 
   /**
@@ -135,7 +135,7 @@ final class DomApplyStylesTest extends MigrateProcessTestCase {
     $output_string = '<div><span><strong class="foo">Bold text</strong></span><em class="foo bar">Italic text</em></div>';
     $value = Html::load($input_string);
     $document = (new DomApplyStyles($this->exampleConfiguration, 'dom_apply_styles', [], $this->configFactory))
-      ->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+      ->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertTrue($document instanceof \DOMDocument);
     $this->assertEquals($output_string, Html::serialize($document));
   }

@@ -1,11 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus\Plugin\migrate_plus\data_parser;
 
 use Drupal\migrate\MigrateException;
 use Drupal\migrate_plus\DataParserPluginBase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Obtain XML data for migration using the SimpleXML API.
@@ -34,11 +35,10 @@ class SimpleXml extends DataParserPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     // Suppress errors during parsing, so we can pick them up after.
     libxml_use_internal_errors(TRUE);
+    return parent::create($container, $configuration, $plugin_id, $plugin_definition);
   }
 
   /**

@@ -5,7 +5,7 @@ namespace Drupal\custom_field\Plugin\views\argument;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
+use Drupal\custom_field\Plugin\CustomField\FieldType\DateTimeType;
 use Drupal\views\Attribute\ViewsArgument;
 use Drupal\views\Plugin\views\argument\Date as NumericDate;
 
@@ -48,7 +48,7 @@ class CustomFieldDate extends NumericDate {
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $route_match, $date_formatter, $time);
 
-    if ($configuration['datetime_type'] === CustomFieldTypeInterface::DATETIME_TYPE_DATE) {
+    if ($configuration['datetime_type'] === DateTimeType::DATETIME_TYPE_DATE) {
       // Timezone offset calculation is not applicable to dates that are stored
       // as date-only.
       $this->calculateOffset = FALSE;

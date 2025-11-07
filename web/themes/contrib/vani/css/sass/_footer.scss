@@ -96,6 +96,7 @@
   transition: all 0.3s ease-in-out;
 }
 .social-icons li a:hover {
-  border: 1px solid var(--footer-color);
+  background-color: var(--theme-color);
+  color: #ffffff;
   border-radius: 6px;
 }

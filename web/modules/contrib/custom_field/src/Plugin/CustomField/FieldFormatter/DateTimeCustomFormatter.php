@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Drupal\custom_field\Plugin\CustomField\FieldFormatter;
 
 use Drupal\Core\Field\Attribute\FieldFormatter;
+use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
+use Drupal\custom_field\Plugin\CustomField\FieldType\DateTimeTypeInterface;
 
 /**
  * Plugin implementation of the 'datetime_custom' formatter.
@@ -26,7 +27,7 @@ class DateTimeCustomFormatter extends DateTimeFormatterBase {
    */
   public static function defaultSettings(): array {
     return [
-      'date_format' => CustomFieldTypeInterface::DATETIME_STORAGE_FORMAT,
+      'date_format' => DateTimeTypeInterface::DATETIME_STORAGE_FORMAT,
     ] + parent::defaultSettings();
   }
 
@@ -51,9 +52,45 @@ class DateTimeCustomFormatter extends DateTimeFormatterBase {
   /**
    * {@inheritdoc}
    */
-  protected function formatDate(object $date): string {
+  public function formatValue(FieldItemInterface $item, mixed $value): ?array {
+    $datetime_type = $this->customFieldDefinition->getDatetimeType();
+
+    /** @var \Drupal\Core\Datetime\DrupalDateTime $date */
+    $date = $value['date'];
+
+    if ($date === NULL) {
+      return NULL;
+    }
+
+    $timezone = $this->getSetting('timezone_stored') ? $value['timezone'] : NULL;
+    if ($this->getSetting('timezone_override')) {
+      $timezone = $this->getSetting('timezone_override');
+    }
+    if ($this->getSetting('user_timezone') && !empty($timezone)) {
+      return [
+        '#theme' => 'item_list',
+        '#list_type' => 'ul',
+        '#items' => [
+          $this->buildDate($date, $datetime_type, $timezone),
+          $this->buildDate($date, $datetime_type),
+        ],
+      ];
+    }
+
+    return $this->buildDate($date, $datetime_type, $timezone);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function formatDate(object $date, ?string $timezone): string {
     $format = $this->getSetting('date_format');
-    $timezone = $this->getSetting('timezone_override') ?: $date->getTimezone()->getName();
+    if ($this->getSetting('timezone_override')) {
+      $timezone = $this->getSetting('timezone_override');
+    }
+    if (empty($timezone)) {
+      $timezone = $date->getTimezone()->getName();
+    }
     return $this->dateFormatter->format($date->getTimestamp(), 'custom', $format, $timezone != '' ? $timezone : NULL);
   }
 

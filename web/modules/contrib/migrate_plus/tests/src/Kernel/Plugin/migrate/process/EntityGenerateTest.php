@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_plus\Kernel\Plugin\migrate\process;
 
@@ -43,9 +43,24 @@ final class EntityGenerateTest extends KernelTestBase implements MigrateMessageI
     'filter',
   ];
 
+  /**
+   * The bundle.
+   */
   private static ?string $bundle = 'page';
+
+  /**
+   * The field name.
+   */
   private static ?string $fieldName = 'field_entity_reference';
+
+  /**
+   * The vocabulary.
+   */
   private static ?string $vocabulary = 'fruit';
+
+  /**
+   * The migration plugin manager.
+   */
   protected ?MigrationPluginManager $migrationPluginManager;
 
   /**
@@ -177,7 +192,7 @@ final class EntityGenerateTest extends KernelTestBase implements MigrateMessageI
                     $this->assertTrue($entity->{$property}[0]->entity->{$key}->isEmpty(), "Expected value is empty but field $property.$key is not empty.");
                   }
                   else {
-                    $this->assertTrue($entity->{$property}->isEmpty(), "BINBAZ Expected value is empty but field $property is not empty.");
+                    $this->assertTrue($entity->{$property}->isEmpty(), "Expected value is empty but field $property is not empty.");
                   }
                 }
                 elseif ($entity->{$property}->getValue()) {

@@ -1,13 +1,14 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus\Plugin\migrate_plus\data_parser;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\migrate\Exception\RequirementsException;
 use Drupal\migrate\MigrateException;
+use Drupal\migrate_plus\DataFetcherPluginManager;
 use Drupal\migrate_plus\DataParserPluginBase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Obtain SOAP data for migration.
@@ -39,20 +40,28 @@ class Soap extends DataParserPluginBase implements ContainerFactoryPluginInterfa
    */
   protected string $responseType;
 
-  /**
-   * {@inheritdoc}
-   *
-   * @throws \Drupal\migrate\Exception\RequirementsException
-   *   If PHP SOAP extension is not installed.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
-    if (!class_exists('\SoapClient')) {
-      throw new RequirementsException('The PHP SOAP extension is not installed');
-    }
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected DataFetcherPluginManager $fetcherPluginManager,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $fetcherPluginManager);
     $this->function = $configuration['function'];
     $this->parameters = $configuration['parameters'];
     $this->responseType = $configuration['response_type'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('plugin.manager.migrate_plus.data_fetcher'),
+    );
   }
 
   /**

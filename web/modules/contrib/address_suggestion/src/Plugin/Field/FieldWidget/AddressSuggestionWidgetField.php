@@ -2,22 +2,20 @@
 
 namespace Drupal\address_suggestion\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Defines the 'address_suggestion_widget' field widget.
- *
- * @FieldWidget(
- *   id = "address_suggestion_widget",
- *   label = @Translation("Address suggestion"),
- *   field_types = {
- *     "text",
- *     "string"
- *   },
- * )
  */
+#[FieldWidget(
+  id: "address_suggestion_widget",
+  label: new TranslatableMarkup('Address suggestion'),
+  field_types: ['text', 'string']
+)]
 final class AddressSuggestionWidgetField extends AddressSuggestionWidget implements ContainerFactoryPluginInterface {
 
   /**

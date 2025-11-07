@@ -2,7 +2,7 @@
 
 namespace Drupal\custom_field\Plugin\views\sort;
 
-use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
+use Drupal\custom_field\Plugin\CustomField\FieldType\DateTimeType;
 use Drupal\views\Attribute\ViewsSort;
 use Drupal\views\Plugin\views\sort\Date as NumericDate;
 
@@ -28,7 +28,7 @@ class CustomFieldDate extends NumericDate {
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
-    if ($configuration['datetime_type'] === CustomFieldTypeInterface::DATETIME_TYPE_DATE) {
+    if ($configuration['datetime_type'] === DateTimeType::DATETIME_TYPE_DATE) {
       // Timezone offset calculation is not applicable to dates that are stored
       // as date-only.
       $this->calculateOffset = FALSE;

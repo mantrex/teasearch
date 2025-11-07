@@ -7,6 +7,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\custom_field\Plugin\CustomField\FieldType\DateTimeType;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 
 /**
@@ -73,12 +74,6 @@ class CustomFlexWidget extends CustomWidgetBase {
       if (isset($columns[$name])) {
         $elements['columns'][$name]['#default_value'] = $columns[$name];
         $elements['columns'][$name]['#wrapper_attributes']['class'][] = 'custom-field-col-' . $columns[$name];
-        $is_disabled = in_array($plugin_id, ['color_boxes', 'map_key_value']);
-        if ($is_disabled) {
-          $elements['columns'][$name]['#default_value'] = 12;
-          $elements['columns'][$name]['#attributes'] = ['disabled' => TRUE];
-          $elements['columns'][$name]['#description'] = $this->t('This widget type as configured requires full width.');
-        }
       }
     }
 
@@ -143,6 +138,7 @@ class CustomFlexWidget extends CustomWidgetBase {
     }
 
     foreach ($custom_items as $name => $custom_item) {
+      $data_type = $custom_item->getDataType();
       $type = $field_settings[$name]['type'] ?? $custom_item->getDefaultWidget();
       if (!in_array($type, $this->customFieldWidgetManager->getWidgetsForField($custom_item->getPluginId()))) {
         $type = $custom_item->getDefaultWidget();
@@ -172,12 +168,15 @@ class CustomFlexWidget extends CustomWidgetBase {
       if (in_array($type, $entity_reference_widgets)) {
         $element[$name]['target_id'][$attributes]['class'][] = $column_class;
       }
-      $date_widgets = [
-        'datetime_default',
-      ];
-      if ($custom_item->getDatetimeType() === 'date' && in_array($type, $date_widgets)) {
-        $element[$name]['#column_class'] = $column_class;
-        $element[$name]['#after_build'][] = [$this, 'callDateAfterBuild'];
+
+      if ($data_type === 'datetime' && in_array($type, ['datetime_default', 'datetime_local'])) {
+        $datetime_type = $custom_item->getDatetimeType();
+        if (($datetime_type === DateTimeType::DATETIME_TYPE_DATE || $type === 'datetime_local') && !isset($element[$name]['timezone'])) {
+          $element[$name]['value']['#wrapper_attributes']['class'][] = $column_class;
+        }
+        else {
+          $element[$name][$attributes]['class'][] = $column_class;
+        }
       }
       else {
         $element[$name][$attributes]['class'][] = $column_class;
@@ -203,22 +202,6 @@ class CustomFlexWidget extends CustomWidgetBase {
   public function callManagedFileAfterBuild(array $element, FormStateInterface $form_state): array {
     $column = $element['#column_class'];
     return static::managedFileAfterBuild($element, $form_state, $column);
-  }
-
-  /**
-   * Closure function to pass arguments to dateAfterBuild().
-   *
-   * @param array<string, mixed> $element
-   *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state.
-   *
-   * @return array<string, mixed>
-   *   The element array.
-   */
-  public function callDateAfterBuild(array $element, FormStateInterface $form_state): array {
-    $column = $element['#column_class'];
-    return static::dateAfterBuild($element, $form_state, $column);
   }
 
   /**
@@ -251,27 +234,6 @@ class CustomFlexWidget extends CustomWidgetBase {
   }
 
   /**
-   * After build function to add class to date outer wrapper div.
-   *
-   * @param array<string, mixed> $element
-   *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state.
-   * @param string $column
-   *   The column class.
-   *
-   * @return array<string, mixed>
-   *   The modified form element.
-   */
-  public static function dateAfterBuild(array $element, FormStateInterface $form_state, string $column): array {
-    // Add an outer div with our class.
-    $element['#prefix'] = '<div class="' . $column . '">';
-    $element['#suffix'] = '</div>';
-
-    return $element;
-  }
-
-  /**
    * Determine which attributes to use based on the plugin type.
    *
    * @param \Drupal\custom_field\Plugin\CustomFieldTypeInterface $custom_item
@@ -286,12 +248,16 @@ class CustomFlexWidget extends CustomWidgetBase {
    */
   protected function getAttributesKey(CustomFieldTypeInterface $custom_item, array $widget_settings, string $type): string {
     $attribute_types = [
+      'color_boxes',
       'media_library_widget',
       'viewfield_select',
       'entity_reference_radios',
       'radios',
       'datetime_datelist',
       'datetime_default',
+      'datetime_local',
+      'daterange_default',
+      'daterange_local',
       'url',
       'link_default',
       'linkit_url',

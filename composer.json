@@ -24,9 +24,10 @@
     "drupal/address": "^2.0",
     "drupal/address_suggestion": "^1.0",
     "drupal/better_exposed_filters": "^7.0",
-    "drupal/choices": "^2.1",
+    "drupal/choices": "^2.2",
     "drupal/chosen": "^5.0",
     "drupal/chosen_lib": "^5.0",
+    "drupal/cookies": "^1.2",
     "drupal/core-composer-scaffold": "^11.1",
     "drupal/core-project-message": "^11.1",
     "drupal/core-recommended": "^11.1",
@@ -37,7 +38,6 @@
     "drupal/gin": "^4.0",
     "drupal/gin_toolbar": "^2.0",
     "drupal/inline_entity_form": "^3.0@RC",
-    "drupal/mfd": "^3.0",
     "drupal/migrate_plus": "^6.0",
     "drupal/multiselect_dropdown": "^1.2",
     "drupal/node_save_redirect": "^2.0",
@@ -87,12 +87,6 @@
       "drupal/mfd": {
         "Compatibilità Drupal 11 (info.yml)": "patches/mfd-info-core11.patch",
         "Rimuovi @Translation da category in MultilingualFormDisplayType": "patches/mfd-fieldtype-category.patch"
-      },
-      "drupal/entity_browser": {
-        "Fix key() expects array, null given error": "patches/entity-browser.patch"
-      },
-      "drupal/choices": {
-        "Compatibility with Drupal 11": "patches/choices-drupal11.patch"
       }
     },
     "drupal-scaffold": {

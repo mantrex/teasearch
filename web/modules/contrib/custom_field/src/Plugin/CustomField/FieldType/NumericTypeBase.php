@@ -38,27 +38,31 @@ class NumericTypeBase extends CustomFieldTypeBase {
       $constraints['Range']['max'] = $max;
     }
 
-    // If both min and max are set, use notInRangeMessage.
+    // Determine and add appropriate message.
+    $params = [
+      '%name' => $settings['name'],
+      '%min' => $min,
+      '%max' => $max,
+    ];
+    $messages = [
+      'notInRangeMessage' => $this->t('%name: the value must be between %min and %max.', $params),
+      'minMessage' => $this->t('%name: the value may be no less than %min.', $params),
+      'maxMessage' => $this->t('%name: the value may be no greater than %max.', $params),
+    ];
+
+    $message_type = NULL;
     if ($min_set && $max_set) {
-      $constraints['Range']['notInRangeMessage'] = $this->t('%name: the value must be between %min and %max.', [
-        '%name' => $settings['name'],
-        '%min' => $min,
-        '%max' => $max,
-      ]);
+      $message_type = 'notInRangeMessage';
     }
-    // Only min is set.
     elseif ($min_set) {
-      $constraints['Range']['minMessage'] = $this->t('%name: the value may be no less than %min.', [
-        '%name' => $settings['name'],
-        '%min' => $min,
-      ]);
+      $message_type = ($min && $max) ? 'notInRangeMessage' : 'minMessage';
     }
-    // Only max is set.
     elseif ($max_set) {
-      $constraints['Range']['maxMessage'] = $this->t('%name: the value may be no greater than %max.', [
-        '%name' => $settings['name'],
-        '%max' => $max,
-      ]);
+      $message_type = ($min && $max) ? 'notInRangeMessage' : 'maxMessage';
+    }
+
+    if (!is_null($message_type)) {
+      $constraints['Range'][$message_type] = $messages[$message_type];
     }
 
     return $constraints;

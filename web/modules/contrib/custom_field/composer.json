@@ -12,7 +12,7 @@
     "docs": "https://www.drupal.org/docs/extending-drupal/contributed-modules/contributed-module-documentation/custom-field"
   },
   "require": {
-    "drupal/core": "^10.3 || ^11.0"
+    "drupal/core": "^10.3 || ^11"
   },
   "require-dev": {
     "drupal/feeds": "^3",
@@ -23,6 +23,7 @@
     "drupal/entity_usage": "^2",
     "drupal/svg_image": "^3",
     "drupal/token": "^1",
-    "drupal/entity_browser": "^2"
+    "drupal/entity_browser": "^2",
+    "drupal/ai": "^1.2"
   }
 }

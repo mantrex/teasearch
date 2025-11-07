@@ -9,16 +9,16 @@
       "type": "package",
       "package": {
         "name": "yaireo/tagify",
-        "version": "4.32.2",
+        "version": "4.35.4",
         "type": "drupal-library",
         "dist": {
-          "url": "https://github.com/yaireo/tagify/archive/refs/tags/v4.32.2.zip",
+          "url": "https://github.com/yaireo/tagify/archive/refs/tags/v4.35.4.zip",
           "type": "zip"
         }
       }
     }
   },
   "require": {
-    "yaireo/tagify": "^4.21"
+    "yaireo/tagify": "^4.35"
   }
 }

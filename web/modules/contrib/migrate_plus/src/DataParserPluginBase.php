@@ -1,9 +1,10 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus;
 
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -15,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @see \Drupal\migrate_plus\DataParserPluginManager
  * @see plugin_api
  */
-abstract class DataParserPluginBase extends PluginBase implements DataParserPluginInterface {
+abstract class DataParserPluginBase extends PluginBase implements DataParserPluginInterface, ContainerFactoryPluginInterface {
 
   /**
    * List of source urls.
@@ -53,10 +54,12 @@ abstract class DataParserPluginBase extends PluginBase implements DataParserPlug
    */
   protected DataFetcherPluginInterface $dataFetcher;
 
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected DataFetcherPluginManager $fetcherPluginManager,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->urls = $configuration['urls'];
     $this->itemSelector = $configuration['item_selector'] ?? '';
@@ -66,7 +69,12 @@ abstract class DataParserPluginBase extends PluginBase implements DataParserPlug
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): self {
-    return new static($configuration, $plugin_id, $plugin_definition);
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('plugin.manager.migrate_plus.data_fetcher'),
+    );
   }
 
   /**
@@ -74,7 +82,7 @@ abstract class DataParserPluginBase extends PluginBase implements DataParserPlug
    */
   public function getDataFetcherPlugin(): DataFetcherPluginInterface {
     if (!isset($this->dataFetcher)) {
-      $this->dataFetcher = \Drupal::service('plugin.manager.migrate_plus.data_fetcher')->createInstance($this->configuration['data_fetcher_plugin'], $this->configuration);
+      $this->dataFetcher = $this->fetcherPluginManager->createInstance($this->configuration['data_fetcher_plugin'], $this->configuration);
     }
     return $this->dataFetcher;
   }

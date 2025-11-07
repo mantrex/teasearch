@@ -1,11 +1,10 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_plus\Kernel\Plugin\migrate_plus\data_parser;
 
 use Drupal\migrate\MigrateException;
-use Drupal\migrate_plus\DataParserPluginInterface;
 
 /**
  * Test of the data_parser SimpleXml migrate_plus plugin.
@@ -22,7 +21,7 @@ class SimpleXmlTest extends BaseXml {
   public function testReadNonStandardXmlWhitespace(): void {
     $url = $this->path . '/tests/data/simple_xml_invalid_multi_whitespace.xml';
     $this->configuration['urls'][0] = $url;
-    $this->assertResults($this->expected, $this->getParser());
+    $this->assertEquals($this->expected, $this->parseResults($this->getParser()));
   }
 
   /**
@@ -33,7 +32,7 @@ class SimpleXmlTest extends BaseXml {
   public function testReadNonStandardXml2(): void {
     $url = $this->path . '/tests/data/simple_xml_invalid_single_line.xml';
     $this->configuration['urls'][0] = $url;
-    $this->assertResults($this->expected, $this->getParser());
+    $this->assertEquals($this->expected, $this->parseResults($this->getParser()));
   }
 
   /**
@@ -87,8 +86,8 @@ class SimpleXmlTest extends BaseXml {
   /**
    * {@inheritdoc}
    */
-  protected function getParser(): DataParserPluginInterface {
-    return $this->pluginManager->createInstance('simple_xml', $this->configuration);
+  protected function getDataParserPluginId(): string {
+    return 'simple_xml';
   }
 
 }

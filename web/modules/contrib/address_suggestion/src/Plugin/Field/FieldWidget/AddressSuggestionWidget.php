@@ -7,24 +7,23 @@ use Drupal\address\Plugin\Field\FieldWidget\AddressDefaultWidget;
 use Drupal\address_suggestion\AddressProviderManager;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldConfigInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Plugin implementation of the 'address_autocomplete' widget.
- *
- * @FieldWidget(
- *   id = "address_suggestion",
- *   label = @Translation("Address suggestion"),
- *   field_types = {
- *     "address"
- *   }
- * )
  */
+#[FieldWidget(
+  id: "address_suggestion",
+  label: new TranslatableMarkup('Address suggestion'),
+  field_types: ['address']
+)]
 class AddressSuggestionWidget extends AddressDefaultWidget {
 
   /**

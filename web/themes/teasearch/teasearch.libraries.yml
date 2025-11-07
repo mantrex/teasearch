@@ -20,6 +20,7 @@ global-styling:
     theme:
       css/style.css: {} 
       css/category_selector.css: {} 
+      css/cookies.css: {}
 image-lightbox:
   css:
     theme:

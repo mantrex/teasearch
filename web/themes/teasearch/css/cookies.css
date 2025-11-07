@@ -1,0 +1,37 @@
+.cookiesjsr-banner  {
+  background-color: var(--header);
+  color: var(--light);
+}
+.cookiesjsr-btn.important {
+  color: var(--item-primary);
+}
+
+.cookiesjsr-btn.cookiesjsr-settings {
+  background:var(--item-primary);
+  color:var(--light);
+}
+.cookiesjsr-service-group--tab:not(.active) {
+  color: var(--item-primary);
+}
+.cookiesjsr-service-group.active .cookiesjsr-service-group--tab {
+  background-color: var(--header);
+}
+
+.cookiesjsr-service-group.active .cookiesjsr-service-group--content {
+  background-color: var(--header);
+
+}
+.cookiesjsr-btn.invert.denyAll,.cookiesjsr-btn.invert.allowAll {
+  border-color: var(--item-primary);
+  color: var(--item-primary);
+}
+
+.cookiesjsr-btn.invert.important.save {
+  background: var(--item-primary);
+  border-color: var(--item-primary);
+}
+
+#cookiesjsrLabel {
+  color:var(--item-primary);
+  font-weight:bold;
+}

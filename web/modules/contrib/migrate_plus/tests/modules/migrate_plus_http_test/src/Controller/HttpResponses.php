@@ -16,7 +16,7 @@ class HttpResponses extends ControllerBase {
   /**
    * Returns a render-able array for a test page.
    */
-  public function content() {
+  public function content(): JsonResponse {
 
     $url = Url::fromRoute('migrate_plus_http_test.json_second', [], ['absolute' => TRUE]);
 
@@ -29,78 +29,93 @@ class HttpResponses extends ControllerBase {
     return new JsonResponse($data);
   }
 
-  public function second(){
+  /**
+   * Callback.
+   */
+  public function second(): JsonResponse {
     $data = [
       "status" => "ok",
       'nextUrl' => NULL,
-      "data" => $this->generateRowsData(3,4),
+      "data" => $this->generateRowsData(3, 4),
     ];
 
     return new JsonResponse($data);
   }
 
-  public function third(Request $request){
+  /**
+   * Callback.
+   */
+  public function third(Request $request): JsonResponse {
     $page = $request->query->get('page') ?? 0;
-    $first = $page*3 +1;
+    $first = $page * 3 + 1;
 
     $data = [
       "status" => "ok",
       'currentPage' => $page,
       'numPages' => 2,
-      'nextPage' => $page+1,
-      "data" => $this->generateRowsData(3,$first),
+      'nextPage' => $page + 1,
+      "data" => $this->generateRowsData(3, $first),
     ];
 
-    if($page == 2){
+    if ($page == 2) {
       unset($data['nextPage']);
     }
 
     return new JsonResponse($data);
   }
 
-  public function fourth( Request $request ) {
+  /**
+   * Callback.
+   */
+  public function fourth(Request $request): JsonResponse {
     $page = $request->query->get('cursor') ?? 0;
-    $first = $page*3 +1;
+    $first = $page * 3 + 1;
 
     $data = [
       "status" => "ok",
-      'nextPage' => $page+1,
-      "data" => $this->generateRowsData(3,$first),
+      'nextPage' => $page + 1,
+      "data" => $this->generateRowsData(3, $first),
     ];
 
-    if($page == 2){
+    if ($page == 2) {
       unset($data['nextPage']);
     }
 
     return new JsonResponse($data);
   }
 
-  public function fifth( Request $request ) {
+  /**
+   * Callback.
+   */
+  public function fifth(Request $request): JsonResponse {
     $page = $request->query->get('page') ?? 0;
-    $first = $page*3 +1;
+    $first = $page * 3 + 1;
 
     $data = [
       "status" => "ok",
       'numItems' => 3,
-      "data" => $this->generateRowsData(3,$first),
+      "data" => $this->generateRowsData(3, $first),
     ];
 
-    if($page == 2){
+    if ($page == 2) {
       $data['numItems'] = 0;
       $data["data"] = [];
     }
 
-    if($page == 3){
+    if ($page == 3) {
       throw new NotFoundHttpException();
     }
 
     return new JsonResponse($data);
   }
 
-  protected function generateRowsData(int $length, int $first = 1){
+  /**
+   * Callback.
+   */
+  protected function generateRowsData(int $length, int $first = 1): array {
     $data = [];
     $last = $first + $length;
-    for($i = $first; $i < $last; $i++){
+    for ($i = $first; $i < $last; $i++) {
       $data[] = [
         "id" => $i,
       ];

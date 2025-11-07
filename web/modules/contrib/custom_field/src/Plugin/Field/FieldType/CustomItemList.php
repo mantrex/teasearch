@@ -80,6 +80,9 @@ class CustomItemList extends FieldItemList implements CustomFieldItemListInterfa
         if (in_array($data_type, ['file', 'image'])) {
           $id = $item->get($custom_field->getName())->getValue();
           if (!empty($id)) {
+            if (is_array($id) && isset($id['target_id'])) {
+              $id = $id['target_id'];
+            }
             $ids[] = $id;
           }
         }

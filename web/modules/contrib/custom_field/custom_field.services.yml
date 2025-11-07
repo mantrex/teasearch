@@ -1,19 +1,57 @@
 services:
+  Drupal\custom_field\Hook\GeneralHooks:
+    class: Drupal\custom_field\Hook\GeneralHooks
+    autowire: true
+
+  Drupal\custom_field\Hook\FormHooks:
+    class: Drupal\custom_field\Hook\FormHooks
+    autowire: true
+
+  Drupal\custom_field\Hook\ThemeHooks:
+    class: Drupal\custom_field\Hook\ThemeHooks
+    autowire: true
+
+  Drupal\custom_field\Hook\TokenHooks:
+    class: Drupal\custom_field\Hook\TokenHooks
+    autowire: true
+
+  Drupal\custom_field\Hook\ViewsHooks:
+    class: Drupal\custom_field\Hook\ViewsHooks
+    autowire: true
+
+  logger.channel.custom_field:
+    parent: logger.channel_base
+    arguments:
+      - 'custom_field'
+
   plugin.manager.custom_field_type:
     class: Drupal\custom_field\Plugin\CustomFieldTypeManager
+    autowire: true
     parent: default_plugin_manager
     arguments:
       - '@plugin.manager.custom_field_widget'
 
+  # Alias to CustomFieldTypeManager.
+  Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface:
+    alias: plugin.manager.custom_field_type
+
   plugin.manager.custom_field_widget:
     class: Drupal\custom_field\Plugin\CustomFieldWidgetManager
     parent: default_plugin_manager
+
+  # Alias to CustomFieldWidgetManager.
+  Drupal\custom_field\Plugin\CustomFieldWidgetManagerInterface:
+    alias: plugin.manager.custom_field_widget
 
   plugin.manager.custom_field_formatter:
     class: Drupal\custom_field\Plugin\CustomFieldFormatterManager
     parent: default_plugin_manager
     arguments:
       - '@plugin.manager.custom_field_type'
+
+  # Alias to CustomFieldFormatterManager.
+  Drupal\custom_field\Plugin\CustomFieldFormatterManagerInterface:
+    alias: plugin.manager.custom_field_formatter
 
   plugin.manager.custom_field_feeds:
     class: Drupal\custom_field\Plugin\CustomFieldFeedsManager
@@ -33,34 +71,13 @@ services:
       - '@keyvalue'
       - '@config.factory'
       - '@module_handler'
+      - '@logger.channel.custom_field'
+      - '@messenger'
 
   custom_field.generate_data:
     class: Drupal\custom_field\CustomFieldGenerateData
     arguments:
       - '@plugin.manager.custom_field_type'
-
-  custom_field.normalizer.string_long:
-    class: Drupal\custom_field\Normalizer\StringLongNormalizer
-    tags:
-      # Priority must be higher than serializer.normalizer.primitive_data.
-      - { name: normalizer, priority: 20 }
-
-  custom_field.normalizer.entity_reference:
-    class: Drupal\custom_field\Normalizer\EntityReferenceNormalizer
-    arguments:
-      - '@entity.repository'
-    tags:
-      # Priority must be higher than serializer.normalizer.primitive_data.
-      - { name: normalizer, priority: 20 }
-
-  custom_field.normalizer.uri:
-    class: Drupal\custom_field\Normalizer\UriNormalizer
-    arguments:
-      - '@entity_type.manager'
-      - '@entity.repository'
-    tags:
-      # Priority must be higher than serializer.normalizer.primitive_data.
-      - { name: normalizer, priority: 20 }
 
   custom_field.tag_manager:
     class: Drupal\custom_field\TagManager

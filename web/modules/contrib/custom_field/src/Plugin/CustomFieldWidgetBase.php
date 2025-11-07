@@ -105,6 +105,7 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
     // Prep the element base properties. Implementations of the plugin can
     // override as necessary or just set #type and be on their merry way.
     $field_definition = $items->getFieldDefinition();
+    $field_name = $field_definition->getName();
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $items->getEntity();
     $settings = $field->getWidgetSetting('settings') ?? static::defaultSettings()['settings'];
@@ -113,6 +114,8 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
     /** @var \Drupal\custom_field\Plugin\Field\FieldType\CustomItem $item */
     $item = $items[$delta];
     $access = TRUE;
+    $parents = $form['#parents'];
+    $field_parents = array_merge($parents, [$field_name, $delta, $field->getName()]);
     if (!$this->isDefaultValueWidget($form_state) && $entity->isTranslatable()) {
       $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
       $is_translatable = $field_definition->isTranslatable() && $field->getWidgetSetting('translatable');
@@ -130,6 +133,7 @@ abstract class CustomFieldWidgetBase extends PluginSettingsBase implements Custo
       '#default_value' => $item->{$field->getName()} ?? NULL,
       '#required' => !(isset($form_state->getBuildInfo()['base_form_id']) && $form_state->getBuildInfo()['base_form_id'] == 'field_config_form') && $is_required && $settings['required'],
       '#access' => $access,
+      '#field_parents' => $field_parents,
     ];
   }
 

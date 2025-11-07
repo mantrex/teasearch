@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_example_advanced_setup\Plugin\rest\resource;
 
@@ -26,8 +26,8 @@ final class PositionResource extends ResourceBase {
    *   The response containing the position data.
    */
   public function get(): ResourceResponse {
-    $position1 = ['sourceid' => 'wine_taster', 'name' => 'Wine Taster'];
-    $position2 = ['sourceid' => 'vintner', 'name' => 'Vintner'];
+    $position1 = ['sourceId' => 'wine_taster', 'name' => 'Wine Taster'];
+    $position2 = ['sourceId' => 'vintner', 'name' => 'Vintner'];
     $data = ['position' => [$position1, $position2]];
 
     return new ResourceResponse($data, 200);

@@ -9,7 +9,7 @@ dependencies:
   - drupal:image
   - drupal:link
 
-# Information added by Drupal.org packaging script on 2025-05-27
-version: '3.1.10'
+# Information added by Drupal.org packaging script on 2025-08-29
+version: '3.1.15'
 project: 'custom_field'
-datestamp: 1748358777
+datestamp: 1756498852

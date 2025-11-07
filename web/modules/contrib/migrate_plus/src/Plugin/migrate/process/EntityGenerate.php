@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus\Plugin\migrate\process;
 
@@ -51,15 +51,30 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class EntityGenerate extends EntityLookup {
 
+  /**
+   * The row.
+   */
   protected ?Row $row = NULL;
+
+  /**
+   * The migrate executable.
+   */
   protected ?MigrateExecutableInterface $migrateExecutable = NULL;
+
+  /**
+   * The migrate plugin manager.
+   */
   protected ?MigratePluginManagerInterface $processPluginManager = NULL;
+
+  /**
+   * The Get process plugin.
+   */
   protected ?Get $getProcessPlugin = NULL;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition, MigrationInterface $migration = NULL): self {
+  public static function create(ContainerInterface $container, array $configuration, $pluginId, $pluginDefinition, ?MigrationInterface $migration = NULL): self {
     $instance = parent::create($container, $configuration, $pluginId, $pluginDefinition, $migration);
     $instance->processPluginManager = $container->get('plugin.manager.migrate.process');
     return $instance;
@@ -85,10 +100,10 @@ class EntityGenerate extends EntityLookup {
    * @param string $value
    *   Value to use in creation of the entity.
    *
-   * @return int|string
+   * @return null|int|string
    *   The entity id of the generated entity.
    */
-  protected function generateEntity($value) {
+  protected function generateEntity($value): null|int|string {
     if (!empty($value)) {
       $entity = $this->entityTypeManager
         ->getStorage($this->lookupEntityType)
@@ -97,6 +112,8 @@ class EntityGenerate extends EntityLookup {
 
       return $entity->id();
     }
+
+    return NULL;
   }
 
   /**

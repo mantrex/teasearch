@@ -18,11 +18,21 @@ use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
   id: 'datetime',
   label: new TranslatableMarkup('Date'),
   description: new TranslatableMarkup('A field containing a Date.'),
-  category: new TranslatableMarkup('General'),
+  category: new TranslatableMarkup('Date/Time'),
   default_widget: 'datetime_default',
   default_formatter: 'datetime_default',
 )]
-class DateTimeType extends CustomFieldTypeBase {
+class DateTimeType extends CustomFieldTypeBase implements DateTimeTypeInterface {
+
+  /**
+   * Value for the 'datetime_type' setting: store only a date.
+   */
+  const DATETIME_TYPE_DATE = 'date';
+
+  /**
+   * Value for the 'datetime_type' setting: store a date and time.
+   */
+  const DATETIME_TYPE_DATETIME = 'datetime';
 
   /**
    * {@inheritdoc}
@@ -34,6 +44,11 @@ class DateTimeType extends CustomFieldTypeBase {
       'type' => 'varchar',
       'length' => 20,
     ];
+    $columns[$name . self::SEPARATOR . 'timezone'] = [
+      'description' => 'The preferred timezone.',
+      'type' => 'varchar',
+      'length' => 32,
+    ];
 
     return $columns;
   }
@@ -42,11 +57,32 @@ class DateTimeType extends CustomFieldTypeBase {
    * {@inheritdoc}
    */
   public static function propertyDefinitions(array $settings): array {
-    ['name' => $name] = $settings;
+    ['name' => $name, 'datetime_type' => $datetime_type] = $settings;
+    $date = $name . self::SEPARATOR . 'date';
+    $timezone = $name . self::SEPARATOR . 'timezone';
+    $timezones = \DateTimeZone::listIdentifiers();
+    array_unshift($timezones, '');
 
-    $properties[$name] = DataDefinition::create('datetime_iso8601')
+    $properties[$name] = DataDefinition::create('custom_field_datetime')
       ->setLabel(new TranslatableMarkup('@name', ['@name' => $name]))
       ->setRequired(FALSE);
+
+    $properties[$date] = DataDefinition::create('any')
+      ->setLabel(new TranslatableMarkup('@name computed date', ['@name' => $name]))
+      ->setDescription(new TranslatableMarkup('The computed DateTime object.'))
+      ->setComputed(TRUE)
+      ->setClass('\Drupal\custom_field\Plugin\CustomField\DateTimeComputed')
+      ->setSettings(['datetime_type' => $datetime_type, 'date source' => $name]);
+
+    $properties[$timezone] = DataDefinition::create('string')
+      ->setLabel(t('Timezone'))
+      ->setDescription(t('The timezone of this date.'))
+      ->setSetting('max_length', 32)
+      ->setRequired(FALSE)
+      ->setInternal(TRUE)
+      // @todo Define this via an options provider once
+      // https://www.drupal.org/node/2329937 is completed.
+      ->addConstraint('AllowedValues', $timezones);
 
     return $properties;
   }
@@ -57,11 +93,11 @@ class DateTimeType extends CustomFieldTypeBase {
   public static function generateSampleValue(CustomFieldTypeInterface $field, string $target_entity_type): string {
     $datetime_type = $field->getDatetimeType();
     $timestamp = \Drupal::time()->getRequestTime() - mt_rand(0, 86400 * 365);
-    if ($datetime_type == $field::DATETIME_TYPE_DATE) {
-      $value = gmdate($field::DATE_STORAGE_FORMAT, $timestamp);
+    if ($datetime_type == self::DATETIME_TYPE_DATE) {
+      $value = gmdate(static::DATE_STORAGE_FORMAT, $timestamp);
     }
     else {
-      $value = gmdate($field::DATETIME_STORAGE_FORMAT, $timestamp);
+      $value = gmdate(static::DATETIME_STORAGE_FORMAT, $timestamp);
     }
 
     return $value;
@@ -89,6 +125,15 @@ class DateTimeType extends CustomFieldTypeBase {
     }
 
     return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function onChange(string $property_name, bool $notify, FieldItemInterface $item): void {
+    // Enforce that the computed date is recalculated.
+    $item->set($property_name . '__date', NULL);
+    parent::onChange($property_name, $notify, $item);
   }
 
 }

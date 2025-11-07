@@ -1,9 +1,10 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_plus\Kernel\Plugin\migrate\process;
 
+use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\migrate\MigrateExecutableInterface;
@@ -206,12 +207,12 @@ EOT;
     $executable = $this->prophesize(MigrateExecutableInterface::class)->reveal();
 
     // Delete the target directory in case it already exists
-    // to make sure target directories are automatically created
+    // to make sure target directories are automatically created.
     if (is_dir(dirname($this->filename))) {
       rmdir(dirname($this->filename));
     }
 
-    // Run the plugin
+    // Run the plugin.
     $row = new Row([], []);
     $value = [$this->filename, base64_decode($this->blob, TRUE)];
     /** @var \Drupal\migrate_plus\Plugin\migrate\process\FileBlob $file_blob */
@@ -220,9 +221,9 @@ EOT;
     $this->assertEquals($this->filename, $file);
     $this->assertEquals($this->sha1sum, sha1_file($file));
 
-    // Run the plugin again, but error if the file already exists
+    // Run the plugin again, but error if the file already exists.
     $configuration = [
-      'reuse' => FileSystemInterface::EXISTS_ERROR,
+      'reuse' => FileExists::Error,
     ];
     /** @var \Drupal\migrate_plus\Plugin\migrate\process\FileBlob $file_blob */
     $file_blob = $this->pluginManager->createInstance('file_blob', $configuration);

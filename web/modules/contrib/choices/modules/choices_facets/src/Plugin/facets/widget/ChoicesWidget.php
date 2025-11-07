@@ -64,7 +64,7 @@ class ChoicesWidget extends WidgetPluginBase implements ContainerFactoryPluginIn
         'class' => ['js-facets-choices', 'js-facets-widget'],
       ],
       '#attached' => [
-        'library' => ['choices/widget'],
+        'library' => ['choices_facets/widget'],
         'drupalSettings' => [
           'choices' => [
             'facets' => [

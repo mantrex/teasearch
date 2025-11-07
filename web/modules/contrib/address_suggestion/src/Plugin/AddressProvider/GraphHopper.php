@@ -2,20 +2,21 @@
 
 namespace Drupal\address_suggestion\Plugin\AddressProvider;
 
-use Drupal\address_suggestion\AddressProviderBase;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\address_suggestion\AddressProviderBase;
+use Drupal\address_suggestion\Attribute\AddressProvider;
 
 /**
  * Defines a Graph Hopper plugin for address_suggestion.
  *
  * @package Drupal\address_suggestion\Plugin\AddressProvider
- *
- * @AddressProvider(
- *   id = "graph_hopper",
- *   label = @Translation("Graph Hopper api"),
- *   api = "https://graphhopper.com/api/1/geocode",
- * )
  */
+#[AddressProvider(
+  id: 'graph_hopper',
+  label: new TranslatableMarkup('Graph Hopper api'),
+  api: 'https://graphhopper.com/api/1/geocode',
+)]
 class GraphHopper extends AddressProviderBase {
 
   /**

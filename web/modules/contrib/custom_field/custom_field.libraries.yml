@@ -26,13 +26,19 @@ custom-field-flex-admin:
 custom-field-color-box:
   version: 1.x
   js:
-    js/custom_field_color_box.js: {}
+    js/custom-field-color-box.js: {}
   css:
     component:
-      css/custom_field_color_box.css: {}
+      css/custom-field-color-box.css: {}
   dependencies:
     - core/drupalSettings
     - core/once
+
+custom-field-datetime:
+  version: 1.x
+  css:
+    component:
+      css/custom-field-datetime.css: {}
 
 drupal.custom-icon:
   version: VERSION

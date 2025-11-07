@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_plus\Kernel\Plugin\migrate\process;
 
@@ -97,23 +97,23 @@ final class EntityValueTest extends KernelTestBase {
     $row = new Row();
 
     // Ensure that the entity is returned if it really exists.
-    $value = $this->plugin->transform($this->uid, $executable, $row, 'dummmy');
+    $value = $this->plugin->transform($this->uid, $executable, $row, 'dummy');
     $this->assertSame($this->title, $value[0]['value']);
     $this->assertFalse($this->plugin->multiple());
 
     // Ensure that an array of entities is returned.
     $value = $this->plugin->transform([$this->uid], $executable, $row,
-      'dummmy');
+      'dummy');
     $this->assertSame($this->title, $value[0][0]['value']);
     $this->assertTrue($this->plugin->multiple());
 
     // Ensure that the plugin returns [] if the entity doesn't exist.
-    $value = $this->plugin->transform(9999999, $executable, $row, 'dummmy');
+    $value = $this->plugin->transform(9999999, $executable, $row, 'dummy');
     $this->assertSame([], $value);
     $this->assertFalse($this->plugin->multiple());
 
     // Ensure that the plugin returns [] if NULL is passed.
-    $value = $this->plugin->transform(NULL, $executable, $row, 'dummmy');
+    $value = $this->plugin->transform(NULL, $executable, $row, 'dummy');
     $this->assertSame([], $value);
     $this->assertFalse($this->plugin->multiple());
   }
@@ -135,13 +135,12 @@ final class EntityValueTest extends KernelTestBase {
     $row = new Row();
 
     // Ensure that the entity is returned if it really exists.
-    $value = $this->plugin->transform($this->uid, $executable, $row, 'dummmy');
+    $value = $this->plugin->transform($this->uid, $executable, $row, 'dummy');
     $this->assertSame($this->titleSpanish, $value[0]['value']);
     $this->assertFalse($this->plugin->multiple());
 
     // Ensure that an array of entities is returned.
-    $value = $this->plugin->transform([$this->uid], $executable, $row,
-      'dummmy');
+    $value = $this->plugin->transform([$this->uid], $executable, $row, 'dummy');
     $this->assertSame($this->titleSpanish, $value[0][0]['value']);
     $this->assertTrue($this->plugin->multiple());
   }
@@ -168,7 +167,7 @@ final class EntityValueTest extends KernelTestBase {
     // Ensure that the entity is returned if it really exists.
     $this->expectException(MigrateException::class);
     $this->expectExceptionMessage('Langcode can only be used with content entities currently.');
-    $this->plugin->transform([$config_entity->id()], $executable, $row, 'dummmy');
+    $this->plugin->transform([$config_entity->id()], $executable, $row, 'dummy');
   }
 
   /**

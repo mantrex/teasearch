@@ -46,7 +46,7 @@ here - it is expected that if you are learning Drupal 8+ migration, you will
 study and understand those examples first, and use migrate_example_advanced to
 learn about specific techniques beyond those basics. This example doesn't have
 the narrative form of migrate_example - it's more of a grab-bag demonstrating
-varous features, and is more of a reference for, say, copying the code to set
+various features, and is more of a reference for, say, copying the code to set
 up an XML migration. An index of things demonstrated by this module:
 
 Multiple vocabularies populated in one migration

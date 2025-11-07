@@ -29,7 +29,7 @@
 <section{{ attributes }} id="node-comment">
   {% if comments and not label_hidden %}
     {{ title_prefix }}
-    <h2{{ title_attributes.addClass('comments-title') }}><i class="icon-comments theme-color"></i> {{ label }}</h2>
+    <h2{{ title_attributes.addClass('comments-title') }}><i class="ficon-comments theme-color"></i> {{ label }}</h2>
     {{ title_suffix }}
   {% endif %}
 
@@ -37,7 +37,7 @@
 
   {% if comment_form %}
     <div class="comment-form-wrap">
-      <h2{{ content_attributes.addClass('add-comment-title') }}><i class="icon-add_comment theme-color"></i> {{ 'Add new comment'|t }}</h2>
+      <h2{{ content_attributes.addClass('add-comment-title') }}><i class="ficon-add_comment theme-color"></i> {{ 'Add new comment'|t }}</h2>
       {{ comment_form }}
   </div> <!--/.comment-form -->
   {% endif %}

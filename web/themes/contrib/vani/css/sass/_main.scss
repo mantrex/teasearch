@@ -158,28 +158,3 @@
 .comment-add a::before {
   content: "\e910";
 }
-/* Main -> node -> pager */
-.pager__items {
-  list-style: none;
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  margin: 0;
-  padding: 1rem 0;
-}
-.pager__item {
-  display: grid;
-  place-content: center;
-  padding: 0;
-  line-height: 1;
-}
-.pager__item a {
-  padding: 10px 14px;
-  background: var(--content-bg);
-  border-radius: 4px;
-}
-.pager__item a:hover,
-.pager__item.is-active a {
-  background: var(--theme-color);
-  color: #ffffff;
-}

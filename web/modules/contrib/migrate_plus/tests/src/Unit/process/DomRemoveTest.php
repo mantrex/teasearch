@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_plus\Unit\process;
 
@@ -24,13 +24,13 @@ final class DomRemoveTest extends MigrateProcessTestCase {
   public function testTransform($input_string, $configuration, $output_string): void {
     $value = Html::load($input_string);
     $document = (new DomRemove($configuration, 'dom_remove', []))
-      ->transform($value, $this->migrateExecutable, $this->row, 'destinationproperty');
+      ->transform($value, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertTrue($document instanceof \DOMDocument);
     $this->assertEquals($output_string, Html::serialize($document));
   }
 
   /**
-   * Dataprovider for testTransform().
+   * Data provider for testTransform().
    */
   public static function providerTestTransform(): array {
     $input_string = '<ul><li>Item 1</li><li>Item 2</li><li><ul><li>Item 3.1</li><li>Item 3.2</li></ul></li><li>Item 4</li><li>Item 5</li></ul>';

@@ -140,7 +140,7 @@ class ChoicesWidgetFunctionalJsTest extends WebDriverTestBase {
   }
 
   /**
-   * Tests if the select is modified by choices inside a inetger list field.
+   * Tests if the select is modified by choices inside an integer list field.
    */
   public function testChoicesAppliedOnFieldSelectListInteger() {
     $session = $this->assertSession();
@@ -182,7 +182,7 @@ class ChoicesWidgetFunctionalJsTest extends WebDriverTestBase {
       }');
     $page->pressButton('Update');
     $page->pressButton('edit-submit');
-    $session->pageTextContains('Your settings have been saved.');
+    $this->assertTrue($session->waitForText('Your settings have been saved.'));
     $this->drupalGet('/node/add/article');
     $session->elementExists('css', 'script[src*="choices.min.js"]');
     $session->elementExists('css', 'link[href*="choices.min.css"]');
@@ -207,7 +207,7 @@ class ChoicesWidgetFunctionalJsTest extends WebDriverTestBase {
     $page->pressButton('Update');
     // Save the config and see, if it fails to apply:
     $page->pressButton('edit-submit');
-    $session->pageTextContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
+    $this->assertTrue($session->waitForText('You have to enter a correct JSON object definition or leave the field empty to use default settings.'));
 
     // Go to config page and set a 0 as json setting:
     $this->drupalGet('/admin/structure/types/manage/article/form-display');
@@ -217,7 +217,7 @@ class ChoicesWidgetFunctionalJsTest extends WebDriverTestBase {
     $page->pressButton('Update');
     // Save the config and see, if it fails to apply:
     $page->pressButton('edit-submit');
-    $session->pageTextContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
+    $this->assertTrue($session->waitForText('You have to enter a correct JSON object definition or leave the field empty to use default settings.'));
 
     // Go to config page and set "blank" as json setting:
     $this->drupalGet('/admin/structure/types/manage/article/form-display');
@@ -227,7 +227,7 @@ class ChoicesWidgetFunctionalJsTest extends WebDriverTestBase {
     $page->pressButton('Update');
     // Save the config and see, if it fails to apply:
     $page->pressButton('edit-submit');
-    $session->pageTextContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
+    $this->assertTrue($session->waitForText('You have to enter a correct JSON object definition or leave the field empty to use default settings.'));
 
     // Go to config page and set "'" as json setting:
     $this->drupalGet('/admin/structure/types/manage/article/form-display');
@@ -237,7 +237,7 @@ class ChoicesWidgetFunctionalJsTest extends WebDriverTestBase {
     $page->pressButton('Update');
     // Save the config and see, if it fails to apply:
     $page->pressButton('edit-submit');
-    $session->pageTextContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
+    $this->assertTrue($session->waitForText('You have to enter a correct JSON object definition or leave the field empty to use default settings.'));
 
     // Go to config page and set '"' as json setting:
     $this->drupalGet('/admin/structure/types/manage/article/form-display');
@@ -247,7 +247,7 @@ class ChoicesWidgetFunctionalJsTest extends WebDriverTestBase {
     $page->pressButton('Update');
     // Save the config and see, if it fails to apply:
     $page->pressButton('edit-submit');
-    $session->pageTextContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
+    $this->assertTrue($session->waitForText('You have to enter a correct JSON object definition or leave the field empty to use default settings.'));
 
     // Go to config page and set '[]' as json setting:
     $this->drupalGet('/admin/structure/types/manage/article/form-display');
@@ -257,7 +257,7 @@ class ChoicesWidgetFunctionalJsTest extends WebDriverTestBase {
     $page->pressButton('Update');
     // Save the config and see, if it fails to apply:
     $page->pressButton('edit-submit');
-    $session->pageTextContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
+    $this->assertTrue($session->waitForText('You have to enter a correct JSON object definition or leave the field empty to use default settings.'));
 
     // Go to config page and set '{' as json setting:
     $this->drupalGet('/admin/structure/types/manage/article/form-display');
@@ -267,7 +267,7 @@ class ChoicesWidgetFunctionalJsTest extends WebDriverTestBase {
     $page->pressButton('Update');
     // Save the config and see, if it fails to apply:
     $page->pressButton('edit-submit');
-    $session->pageTextContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
+    $this->assertTrue($session->waitForText('You have to enter a correct JSON object definition or leave the field empty to use default settings.'));
 
     // Go to config page and set '}' as json setting:
     $this->drupalGet('/admin/structure/types/manage/article/form-display');
@@ -277,7 +277,7 @@ class ChoicesWidgetFunctionalJsTest extends WebDriverTestBase {
     $page->pressButton('Update');
     // Save the config and see, if it fails to apply:
     $page->pressButton('edit-submit');
-    $session->pageTextContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
+    $this->assertTrue($session->waitForText('You have to enter a correct JSON object definition or leave the field empty to use default settings.'));
 
     // Go to config page and set '' as json setting:
     $this->drupalGet('/admin/structure/types/manage/article/form-display');
@@ -287,6 +287,7 @@ class ChoicesWidgetFunctionalJsTest extends WebDriverTestBase {
     $page->pressButton('Update');
     // Save the config and see, if it applies successfully:
     $page->pressButton('edit-submit');
+    $this->assertTrue($session->waitForText('Your settings have been saved.'));
     $session->pageTextNotContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
 
     // Go to config page and set '{}' as json setting:
@@ -297,6 +298,7 @@ class ChoicesWidgetFunctionalJsTest extends WebDriverTestBase {
     $page->pressButton('Update');
     // Save the config and see, if it applies successfully:
     $page->pressButton('edit-submit');
+    $this->assertTrue($session->waitForText('Your settings have been saved.'));
     $session->pageTextNotContains('You have to enter a correct JSON object definition or leave the field empty to use default settings.');
   }
 

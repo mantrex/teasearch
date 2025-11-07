@@ -20,3 +20,23 @@ Version 11.0.0
 +===============================+
 - Initial release of 11.x.x series.
 - Drupal 11 compatible.
+
+
++===============================+
+Version 11.0.1
+15 Oct 2025
++===============================+
+- Fixed slider image upload issue.
+
+
++===============================+
+Version 11.0.2
+17 Oct 2025
++===============================+
+- Fixed comment buttons styling issue.
+- Added styling for full page search form.
+- Updated twitter icon.
+- New template file, pager.html.twig, views-mini-pager.html.twig
+- Fixed styling for mini pager.
+- Added gap between slider text and slider image.
+- Fixed ajax issue in view.

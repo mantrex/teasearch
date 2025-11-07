@@ -19,11 +19,14 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\custom_field\Event\PreFormatEvent;
 use Drupal\custom_field\Plugin\CustomFieldFormatterInterface;
 use Drupal\custom_field\Plugin\CustomFieldFormatterManagerInterface;
+use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface;
 use Drupal\custom_field\TagManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * The base formatter for custom_field.
@@ -59,6 +62,13 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
   protected EntityRepositoryInterface $entityRepository;
 
   /**
+   * The event dispatcher.
+   *
+   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   */
+  protected EventDispatcherInterface $eventDispatcher;
+
+  /**
    * The module handler service.
    *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
@@ -88,6 +98,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
     $instance->customFieldFormatterManager = $container->get('plugin.manager.custom_field_formatter');
     $instance->entityTypeManager = $container->get('entity_type.manager');
     $instance->entityRepository = $container->get('entity.repository');
+    $instance->eventDispatcher = $container->get('event_dispatcher');
     $instance->moduleHandler = $container->get('module_handler');
     $instance->tagManager = $container->get('custom_field.tag_manager');
     $instance->renderer = $container->get('renderer');
@@ -110,15 +121,30 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
   public function settingsForm(array $form, FormStateInterface $form_state): array {
     $form = parent::settingsForm($form, $form_state);
     $field_name = $this->fieldDefinition->getName();
+
     $form['fields'] = [
-      '#type' => 'details',
-      '#title' => $this->t('Field settings'),
-      '#open' => TRUE,
+      '#type' => 'table',
+      '#header' => [
+        $this->t('Field'),
+        $this->t('Settings'),
+        $this->t('Weight'),
+      ],
+      '#tableselect' => FALSE,
+      '#tabledrag' => [
+        [
+          'action' => 'order',
+          'relationship' => 'sibling',
+          'group' => 'field-settings-order-weight',
+        ],
+      ],
       '#weight' => 10,
     ];
 
-    foreach ($this->getCustomFieldItems() as $name => $custom_item) {
-      $settings = $this->getSetting('fields')[$name] ?? [];
+    $field_settings = $this->getSetting('fields') ?? [];
+    $custom_items = $this->sortFields($field_settings);
+
+    foreach ($custom_items as $name => $custom_item) {
+      $settings = $field_settings[$name] ?? [];
       $formatter_settings = $settings['formatter_settings'] ?? [];
       $wrapper_settings = $settings['wrappers'] ?? [];
       $type = $custom_item->getPluginId();
@@ -129,6 +155,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
       }
       $values = $form_state->getValues();
       $value_keys = $this->customFieldFormatterManager->getFormatterValueKeys($form_state, $field_name, (string) $name);
+      $parents = array_slice($value_keys, 0, -1);
       $format_type = NestedArray::getValue($values, $value_keys) ?? $default_format;
 
       $visibility_path = $this->customFieldFormatterManager->getInputPathForStatesApi($form_state, $field_name, (string) $name);
@@ -139,16 +166,26 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
       }
       $form['#visibility_path'] = $visibility_path;
       $wrapper_id = 'field-' . $field_name . '-' . $name . '-ajax';
+      $weight = $settings['weight'] ?? 0;
       $form['fields'][$name] = [
+        '#attributes' => [
+          'class' => ['draggable'],
+        ],
+        '#weight' => $weight,
+      ];
+      $form['fields'][$name]['name'] = [
+        '#type' => 'markup',
+        '#markup' => $custom_item->getLabel(),
+      ];
+
+      $form['fields'][$name]['content'] = [
         '#type' => 'details',
-        '#title' => $this->t('@label (@type)', [
-          '@label' => $custom_item->getLabel(),
-          '@type' => $custom_item->getDataType(),
-        ]),
+        '#title' => $this->t('Settings'),
+        '#parents' => $parents,
       ];
 
       if (!empty($formatter_options)) {
-        $form['fields'][$name]['format_type'] = [
+        $form['fields'][$name]['content']['format_type'] = [
           '#type' => 'select',
           '#title' => $this->t('Format type'),
           '#options' => $formatter_options,
@@ -159,7 +196,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
             'method' => 'replace',
           ],
         ];
-        $form['fields'][$name]['formatter_settings'] = [
+        $form['fields'][$name]['content']['formatter_settings'] = [
           '#type' => 'container',
           '#prefix' => '<div id="' . $wrapper_id . '">',
           '#suffix' => '</div>',
@@ -172,9 +209,9 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
         if (!is_null($format)) {
           $formatter = $format->settingsForm($form, $form_state);
         }
-        $form['fields'][$name]['formatter_settings'] += $formatter;
+        $form['fields'][$name]['content']['formatter_settings'] += $formatter;
 
-        $form['fields'][$name]['formatter_settings']['label_display'] = [
+        $form['fields'][$name]['content']['formatter_settings']['label_display'] = [
           '#type' => 'select',
           '#title' => $this->t('Label display'),
           '#options' => $this->fieldLabelOptions(),
@@ -182,7 +219,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
           '#weight' => 10,
           '#access' => $type !== 'boolean' && $format_type !== 'hidden',
         ];
-        $form['fields'][$name]['formatter_settings']['field_label'] = [
+        $form['fields'][$name]['content']['formatter_settings']['field_label'] = [
           '#type' => 'textfield',
           '#title' => $this->t('Field label'),
           '#description' => $this->t('The label for viewing this field. Leave blank to use the default field label.'),
@@ -199,7 +236,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
         // HTML wrapper settings.
         $tag_options = $this->tagManager->getTagOptions();
 
-        $form['fields'][$name]['wrappers'] = [
+        $form['fields'][$name]['content']['wrappers'] = [
           '#type' => 'details',
           '#title' => $this->t('Style settings'),
           '#states' => [
@@ -208,7 +245,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
             ],
           ],
         ];
-        $form['fields'][$name]['wrappers']['field_wrapper_tag'] = [
+        $form['fields'][$name]['content']['wrappers']['field_wrapper_tag'] = [
           '#type' => 'select',
           '#title' => $this->t('Field wrapper tag'),
           '#description' => $this->t('Choose the HTML element to wrap around this field and label.'),
@@ -216,7 +253,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
           '#empty_option' => $this->t('- Use default -'),
           '#default_value' => $wrapper_settings['field_wrapper_tag'] ?? '',
         ];
-        $form['fields'][$name]['wrappers']['field_wrapper_classes'] = [
+        $form['fields'][$name]['content']['wrappers']['field_wrapper_classes'] = [
           '#type' => 'textfield',
           '#title' => $this->t('Field wrapper classes'),
           '#description' => $this->t('Enter additional classes, separated by space.'),
@@ -227,7 +264,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
             ],
           ],
         ];
-        $form['fields'][$name]['wrappers']['field_tag'] = [
+        $form['fields'][$name]['content']['wrappers']['field_tag'] = [
           '#type' => 'select',
           '#title' => $this->t('Field tag'),
           '#description' => $this->t('Choose the HTML element to wrap around this field.'),
@@ -235,7 +272,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
           '#empty_option' => $this->t('- Use default -'),
           '#default_value' => $wrapper_settings['field_tag'] ?? '',
         ];
-        $form['fields'][$name]['wrappers']['field_classes'] = [
+        $form['fields'][$name]['content']['wrappers']['field_classes'] = [
           '#type' => 'textfield',
           '#title' => $this->t('Field classes'),
           '#description' => $this->t('Enter additional classes, separated by space.'),
@@ -246,7 +283,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
             ],
           ],
         ];
-        $form['fields'][$name]['wrappers']['label_tag'] = [
+        $form['fields'][$name]['content']['wrappers']['label_tag'] = [
           '#type' => 'select',
           '#title' => $this->t('Label tag'),
           '#description' => $this->t('Choose the HTML element to wrap around this label.'),
@@ -259,7 +296,7 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
             ],
           ],
         ];
-        $form['fields'][$name]['wrappers']['label_classes'] = [
+        $form['fields'][$name]['content']['wrappers']['label_classes'] = [
           '#type' => 'textfield',
           '#title' => $this->t('Label classes'),
           '#description' => $this->t('Enter additional classes, separated by space.'),
@@ -273,6 +310,13 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
             ],
           ],
         ];
+        $form['fields'][$name]['weight'] = [
+          '#type' => 'weight',
+          '#title' => $this->t('Weight for @label', ['@label' => $custom_item->getLabel()]),
+          '#title_display' => 'invisible',
+          '#default_value' => $weight,
+          '#attributes' => ['class' => ['field-settings-order-weight']],
+        ];
       }
     }
 
@@ -280,13 +324,38 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
   }
 
   /**
+   * Helper function to sort field settings by weight.
+   *
+   * @param array $settings
+   *   The field settings.
+   *
+   * @return array<string, CustomFieldTypeInterface>
+   *   The sorted custom items.
+   */
+  protected function sortFields(array $settings): array {
+    $custom_items = $this->getCustomFieldItems();
+
+    // Sort items by weight.
+    uasort($custom_items, function (CustomFieldTypeInterface $a, CustomFieldTypeInterface $b) use ($settings) {
+      $weight_a = $settings[$a->getName()]['weight'] ?? 0;
+      $weight_b = $settings[$b->getName()]['weight'] ?? 0;
+      return $weight_a <=> $weight_b;
+    });
+
+    return $custom_items;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function settingsSummary(): array {
     $summary = parent::settingsSummary();
-    $custom_fields = $this->getCustomFieldItems();
-    $settings = $this->getSetting('fields');
-    foreach ($custom_fields as $id => $custom_field) {
+    $settings = $this->getSetting('fields') ?? [];
+
+    // Sort items by weight.
+    $custom_items = $this->sortFields($settings);
+
+    foreach ($custom_items as $id => $custom_field) {
       $formatter_options = $this->customFieldFormatterManager->getOptions($custom_field);
       $format_type = $custom_field->getDefaultFormatter();
       if (isset($settings[$id]['format_type']) && isset($formatter_options[$settings[$id]['format_type']])) {
@@ -425,9 +494,9 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
 
     $values = $this->getFormattedValues($item, $langcode);
 
-    foreach ($values as $value) {
+    foreach ($values as $name => $value) {
       if ($value !== NULL && $value !== '') {
-        $output['#items'][] = [
+        $output['#items'][$name] = [
           '#theme' => 'custom_field_item',
           '#field_name' => $field_name,
           '#name' => $value['name'],
@@ -467,10 +536,16 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
    *   An array of formatted values.
    */
   protected function getFormattedValues(FieldItemInterface $item, string $langcode): array {
-    $settings = $this->getSetting('fields');
+    $settings = $this->getSetting('fields') ?? [];
+    $custom_items = $this->sortFields($settings);
+
+    $event = new PreFormatEvent($custom_items, $item, $langcode);
+    $this->eventDispatcher->dispatch($event);
+    $custom_items = $event->getCustomItems();
+
     $values = [];
     $entity_type = $this->fieldDefinition->getTargetEntityTypeId();
-    foreach ($this->getCustomFieldItems() as $name => $custom_item) {
+    foreach ($custom_items as $name => $custom_item) {
       $value = $custom_item->value($item);
       $data_type = $custom_item->getDataType();
       if ($value === '' || $value === NULL) {
@@ -494,6 +569,12 @@ abstract class BaseFormatter extends FormatterBase implements BaseFormatterInter
           'uri' => $value,
           'title' => $item->{$name . '__title'},
           'options' => $item->{$name . '__options'},
+        ];
+      }
+      elseif ($data_type === 'datetime') {
+        $value = [
+          'date' => $item->{$name . '__date'},
+          'timezone' => $item->{$name . '__timezone'},
         ];
       }
       elseif (in_array($data_type, ['entity_reference', 'file', 'image'])) {

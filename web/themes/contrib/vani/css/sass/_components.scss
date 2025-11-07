@@ -33,6 +33,64 @@
   background: var(--theme-color);
   color: #ffffff;
 }
+/* mini pager navigation
+------------------------- */
+.pager {
+  margin: 1rem 0;
+}
+.pager-items {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.pager-item,
+.pager-item a {
+  display: grid;
+  place-content: center;
+  background-color: var(--bold-color);
+  color: #ffffff;
+  min-width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  transition: 0.3s ease-in-out;
+}
+.pager-item:hover,
+.pager-item a:hover {
+  background-color: var(--theme-color);
+}
+.pager-item-arrow a {
+  background-color: var(--bold-color);
+  display: grid;
+  place-content: center;
+  min-width: 40px;
+  height: 40px;
+}
+.pager-item-active,
+.pager-item-active a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--theme-color);
+  color: #ffffff;
+  height: 40px;
+  min-width: 40px;
+}
+/* Full pager navigation
+------------------------- */
+.pager-item-first a,
+.pager-item-last a,
+.pager-item-previous a,
+.pager-item-next a {
+  display: flex;
+  align-items: center;
+  background-color: var(--bold-color);
+  height: 40px;
+  padding: 0 10px;
+}
 /* Drupal system message */
 .message {
   position: relative;

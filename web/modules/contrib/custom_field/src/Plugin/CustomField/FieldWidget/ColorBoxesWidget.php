@@ -113,22 +113,41 @@ class ColorBoxesWidget extends ColorWidget {
     ];
 
     $default_colors = is_array($settings['default_colors']) ? implode(',', $settings['default_colors']) : $settings['default_colors'];
-    preg_match_all("/#[0-9A-F]{6}/i", $default_colors, $default_colors, PREG_SET_ORDER);
+    preg_match_all("/#[0-9A-F]{6}/i", $default_colors, $matches, PREG_SET_ORDER);
 
-    foreach ($default_colors as $color) {
+    foreach ($matches as $color) {
       $settings[$element['#uid']]['palette'][] = $color[0];
     }
 
     $element['#attached']['drupalSettings']['custom_field']['color_box']['settings'] = $settings;
 
-    $element['#suffix'] = "<div class='custom-field-color-box-form' id='" . $element['#uid'] . "'></div>";
-
-    // Add our widget type and additional properties and return.
     return [
-      '#type' => 'textfield',
-      '#maxlength' => 7,
-      '#size' => 7,
-    ] + $element;
+      '#type' => 'container',
+      'value' => [
+        '#type' => 'textfield',
+        '#maxlength' => 7,
+        '#size' => 7,
+        '#attributes' => ['class' => ['visually-hidden']],
+      ] + $element,
+      'color_picker' => [
+        '#type' => 'container',
+        '#attributes' => [
+          'class' => ['custom-field-color-box-container'],
+          'id' => $element['#uid'],
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function massageFormValue(mixed $value, array $column): mixed {
+    $value = $value['value'] ?? NULL;
+    if (empty($value)) {
+      return NULL;
+    }
+    return $value;
   }
 
   /**

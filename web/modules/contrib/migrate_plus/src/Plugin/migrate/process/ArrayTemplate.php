@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\migrate_plus\Plugin\migrate\process;
 
 use Drupal\Component\Utility\NestedArray;
-use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
@@ -93,10 +92,10 @@ final class ArrayTemplate extends ProcessPluginBase {
    * Replaces source, destination, or pipeline with the correct value.
    *
    * @param mixed $value
-   *   The array value as provided by arraywalk_recursive(): any type other than
-   *   array. Passed by reference.
+   *   The array value as provided by array_walk_recursive. Any type other than
+   *   array passed by reference.
    * @param string $key
-   *   The array key as provided by arraywalk_recursive(): ignored.
+   *   The array key as provided by array_walk_recursive(): ignored.
    * @param array $args
    *   An array with the keys
    *   - row: the current Row object;
@@ -115,6 +114,7 @@ final class ArrayTemplate extends ProcessPluginBase {
     // Strip the added ':'.
     $key = substr($key, 0, -1);
     ['row' => $row, 'pipeline' => $pipeline] = $args;
+    assert($row instanceof Row);
     $value = match($type) {
       'source' => $row->getSourceProperty($key),
       'dest' => $row->getDestinationProperty($key),

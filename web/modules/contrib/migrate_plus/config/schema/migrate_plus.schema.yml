@@ -37,6 +37,9 @@ migrate_plus.migration.*:
     destination:
       type: ignore
       label: 'Destination'
+    idMap:
+      type: migrate_plus.id_map.[plugin]
+      label: 'Id Map'
     migration_dependencies:
       type: mapping
       label: 'Dependencies'

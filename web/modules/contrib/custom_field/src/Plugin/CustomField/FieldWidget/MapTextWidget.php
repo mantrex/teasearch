@@ -30,30 +30,21 @@ class MapTextWidget extends MapWidgetBase {
   public function widget(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state, CustomFieldTypeInterface $field): array {
     $element = parent::widget($items, $delta, $element, $form, $form_state, $field);
     $element['#element_validate'] = [[static::class, 'validateArrayValues']];
+    /** @var \Drupal\Core\Field\FieldItemInterface $item */
+    $item = $items[$delta];
     $settings = $field->getWidgetSetting('settings') + self::defaultSettings()['settings'];
     $field_name = $items->getFieldDefinition()->getName();
     $custom_field_name = $field->getName();
-    $is_config_form = $form_state->getBuildInfo()['base_form_id'] == 'field_config_form';
-    $field_parents = [
-      $field_name,
-      $delta,
-      $custom_field_name,
-    ];
-    if ($is_config_form) {
-      array_unshift($field_parents, 'default_value_input');
-    }
-
-    $wrapper_id = $field_name . $delta . $custom_field_name;
-    $element['#attached'] = [
-      'library' => ['custom_field/customfield-admin'],
-    ];
+    $wrapper_id = $this->getUniqueElementId($form, $field_name, $delta, $custom_field_name);
+    $name_key = str_replace('-', '_', $wrapper_id);
+    $field_parents = $element['#field_parents'];
 
     if (!$form_state->has($wrapper_id)) {
-      $default_value = $element['#default_value'] ?? [];
+      $default_value = $item->{$custom_field_name} ?? [];
       $form_state->set($wrapper_id, $default_value);
     }
 
-    $items = $form_state->get($wrapper_id);
+    $map_items = $form_state->get($wrapper_id);
 
     $element['data'] = [
       '#type' => 'table',
@@ -65,7 +56,7 @@ class MapTextWidget extends MapWidgetBase {
       '#suffix' => '</div>',
       '#wrapper_id' => $wrapper_id,
     ];
-    foreach ($items as $key => $value) {
+    foreach ($map_items as $key => $value) {
       $element['data'][$key]['value'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Value'),
@@ -77,20 +68,20 @@ class MapTextWidget extends MapWidgetBase {
         '#type' => 'submit',
         '#value' => $this->t('Remove'),
         '#submit' => [[static::class, 'removeItem']],
-        '#name' => 'remove_' . $wrapper_id . $key,
+        '#name' => $name_key . '_' . $key . '_remove',
         '#attributes' => ['data-key' => $key],
         '#ajax' => [
           'callback' => [$this, 'actionCallback'],
           'wrapper' => $wrapper_id,
         ],
-        '#limit_validation_errors' => [$field_parents],
+        '#limit_validation_errors' => [[...$field_parents, 'data', $key, 'remove']],
       ];
     }
     $element['add_item'] = [
       '#type' => 'submit',
       '#value' => $this->t('Add item'),
       '#submit' => [[static::class, 'addItem']],
-      '#name' => 'add_' . $wrapper_id,
+      '#name' => $name_key . '_add_item',
       '#ajax' => [
         'callback' => [$this, 'actionCallback'],
         'wrapper' => $wrapper_id,

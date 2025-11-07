@@ -2,20 +2,21 @@
 
 namespace Drupal\address_suggestion\Plugin\AddressProvider;
 
-use Drupal\address_suggestion\AddressProviderBase;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\address_suggestion\AddressProviderBase;
+use Drupal\address_suggestion\Attribute\AddressProvider;
 
 /**
  * Defines a Map Quest plugin for address_suggestion.
  *
  * @package Drupal\address_suggestion\Plugin\AddressProvider
- *
- * @AddressProvider(
- *   id = "map_quest",
- *   label = @Translation("Map Quest api"),
- *   api = "https://www.mapquestapi.com/geocoding/v1/address",
- * )
  */
+#[AddressProvider(
+  id: 'map_quest',
+  label: new TranslatableMarkup('Map Quest api'),
+  api: 'https://www.mapquestapi.com/geocoding/v1/address',
+)]
 class MapQuest extends AddressProviderBase {
 
   /**

@@ -2,10 +2,11 @@
 
 namespace Drupal\address_suggestion\Element;
 
-use Drupal\address\Element\Address;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Locale\CountryManager;
+use Drupal\Core\Render\Attribute\FormElement;
+use Drupal\address\Element\Address;
 
 /**
  * Provides an address_suggestion form element.
@@ -17,9 +18,8 @@ use Drupal\Core\Locale\CountryManager;
  *   '#type' => 'address_suggestion',
  * ];
  * @endcode
- *
- * @FormElement("address_suggestion")
  */
+#[FormElement('address_suggestion')]
 class AddressSuggestion extends Address {
 
   /**

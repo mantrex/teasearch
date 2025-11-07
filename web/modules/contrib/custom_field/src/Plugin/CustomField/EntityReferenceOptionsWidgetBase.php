@@ -84,7 +84,7 @@ class EntityReferenceOptionsWidgetBase extends EntityReferenceWidgetBase {
       }
     }
 
-    $settableOptions = $handler->getReferenceableEntities(NULL, 'CONTAINS', 50);
+    $settableOptions = $handler->getReferenceableEntities(NULL, 'CONTAINS', 250);
     $bundles = $this->entityTypeBundleInfo->getBundleInfo($target_type);
     $return = [];
     foreach ($settableOptions as $bundle => $entity_ids) {

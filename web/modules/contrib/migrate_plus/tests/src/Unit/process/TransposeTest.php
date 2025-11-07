@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_plus\Unit\process;
 
@@ -34,7 +34,7 @@ final class TransposeTest extends MigrateProcessTestCase {
    * @dataProvider transposeDataProvider
    */
   public function testTranspose(array $input, array $expected_output): void {
-    $output = $this->plugin->transform($input, $this->migrateExecutable, $this->row, 'destinationproperty');
+    $output = $this->plugin->transform($input, $this->migrateExecutable, $this->row, 'destinationProperty');
     $this->assertSame($output, $expected_output);
   }
 

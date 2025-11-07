@@ -2,6 +2,7 @@
 
 namespace Drupal\choices\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Config\ImmutableConfig;
 use JsonSchema\Validator;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Form\FormStateInterface;
@@ -32,6 +33,16 @@ class ChoicesWidget extends OptionsSelectWidget {
     return [
       'configuration_options' => '',
     ] + parent::defaultSettings();
+  }
+
+  /**
+   * Returns the choices module configuration.
+   *
+   * @return \Drupal\Core\Config\ImmutableConfig
+   *   The choices module configuration.
+   */
+  private static function getChoicesConfig(): ImmutableConfig {
+    return \Drupal::config('choices.settings');
   }
 
   /**
@@ -89,7 +100,7 @@ class ChoicesWidget extends OptionsSelectWidget {
     // The widget inherits the global settings but allows to override them:
     $widgetConfigurationOptionsString = $this->getSetting('configuration_options');
     $widgetConfigurationOptions = !empty($widgetConfigurationOptionsString) ? Json::decode($this->getSetting('configuration_options')) : [];
-    $globalConfigurationOptionsString = \Drupal::config('choices.settings')->get('configuration_options');
+    $globalConfigurationOptionsString = self::getChoicesConfig()->get('configuration_options');
     $globalConfigurationOptions = !empty($globalConfigurationOptionsString) ? Json::decode($globalConfigurationOptionsString) : [];
     if (!empty($globalConfigurationOptions)) {
       // Widget configuration takes precedence over global options:

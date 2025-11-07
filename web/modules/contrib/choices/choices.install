@@ -70,7 +70,7 @@ function choices_requirements($phase) {
 /**
  * Empty update hook.
  *
- * Empty update hook for compability issues emerging through
+ * Empty update hook for compatibility issues emerging through
  * https://www.drupal.org/project/choices/issues/3318640.
  */
 function choices_update_8001() {

@@ -273,7 +273,7 @@ class FileWidget extends CustomFieldWidgetBase {
       $defaults['fids'][] = $fid;
     }
 
-    // Essentially we use the managed_file type, extended with some
+    // Essentially, we use the managed_file type, extended with some
     // enhancements.
     $element_info = $this->elementInfo->getInfo('managed_file');
     $element += [
@@ -298,8 +298,8 @@ class FileWidget extends CustomFieldWidgetBase {
         '#upload_validators' => $element['#upload_validators'],
         '#cardinality' => 1,
       ];
+      $element['#description'] = $this->renderer->renderInIsolation($file_upload_help);
     }
-    $element['#description'] = $this->renderer->renderInIsolation($file_upload_help);
 
     return $element;
   }

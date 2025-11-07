@@ -7,25 +7,26 @@ use CommerceGuys\Addressing\AddressFormat\AddressFormatRepositoryInterface;
 use CommerceGuys\Addressing\Country\CountryRepositoryInterface;
 use Drupal\address\AddressInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'Address Suggestion Map' formatter.
- *
- * @FieldFormatter(
- *   id = "address_suggestion_map",
- *   label = @Translation("Address Suggestion Map"),
- *   field_types = {"address"},
- * )
  */
+#[FieldFormatter(
+  id: "address_suggestion_map",
+  label: new TranslatableMarkup('Address Suggestion Map'),
+  field_types: ['address']
+)]
 class AddressSuggestionMapFormatter extends FormatterBase {
 
   /**

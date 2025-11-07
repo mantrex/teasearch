@@ -2,20 +2,22 @@
 
 namespace Drupal\address_suggestion\Plugin\AddressProvider;
 
-use Drupal\address_suggestion\AddressProviderBase;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\address_suggestion\AddressProviderBase;
+use Drupal\address_suggestion\Attribute\AddressProvider;
 
 /**
  * Defines a Photon Komoot plugin for address_suggestion.
  *
  * @package Drupal\address_suggestion\Plugin\AddressProvider
- * @AddressProvider(
- *   id = "photon",
- *   label = @Translation("Photon Komoot"),
- *   api = "https://photon.komoot.io/api/",
- *   nokey = "TRUE"
- * )
  */
+#[AddressProvider(
+  id: 'photon',
+  label: new TranslatableMarkup('Photon Komoot'),
+  api: 'https://photon.komoot.io/api/',
+  nokey: TRUE
+)]
 class PhotonKomoot extends AddressProviderBase {
 
   /**

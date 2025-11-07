@@ -159,8 +159,6 @@ class TagifyUserListEntityReferenceAutocompleteWidget extends TagifyEntityRefere
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    $entity = $items->getEntity();
-
     // Append the match operation to the selection settings.
     $selection_settings = $this->getFieldSetting('handler_settings') + [
       'match_operator' => $this->getSetting('match_operator'),
@@ -191,11 +189,6 @@ class TagifyUserListEntityReferenceAutocompleteWidget extends TagifyEntityRefere
           $tags_identifier .= '_' . $parent;
         }
       }
-    }
-
-    // Append the entity if it is already created.
-    if (!$entity->isNew()) {
-      $selection_settings['entity'] = $entity;
     }
 
     $element += [

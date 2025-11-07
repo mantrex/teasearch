@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types = 1);
-
 /**
  * @file
  * Install file for migrate example module.
@@ -10,6 +8,8 @@ declare(strict_types = 1);
  * module. We do this in a separate module so migrate_example itself is a pure
  * migration module.
  */
+
+declare(strict_types=1);
 
 /**
  * Implements hook_schema().
@@ -327,9 +327,9 @@ function migrate_example_beer_data_node(): void {
       'Netherlands|Belgium',
       1,
       'heineken.jpg',
-      'Heinekin alt',
-      'Heinekin title',
-      'Heinekin description',
+      'Heineken alt',
+      'Heineken title',
+      'Heineken description',
     ],
     [
       99999998,
@@ -388,8 +388,8 @@ function migrate_example_beer_data_account(): void {
       1,
       '2010-03-30 10:31:05',
       'alice',
-      'alice in beerland',
-      'alicepass',
+      'alice in beerLand',
+      'alicePass',
       'alice@example.com',
       '1',
       '99999999|99999998|99999997',
@@ -398,8 +398,8 @@ function migrate_example_beer_data_account(): void {
       1,
       '2010-04-04 10:31:05',
       'alice',
-      'alice in aleland',
-      'alicepass',
+      'alice in aleLand',
+      'alicePass',
       'alice2@example.com',
       '1',
       '99999999|99999998|99999997',
@@ -408,8 +408,8 @@ function migrate_example_beer_data_account(): void {
       0,
       '2007-03-15 10:31:05',
       'bob',
-      'rebob',
-      'bobpass',
+      'reBob',
+      'bobPass',
       'bob@example.com',
       '0',
       '99999999|99999997',
@@ -419,7 +419,7 @@ function migrate_example_beer_data_account(): void {
       '2004-02-29 10:31:05',
       'charlie',
       'charlie chocolate',
-      'mykids',
+      'myKids',
       'charlie@example.com',
       '0',
       '99999999|99999998',

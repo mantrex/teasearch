@@ -91,10 +91,10 @@ set node_classes = [
     {% endif %}
     <div{{ author_attributes.addClass('node-submitted-details') }}>
       {% set createdDate = node.getCreatedTime|date('j F Y') %}
-      {% trans %}<div><i class="icon-user user-icon"></i> {{ author_name }}</div><div><i class="icon-calendar"></i> {{ createdDate }}</div>{% endtrans %}
+      {% trans %}<div><i class="ficon-user user-icon"></i> {{ author_name }}</div><div><i class="ficon-calendar"></i> {{ createdDate }}</div>{% endtrans %}
       {% if node_tags %}
       {% if content.field_tags %}
-        <div><i class="icon-hashtag"></i>
+        <div><i class="ficon-hashtag"></i>
         {% for item in content.field_tags %}
           {% if item['#title'] %}
             <a href="{{ item['#url']}}">{{ item['#title']  }}</a>{{ ',' }}

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_plus\Unit\data_fetcher;
 
@@ -87,12 +87,12 @@ final class HttpTest extends MigrateTestCase {
     $basic_authenticator = $this->createMock(Basic::class);
 
     $basic_authenticator->method('getAuthenticationOptions')
-      ->will($this->returnValue([
+      ->willReturn([
         'auth' => [
           'username',
           'password',
         ],
-      ]));
+      ]);
 
     $this->basicAuthenticator = $basic_authenticator;
   }
@@ -186,7 +186,7 @@ final class TestHttp extends Http {
    * @param object $authenticator
    *   Mocked authenticator plugin.
    */
-  public function mockHttpClient(array $responses, object $authenticator = NULL): void {
+  public function mockHttpClient(array $responses, ?object $authenticator = NULL): void {
     // Set mocked authentication plugin to be used for the request auth plugin.
     $this->authenticator = $authenticator;
 

@@ -2,20 +2,21 @@
 
 namespace Drupal\address_suggestion\Plugin\AddressProvider;
 
-use Drupal\address_suggestion\AddressProviderBase;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\address_suggestion\AddressProviderBase;
+use Drupal\address_suggestion\Attribute\AddressProvider;
 
 /**
  * Defines a BingMaps plugin for address_suggestion.
  *
  * @package Drupal\address_suggestion\Plugin\AddressProvider
- *
- * @AddressProvider(
- *   id = "bing_maps",
- *   label = @Translation("Bing Maps"),
- *   api = "http://dev.virtualearth.net/REST/v1/Autosuggest",
- * )
  */
+#[AddressProvider(
+  id: 'bing_maps',
+  label: new TranslatableMarkup('Bing Maps'),
+  api: 'http://dev.virtualearth.net/REST/v1/Autosuggest',
+)]
 class BingMaps extends AddressProviderBase {
 
   /**

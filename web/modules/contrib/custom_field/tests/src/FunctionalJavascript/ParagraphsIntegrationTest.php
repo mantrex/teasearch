@@ -71,9 +71,11 @@ class ParagraphsIntegrationTest extends WebDriverTestBase {
   protected function addCard(string $title, string $image_id): void {
     static $delta = 0;
     $this->getSession()->getPage()->pressButton('Add Card');
+    $this->assertSession()->assertWaitOnAjaxRequest();
     $assert = $this->assertSession();
 
-    $card = $assert->waitForElement('css', '.js-form-item-field-components-' . $delta . '-subform-field-content-0');
+    $card = $assert->waitForElement('css', '[data-drupal-selector="edit-field-components-' . $delta . '"]');
+    $this->assertNotNull($card, 'Card exists.');
 
     $card->fillField('Title', $title);
     $card->pressButton('Add media');

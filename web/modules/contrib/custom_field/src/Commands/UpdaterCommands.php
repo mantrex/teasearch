@@ -9,6 +9,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\custom_field\CustomFieldUpdateManagerInterface;
+use Drupal\custom_field\Plugin\CustomField\FieldType\DateTimeType;
 use Drupal\custom_field\Plugin\CustomFieldTypeManagerInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drush\Commands\DrushCommands;
@@ -220,8 +221,8 @@ final class UpdaterCommands extends DrushCommands {
         throw new \RuntimeException("The column name '$answer' already exists in the field storage.");
       }
       // Validate machine name format (alphanumeric and underscores).
-      if (!preg_match('/^[a-zA-Z0-9_]+$/', $answer)) {
-        throw new \RuntimeException('The column name must contain only alphanumeric characters and underscores.');
+      if (!preg_match('/^(?!.*__)[a-zA-Z0-9_]+$/', $answer)) {
+        throw new \RuntimeException('The column name must contain only alphanumeric characters and single underscores, no double underscores.');
       }
       return $answer;
     });
@@ -503,10 +504,15 @@ final class UpdaterCommands extends DrushCommands {
         break;
 
       case 'datetime':
+      case 'daterange':
         $prompt = $this->t('Select datetime type');
+        $date_time_types = [
+          DateTimeType::DATETIME_TYPE_DATE,
+          DateTimeType::DATETIME_TYPE_DATETIME,
+        ];
         $options['datetime_type'] = $this->promptChoice(
           (string) $prompt,
-          ['date', 'datetime'],
+          $date_time_types,
           'datetime'
         );
         break;
@@ -720,7 +726,7 @@ final class UpdaterCommands extends DrushCommands {
         throw new \Exception('Failed to process batch for data restoration. Please check the logs for errors.');
       }
       // Clear the batch after processing.
-      batch_set(NULL);
+      batch_set([]);
     }
   }
 

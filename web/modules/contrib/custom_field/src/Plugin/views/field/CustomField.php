@@ -231,7 +231,7 @@ final class CustomField extends FieldPluginBase implements MultiItemsFieldHandle
       return FALSE;
     }
 
-    // If field definition is set, use that.
+    // If the field definition is set, use that.
     if (isset($this->definition['click sortable'])) {
       return (bool) $this->definition['click sortable'];
     }
@@ -265,7 +265,7 @@ final class CustomField extends FieldPluginBase implements MultiItemsFieldHandle
         $this->query->addField($this->tableAlias, $column);
       }
     }
-    $this->query->addOrderBy(NULL, NULL, $order, $this->aliases[$column]);
+    $this->query->addOrderBy('', NULL, $order, $this->aliases[$column]);
   }
 
   /**
@@ -747,6 +747,8 @@ final class CustomField extends FieldPluginBase implements MultiItemsFieldHandle
     $langcode = $entity->language()->getId();
     $field_storage = $this->getFieldStorageDefinition();
     $custom_fields = $this->customFieldTypeManager->getCustomFieldItems($field_storage->getSettings());
+    /** @var string $field_name */
+    /** @var string $subfield */
     [$field_name, $subfield] = $this->extractFieldInfo();
     $custom_field = $custom_fields[$subfield];
     $formatter_id = $this->options['type'];
@@ -800,6 +802,12 @@ final class CustomField extends FieldPluginBase implements MultiItemsFieldHandle
           'uri' => $value,
           'title' => $field_item->{$subfield . '__title'},
           'options' => $field_item->{$subfield . '__options'},
+        ];
+      }
+      elseif ($data_type === 'datetime') {
+        $value = [
+          'date' => $field_item->{$subfield . '__date'},
+          'timezone' => $field_item->{$subfield . '__timezone'},
         ];
       }
       $formatted_value = $plugin->formatValue($field_item, $value);

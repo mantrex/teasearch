@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\custom_field\Plugin\DataType;
 
+use Drupal\Component\Uuid\Uuid;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -21,20 +22,20 @@ use Drupal\custom_field\TypedData\CustomFieldDataDefinition;
   label: new TranslatableMarkup('Entity reference'),
   definition_class: CustomFieldDataDefinition::class,
 )]
-class CustomFieldEntityReference extends CustomFieldDataTypeBase {
-
-  /**
-   * The entity object or null.
-   *
-   * @var \Drupal\Core\Entity\EntityInterface|null
-   */
-  protected ?EntityInterface $entity = NULL;
+class CustomFieldEntityReference extends CustomFieldEntityReferenceBase {
 
   /**
    * {@inheritdoc}
    */
   public function setValue($value, $notify = TRUE): void {
     $entity = $value['entity'] ?? NULL;
+    // Drupal core Default Content API Importer will call this method with an
+    // array of exported entity reference data. If this is the case, try loading
+    // the referenced entity here, before assigning as data value.
+    if (!$entity && is_string($value) && Uuid::isValid($value)) {
+      $entity = $this->getEntityByUuid($value);
+    }
+
     if ($entity instanceof EntityInterface) {
       if ($entity->isNew()) {
         try {
@@ -48,31 +49,6 @@ class CustomFieldEntityReference extends CustomFieldDataTypeBase {
       $value = $entity?->id();
     }
     $this->value = $value['target_id'] ?? $value;
-  }
-
-  /**
-   * Helper function to load an entity.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface|null
-   *   The entity object or null.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
-   */
-  public function getEntity(): ?EntityInterface {
-    if (empty($this->entity) && !empty($this->value)) {
-      $target_type = $this->getDataDefinition()->getSetting('target_type');
-      $storage = \Drupal::entityTypeManager()->getStorage($target_type);
-      $this->entity = $storage->load($this->getValue());
-    }
-    return $this->entity;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getValue() {
-    return $this->value;
   }
 
   /**

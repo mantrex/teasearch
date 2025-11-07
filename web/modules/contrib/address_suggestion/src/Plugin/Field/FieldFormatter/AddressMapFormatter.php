@@ -2,19 +2,20 @@
 
 namespace Drupal\address_suggestion\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Plugin implementation of the 'Address Suggestion Map' formatter.
- *
- * @FieldFormatter(
- *   id = "address_map",
- *   label = @Translation("Address Suggestion Map"),
- *   field_types = {"geofield"},
- * )
  */
+#[FieldFormatter(
+  id: "address_map",
+  label: new TranslatableMarkup('Address Suggestion Map'),
+  field_types: ['geofield']
+)]
 class AddressMapFormatter extends FormatterBase {
 
   /**

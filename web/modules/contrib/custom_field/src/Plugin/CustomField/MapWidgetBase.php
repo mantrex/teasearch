@@ -6,9 +6,11 @@ namespace Drupal\custom_field\Plugin\CustomField;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\custom_field\Plugin\CustomFieldTypeInterface;
 use Drupal\custom_field\Plugin\CustomFieldWidgetBase;
 
@@ -114,10 +116,29 @@ class MapWidgetBase extends CustomFieldWidgetBase {
     // Get the updated element from the form structure.
     $updated_element = NestedArray::getValue($form, $sliced_parents)['data'];
 
+    $focus_input = NULL;
+    $children = Element::children($updated_element);
+    $last_child_key = end($children);
+    if ($last_child_key !== FALSE && isset($updated_element[$last_child_key])) {
+      $last_child = $updated_element[$last_child_key];
+      // For key/value widget.
+      if (array_key_exists('key', $last_child)) {
+        $focus_input = $last_child['key']['#name'];
+      }
+      // For text widget.
+      elseif (array_key_exists('value', $last_child)) {
+        $focus_input = $last_child['value']['#name'];
+      }
+    }
+
     // Create an AjaxResponse.
     $response = new AjaxResponse();
     // Add a ReplaceCommand to replace the content inside the widget's wrapper.
     $response->addCommand(new ReplaceCommand('#' . $wrapper_id, $updated_element));
+    // Set the focus to the newly added item if applicable.
+    if (!empty($focus_input)) {
+      $response->addCommand(new InvokeCommand('input[name="' . $focus_input . '"]', 'focus'));
+    }
 
     return $response;
   }

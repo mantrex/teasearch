@@ -2,20 +2,22 @@
 
 namespace Drupal\address_suggestion\Plugin\AddressProvider;
 
-use Drupal\address_suggestion\AddressProviderBase;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\address_suggestion\AddressProviderBase;
+use Drupal\address_suggestion\Attribute\AddressProvider;
 
 /**
  * Defines a PostCh plugin for address_suggestion.
  *
  * @package Drupal\address_suggestion\Plugin\AddressProvider
- * @AddressProvider(
- *   id = "post_ch",
- *   label = @Translation("Post CH"),
- *   api = "https://post.ch",
- *   login = "TRUE",
- * )
  */
+#[AddressProvider(
+  id: 'post_ch',
+  label: new TranslatableMarkup('Post CH'),
+  api: 'https://post.ch',
+  login: TRUE,
+)]
 class PostCh extends AddressProviderBase {
 
   /**

@@ -50,7 +50,7 @@ class CustomFieldLink extends GraphQLComposeFieldTypeBase implements FieldProduc
    * {@inheritdoc}
    */
   public function resolveFieldItem(FieldItemInterface $item, FieldContext $context) {
-    $property = $context->getContextValue('property_name');
+    $property = (string) $context->getContextValue('property_name');
     $data_type = $context->getContextValue('data_type');
     $url = Url::fromUri($item->{$property});
     $attributes = [];

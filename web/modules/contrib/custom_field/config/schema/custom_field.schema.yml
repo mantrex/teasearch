@@ -75,6 +75,9 @@ custom_field.formatter.*:
   type: mapping
   label: 'Formatter settings'
   mapping:
+    weight:
+      type: weight
+      label: 'Weight'
     format_type:
       type: string
       label: 'Format type'
@@ -199,6 +202,18 @@ custom_field.formatter.*:
         timezone_override:
           type: string
           label: 'Time zone override'
+        timezone_stored:
+          type: boolean
+          label: 'Use stored time zone'
+        display_timezone:
+          type: boolean
+          label: 'Display time zone'
+        timezone_format:
+          type: string
+          label: 'Time zone format'
+        user_timezone:
+          type: boolean
+          label: "Append date/time in user's time zone"
         format_type:
           type: string
           label: 'Date format'
@@ -268,6 +283,18 @@ field.formatter.settings.custom_list:
 field.formatter.settings.custom_table:
   type: custom_field_formatter_base
   label: 'Table'
+  mapping:
+    hide_empty:
+      type: boolean
+      label: 'Hide columns with empty rows'
+
+field.formatter.settings.flipped_table:
+  type: custom_field_formatter_base
+  label: 'Table (flipped)'
+  mapping:
+    hide_empty:
+      type: boolean
+      label: 'Hide rows with empty columns'
 
 field.formatter.settings.custom_template:
   type: mapping
@@ -560,6 +587,15 @@ custom_field.widget.*:
               sequence:
                 type: string
                 label: 'Media type ID'
+            timezone_enabled:
+              type: boolean
+              label: 'Enable time zone selection'
+            timezone_options:
+              type: sequence
+              label: 'Time zone options'
+              sequence:
+                type: string
+                label: 'Time zone'
             token_browser:
               type: mapping
               label: 'Token browser'

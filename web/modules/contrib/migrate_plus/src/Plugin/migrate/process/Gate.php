@@ -1,11 +1,10 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus\Plugin\migrate\process;
 
 use Drupal\migrate\MigrateExecutableInterface;
-use Drupal\migrate\MigrateSkipProcessException;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
 
@@ -111,18 +110,10 @@ class Gate extends ProcessPluginBase {
     $key_is_valid = in_array($key, $valid_keys, TRUE);
     $key_direction = $this->configuration['key_direction'];
     $value_can_pass = ($key_is_valid && $key_direction == 'unlock') || (!$key_is_valid && $key_direction == 'lock');
-    if ($value_can_pass) {
-      return $value;
+    if (!$value_can_pass) {
+      $this->stopPipeline();
     }
-    else {
-      if ($key_direction == 'lock') {
-        $message = sprintf('Processing of destination property %s was skipped: Gate was locked by property %s with value %s.', $destination_property, $this->configuration['use_as_key'], $key);
-      }
-      else {
-        $message = sprintf('Processing of destination property %s was skipped: Gate was not unlocked by property %s with value %s. ', $destination_property, $this->configuration['use_as_key'], $key);
-      }
-      throw new MigrateSkipProcessException($message);
-    }
+    return $value;
   }
 
 }

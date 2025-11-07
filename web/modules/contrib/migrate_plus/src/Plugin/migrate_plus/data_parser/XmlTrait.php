@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\migrate_plus\Plugin\migrate_plus\data_parser;
 
@@ -51,14 +51,14 @@ trait XmlTrait {
     }
 
     return t(
-      "@libxmlerrorcodename @libxmlerrorcode: @libxmlerrormessage\nLine: @libxmlerrorline\nColumn: @libxmlerrorcolumn\nFile: @libxmlerrorfile",
+      "@libxml_error_code_name @libxml_error_code: @libxml_error_message\nLine: @libxml_error_line\nColumn: @libxml_error_column\nFile: @libxml_error_file",
       [
-        '@libxmlerrorcodename' => $error_code_name,
-        '@libxmlerrorcode' => $error->code,
-        '@libxmlerrormessage' => trim((string) $error->message),
-        '@libxmlerrorline' => $error->line,
-        '@libxmlerrorcolumn' => $error->column,
-        '@libxmlerrorfile' => $error->file,
+        '@libxml_error_code_name' => $error_code_name,
+        '@libxml_error_code' => $error->code,
+        '@libxml_error_message' => trim((string) $error->message),
+        '@libxml_error_line' => $error->line,
+        '@libxml_error_column' => $error->column,
+        '@libxml_error_file' => $error->file,
       ]
     );
   }
