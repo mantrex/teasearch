@@ -12,8 +12,8 @@
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(2, 1fr);
   gap: 8px;
-  height: 70vh;
-  min-height: 650px;
+  height: 50vh;
+  min-height: 500px;
   max-height: 900px;
   border-radius: 12px;
   overflow: hidden;

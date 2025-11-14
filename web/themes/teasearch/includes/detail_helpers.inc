@@ -184,12 +184,14 @@ function teasearch_get_content_type_label($content_type)
       'people' => 'People',
       'article' => 'Article',
       'event' => 'Event',
+      'about' => 'About',
       // Aggiungi altri content type qui...
     ],
     'it' => [
       'people' => 'Persone',
       'article' => 'Articolo',
       'event' => 'Evento',
+      'about' => 'Chi siamo'
       // Aggiungi altri content type qui...
     ],
   ];

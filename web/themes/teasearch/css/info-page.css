@@ -1,0 +1,167 @@
+/**
+ * @file
+ * Stili About/News
+ */
+
+/* TITOLO VERDE */
+.info-title-section {
+  background: var(--details-bg);
+  padding-top:1.5em;
+  padding-left:1em;
+  padding-right:1em;
+  padding-bottom:2.5em;
+}
+
+.info-title-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--body-text);
+  margin-bottom: 0.25rem;
+  opacity: 0.7;
+}
+
+.info-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--body-text);
+  margin: 0;
+}
+
+/* LAYOUT PRINCIPALE */
+.info-main {
+  background: var(--light);
+}
+
+/* COLONNA SINISTRA */
+.left-col-wrapper {
+  margin:0;
+  border-right: 1px solid var(--block-borderline);
+  padding-right:0.7em;
+  padding-top:0.7em;
+  padding-bottom:2em;
+}
+
+.info-left-col {
+  background: var(--light);
+  padding:0.5em;
+}
+
+.info-main-image {
+  margin-bottom: 2rem;
+  width:100%;
+}
+
+.info-main-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.info-section {
+  margin-bottom: 2rem;
+}
+
+.info-section:last-child {
+  margin-bottom: 0;
+}
+
+.info-section-title {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--about-title);
+  padding-bottom: 0.2rem;
+}
+
+.info-section-body {
+  color: var(--body-text);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.info-section-body p {
+  margin-bottom: 1rem;
+}
+
+.info-section-body p:last-child {
+  margin-bottom: 0;
+}
+
+.info-section-links {
+  margin-top: 1rem;
+  padding-left:1em;
+}
+.info-section-links a {
+  font-weight:bold;
+}
+
+.info-section-links a {
+  display: inline-block;
+  margin-right: 1rem;
+  margin-bottom: 0.5rem;
+  color: var(--details-link);
+  text-decoration: underline;
+}
+
+.info-section-links a:hover {
+  color: var(--item-primary);
+}
+
+/* SIDEBAR DESTRA */
+.info-sidebar {
+  background: var(--light);
+  padding: 1.5rem;
+  position: sticky;
+  top: 120px;
+}
+
+.info-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.info-menu li {
+  margin: 0;
+  padding: 0;
+}
+
+.info-menu li:last-child {
+  border-bottom: none;
+}
+
+.info-menu a {
+  display: block;
+  padding: 0.75rem 0;
+  color: var(--item-primary);
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight:800;
+}
+
+.info-menu a:hover {
+  color: var(--item-primary);
+}
+
+/* RESPONSIVE */
+@media (max-width: 991px) {
+  .info-sidebar {
+    position: static;
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .info-title {
+    font-size: 1.5rem;
+  }
+  
+  .info-left-col {
+    padding: 1.5rem;
+  }
+  
+  .info-section-title {
+    font-size: 1.25rem;
+  }
+}

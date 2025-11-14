@@ -273,6 +273,11 @@ function teasearch_theme_suggestions_node_alter(array &$suggestions, array $vari
   if ($view_mode === 'full') {
     $content_type = $node->bundle();
 
+    // Template speciale per about e news
+    if (in_array($content_type, ['about'])) {
+      $suggestions[] = 'node__info';
+      return;
+    }
     // Carica lo schema
     $schemas = teasearch_get_detail_schemas();
 
@@ -281,6 +286,75 @@ function teasearch_theme_suggestions_node_alter(array &$suggestions, array $vari
       $suggestions[] = 'node__detail';
     }
   }
+}
+
+
+function teasearch_preprocess_node__info(&$variables)
+{
+  $node = $variables['node'];
+  $content_type = $node->bundle();
+  $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+
+  // Carica libreria CSS e JS
+  $variables['#attached']['library'][] = 'teasearch/info-page';
+
+  // Content type label
+  $variables['content_type_label'] = teasearch_get_content_type_label($content_type);
+
+  // Immagine header
+  if ($node->hasField('field_image') && !$node->get('field_image')->isEmpty()) {
+    $image_field = $node->get('field_image')->first();
+    $file = $image_field->entity;
+    if ($file) {
+      $variables['header_image_url'] = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
+      $variables['header_image_alt'] = $image_field->alt;
+    }
+  }
+
+  // Processa i paragraphs del contenuto
+  $sections = [];
+  if ($node->hasField('field_contents') && !$node->get('field_contents')->isEmpty()) {
+    foreach ($node->get('field_contents') as $paragraph_item) {
+      $paragraph = $paragraph_item->entity;
+      if ($paragraph) {
+        $sections[] = [
+          'title' => $paragraph->get('field_title')->value,
+          'content' => $paragraph->get('field_content')->value,
+          'links' => $paragraph->get('field_links'),
+        ];
+      }
+    }
+  }
+  $variables['sections'] = $sections;
+
+  // Carica altri nodi dello stesso content type (escluso quello corrente)
+  $other_nodes = [];
+  $query = \Drupal::entityQuery('node')
+    ->condition('type', $content_type)
+    ->condition('nid', $node->id(), '!=')
+    ->condition('status', 1)
+    ->accessCheck(TRUE)
+    ->sort('title', 'ASC')
+    ->range(0, 20);
+
+  $nids = $query->execute();
+
+  if (!empty($nids)) {
+    $nodes = \Drupal::entityTypeManager()->getStorage('node')->loadMultiple($nids);
+    foreach ($nodes as $other_node) {
+      // Usa traduzione se disponibile
+      if ($other_node->hasTranslation($current_language)) {
+        $other_node = $other_node->getTranslation($current_language);
+      }
+
+      $other_nodes[] = [
+        'title' => $other_node->label(),
+        'url' => $other_node->toUrl()->toString(),
+      ];
+    }
+  }
+
+  $variables['related_pages'] = $other_nodes;
 }
 
 

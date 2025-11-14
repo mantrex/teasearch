@@ -23,6 +23,8 @@
   --item-title: #6f8c2f; /* tutti i titoli nelle liste */
   --item-primary:#259a00; /* lo uso per i checkbox, per altre parti ecc*/
   --item-secondary:#155b00; /*  da usare come contrasto, è più scuro */
+  --block-borderline: #efefef; /* linee separatrici molto chiare */
+  --about-title: #533f3a; /* sottotitoli about */
   --filter-group-hover: #e1ebc6; /* appoggio il mouse sull'area filtri*/
   --filter-group-open: #e4efca; /* apro l'area filtri */
   --filter-actions: #d5d0cb; /* alla base dell'area filtri dove ci sono i bottoni */
@@ -35,6 +37,7 @@
   --details-link: #6b8e23;
   --details-border: #e6e5e5;
   --details-field-label:#dfdbd8;
+  --breadcrumb-bg: #d6d0ca;
 }
 
 body {
@@ -369,4 +372,41 @@ a {
   font-weight: bold;
   text-transform: uppercase;
   margin-bottom: 1em;
+}
+
+
+/* breadcrumb */
+.breadcrumb {
+  background-color: var(--breadcrumb-bg);
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  margin-left:-12px;
+  margin-right:-12px;
+}
+
+.breadcrumb ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.breadcrumb li {
+  color: #000;
+}
+
+.breadcrumb li + li::before {
+  content: "/";
+  margin: 0 8px;
+  color: #555; /* separatore più tenue */
+}
+
+.breadcrumb a {
+  text-decoration: none;
+  color: #000;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
 }

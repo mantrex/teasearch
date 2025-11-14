@@ -1,0 +1,86 @@
+{#
+  /**
+  * @file
+  * Template per About e News
+  */
+#}
+
+<article{{ attributes.addClass('node','node--type-'~node.bundle|clean_class,'node--info') }}>
+
+  {# HEADER H1 CON RIQUADRO VERDE #}
+  <div class="info-title-section">
+    <div class="container-fluid">
+      <h1 class="info-title">
+        {{ node.label }}
+      </h1>
+    </div>
+  </div>
+
+  {# CONTENUTO: 2 COLONNE #}
+  <div class="info-main">
+    <div class="container-fluid">
+      <div class="row g-3">
+
+        {# COLONNA SINISTRA: Immagine + Contenuti #}
+        <div class="col-lg-9 left-col-wrapper">
+          <div class="info-left-col">
+
+            {# Immagine #}
+            {% if header_image_url %}
+              <div class="info-main-image">
+                <img src="{{ header_image_url }}" alt="{{ header_image_alt|default('') }}" />
+              </div>
+            {% endif %}
+
+            {# Sezioni paragraphs #}
+            {% for section in sections %}
+              <div class="info-section">
+                <h2 class="info-section-title">
+                  {{ section.title }}
+                </h2>
+                <div class="info-section-body">
+                  {{ section.content|raw }}
+                </div>
+
+                {% if section.links and not section.links.isEmpty() %}
+                  <div class="info-section-links">
+                    {% for link_item in section.links %}
+                      {% set link_url = link_item.getUrl() %}
+                      {% set link_title = link_item.title ?: link_url.toString() %}
+                      {% if link_url %}
+                        See: 
+                      {% endif %}
+                      <a href="{{ link_url.toString() }}" target="_blank" rel="noopener">
+                        {{ link_title }}
+                      </a>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+
+          </div>
+        </div>
+
+        {# COLONNA DESTRA: Menu altri about #}
+        <div class="col-lg-3">
+          {% if related_pages %}
+            <div class="info-sidebar">
+              <ul class="info-menu">
+                {% for page in related_pages %}
+                  <li>
+                    <a href="{{ page.url }}">
+                      {{ page.title }}
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</article>

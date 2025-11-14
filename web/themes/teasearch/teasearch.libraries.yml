@@ -33,3 +33,12 @@ detail-page:
   css:
     theme:
       css/detail-page.css: {}
+info-page:
+  css:
+    theme:
+      css/info-page.css: {}
+  js:
+    js/info-page.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
