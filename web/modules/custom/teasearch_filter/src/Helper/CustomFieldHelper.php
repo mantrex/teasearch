@@ -589,8 +589,8 @@ class CustomFieldHelper
       $author_line_parts[] = 'Anonymous';
     } else {
       // Altrimenti processa gli autori dal paragraph
-      if ($entity->hasField('field_texts_authors')) {
-        $field_texts_authors = $entity->get('field_texts_authors');
+      if ($entity->hasField('field_responsibles')) {
+        $field_texts_authors = $entity->get('field_responsibles');
 
         if ($field_texts_authors && !$field_texts_authors->isEmpty()) {
           $authors = [];
@@ -872,8 +872,8 @@ class CustomFieldHelper
       $author_line_parts[] = 'Anonymous';
     } else {
       // Altrimenti processa gli autori dal paragraph
-      if ($entity->hasField('field_texts_authors')) {
-        $field_texts_authors = $entity->get('field_texts_authors');
+      if ($entity->hasField('field_responsibles')) {
+        $field_texts_authors = $entity->get('field_responsibles');
 
         if ($field_texts_authors && !$field_texts_authors->isEmpty()) {
           $authors = [];
@@ -1144,7 +1144,7 @@ class CustomFieldHelper
 
     // =============================================================================
     // PARTE 2: AUTORI
-    // IMPORTANTE: Questo content type usa il paragraph "texts_authors" (field_texts_authors)
+    // IMPORTANTE: Questo content type usa il paragraph "texts_authors" (field_responsibles)
     // Se in futuro viene creato un nuovo paragraph con campi diversi, modificare qui:
     // - Nome del field paragraph
     // - Nomi dei subfields nel paragraph
@@ -1167,8 +1167,8 @@ class CustomFieldHelper
     } else {
       // Altrimenti processa gli autori dal paragraph
       // PARAGRAPH UTILIZZATO: field_texts_authors (tipo: texts_authors)
-      if ($entity->hasField('field_texts_authors')) {
-        $field_texts_authors = $entity->get('field_texts_authors');
+      if ($entity->hasField('field_responsibiles')) {
+        $field_texts_authors = $entity->get('field_responsibles');
 
         if ($field_texts_authors && !$field_texts_authors->isEmpty()) {
           $authors = [];

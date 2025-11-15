@@ -2579,7 +2579,7 @@ function teasearch_render_field_texts_title($node, $field_config, $field_identif
 
   $title_original = $title_original_field && !$title_original_field->isEmpty()
     ? $title_original_field->value
-    : '';
+    : ''; 
 
   $title_translated = $title_translated_field && !$title_translated_field->isEmpty()
     ? $title_translated_field->value

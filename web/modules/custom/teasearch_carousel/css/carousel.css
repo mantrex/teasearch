@@ -353,13 +353,18 @@
 }
 
 .swiper.swiper-initialized { 
-  overflow: visible !important;        /* sovrascrive il CDN */
+  overflow: hidden !important;        /* sovrascrive il CDN */
   padding-bottom: 26px !important;     /* spazio per i pallini */
 }
 .swiper.swiper-horizontal > .swiper-pagination-bullets,
 .swiper .swiper-pagination {
   bottom: 10px !important;             /* spostali sotto di 10px */
   z-index: 10;
+}
+
+.container-fluid .swiper {
+  max-width: 100%;
+  overflow: hidden;
 }
 
 

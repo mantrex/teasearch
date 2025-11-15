@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "87588015530a8c1e89e05e44f30b0422",
+    "content-hash": "6702d136b3478e32ae05310acf2c9da6",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -9177,6 +9177,43 @@
                 }
             ],
             "time": "2025-09-27T09:00:46+00:00"
+        },
+        {
+            "name": "tribus-studio/versioncontrol",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://gitlab.com/tribus.studio.public/versioncontrol.git",
+                "reference": "06d2ef4c13d63428f31591c729eaa6a3cf4478e5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.com/api/v4/projects/tribus%2Estudio%2Epublic%2Fversioncontrol/repository/archive.zip?sha=06d2ef4c13d63428f31591c729eaa6a3cf4478e5",
+                "reference": "06d2ef4c13d63428f31591c729eaa6a3cf4478e5",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Tribus\\VersionControl\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Kayla Brault",
+                    "email": "kayla@tribus.studio",
+                    "role": "lead developer"
+                }
+            ],
+            "description": "PHP library that helps with deprecated classes and function calls in Drupal 8 and 9.",
+            "support": {
+                "issues": "https://gitlab.com/api/v4/projects/26005379/issues"
+            },
+            "time": "2021-09-30T03:11:43+00:00"
         },
         {
             "name": "twbs/bootstrap",
