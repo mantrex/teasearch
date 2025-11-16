@@ -182,6 +182,8 @@ function teasearch_get_content_type_label($content_type)
   $labels = [
     'en' => [
       'people' => 'People',
+      'primary_sources' => 'Texts',
+      'first_reference' => "Essentials",
       'article' => 'Article',
       'event' => 'Event',
       'about' => 'About',
@@ -189,6 +191,8 @@ function teasearch_get_content_type_label($content_type)
     ],
     'it' => [
       'people' => 'Persone',
+      'primary_sources' => 'Texts',
+      'first_reference' => "Essentials",
       'article' => 'Articolo',
       'event' => 'Evento',
       'about' => 'Chi siamo'

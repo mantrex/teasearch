@@ -45,6 +45,9 @@ function teasearch_get_field_type_registry()
     'referenced_in' => 'teasearch_render_field_referenced_in',
     'square_or_main' => 'teasearch_render_field_square_or_main',
     'texts_title' => 'teasearch_render_field_texts_title',
+    'authors_general' => 'teasearch_render_field_authors_general',
+    'unified_title' => 'teasearch_render_field_unified_title',
+    'date_label' => 'teasearch_render_field_date_label'
   ];
 }
 /**
@@ -921,11 +924,11 @@ function teasearch_build_contribution($node, $content_type, $role, $language)
   if (!empty($title)) {
     $title_string = $title;
     if ($title_original) {
-      $title_string .= ' ' . $title_original;
+      $title_string .= ' &middot; ' . $title_original;
     }
     $parts[] = $title_string;
   } elseif ($title_translated) {
-    $parts[] = $title_translated;
+    $parts[] = "[".$title_translated."]";
   }
 
   // 2. AUTORI (se il paragraph field esiste per questo content type)
@@ -2681,4 +2684,371 @@ function teasearch_render_field_bibliography_icon($node, $field_config, $field_i
     . ' class="entity-image bibliography-icon rounded" width="96" height="96" loading="lazy"'
     . ' onerror="this.src=\'' . htmlspecialchars($placeholder, ENT_QUOTES, 'UTF-8') . '\'; this.onerror=null;"'
     . ' data-field-used="bibliography_icon">';
+}
+
+
+
+
+function teasearch_format_single_author_from_general($paragraph, $language)
+{
+  // Recupera i campi dal paragraph
+  $is_org = $paragraph->get('field_is_org')->value ?? false;
+  $surname_first = $paragraph->get('field_surname_first')->value ?? false;
+  $lastname = $paragraph->get('field_lastname')->value ?? '';
+  $firstname = $paragraph->get('field_firstname')->value ?? '';
+  $fullname = $paragraph->get('field_fullname')->value ?? '';
+  $pseudonym = $paragraph->get('field_pseudonym')->value ?? '';
+  $dates = $paragraph->get('field_dates')->value ?? '';
+
+  $parts = [];
+  $middle_dot = ' · '; // U+00B7
+
+  // ========================================================================
+  // CASO 1: ORGANIZZAZIONE
+  // ========================================================================
+  if ($is_org) {
+    // Formato: SURNAME_(LATIN) · FULL_NAME_(ORIG_NON_LATIN)
+    if (!empty($lastname)) {
+      $parts[] = $lastname;
+    }
+    if (!empty($fullname)) {
+      if (!empty($parts)) {
+        $parts[] = $middle_dot . $fullname;
+      } else {
+        $parts[] = $fullname;
+      }
+    }
+
+    // Per organizzazioni: NO pseudonym, NO dates
+    if (empty($parts)) {
+      return null;
+    }
+
+    return implode('', $parts);
+  }
+
+  // ========================================================================
+  // CASO 2: PERSONA
+  // ========================================================================
+
+  // Costruisce la parte "nome latino"
+  $latin_name = '';
+
+  if ($surname_first) {
+    // SURNAME_FIRST = true
+    // Formato: GIVEN_NAME_(LATIN) + SURNAME_(LATIN) [CAPS]
+    if (!empty($firstname)) {
+      $latin_name .= $firstname . ' ';
+    }
+    if (!empty($lastname)) {
+      $latin_name .= mb_strtoupper($lastname, 'UTF-8');
+    }
+  } else {
+    // SURNAME_FIRST = false
+    // Formato: SURNAME_(LATIN) [CAPS] + GIVEN_NAME_(LATIN)
+    if (!empty($lastname)) {
+      $latin_name .= mb_strtoupper($lastname, 'UTF-8');
+    }
+    if (!empty($firstname)) {
+      $latin_name .= ' ' . $firstname;
+    }
+  }
+
+  // Trim spazi extra
+  $latin_name = trim($latin_name);
+
+  // Aggiungi nome latino se presente
+  if (!empty($latin_name)) {
+    $parts[] = $latin_name;
+  }
+
+  // Aggiungi fullname (nome originale) se presente
+  if (!empty($fullname)) {
+    if (!empty($parts)) {
+      $parts[] = $middle_dot . $fullname;
+    } else {
+      $parts[] = $fullname;
+    }
+  }
+
+  // Se non abbiamo né nome latino né fullname, non possiamo formattare
+  if (empty($parts)) {
+    return null;
+  }
+
+  // Costruisci stringa base
+  $result = implode('', $parts);
+
+  // Aggiungi PSEUDONYM in parentesi se presente
+  if (!empty($pseudonym)) {
+    $result .= ' (' . $pseudonym . ')';
+  }
+
+  // Aggiungi DATE in parentesi se presente
+  if (!empty($dates)) {
+    $result .= ' (' . $dates . ')';
+  }
+
+  return $result;
+}
+
+// ============================================================================
+// TYPE: authors_general
+// ============================================================================
+
+/**
+ * TYPE: authors_general
+ * Renderizza lista autori da paragraph unificato authors_general.
+ * 
+ * WORKFLOW:
+ * 
+ * 1. Controlla field_anonymous (a livello nodo):
+ *    - Se true → return "Anonimo" / "Anonymous"
+ * 
+ * 2. Itera sui paragraph nel campo specificato (es. field_responsibles):
+ *    - Per ogni paragraph, formatta l'autore usando teasearch_format_single_author_from_general()
+ * 
+ * 3. Controlla field_attributed_authorship (a livello nodo):
+ *    - Se true → aggiungi "(Attribuito a)" / "(Attributed to)" dopo OGNI autore
+ * 
+ * 4. Join tutti gli autori con ", " (virgola spazio)
+ * 
+ * USO NELLO SCHEMA:
+ * 
+ * 'authors' => [
+ *   'type' => 'authors_general',
+ *   'field' => 'field_responsibles',
+ *   'label' => 'Authors',
+ * ],
+ * 
+ * 'editors' => [
+ *   'type' => 'authors_general',
+ *   'field' => 'field_editors',
+ *   'label' => 'Editors',
+ * ],
+ * 
+ * @param \Drupal\node\Entity\Node $node
+ *   Il nodo
+ * @param array $field_config
+ *   La configurazione del campo dallo schema
+ * @param string $field_identifier
+ *   L'identificativo del campo (nome del campo paragraph, es. 'field_responsibles')
+ * 
+ * @return string|null
+ *   La lista di autori formattata, NULL se nessun autore
+ */
+function teasearch_render_field_authors_general($node, $field_config, $field_identifier)
+{
+  $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+
+  // ========================================================================
+  // STEP 1: Controlla field_anonymous (a livello nodo)
+  // ========================================================================
+  if ($node->hasField('field_anonymous')) {
+    $anonymous_field = $node->get('field_anonymous');
+    if (!$anonymous_field->isEmpty() && $anonymous_field->value) {
+      // Return "Anonimo" / "Anonymous" in base alla lingua
+      return $current_language === 'it' ? 'Anonimo' : 'Anonymous';
+    }
+  }
+
+  // ========================================================================
+  // STEP 2: Recupera il campo paragraph (es. field_responsibles)
+  // ========================================================================
+  $field_name = $field_config['field'] ?? $field_identifier;
+  $authors_field = teasearch_get_field_value($node, $field_name);
+
+  if (!$authors_field || $authors_field->isEmpty()) {
+    return null;
+  }
+
+  // ========================================================================
+  // STEP 3: Controlla field_attributed_authorship (a livello nodo)
+  // ========================================================================
+  $is_attributed = false;
+  if ($node->hasField('field_attributed_authorship')) {
+    $attributed_field = $node->get('field_attributed_authorship');
+    if (!$attributed_field->isEmpty() && $attributed_field->value) {
+      $is_attributed = true;
+    }
+  }
+
+  // Testo "(Attributed to)" / "(Attribuito a)"
+  $attributed_text = $current_language === 'it' ? ' (Attribuito a)' : ' (Attributed to)';
+
+  // ========================================================================
+  // STEP 4: Itera sui paragraph e formatta ogni autore
+  // ========================================================================
+  $formatted_authors = [];
+
+  foreach ($authors_field as $item) {
+    if ($item->isEmpty()) {
+      continue;
+    }
+
+    $paragraph = $item->entity;
+    if (!$paragraph) {
+      continue;
+    }
+
+    // Formatta l'autore usando l'helper
+    $formatted_author = teasearch_format_single_author_from_general($paragraph, $current_language);
+
+    if ($formatted_author) {
+      // Se attributed = true, aggiungi il testo dopo ogni autore
+      if ($is_attributed) {
+        $formatted_author .= $attributed_text;
+      }
+
+      $formatted_authors[] = $formatted_author;
+    }
+  }
+
+  // ========================================================================
+  // STEP 5: Join con ", " e return
+  // ========================================================================
+  if (empty($formatted_authors)) {
+    return null;
+  }
+
+  return implode(', ', $formatted_authors);
+}
+
+// ============================================================================
+// TYPE: unified_title
+// ============================================================================
+
+/**
+ * TYPE: unified_title
+ * Renderizza titoli unificati per tutti i content types.
+ * 
+ * Campi utilizzati:
+ * - title (titolo del nodo)
+ * - field_title_original
+ * - field_title_translated (multilingua)
+ * 
+ * LOGICA:
+ * 
+ * Subtype 'main' (per maintitle nell'header verde):
+ * - Se title NOT NULL: title + field_title_original
+ * - Altrimenti: field_title_translated
+ * 
+ * Subtype 'row' (per il campo nella tabella):
+ * - title + " – " + field_title_original
+ * 
+ * USO NELLO SCHEMA:
+ * 
+ * 'maintitle' => [
+ *   'type' => 'unified_title',
+ *   'options' => [
+ *     'subtype' => 'main',
+ *   ],
+ * ],
+ * 
+ * 'title' => [
+ *   'type' => 'unified_title',
+ *   'label' => 'Title',
+ *   'options' => [
+ *     'subtype' => 'row',
+ *   ],
+ * ],
+ * 
+ * @param \Drupal\node\Entity\Node $node
+ *   Il nodo
+ * @param array $field_config
+ *   La configurazione del campo dallo schema
+ * @param string $field_identifier
+ *   L'identificativo del campo
+ * 
+ * @return string|null
+ *   Il titolo formattato, NULL se nessun dato disponibile
+ */
+function teasearch_render_field_unified_title($node, $field_config, $field_identifier)
+{
+  $subtype = $field_config['options']['subtype'] ?? 'base';
+  $separator = ' &middot; '; // Puntino catalano (U+00B7)
+
+  // ========================================================================
+  // STEP 1: Recupera i campi (tutti opzionali)
+  // ========================================================================
+  $title = trim($node->getTitle() ?? '');
+
+  $title_original_field = teasearch_get_field_value($node, 'field_title_original');
+  $title_original = $title_original_field && !$title_original_field->isEmpty()
+    ? trim($title_original_field->value)
+    : '';
+
+  $title_translated_field = teasearch_get_field_value($node, 'field_title_translated');
+  $title_translated = $title_translated_field && !$title_translated_field->isEmpty()
+    ? trim($title_translated_field->value)
+    : '';
+
+  // ========================================================================
+  // STEP 2: Costruisci l'array di parts
+  // ========================================================================
+  $parts = [];
+
+  // Aggiungi title se presente
+  if (!empty($title)) {
+    $parts[] = $title;
+  }
+
+  // Aggiungi field_title_original se presente
+  if (!empty($title_original)) {
+    $parts[] = $title_original;
+  }
+
+  // ========================================================================
+  // STEP 3: Gestisci field_title_translated
+  // ========================================================================
+  if (!empty($title_translated)) {
+    // Se ci sono altri campi prima, aggiungi con []
+    // Altrimenti aggiungi senza []
+    if (count($parts) > 0) {
+      $parts[] = '[' . $title_translated . ']';
+    } else {
+      $parts[] = $title_translated;
+    }
+  }
+
+  // ========================================================================
+  // STEP 4: Dates
+  // ========================================================================
+
+  $field_year_range = teasearch_get_field_value($node, 'field_year_range');
+
+  $century_label = '';
+  if ($field_year_range && !$field_year_range->isEmpty()) {
+    $first_item = $field_year_range->first();
+    if ($first_item && isset($first_item->century_label)) {
+      $century_label = $first_item->century_label;
+      $parts[] = $century_label;
+    }
+  }
+
+  // ========================================================================
+  // STEP 5: Join e return
+  // ========================================================================
+  if (empty($parts)) {
+    return null;
+  }
+
+  // Per ora 'base' e 'main' hanno lo stesso comportamento
+  return implode($separator, $parts);
+}
+
+function teasearch_render_field_date_label($node, $field_config, $field_identifier)
+{
+  // Recupera il campo field_year_range
+  $field_year_range = teasearch_get_field_value($node, 'field_year_range');
+
+  // Estrai century_label se presente
+  if ($field_year_range && !$field_year_range->isEmpty()) {
+    $first_item = $field_year_range->first();
+    if ($first_item && isset($first_item->century_label)) {
+      return $first_item->century_label;
+    }
+  }
+
+  return NULL;
 }
