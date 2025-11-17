@@ -26,7 +26,6 @@ function teasearch_get_field_type_registry()
     'image_round' => 'teasearch_render_field_image_round', 
     'people_main_title' => 'teasearch_render_field_people_main_title',
     'people_name' => 'teasearch_render_field_people_name',
-    'video' => 'teasearch_render_field_video',
     'location' => 'teasearch_render_location',
     'record_data' => 'teasearch_render_field_record_data',
     'systemdate' => 'teasearch_render_field_systemdate',
@@ -47,7 +46,9 @@ function teasearch_get_field_type_registry()
     'texts_title' => 'teasearch_render_field_texts_title',
     'authors_general' => 'teasearch_render_field_authors_general',
     'unified_title' => 'teasearch_render_field_unified_title',
-    'date_label' => 'teasearch_render_field_date_label'
+    'date_label' => 'teasearch_render_field_date_label',
+    'image' => 'teasearch_render_field_image',
+    'video' => 'teasearch_render_field_video',
   ];
 }
 /**
@@ -256,45 +257,7 @@ function teasearch_render_field_link($node, $field_config, $field_identifier)
   return '<a href="' . $url->toString() . '" target="_blank">' . htmlspecialchars($title) . '</a>';
 }
 
-/**
- * TYPE: media_image
- * Renderizza un'immagine da campo media.
- */
-function teasearch_render_field_media_image($node, $field_config, $field_identifier)
-{
-  // TODO: Implementare
-  return NULL;
-}
 
-/**
- * TYPE: media_image_round
- * Renderizza un'immagine tonda (per icone/avatar).
- */
-function teasearch_render_field_media_image_round($node, $field_config, $field_identifier)
-{
-  // TODO: Implementare
-  return NULL;
-}
-
-/**
- * TYPE: video
- * Renderizza immagine con overlay play button e modal per video YouTube.
- */
-function teasearch_render_field_video($node, $field_config, $field_identifier)
-{
-  // TODO: Implementare
-  return NULL;
-}
-
-/**
- * TYPE: record_data
- * Mostra data di creazione e ultimo aggiornamento del nodo.
- */
-function teasearch_render_field_record_data($node, $field_config, $field_identifier)
-{
-  // TODO: Implementare
-  return NULL;
-}
 
 function teasearch_render_field_image_round($node, $field_config, $field_identifier)
 {
@@ -3051,4 +3014,227 @@ function teasearch_render_field_date_label($node, $field_config, $field_identifi
   }
 
   return NULL;
+}
+
+
+
+/**
+ * TYPE: image
+ * Renderizza un'immagine con lightbox popup.
+ * 
+ * OPZIONI:
+ * - 'icon' (bool): Se true, mostra icona lente in basso a destra
+ * - 'field' (string): Campo immagine da usare (default: field_main_image)
+ * 
+ * FUNZIONALITÀ:
+ * - Click sull'immagine → apre popup lightbox full-size
+ * - Usa il sistema teasearch-lightbox esistente
+ * 
+ * USO NELLO SCHEMA:
+ * 
+ * 'image' => [
+ *   'type' => 'image',
+ *   'label' => 'Image',
+ *   'options' => [
+ *     'icon' => true,  // Mostra lente
+ *     'field' => 'field_main_image',  // Campo immagine (opzionale)
+ *   ],
+ * ],
+ * 
+ * @param \Drupal\node\Entity\Node $node
+ *   Il nodo
+ * @param array $field_config
+ *   La configurazione del campo dallo schema
+ * @param string $field_identifier
+ *   L'identificativo del campo
+ * 
+ * @return string|null
+ *   L'HTML dell'immagine con lightbox, NULL se nessuna immagine
+ */
+
+function teasearch_render_field_image($node, $field_config, $field_identifier)
+{
+  // Recupera il campo immagine
+  $field_name = $field_config['options']['field'] ?? $field_config['field'] ?? 'field_main_image';
+  $show_icon = $field_config['options']['icon'] ?? false;
+
+  $image_field = teasearch_get_field_value($node, $field_name);
+
+  if (!$image_field || $image_field->isEmpty()) {
+    return NULL;
+  }
+
+  // Ottieni il file immagine
+  $image_item = $image_field->first();
+  if (!$image_item || !$image_item->entity) {
+    return NULL;
+  }
+
+  $file = $image_item->entity;
+  $image_url = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
+  $alt = $image_item->alt ?: 'Image';
+
+  // Costruisci HTML con lightbox
+  $html = '<div class="detail-image-container" data-teasearch-lightbox>';
+  $html .= '<img src="' . htmlspecialchars($image_url) . '" ';
+  $html .= 'alt="' . htmlspecialchars($alt) . '" ';
+  $html .= 'class="detail-image img-fluid" />';
+
+  // Aggiungi icona lente se richiesta
+  if ($show_icon) {
+    $html .= '<div class="detail-image-icon">🔍</div>';
+  }
+
+  $html .= '</div>';
+
+  // Allega la libreria lightbox
+  $attach_library = [
+    '#attached' => [
+      'library' => ['teasearch/image-lightbox'],
+    ],
+  ];
+
+  return [
+    '#markup' => $html,
+    '#attached' => $attach_library['#attached'],
+  ];
+}
+
+// ============================================================================
+// TYPE: video
+// ============================================================================
+
+/**
+ * TYPE: video
+ * Renderizza un video YouTube con thumbnail e play button.
+ * 
+ * OPZIONI:
+ * - 'mode' (string): 'inline' (default) o 'popup'
+ * - 'thumbnail_field' (string): Campo per thumbnail (default: field_main_image)
+ * - 'code_field' (string): Campo codice YouTube (default: field_youtube_code)
+ * 
+ * FUNZIONALITÀ:
+ * - Mostra thumbnail da field_main_image croppata 16:9
+ * - Overlay play button 50x50 centrato con 80% opacity
+ * - field_youtube_code contiene solo il codice (es. "dQw4w9WgXcQ")
+ * - Mode 'inline': mostra iframe YouTube nel campo
+ * - Mode 'popup': apre modal con iframe YouTube
+ * 
+ * USO NELLO SCHEMA:
+ * 
+ * 'video' => [
+ *   'type' => 'video',
+ *   'label' => 'Video',
+ *   'options' => [
+ *     'mode' => 'inline',  // o 'popup'
+ *   ],
+ * ],
+ * 
+ * @param \Drupal\node\Entity\Node $node
+ *   Il nodo
+ * @param array $field_config
+ *   La configurazione del campo dallo schema
+ * @param string $field_identifier
+ *   L'identificativo del campo
+ * 
+ * @return string|null
+ *   L'HTML del video player, NULL se nessun video
+ */
+function teasearch_render_field_video($node, $field_config, $field_identifier)
+{
+  // Recupera le opzioni
+  $mode = $field_config['options']['mode'] ?? 'inline';
+  $thumbnail_field_name = $field_config['options']['thumbnail_field'] ?? 'field_main_image';
+  $code_field_name = $field_config['options']['code_field'] ?? 'field_youtube_code';
+
+  // Recupera il codice YouTube
+  $youtube_code_field = teasearch_get_field_value($node, $code_field_name);
+  if (!$youtube_code_field || $youtube_code_field->isEmpty()) {
+    return NULL;
+  }
+
+  $youtube_code = trim($youtube_code_field->value);
+  if (empty($youtube_code)) {
+    return NULL;
+  }
+
+  // Recupera la thumbnail
+  $thumbnail_field = teasearch_get_field_value($node, $thumbnail_field_name);
+  $thumbnail_url = '';
+
+  if ($thumbnail_field && !$thumbnail_field->isEmpty()) {
+    $thumbnail_item = $thumbnail_field->first();
+    if ($thumbnail_item && $thumbnail_item->entity) {
+      $file = $thumbnail_item->entity;
+      $thumbnail_url = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
+    }
+  }
+
+  // Fallback: usa thumbnail di YouTube
+  if (empty($thumbnail_url)) {
+    $thumbnail_url = 'https://img.youtube.com/vi/' . $youtube_code . '/maxresdefault.jpg';
+  }
+
+  // URL iframe YouTube
+  $youtube_embed_url = 'https://www.youtube.com/embed/' . $youtube_code . '?autoplay=1';
+
+  // ID univoco per il video
+  $video_id = 'video-' . $node->id() . '-' . md5($youtube_code);
+
+  // ========================================================================
+  // MODE: INLINE
+  // ========================================================================
+  if ($mode === 'inline') {
+    $html = '<div class="detail-video-container detail-video-inline" id="' . $video_id . '">';
+    
+    // Thumbnail con play button
+    $html .= '<div class="detail-video-thumbnail" data-video-id="' . $video_id . '" data-youtube-code="' . htmlspecialchars($youtube_code) . '">';
+    $html .= '<img src="' . htmlspecialchars($thumbnail_url) . '" alt="Video thumbnail" class="detail-video-thumbnail-img" />';
+    $html .= '<div class="detail-video-play-button">';
+    $html .= '<svg width="50" height="50" viewBox="0 0 68 48" fill="none">';
+    $html .= '<path d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#f00"></path>';
+    $html .= '<path d="M 45,24 27,14 27,34" fill="#fff"></path>';
+    $html .= '</svg>';
+    $html .= '</div>';
+    $html .= '</div>';
+    
+    // Placeholder per iframe (nascosto inizialmente)
+    $html .= '<div class="detail-video-player" style="display: none;"></div>';
+    
+    $html .= '</div>';
+
+    return [
+      '#markup' => $html,
+      '#attached' => [
+        'library' => ['teasearch/video-player'],
+      ],
+    ];
+  }
+
+  // ========================================================================
+  // MODE: POPUP
+  // ========================================================================
+  else {
+    $html = '<div class="detail-video-container detail-video-popup" id="' . $video_id . '">';
+    
+    // Thumbnail con play button
+    $html .= '<div class="detail-video-thumbnail" data-video-popup="' . $video_id . '" data-youtube-code="' . htmlspecialchars($youtube_code) . '">';
+    $html .= '<img src="' . htmlspecialchars($thumbnail_url) . '" alt="Video thumbnail" class="detail-video-thumbnail-img" />';
+    $html .= '<div class="detail-video-play-button">';
+    $html .= '<svg width="50" height="50" viewBox="0 0 68 48" fill="none">';
+    $html .= '<path d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#f00"></path>';
+    $html .= '<path d="M 45,24 27,14 27,34" fill="#fff"></path>';
+    $html .= '</svg>';
+    $html .= '</div>';
+    $html .= '</div>';
+    
+    $html .= '</div>';
+
+    return [
+      '#markup' => $html,
+      '#attached' => [
+        'library' => ['teasearch/video-player'],
+      ],
+    ];
+  }
 }

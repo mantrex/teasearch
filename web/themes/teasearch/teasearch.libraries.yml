@@ -42,3 +42,11 @@ info-page:
   dependencies:
     - core/drupal
     - core/jquery
+video-player:
+  css:
+    theme:
+      css/video-player.css: {}
+  js:
+    js/video-player.js: {}
+  dependencies:
+    - core/drupal
