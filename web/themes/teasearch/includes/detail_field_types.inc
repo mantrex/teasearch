@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\Core\Render\Markup;
 /**
  * @file
  * Definizione dei type per il rendering dei campi nelle schede di dettaglio.
@@ -51,6 +52,30 @@ function teasearch_get_field_type_registry()
     'video' => 'teasearch_render_field_video',
   ];
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * TYPE: people_main_title
  * Renderizza il titolo principale per il content type people (campo verde in alto).
@@ -279,8 +304,12 @@ function teasearch_render_field_image_round($node, $field_config, $field_identif
   $image_url = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
   $alt = $image->alt ?: 'Profile image';
 
-  return '<img src="' . $image_url . '" alt="' . htmlspecialchars($alt) . '" />';
+  return '<img src="' . $image_url . '" alt="' . htmlspecialchars($alt) . '" class="detail-icon-image" />';
+
 }
+
+
+
 
 function teasearch_render_location($node, $field_config, $field_identifier)
 {
@@ -469,8 +498,8 @@ function teasearch_get_first_author_lastname($bibliography_node)
   }
 
   // Recupero il cognome
-  if ($first_author->hasField('field_lastname_latin') && !$first_author->get('field_lastname_latin')->isEmpty()) {
-    return $first_author->get('field_lastname_latin')->value;
+  if ($first_author->hasField('field_lastname') && !$first_author->get('field_lastname')->isEmpty()) {
+    return $first_author->get('field_lastname')->value;
   }
 
   return '';
@@ -567,12 +596,12 @@ function teasearch_format_authors($bibliography_node)
       ? $paragraph->get('field_surname_first')->value
       : FALSE;
 
-    $lastname_latin = $paragraph->hasField('field_lastname_latin') && !$paragraph->get('field_lastname_latin')->isEmpty()
-      ? $paragraph->get('field_lastname_latin')->value
+    $lastname_latin = $paragraph->hasField('field_lastname') && !$paragraph->get('field_lastname')->isEmpty()
+      ? $paragraph->get('field_lastname')->value
       : '';
 
-    $firstname_latin = $paragraph->hasField('field_firstname_latin') && !$paragraph->get('field_firstname_latin')->isEmpty()
-      ? $paragraph->get('field_firstname_latin')->value
+    $firstname_latin = $paragraph->hasField('field_firstname') && !$paragraph->get('field_firstname')->isEmpty()
+      ? $paragraph->get('field_firstname')->value
       : '';
 
     $fullname = $paragraph->hasField('field_fullname') && !$paragraph->get('field_fullname')->isEmpty()
@@ -790,16 +819,14 @@ function teasearch_format_authors_universal($node, $content_type)
 
     // Cognome: prova field_lastname_latin, poi field_lastname
     $lastname = '';
-    if ($paragraph->hasField('field_lastname_latin') && !$paragraph->get('field_lastname_latin')->isEmpty()) {
-      $lastname = $paragraph->get('field_lastname_latin')->value;
-    } elseif ($paragraph->hasField('field_lastname') && !$paragraph->get('field_lastname')->isEmpty()) {
+    if ($paragraph->hasField('field_lastname') && !$paragraph->get('field_lastname')->isEmpty()) {
       $lastname = $paragraph->get('field_lastname')->value;
     }
 
     // Nome: prova field_firstname_latin, poi field_firstname
     $firstname = '';
-    if ($paragraph->hasField('field_firstname_latin') && !$paragraph->get('field_firstname_latin')->isEmpty()) {
-      $firstname = $paragraph->get('field_firstname_latin')->value;
+    if ($paragraph->hasField('field_firstname') && !$paragraph->get('field_firstname')->isEmpty()) {
+      $firstname = $paragraph->get('field_firstname')->value;
     } elseif ($paragraph->hasField('field_firstname') && !$paragraph->get('field_firstname')->isEmpty()) {
       $firstname = $paragraph->get('field_firstname')->value;
     }
@@ -1058,12 +1085,12 @@ function teasearch_format_single_author($paragraph)
     ? $paragraph->get('field_surname_first')->value
     : FALSE;
 
-  $lastname_latin = $paragraph->hasField('field_lastname_latin') && !$paragraph->get('field_lastname_latin')->isEmpty()
-    ? $paragraph->get('field_lastname_latin')->value
+  $lastname_latin = $paragraph->hasField('field_lastname') && !$paragraph->get('field_lastname_latin')->isEmpty()
+    ? $paragraph->get('field_lastname')->value
     : '';
 
-  $firstname_latin = $paragraph->hasField('field_firstname_latin') && !$paragraph->get('field_firstname_latin')->isEmpty()
-    ? $paragraph->get('field_firstname_latin')->value
+  $firstname_latin = $paragraph->hasField('field_firstname') && !$paragraph->get('field_firstname_latin')->isEmpty()
+    ? $paragraph->get('field_firstname')->value
     : '';
 
   $fullname = $paragraph->hasField('field_fullname') && !$paragraph->get('field_fullname')->isEmpty()
@@ -1810,8 +1837,8 @@ function teasearch_get_first_author_for_citation($bib_node)
 
   // Recupero i campi necessari
   $surname_first = $paragraph->get('field_surname_first')->value ?? FALSE;
-  $lastname_latin = $paragraph->get('field_lastname_latin')->value ?? '';
-  $firstname_latin = $paragraph->get('field_firstname_latin')->value ?? '';
+  $lastname_latin = $paragraph->get('field_lastname')->value ?? '';
+  $firstname_latin = $paragraph->get('field_firstname')->value ?? '';
   $fullname = $paragraph->get('field_fullname')->value ?? '';
 
   $parts = [];
@@ -2163,16 +2190,16 @@ function teasearch_get_first_author_for_box2_citation($node, $content_type)
 
   // Cognome: prova field_lastname_latin, poi field_lastname
   $lastname_latin = '';
-  if ($paragraph->hasField('field_lastname_latin') && !$paragraph->get('field_lastname_latin')->isEmpty()) {
-    $lastname_latin = $paragraph->get('field_lastname_latin')->value;
+  if ($paragraph->hasField('field_lastname') && !$paragraph->get('field_lastname')->isEmpty()) {
+    $lastname_latin = $paragraph->get('field_lastname')->value;
   } elseif ($paragraph->hasField('field_lastname') && !$paragraph->get('field_lastname')->isEmpty()) {
     $lastname_latin = $paragraph->get('field_lastname')->value;
   }
 
   // Nome: prova field_firstname_latin, poi field_firstname
   $firstname_latin = '';
-  if ($paragraph->hasField('field_firstname_latin') && !$paragraph->get('field_firstname_latin')->isEmpty()) {
-    $firstname_latin = $paragraph->get('field_firstname_latin')->value;
+  if ($paragraph->hasField('field_firstname') && !$paragraph->get('field_firstname_latin')->isEmpty()) {
+    $firstname_latin = $paragraph->get('field_firstname')->value;
   } elseif ($paragraph->hasField('field_firstname') && !$paragraph->get('field_firstname')->isEmpty()) {
     $firstname_latin = $paragraph->get('field_firstname')->value;
   }
@@ -2422,13 +2449,10 @@ function teasearch_get_first_author_for_citation_universal($node, $content_type)
   // Recupero i campi necessari (con fallback per nomi diversi)
   $surname_first = $paragraph->get('field_surname_first')->value ?? FALSE;
 
-  // Cognome: prova field_lastname_latin, poi field_lastname
   $lastname_latin = '';
-  if ($paragraph->hasField('field_lastname_latin') && !$paragraph->get('field_lastname_latin')->isEmpty()) {
-    $lastname_latin = $paragraph->get('field_lastname_latin')->value;
-  } elseif ($paragraph->hasField('field_lastname') && !$paragraph->get('field_lastname')->isEmpty()) {
+  if ($paragraph->hasField('field_lastname') && !$paragraph->get('field_lastname_latin')->isEmpty()) {
     $lastname_latin = $paragraph->get('field_lastname')->value;
-  }
+  } 
 
   // Nome: prova field_firstname_latin, poi field_firstname
   $firstname_latin = '';
@@ -2483,30 +2507,34 @@ function teasearch_get_first_author_for_citation_universal($node, $content_type)
 
 /**
  * TYPE: square_or_main
- * Renderizza l'icona per primary_sources (Texts).
- * Priorità: field_square_thumbnail, se vuoto usa field_main_image (cropped).
+ * Renderizza l'icona per primary_sources (Texts) e Images.
+ * Priorità: field_square_thumbnail, se vuoto usa field_main_image.
+ * 
+ * IMPORTANTE: Questa funzione non richiede 'field' nella configurazione.
+ * Cerca automaticamente i campi field_square_thumbnail e field_main_image.
  */
 function teasearch_render_field_square_or_main($node, $field_config, $field_identifier)
 {
   // Prova prima field_square_thumbnail
   $square_thumb = teasearch_get_field_value($node, 'field_square_thumbnail');
   if ($square_thumb && !$square_thumb->isEmpty()) {
-    return teasearch_render_image_field($square_thumb, 'Square thumbnail');
+    return teasearch_render_image_field_square($square_thumb, 'Square thumbnail');
   }
 
   // Se vuoto, usa field_main_image
   $main_image = teasearch_get_field_value($node, 'field_main_image');
   if ($main_image && !$main_image->isEmpty()) {
-    return teasearch_render_image_field($main_image, 'Main image');
+    return teasearch_render_image_field_square($main_image, 'Main image');
   }
 
   return NULL;
 }
 
 /**
- * Helper: Renderizza un campo immagine.
+ * Helper: Renderizza un campo immagine QUADRATA/RETTANGOLARE (NON tonda).
+ * Usa classe specifica 'detail-icon-image-square' invece di 'detail-icon-image'.
  */
-function teasearch_render_image_field($field, $alt_text = 'Image')
+function teasearch_render_image_field_square($field, $alt_text = 'Image')
 {
   $image = $field->first();
   if (!$image || !$image->entity) {
@@ -2517,8 +2545,10 @@ function teasearch_render_image_field($field, $alt_text = 'Image')
   $image_url = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
   $alt = $image->alt ?: $alt_text;
 
-  return '<img src="' . htmlspecialchars($image_url) . '" alt="' . htmlspecialchars($alt) . '" class="detail-icon-image" />';
+  // IMPORTANTE: Usa classe 'detail-icon-image-square' per evitare border-radius
+  return '<img src="' . htmlspecialchars($image_url) . '" alt="' . htmlspecialchars($alt) . '" class="detail-icon-image-square" />';
 }
+
 
 
 /**
@@ -3054,8 +3084,9 @@ function teasearch_render_field_date_label($node, $field_config, $field_identifi
 
 function teasearch_render_field_image($node, $field_config, $field_identifier)
 {
-  // Recupera il campo immagine
+  // Recupera il campo immagine principale (thumbnail)
   $field_name = $field_config['options']['field'] ?? $field_config['field'] ?? 'field_main_image';
+  $large_field_name = $field_config['options']['large_field'] ?? 'field_large_image';
   $show_icon = $field_config['options']['icon'] ?? false;
 
   $image_field = teasearch_get_field_value($node, $field_name);
@@ -3064,7 +3095,7 @@ function teasearch_render_field_image($node, $field_config, $field_identifier)
     return NULL;
   }
 
-  // Ottieni il file immagine
+  // Ottieni il file immagine principale (thumbnail)
   $image_item = $image_field->first();
   if (!$image_item || !$image_item->entity) {
     return NULL;
@@ -3074,15 +3105,46 @@ function teasearch_render_field_image($node, $field_config, $field_identifier)
   $image_url = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
   $alt = $image_item->alt ?: 'Image';
 
+  // ========================================================================
+  // Controlla se esiste field_large_image per il lightbox
+  // ========================================================================
+  $large_image_url = NULL;
+  $large_field = teasearch_get_field_value($node, $large_field_name);
+
+  if ($large_field && !$large_field->isEmpty()) {
+    $large_item = $large_field->first();
+    if ($large_item && $large_item->entity) {
+      $large_file = $large_item->entity;
+      $large_image_url = \Drupal::service('file_url_generator')->generateAbsoluteString($large_file->getFileUri());
+    }
+  }
+
+  // Se non esiste large image, usa la main image anche per il lightbox
+  if (empty($large_image_url)) {
+    $large_image_url = $image_url;
+  }
+
+  // ========================================================================
   // Costruisci HTML con lightbox
-  $html = '<div class="detail-image-container" data-teasearch-lightbox>';
+  // ========================================================================
+  $html = '<div class="detail-image-container" data-teasearch-lightbox';
+
+  // Aggiungi attributo data-large-src se diverso dalla thumbnail
+  if ($large_image_url !== $image_url) {
+    $html .= ' data-large-src="' . htmlspecialchars($large_image_url) . '"';
+  }
+
+  $html .= '>';
   $html .= '<img src="' . htmlspecialchars($image_url) . '" ';
   $html .= 'alt="' . htmlspecialchars($alt) . '" ';
   $html .= 'class="detail-image img-fluid" />';
 
   // Aggiungi icona lente se richiesta
   if ($show_icon) {
-    $html .= '<div class="detail-image-icon">🔍</div>';
+    $theme_path = \Drupal::service('extension.list.theme')->getPath('teasearch');
+    $lente_url = base_path() . $theme_path . '/images/lente.png';
+
+    $html .= '<div class="detail-image-icon"><img  src="'.$lente_url.'"></div>';
   }
 
   $html .= '</div>';
@@ -3099,6 +3161,8 @@ function teasearch_render_field_image($node, $field_config, $field_identifier)
     '#attached' => $attach_library['#attached'],
   ];
 }
+
+
 
 // ============================================================================
 // TYPE: video
@@ -3142,6 +3206,11 @@ function teasearch_render_field_image($node, $field_config, $field_identifier)
  */
 function teasearch_render_field_video($node, $field_config, $field_identifier)
 {
+  $svg = '<svg width="68" height="48" viewBox="0 0 68 48">';
+  $svg .= '<path d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#f00"/>';
+  $svg .= '<path d="M 45,24 27,14 27,34" fill="#fff"/>';
+  $svg .= '</svg>';
+
   // Recupera le opzioni
   $mode = $field_config['options']['mode'] ?? 'inline';
   $thumbnail_field_name = $field_config['options']['thumbnail_field'] ?? 'field_main_image';
@@ -3184,27 +3253,24 @@ function teasearch_render_field_video($node, $field_config, $field_identifier)
   // ========================================================================
   // MODE: INLINE
   // ========================================================================
+
+
   if ($mode === 'inline') {
     $html = '<div class="detail-video-container detail-video-inline" id="' . $video_id . '">';
     
     // Thumbnail con play button
     $html .= '<div class="detail-video-thumbnail" data-video-id="' . $video_id . '" data-youtube-code="' . htmlspecialchars($youtube_code) . '">';
     $html .= '<img src="' . htmlspecialchars($thumbnail_url) . '" alt="Video thumbnail" class="detail-video-thumbnail-img" />';
-    $html .= '<div class="detail-video-play-button">';
-    $html .= '<svg width="50" height="50" viewBox="0 0 68 48" fill="none">';
-    $html .= '<path d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#f00"></path>';
-    $html .= '<path d="M 45,24 27,14 27,34" fill="#fff"></path>';
-    $html .= '</svg>';
-    $html .= '</div>';
+    $html .= '<div class="detail-video-play-button">' . $svg . '</div>';
     $html .= '</div>';
     
     // Placeholder per iframe (nascosto inizialmente)
-    $html .= '<div class="detail-video-player" style="display: none;"></div>';
+    $html .= '<div class="detail-video-player detail-video-hidden" ></div>';
     
     $html .= '</div>';
 
     return [
-      '#markup' => $html,
+      '#markup' => Markup::create($html),
       '#attached' => [
         'library' => ['teasearch/video-player'],
       ],

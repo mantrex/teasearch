@@ -392,6 +392,7 @@ function teasearch_preprocess_node(&$variables)
   }
 }
 
+
 /**
  * Renderizza l'icona secondo lo schema.
  */
@@ -400,7 +401,12 @@ function teasearch_render_icon($node, $icon_config)
   $field_name = $icon_config['field'] ?? NULL;
   $type = $icon_config['type'] ?? 'media_image';
 
-  if (!$field_name) {
+  // ========================================================================
+  // MODIFICA: Alcuni type non richiedono 'field' (es. square_or_main)
+  // ========================================================================
+  $types_without_field = [ 'square_or_main', 'bibliography_icon'];
+
+  if (!$field_name && !in_array($type, $types_without_field)) {
     return NULL;
   }
 
@@ -412,6 +418,7 @@ function teasearch_render_icon($node, $icon_config)
   }
 
   // Chiama la funzione render
+  // Nota: $field_name può essere NULL per alcuni type
   $content = $render_function($node, $icon_config, $field_name);
 
   return $content;

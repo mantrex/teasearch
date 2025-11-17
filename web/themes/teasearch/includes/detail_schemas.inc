@@ -681,6 +681,7 @@ function teasearch_get_detail_schemas()
   $images = [
     'icon' => [
       'type' => 'square_or_main',
+      'field' => 'qualcosa'
     ],
     'fields' => [
       'maintitle' => [
@@ -720,7 +721,10 @@ function teasearch_get_detail_schemas()
       'paragraph1' => "Digital Resources",
       'image' => [
         'label' => 'Image',
-        'type' => 'image'
+        'type' => 'image',
+        'options' => [
+          'icon' => true
+        ]
       ],
       'field_source' => [
         'label' => 'Source',

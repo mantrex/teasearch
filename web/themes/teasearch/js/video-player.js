@@ -52,7 +52,8 @@
 
           // Sostituisci thumbnail con iframe
           thumbnail.style.display = "none";
-          player.style.display = "block";
+          player.classList.remove("detail-video-hidden");
+          player.classList.add("detail-video-visible");
           player.innerHTML = "";
           player.appendChild(iframe);
         });

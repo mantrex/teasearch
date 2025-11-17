@@ -185,6 +185,10 @@
 
 /* Responsive Design */
 @media (max-width: 1200px) {
+  .categories-wrapper {
+    padding: 0 1rem 2rem; /* Aggiungi padding laterale */
+  }
+  
   .categories-grid {
     height: 70vh;
     min-height: 600px;
@@ -197,6 +201,10 @@
 }
 
 @media (max-width: 992px) {
+  .categories-wrapper {
+    padding: 0 1rem 2rem; /* Mantieni padding laterale */
+  }
+  
   .categories-grid {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(3, 1fr);
@@ -243,12 +251,17 @@
 }
 
 @media (max-width: 576px) {
+  .categories-wrapper {
+    padding: 0 2.5rem 2rem; /* Padding laterale più ampio per mobile */
+  }
+  
   .categories-grid {
     grid-template-columns: 1fr;
     grid-template-rows: repeat(6, 180px);
     gap: 3px;
     height: auto;
-    min-height: auto;
+    min-height: calc(6 * 180px + 5 * 3px); /* Calcolo automatico dell'altezza */
+    overflow: visible;
   }
   
   .category-item {
@@ -271,6 +284,12 @@
   .category-type {
     font-size: 0.75rem;
     padding: 4px 8px;
+  }
+}
+
+@media (max-width: 400px) {
+  .categories-wrapper {
+    padding: 0 0.5rem 2rem; /* 48px per lato sui telefoni più piccoli */
   }
 }
 

@@ -4,10 +4,16 @@
    ============================================================================ */
 
 /* Container principale video */
+
 .detail-video-container {
   position: relative;
   width: 100%;
   margin: 1rem 0;
+}
+
+.detail-video-inline {
+  display: inline-block;
+  width: 100%;
 }
 
 /* Thumbnail container */
@@ -34,6 +40,7 @@
   object-fit: cover;
   display: block;
   transition: filter 0.3s ease;
+ 
 }
 
 .detail-video-thumbnail:hover .detail-video-thumbnail-img {
@@ -59,14 +66,23 @@
   transform: translate(-50%, -50%) scale(1.1);
 }
 
-/* Video player (iframe container) */
 .detail-video-player {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
-  max-height: 300px;
   border-radius: 8px;
   overflow: hidden;
+}
+
+/* Nascosto di default */
+.detail-video-player.detail-video-hidden {
+  display: none;
+}
+
+/* Visibile con aspect ratio */
+.detail-video-player.detail-video-visible {
+  display: block;
+  aspect-ratio: 16 / 9;
+  max-height: 300px;
 }
 
 .detail-video-player iframe {
@@ -77,7 +93,6 @@
   height: 100%;
   border: none;
 }
-
 /* ============================================================================
    POPUP MODE - Modal overlay
    ============================================================================ */
@@ -269,3 +284,4 @@
     background: rgba(0, 0, 0, 0.9);
   }
 }
+
