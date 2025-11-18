@@ -9,67 +9,100 @@ include_once __DIR__ . '/includes/detail_schemas.inc';
 include_once __DIR__ . '/includes/detail_field_types.inc';
 include_once __DIR__ . '/includes/detail_helpers.inc';
 
+
+
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Url;
+
 /**
- * Implements hook_preprocess_image_widget().
+ * Preprocess per la pagina (site header, language switcher, ecc.).
  */
-function teasearch_preprocess_page(&$variables)
+function teasearch_preprocess_page(array &$variables): void
 {
   $language_manager = \Drupal::languageManager();
-  $current_language = $language_manager->getCurrentLanguage();
+
+  // Lingua corrente (contenuti).
+  $current_language = $language_manager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT);
   $current_language_id = $current_language->getId();
 
-  // Ottieni l'URL corrente
+  // Request corrente (solo per debug e query string).
   $request = \Drupal::request();
   $current_path = $request->getPathInfo();
   $query_string = $request->getQueryString();
   $base_url = $request->getSchemeAndHttpHost() . $request->getBasePath();
 
-  // Inizializza i link delle lingue
-  $language_data = [];
+  // Route corrente (ES: node.view, view.xxx, <front>, ecc.).
+  $route_match = \Drupal::routeMatch();
+  $route_name = $route_match->getRouteName();
+  $route_parameters = $route_match->getRawParameters()->all();
 
-  // Lingue supportate
+  // Query string da mantenere quando switcho lingua.
+  $current_query = $request->query->all();
+
+  // Lingue supportate (come volevi tu).
   $supported_languages = ['en', 'it'];
 
-  foreach ($supported_languages as $lang_code) {
-    $url = $base_url;
+  // Recupera lingue configurabili da Drupal.
+  $languages = $language_manager->getLanguages(LanguageInterface::STATE_CONFIGURABLE);
 
-    // Rimuovi il prefisso lingua attuale se presente
-    $clean_path = preg_replace('/^\/(en|it)\//', '/', $current_path);
-    $clean_path = preg_replace('/^\/(en|it)$/', '', $current_path);
+  $language_data = [];
 
-    // Se il path è vuoto o solo "/", usa la homepage
-    if (empty($clean_path) || $clean_path === '/') {
-      $url .= '/' . $lang_code;
-    } else {
-      $url .= '/' . $lang_code . $clean_path;
+  foreach ($languages as $lang_code => $language) {
+    // Mostra solo en/it.
+    if (!in_array($lang_code, $supported_languages, TRUE)) {
+      continue;
     }
 
-    // Aggiungi query string se presente
-    if ($query_string) {
-      $url .= '?' . $query_string;
+    // Opzioni per generare la URL nella lingua target.
+    $options = [
+      'language' => $language,
+      'absolute' => FALSE,   // Se vuoi URL assolute metti TRUE
+      'query'    => $current_query,
+    ];
+
+    // Fallback sicuro in caso di route "strana".
+    if ($route_name) {
+      try {
+        $url = Url::fromRoute($route_name, $route_parameters, $options);
+      } catch (\Throwable $e) {
+        // In caso di errore sulla route, manda alla homepage in quella lingua.
+        $url = Url::fromRoute('<front>', [], [
+          'language' => $language,
+          'absolute' => FALSE,
+        ]);
+      }
+    } else {
+      // Se proprio non c'è una route (error pages particolari), vai alla front.
+      $url = Url::fromRoute('<front>', [], [
+        'language' => $language,
+        'absolute' => FALSE,
+      ]);
     }
 
     $language_data[$lang_code] = [
-      '#lang_url' => $url,
-      '#lang_code' => $lang_code,
+      '#lang_url'   => $url->toString(),
+      '#lang_code'  => $lang_code,
       '#lang_label' => strtoupper($lang_code),
       '#is_current' => ($lang_code === $current_language_id),
-      '#lang_title' => $lang_code === 'en' ? 'English' : 'Italiano'
+      '#lang_title' => $lang_code === 'en' ? 'English' : 'Italiano',
     ];
   }
 
-  // Aggiungi le variabili al template
+  // Passa i dati al Twig.
   $variables['language_data'] = $language_data;
   $variables['current_language'] = $current_language_id;
 
-  // Debug info (rimuovi in produzione)
+  // Debug info (ok tenerli mentre sistemi).
   $variables['debug_info'] = [
-    'current_path' => $current_path,
-    'base_url' => $base_url,
-    'query_string' => $query_string,
-    'current_language' => $current_language_id
+    'current_path'      => $current_path,
+    'base_url'          => $base_url,
+    'query_string'      => $query_string,
+    'current_language'  => $current_language_id,
+    'route_name'        => $route_name,
+    'route_parameters'  => $route_parameters,
   ];
 }
+
 
 
 function teasearch_node_access(\Drupal\node\NodeInterface $node, $op, \Drupal\Core\Session\AccountInterface $account)
@@ -289,50 +322,85 @@ function teasearch_theme_suggestions_node_alter(array &$suggestions, array $vari
 }
 
 
-function teasearch_preprocess_node__info(&$variables)
+function teasearch_preprocess_node__info(array &$variables): void
 {
+  /** @var \Drupal\node\NodeInterface $node */
   $node = $variables['node'];
-  $content_type = $node->bundle();
-  $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
 
-  // Carica libreria CSS e JS
+  // Lingua corrente.
+  $language_manager = \Drupal::languageManager();
+  $current_language = $language_manager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
+
+  // Assicurati che il nodo sia nella lingua corrente.
+  if ($node->hasTranslation($current_language)) {
+    $node = $node->getTranslation($current_language);
+    $variables['node'] = $node;
+  }
+
+  $content_type = $node->bundle();
+
+  // Carica libreria CSS e JS.
   $variables['#attached']['library'][] = 'teasearch/info-page';
 
-  // Content type label
-  $variables['content_type_label'] = teasearch_get_content_type_label($content_type);
+  // Content type label (idealmente anche questa funzione deve essere i18n-safe).
+  $variables['content_type_label'] = teasearch_get_content_type_label($content_type, $current_language);
 
-  // Immagine header
+  // Immagine header (campo potenzialmente traducibile).
   if ($node->hasField('field_image') && !$node->get('field_image')->isEmpty()) {
+    /** @var \Drupal\file\FileInterface|null $image_field */
     $image_field = $node->get('field_image')->first();
-    $file = $image_field->entity;
+    $file = $image_field?->entity;
     if ($file) {
-      $variables['header_image_url'] = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
-      $variables['header_image_alt'] = $image_field->alt;
+      $variables['header_image_url'] = \Drupal::service('file_url_generator')
+        ->generateAbsoluteString($file->getFileUri());
+      // Alt viene dalla traduzione del nodo, se il campo è tradotto.
+      $variables['header_image_alt'] = $image_field->alt ?? '';
     }
   }
 
-  // Processa i paragraphs del contenuto
+  // Processa i paragraphs del contenuto, forza la traduzione.
   $sections = [];
   if ($node->hasField('field_contents') && !$node->get('field_contents')->isEmpty()) {
     foreach ($node->get('field_contents') as $paragraph_item) {
+      /** @var \Drupal\paragraphs\Entity\Paragraph|null $paragraph */
       $paragraph = $paragraph_item->entity;
-      if ($paragraph) {
-        $sections[] = [
-          'title' => $paragraph->get('field_title')->value,
-          'content' => $paragraph->get('field_content')->value,
-          'links' => $paragraph->get('field_links'),
-        ];
+      if (!$paragraph) {
+        continue;
       }
+
+      // Usa la traduzione del paragraph se esiste.
+      if ($paragraph->hasTranslation($current_language)) {
+        $paragraph = $paragraph->getTranslation($current_language);
+      }
+
+      $title = $paragraph->hasField('field_title') && !$paragraph->get('field_title')->isEmpty()
+        ? $paragraph->get('field_title')->value
+        : '';
+
+      $content = $paragraph->hasField('field_content') && !$paragraph->get('field_content')->isEmpty()
+        ? $paragraph->get('field_content')->value
+        : '';
+
+      $links = $paragraph->hasField('field_links')
+        ? $paragraph->get('field_links')
+        : NULL;
+
+      $sections[] = [
+        'title'   => $title,
+        'content' => $content,
+        'links'   => $links,
+      ];
     }
   }
   $variables['sections'] = $sections;
 
-  // Carica altri nodi dello stesso content type (escluso quello corrente)
+  // Carica altri nodi dello stesso content type (escluso quello corrente), filtrati per lingua.
   $other_nodes = [];
   $query = \Drupal::entityQuery('node')
     ->condition('type', $content_type)
     ->condition('nid', $node->id(), '!=')
     ->condition('status', 1)
+    ->condition('langcode', $current_language) // considera solo traduzioni nella lingua corrente
     ->accessCheck(TRUE)
     ->sort('title', 'ASC')
     ->range(0, 20);
@@ -340,22 +408,25 @@ function teasearch_preprocess_node__info(&$variables)
   $nids = $query->execute();
 
   if (!empty($nids)) {
-    $nodes = \Drupal::entityTypeManager()->getStorage('node')->loadMultiple($nids);
+    $storage = \Drupal::entityTypeManager()->getStorage('node');
+    /** @var \Drupal\node\NodeInterface[] $nodes */
+    $nodes = $storage->loadMultiple($nids);
+
     foreach ($nodes as $other_node) {
-      // Usa traduzione se disponibile
       if ($other_node->hasTranslation($current_language)) {
         $other_node = $other_node->getTranslation($current_language);
       }
 
       $other_nodes[] = [
         'title' => $other_node->label(),
-        'url' => $other_node->toUrl()->toString(),
+        'url'   => $other_node->toUrl()->toString(),
       ];
     }
   }
 
   $variables['related_pages'] = $other_nodes;
 }
+
 
 
 function teasearch_preprocess_node(&$variables)

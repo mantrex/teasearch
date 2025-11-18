@@ -7,6 +7,7 @@
   --language-hover:#ffffff26; /* hoover lingua */
   --header:#6b8e24; /* per l'header del layout*/
   --header-bottom:#5e7e1e;
+  --menu-unselected:#bdcca0;
   --footer: #523e39; /*background del footer*/
   --foter-shadow: #3d2e2b;/* shadow background del footer*/
   --footer-light:#ffffff1a; /* footer input fields */
@@ -59,6 +60,33 @@ a {
   font-weight: bold;
 }
 
+/* menu*/
+.dropdown-menu {
+  background:var(--header);
+
+}
+.dropdown-menu .nav-item a {
+  background:var(--header);
+}
+.dropdown-menu .nav-item a:not(.is-active) {
+  color:var(--menu-unselected);
+}
+
+@media (max-width: 991px) { /* breakpoints bootstrap: md = 768, lg = 992 */
+  .navbar-collapse .dropdown-menu {
+    background: var(--header);
+    border: none;
+    box-shadow: none;
+    position: static; /* importantissimo per evitare overlay strani */
+  }
+
+  .navbar-collapse .dropdown-menu .nav-item a {
+    background: var(--header);
+    padding-left: 1.5rem; /* indentazione carina */
+  }
+}
+/* fine menu */
+
 .site-wrapper {
   display: flex;
   flex-direction: column;
@@ -71,6 +99,7 @@ a {
 .site-content {
   flex: 1; /* Allow main content to expand and push the footer down */
 }
+
 
 .site-header {
   position: sticky;
@@ -350,15 +379,10 @@ a {
   pointer-events: none; /* opzionale: evita click */
 }
 
-.white-border {
-  border: 1px solid var(--light-border);
-  border-bottom: 2px solid var(--light-border-bottom);
-}
 
 .teasearch-introblock {
-  margin-top: 2em;
-  margin-bottom: 1em;
-  background: var(--light);
+  margin-top: 1em;
+  margin-bottom: 0em;
   padding: 2px;
   text-align: center;
 }

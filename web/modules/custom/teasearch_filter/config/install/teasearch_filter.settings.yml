@@ -70,10 +70,10 @@ content_types:
         display: auto
   
   # Esempio con condizione WHERE per filtrare nodi specifici
-  contributors:
+  people:
     machine_name: people
     type: node
-    label: 'Contributors'
+    label: 'People'
     #where: '[{"field_roles.target_id":"contributors"}]'
     results:
       function: format_people_display
@@ -122,4 +122,4 @@ content_types:
 
 # Mappatura per retrocompatibilità
 legacy_mappings:
-  people: contributors
+  people: people

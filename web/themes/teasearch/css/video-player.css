@@ -21,7 +21,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  max-height: 300px;
+  max-height: 600px;
   overflow: hidden;
   border-radius: 8px;
   cursor: pointer;
@@ -82,7 +82,7 @@
 .detail-video-player.detail-video-visible {
   display: block;
   aspect-ratio: 16 / 9;
-  max-height: 300px;
+  max-height: 600px;
 }
 
 .detail-video-player iframe {

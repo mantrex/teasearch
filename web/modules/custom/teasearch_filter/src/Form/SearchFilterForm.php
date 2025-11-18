@@ -333,7 +333,7 @@ class SearchFilterForm extends FormBase
           ->condition("{$field_name}.target_id", $term_id);
 
         // Special handling for contributors
-        if ($content_type === 'contributors') {
+        if ($content_type === 'people') {
           $query->condition('roles', 'contributor', 'IN');
         }
 

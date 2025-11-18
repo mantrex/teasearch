@@ -7,7 +7,7 @@ bootstrap:
       css/entity-browser-fix.css: {}
       ../../../vendor/npm-asset/select2/dist/css/select2.min.css: {}
   js:
-    ../../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js: {}
+    ../../../vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js: {}
     ../../../vendor/npm-asset/select2/dist/js/select2.full.min.js: {}
 global-scripts:
   dependencies:

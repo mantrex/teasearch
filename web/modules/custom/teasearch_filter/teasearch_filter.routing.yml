@@ -2,7 +2,7 @@ teasearch_filter.search:
   path: '/category/{content_type}'
   defaults:
     _controller: '\Drupal\teasearch_filter\Controller\SearchController::search'
-    _title: 'Content search'
+    _title_callback: '\Drupal\teasearch_filter\Controller\SearchController::title'
   requirements:
     _permission: 'access content'
     content_type: '[a-z0-9_]+'
@@ -12,5 +12,70 @@ teasearch_filter.free_search_results:
   defaults:
     _controller: '\Drupal\teasearch_filter\Controller\SearchController::freeSearchResults'
     _title: 'Search Results'
+  requirements:
+    _permission: 'access content'
+
+
+# =========================
+# OVERVIEW PER CONTENT TYPES
+# =========================
+
+# texts → node type: primary_sources
+teasearch_filter.texts_overview:
+  path: '/primary_sources'
+  defaults:
+    _controller: '\Drupal\teasearch_filter\Controller\SearchController::search'
+    _title_callback: '\Drupal\teasearch_filter\Controller\SearchController::title'
+    content_type: 'texts'
+  requirements:
+    _permission: 'access content'
+
+# essentials → node type: reference_materials
+teasearch_filter.essentials_overview:
+  path: '/reference_materials'
+  defaults:
+    _controller: '\Drupal\teasearch_filter\Controller\SearchController::search'
+    _title_callback: '\Drupal\teasearch_filter\Controller\SearchController::title'
+    content_type: 'essentials'
+  requirements:
+    _permission: 'access content'
+
+# video → node type: videos
+teasearch_filter.video_overview:
+  path: '/videos'
+  defaults:
+    _controller: '\Drupal\teasearch_filter\Controller\SearchController::search'
+    _title_callback: '\Drupal\teasearch_filter\Controller\SearchController::title'
+    content_type: 'video'
+  requirements:
+    _permission: 'access content'
+
+# images → node type: images
+teasearch_filter.images_overview:
+  path: '/images'
+  defaults:
+    _controller: '\Drupal\teasearch_filter\Controller\SearchController::search'
+    _title_callback: '\Drupal\teasearch_filter\Controller\SearchController::title'
+    content_type: 'images'
+  requirements:
+    _permission: 'access content'
+
+# contributors → node type: people
+teasearch_filter.people_overview:
+  path: '/people'
+  defaults:
+    _controller: '\Drupal\teasearch_filter\Controller\SearchController::search'
+    _title_callback: '\Drupal\teasearch_filter\Controller\SearchController::title'
+    content_type: 'people'
+  requirements:
+    _permission: 'access content'
+
+# bibliography → node type: bibliography
+teasearch_filter.bibliography_overview:
+  path: '/bibliography'
+  defaults:
+    _controller: '\Drupal\teasearch_filter\Controller\SearchController::search'
+    _title_callback: '\Drupal\teasearch_filter\Controller\SearchController::title'
+    content_type: 'bibliography'
   requirements:
     _permission: 'access content'
