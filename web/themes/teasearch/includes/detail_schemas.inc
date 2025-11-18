@@ -309,8 +309,6 @@ function teasearch_get_detail_schemas()
         "label" => "Texts",
         "type" => "contrib",
         "content_type" => "primary_sources",
-
-
       ],
       "videos" => [
         "label" => "Videos",
@@ -550,7 +548,7 @@ function teasearch_get_detail_schemas()
       ],
 
       'field_source' => [
-        'label' => 'source',
+        'label' => 'Source',
       ],
 
       'field_usage_rights' => [

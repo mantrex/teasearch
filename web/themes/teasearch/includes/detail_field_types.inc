@@ -50,6 +50,7 @@ function teasearch_get_field_type_registry()
     'date_label' => 'teasearch_render_field_date_label',
     'image' => 'teasearch_render_field_image',
     'video' => 'teasearch_render_field_video',
+    'pdf' => 'teasearch_render_field_pdf',
   ];
 }
 
@@ -3303,4 +3304,159 @@ function teasearch_render_field_video($node, $field_config, $field_identifier)
       ],
     ];
   }
+}
+
+
+// ============================================================================
+// TYPE: pdf
+// ============================================================================
+
+/**
+ * TYPE: pdf
+ * Renderizza un'immagine con overlay icona PDF e link al file PDF.
+ * 
+ * FUNZIONALITÀ:
+ * - Mostra field_main_image come thumbnail
+ * - Overlay icona PDF 50x50 in basso a sinistra con 80% opacità
+ * - Click apre PDF in nuovo tab
+ * - Se field_portion_of_work ha valore:
+ *   - 'selected' → mostra "(Selected pages)" / "(Pagine selezionate)"
+ *   - 'excerpt' → mostra "(Excerpt)" / "(Estratto)"
+ * 
+ * OPZIONI:
+ * - 'file' (string): Nome del campo che contiene il file PDF (REQUIRED)
+ * - 'image_field' (string): Campo immagine (default: field_main_image)
+ * - 'portion_field' (string): Campo portion (default: field_portion_of_work)
+ * 
+ * USO NELLO SCHEMA:
+ * 
+ * 'pdf' => [
+ *   'label' => 'PDF',
+ *   'type' => 'pdf',
+ *   'file' => 'field_pdf_file',  // REQUIRED
+ * ],
+ * 
+ * @param \Drupal\node\Entity\Node $node
+ *   Il nodo
+ * @param array $field_config
+ *   La configurazione del campo dallo schema
+ * @param string $field_identifier
+ *   L'identificativo del campo
+ * 
+ * @return array|null
+ *   Render array con HTML e librerie, NULL se manca PDF o immagine
+ */
+function teasearch_render_field_pdf($node, $field_config, $field_identifier)
+{
+  // Recupera i nomi dei campi dalle opzioni
+  $pdf_field_name = $field_config['file'] ?? null;
+  $image_field_name = $field_config['image_field'] ?? 'field_main_image';
+  $portion_field_name = $field_config['portion_field'] ?? 'field_portion_of_work';
+
+  // REQUIRED: il campo PDF deve essere specificato
+  if (empty($pdf_field_name)) {
+    \Drupal::logger('teasearch')->error('PDF field type requires "file" option');
+    return NULL;
+  }
+
+  // ========================================================================
+  // Recupera il file PDF
+  // ========================================================================
+  $pdf_field = teasearch_get_field_value($node, $pdf_field_name);
+  if (!$pdf_field || $pdf_field->isEmpty()) {
+    return NULL;
+  }
+
+  $pdf_item = $pdf_field->first();
+  if (!$pdf_item || !$pdf_item->entity) {
+    return NULL;
+  }
+
+  $pdf_file = $pdf_item->entity;
+  $pdf_url = \Drupal::service('file_url_generator')->generateAbsoluteString($pdf_file->getFileUri());
+
+  // ========================================================================
+  // Recupera l'immagine thumbnail
+  // ========================================================================
+  $image_field = teasearch_get_field_value($node, $image_field_name);
+  if (!$image_field || $image_field->isEmpty()) {
+    return NULL;
+  }
+
+  $image_item = $image_field->first();
+  if (!$image_item || !$image_item->entity) {
+    return NULL;
+  }
+
+  $image_file = $image_item->entity;
+  $image_url = \Drupal::service('file_url_generator')->generateAbsoluteString($image_file->getFileUri());
+  $image_alt = $image_item->alt ?: 'PDF Document';
+
+  // ========================================================================
+  // Recupera field_portion_of_work (opzionale)
+  // ========================================================================
+  $portion_text = '';
+  $portion_field = teasearch_get_field_value($node, $portion_field_name);
+
+  if ($portion_field && !$portion_field->isEmpty()) {
+    $portion_value = strtolower(trim($portion_field->value));
+    $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+
+    if ($portion_value === 'selected') {
+      $portion_text = $current_language === 'it'
+        ? '(Pagine selezionate)'
+        : '(Selected pages)';
+    } elseif ($portion_value === 'excerpt') {
+      $portion_text = $current_language === 'it'
+        ? '(Estratto)'
+        : '(Excerpt)';
+    }
+  }
+
+  // ========================================================================
+  // Icona PDF SVG
+  // ========================================================================
+  $pdf_icon_svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="50" height="50">
+    <path fill="#82c341" d="M369.9 97.9L286 14C277 5 264.8-.1 252.1-.1H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V131.9c0-12.7-5.1-25-14.1-34zM332.1 128H256V51.9l76.1 76.1zM48 464V48h160v104c0 13.3 10.7 24 24 24h104v288H48zm250.2-143.7c-12.2-12-47-8.7-64.4-6.5-17.2-10.5-28.7-25-36.8-46.3 3.9-16.1 10.1-40.6 5.4-56-4.2-26.2-37.8-23.6-42.6-5.9-4.4 16.1-.4 38.5 7 67.1-10 23.9-24.9 56-35.4 74.4-20 10.3-47 26.2-51 46.2-3.3 15.8 26 55.2 76.1-31.2 22.4-7.4 46.8-16.5 68.4-20.1 18.9 10.2 41 17 55.8 17 25.5 0 28-28.2 17.5-38.7zm-198.1 77.8c5.1-13.7 24.5-29.5 30.4-35-19 30.3-24.2 31.8-30.4 35zm81.6-190.6c7.4 0 6.7 32.1 1.8 40.8-4.4-13.9-4.3-40.8-1.8-40.8zm-24.4 136.6c9.7-16.9 18-37 24.7-54.7 8.3 15.1 18.9 27.2 30.1 35.5-20.8 4.3-38.9 13.1-54.8 19.2zm131.6-5s-5 6-37.3-7.8c35.1-2.6 40.9 5.4 37.3 7.8z"/>
+  </svg>';
+
+  // ========================================================================
+  // Costruisce HTML
+  // ========================================================================
+  $html = '<div class="detail-pdf-wrapper">';
+  $html.= '<div class="detail-pdf-container">';
+
+  // Link wrapper che apre il PDF
+  $html .= '<a href="' . htmlspecialchars($pdf_url) . '" target="_blank" rel="noopener" class="detail-pdf-link">';
+
+  // Immagine
+  $html .= '<div class="detail-pdf-image-wrapper">';
+  $html .= '<img src="' . htmlspecialchars($image_url) . '" ';
+  $html .= 'alt="' . htmlspecialchars($image_alt) . '" ';
+  $html .= 'class="detail-pdf-image img-fluid" />';
+
+  // Icona PDF overlay
+  $html .= '<div class="detail-pdf-icon">';
+  $html .= $pdf_icon_svg;
+  $html .= '</div>';
+
+  $html .= '</div>'; // close detail-pdf-image-wrapper
+
+  $html .= '</a>'; // close link
+
+  // Testo portion (se presente)
+  if (!empty($portion_text)) {
+    $html .= '<div class="detail-pdf-portion-text">' . htmlspecialchars($portion_text) . '</div>';
+  }
+
+  $html .= '</div>'; // close detail-pdf-container
+  $html .= '</div>'; // close detail-pdf-wrapper
+
+  // ========================================================================
+  // CSS inline per lo styling
+  // ========================================================================
+
+  return [
+    '#markup' => Markup::create( $html),
+  ];
 }

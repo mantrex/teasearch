@@ -61,6 +61,9 @@ a {
 }
 
 /* menu*/
+.navbar-nav .dropdown {
+  cursor:pointer;
+}
 .dropdown-menu {
   background:var(--header);
 
@@ -71,6 +74,7 @@ a {
 .dropdown-menu .nav-item a:not(.is-active) {
   color:var(--menu-unselected);
 }
+
 
 @media (max-width: 991px) { /* breakpoints bootstrap: md = 768, lg = 992 */
   .navbar-collapse .dropdown-menu {

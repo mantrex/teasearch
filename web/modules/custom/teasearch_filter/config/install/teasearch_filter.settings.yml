@@ -22,7 +22,7 @@ content_types:
         to: field_year_range.year_to
         display: auto
   essentials:
-    machine_name: reference_materials
+    machine_name: first_reference
     type: node
     label: 'Essentials'
     results:

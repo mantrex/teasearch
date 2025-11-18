@@ -5,9 +5,6 @@
  * Teasearch Carousel module.
  */
 
-/**
- * Implements hook_theme().
- */
 function teasearch_carousel_theme($existing, $type, $theme, $path)
 {
   return [
@@ -17,6 +14,12 @@ function teasearch_carousel_theme($existing, $type, $theme, $path)
         'highlights' => [],
       ],
       'template' => 'carousel-view-all',
+    ],
+    'news_view_all' => [
+      'variables' => [
+        'news' => [],
+      ],
+      'template' => 'news-view-all',
     ],
   ];
 }

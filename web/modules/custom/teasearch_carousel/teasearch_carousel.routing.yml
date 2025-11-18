@@ -5,16 +5,28 @@ teasearch_carousel.data:
     _controller: '\Drupal\teasearch_carousel\Controller\CarouselController::getData'
     _format: 'json'
   requirements:
-    _access: 'TRUE'            # ← NON _permission
+    _access: 'TRUE'
   methods:  [GET]
   options:
-    _no_login_required: TRUE   # (opzionale, esplicita l’intento)
+    _no_login_required: TRUE
 
 teasearch_carousel.view_all:
   path: '/carousel-all'
   defaults:
     _controller: '\Drupal\teasearch_carousel\Controller\CarouselController::viewAll'
     _title: 'News and Highlights'
+  requirements:
+    _access: 'TRUE'
+  methods: [GET]
+  options:
+    _no_login_required: TRUE
+
+# Nuova route per solo NEWS
+teasearch_carousel.news:
+  path: '/news'
+  defaults:
+    _controller: '\Drupal\teasearch_carousel\Controller\CarouselController::newsOnly'
+    _title: 'NEWS'
   requirements:
     _access: 'TRUE'
   methods: [GET]
