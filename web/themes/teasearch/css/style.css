@@ -1,29 +1,31 @@
 :root {
   --body-bg: #ede8e2;
   --body-text: #2b2727;
-  --top-bar:#45392e; /* barra top con le lingue */
-  --top-bar-bottom:#332a22; /* bordo marrone inferiore alla top-bar */
-  --language-active:#514336;/* lingua selezionata */
-  --language-hover:#ffffff26; /* hoover lingua */
-  --header:#6b8e24; /* per l'header del layout*/
-  --header-bottom:#5e7e1e;
-  --menu-unselected:#bdcca0;
+  --top-bar: #45392e; /* barra top con le lingue */
+  --top-bar-bottom: #332a22; /* bordo marrone inferiore alla top-bar */
+  --language-active: #514336; /* lingua selezionata */
+  --language-hover: #ffffff26; /* hoover lingua */
+  --header: #6b8e24; /* per l'header del layout*/
+  --header-bottom: #5e7e1e;
+  --menu-unselected: #bdcca0;
   --footer: #523e39; /*background del footer*/
-  --foter-shadow: #3d2e2b;/* shadow background del footer*/
-  --footer-light:#ffffff1a; /* footer input fields */
-  --footer-light-hover:#ffffff33;
-  --footer-item-focus:#ffffff26; /* solo per footer*/
+  --foter-shadow: #3d2e2b; /* shadow background del footer*/
+  --footer-light: #ffffff1a; /* footer input fields */
+  --footer-light-hover: #ffffff33;
+  --footer-item-focus: #ffffff26; /* solo per footer*/
   --light: #ffffff; /* si usa in tutti i riquadri chiari e negli elementi in evidenza */
-  --light-almost:#ffffffcc; /* per ora solo nel footer */
-  --light-border-bottom:#cccccc; /* per piccoli interventi di stile */
+  --light-almost: #ffffffcc; /* per ora solo nel footer */
+  --light-border-bottom: #cccccc; /* per piccoli interventi di stile */
   --light-border: #dddddd;
-  --light-text:#aaaaaa;
-  --list-result:#ffffff; /* su usa come background nei risultati delle liste */
-  --list-border:#dddddd;/* bordo dell'item della lista su usa nei risultati delle liste - bordo*/
+  --light-text: #aaaaaa;
+  --list-result: #ffffff; /* su usa come background nei risultati delle liste */
+  --list-border: #dddddd; /* bordo dell'item della lista su usa nei risultati delle liste - bordo*/
   --list-hover: #259a00; /* item la lista quando ci metti il mouse sopra --hover*/
   --item-title: #6f8c2f; /* tutti i titoli nelle liste */
-  --item-primary:#259a00; /* lo uso per i checkbox, per altre parti ecc*/
-  --item-secondary:#155b00; /*  da usare come contrasto, è più scuro */
+  --item-primary: #259a00; /* lo uso per i checkbox, per altre parti ecc*/
+  --item-secondary: #155b00; /*  da usare come contrasto, è più scuro */
+  --item-link: #6b8e24;
+  --item-link-hover: #55721c;
   --block-borderline: #efefef; /* linee separatrici molto chiare */
   --about-title: #533f3a; /* sottotitoli about */
   --filter-group-hover: #e1ebc6; /* appoggio il mouse sull'area filtri*/
@@ -32,12 +34,12 @@
   --actions-button: #628320; /* tutti i tasti */
   --actions-button-hover: #6b8e23; /* tutti i tasti hover */
   --actions-button-border: #59781c; /* tutti i tasti bordo */
-  --box-shadow:#28a74526;
-  --form-color:grey; /* tasto per la newsletter - da fare */
- --details-bg: #dae6bc;
+  --box-shadow: #28a74526;
+  --form-color: grey; /* tasto per la newsletter - da fare */
+  --details-bg: #dae6bc;
   --details-link: #6b8e23;
   --details-border: #e6e5e5;
-  --details-field-label:#dfdbd8;
+  --details-field-label: #dfdbd8;
   --breadcrumb-bg: #d6d0ca;
 }
 
@@ -49,7 +51,7 @@ body {
 }
 
 a {
-  color: green;
+  color: var(--item-link);
   text-decoration: none;
 }
 .href-white {
@@ -62,21 +64,20 @@ a {
 
 /* menu*/
 .navbar-nav .dropdown {
-  cursor:pointer;
+  cursor: pointer;
 }
 .dropdown-menu {
-  background:var(--header);
-
+  background: var(--header);
 }
 .dropdown-menu .nav-item a {
-  background:var(--header);
+  background: var(--header);
 }
 .dropdown-menu .nav-item a:not(.is-active) {
-  color:var(--menu-unselected);
+  color: var(--menu-unselected);
 }
 
-
-@media (max-width: 991px) { /* breakpoints bootstrap: md = 768, lg = 992 */
+@media (max-width: 991px) {
+  /* breakpoints bootstrap: md = 768, lg = 992 */
   .navbar-collapse .dropdown-menu {
     background: var(--header);
     border: none;
@@ -103,7 +104,6 @@ a {
 .site-content {
   flex: 1; /* Allow main content to expand and push the footer down */
 }
-
 
 .site-header {
   position: sticky;
@@ -197,12 +197,12 @@ a {
 }
 
 .newsletter-input::placeholder {
-  color: var(--light)
+  color: var(--light);
 }
 
 .newsletter-input:focus {
   outline: none;
-  background-color: var(--footer-item-focus)
+  background-color: var(--footer-item-focus);
 }
 
 .newsletter-btn {
@@ -261,15 +261,15 @@ a {
 }
 
 .social-icon.twitter:hover {
-  background-color: #1da1f2;/*placeholder*/
+  background-color: #1da1f2; /*placeholder*/
 }
 
 .social-icon.youtube:hover {
-  background-color: #ff0000;/*placeholder*/
+  background-color: #ff0000; /*placeholder*/
 }
 
 .social-icon.instagram:hover {
-  background-color: #e4405f;/*placeholder*/
+  background-color: #e4405f; /*placeholder*/
 }
 
 /* Privacy Section */
@@ -383,13 +383,20 @@ a {
   pointer-events: none; /* opzionale: evita click */
 }
 
-
 .teasearch-introblock {
   margin-top: 1em;
   margin-bottom: 0em;
-  padding: 2px;
+  padding-left: 50px;
+  padding-right: 50px;
   text-align: center;
 }
+@media (max-width: 768px) {
+  .teasearch-introblock {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
 .teasearch-introblock .introblock-body p {
   margin: 0;
   padding: 0;
@@ -402,14 +409,13 @@ a {
   margin-bottom: 1em;
 }
 
-
 /* breadcrumb */
 .breadcrumb {
   background-color: var(--breadcrumb-bg);
   padding: 8px 16px;
   font-size: 0.95rem;
-  margin-left:-12px;
-  margin-right:-12px;
+  margin-left: -12px;
+  margin-right: -12px;
 }
 
 .breadcrumb ol {

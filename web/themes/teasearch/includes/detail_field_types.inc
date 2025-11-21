@@ -3143,8 +3143,7 @@ function teasearch_render_field_image($node, $field_config, $field_identifier)
   // Aggiungi icona lente se richiesta
   if ($show_icon) {
     $theme_path = \Drupal::service('extension.list.theme')->getPath('teasearch');
-    $lente_url = base_path() . $theme_path . '/images/lente.png';
-
+    $lente_url = base_path() . $theme_path . '/images/mediaicons/image.svg';
     $html .= '<div class="detail-image-icon"><img  src="'.$lente_url.'"></div>';
   }
 
@@ -3207,10 +3206,10 @@ function teasearch_render_field_image($node, $field_config, $field_identifier)
  */
 function teasearch_render_field_video($node, $field_config, $field_identifier)
 {
-  $svg = '<svg width="68" height="48" viewBox="0 0 68 48">';
-  $svg .= '<path d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#f00"/>';
-  $svg .= '<path d="M 45,24 27,14 27,34" fill="#fff"/>';
-  $svg .= '</svg>';
+  $theme_path = \Drupal::service('extension.list.theme')->getPath('teasearch');
+  $img_url = base_path() . $theme_path . '/images/mediaicons/video.svg';
+  $videoimg = '<img  src="' . $img_url . '">';
+
 
   // Recupera le opzioni
   $mode = $field_config['options']['mode'] ?? 'inline';
@@ -3262,7 +3261,7 @@ function teasearch_render_field_video($node, $field_config, $field_identifier)
     // Thumbnail con play button
     $html .= '<div class="detail-video-thumbnail" data-video-id="' . $video_id . '" data-youtube-code="' . htmlspecialchars($youtube_code) . '">';
     $html .= '<img src="' . htmlspecialchars($thumbnail_url) . '" alt="Video thumbnail" class="detail-video-thumbnail-img" />';
-    $html .= '<div class="detail-video-play-button">' . $svg . '</div>';
+    $html .= '<div class="detail-video-play-button">' . $videoimg . '</div>';
     $html .= '</div>';
     
     // Placeholder per iframe (nascosto inizialmente)
@@ -3416,9 +3415,14 @@ function teasearch_render_field_pdf($node, $field_config, $field_identifier)
   // ========================================================================
   // Icona PDF SVG
   // ========================================================================
-  $pdf_icon_svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="50" height="50">
-    <path fill="#82c341" d="M369.9 97.9L286 14C277 5 264.8-.1 252.1-.1H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V131.9c0-12.7-5.1-25-14.1-34zM332.1 128H256V51.9l76.1 76.1zM48 464V48h160v104c0 13.3 10.7 24 24 24h104v288H48zm250.2-143.7c-12.2-12-47-8.7-64.4-6.5-17.2-10.5-28.7-25-36.8-46.3 3.9-16.1 10.1-40.6 5.4-56-4.2-26.2-37.8-23.6-42.6-5.9-4.4 16.1-.4 38.5 7 67.1-10 23.9-24.9 56-35.4 74.4-20 10.3-47 26.2-51 46.2-3.3 15.8 26 55.2 76.1-31.2 22.4-7.4 46.8-16.5 68.4-20.1 18.9 10.2 41 17 55.8 17 25.5 0 28-28.2 17.5-38.7zm-198.1 77.8c5.1-13.7 24.5-29.5 30.4-35-19 30.3-24.2 31.8-30.4 35zm81.6-190.6c7.4 0 6.7 32.1 1.8 40.8-4.4-13.9-4.3-40.8-1.8-40.8zm-24.4 136.6c9.7-16.9 18-37 24.7-54.7 8.3 15.1 18.9 27.2 30.1 35.5-20.8 4.3-38.9 13.1-54.8 19.2zm131.6-5s-5 6-37.3-7.8c35.1-2.6 40.9 5.4 37.3 7.8z"/>
-  </svg>';
+
+
+  $theme_path = \Drupal::service('extension.list.theme')->getPath('teasearch');
+  $pdf_url = base_path() . $theme_path . '/images/mediaicons/pdf.svg';
+  $pdfimg = '<img  src="' . $pdf_url . '">';
+
+
+
 
   // ========================================================================
   // Costruisce HTML
@@ -3437,7 +3441,7 @@ function teasearch_render_field_pdf($node, $field_config, $field_identifier)
 
   // Icona PDF overlay
   $html .= '<div class="detail-pdf-icon">';
-  $html .= $pdf_icon_svg;
+  $html .= $pdfimg;
   $html .= '</div>';
 
   $html .= '</div>'; // close detail-pdf-image-wrapper

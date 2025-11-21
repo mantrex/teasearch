@@ -19,34 +19,30 @@
     </h2>
 
     {% if news|length > 0 %}
-      <div class="carousel-items-grid">
+     <div class="carousel-items-grid">
         {% for item in news %}
-
-
-          <a href="{{ item.url }}" class="carousel-item">
-
-<div class="carousel-item-image">
-  
-         
-              <img src="{{ item.image }}" alt="{{ item.title }}" loading="lazy"></div>
-              <div class="carousel-item-content">
-                <h3 class="carousel-item-title">
-                  {{ item.title }}
-                </h3>
-                <div class="carousel-item-meta">
-                  {% if item.location %}
-                    <span class="carousel-item-location">
-                      {{ item.location }}
-                    </span>
-                  {% endif %}
-                  {% if item.formatted_date %}
-                    <span class="carousel-item-date">
-                      {{ item.formatted_date }}
-                    </span>
-                  {% endif %}
-                </div>
-              </div>
-            </a>
+        <a href="{{ item.url }}" class="carousel-item">
+          <div class="carousel-item-image">
+            <img src="{{ item.image }}" alt="{{ item.title }}" loading="lazy">
+          </div>
+          <div class="carousel-item-content">
+            <h3 class="carousel-item-title">
+              {{ item.title }}
+            </h3>
+            <div class="carousel-item-meta">
+              {% if item.location %}
+                <span class="carousel-item-location">
+                  {{ item.location }}
+                </span>
+              {% endif %}
+              {% if item.formatted_date %}
+                <span class="carousel-item-date">
+                  {{ item.formatted_date }}
+                </span>
+              {% endif %}
+            </div>
+          </div>
+        </a>
           {% endfor %}
         </div>
       {% else %}
