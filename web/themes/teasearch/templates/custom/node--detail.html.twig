@@ -14,57 +14,6 @@
   */
 #}
 
-{# DEBUG - RIMUOVI DOPO #}
-{#
-<div style="background: yellow; padding: 20px; margin: 20px;">
-  <h3>
-    DEBUG INFO
-  </h3>
-  <p>
-    Content Type:
-    {{ node.bundle }}
-  </p>
-  <p>
-    Content Type Label:
-    {{ content_type_label }}
-  </p>
-  <p>
-    Has Icon:
-    {{ detail_icon ? 'YES' : 'NO' }}
-  </p>
-  <p>
-    Fields count:
-    {{ detail_fields|length }}
-  </p>
-
-  <h4>
-    Fields:
-  </h4>
-  <ul>
-    {% for field_id, field in detail_fields %}
-      <li>
-        <strong>
-          {{ field_id }}
-        </strong>
-        :
-        type=
-        {{ field.type }}
-        ,
-        label=
-        {{ field.label|default('NO LABEL') }}
-        ,
-        has_content=
-        {{ field.content ? 'YES' : 'NO' }}
-      </li>
-    {% endfor %}
-  </ul>
-</div>
-#}
-{# FINE DEBUG #}
-
-
-
-
 <article{{ attributes.addClass('node','node--type-'~node.bundle|clean_class,'node--view-mode-'~view_mode|clean_class,'node--detail') }}>
 
   {# Header con icona e titolo principale #}
@@ -106,12 +55,32 @@
 
               {# Separatore (es. PROFILE, DETAILS, etc.) #}
               {% elseif field.type == 'separator' %}
-                <tr class="detail-separator"> <td colspan="2">
-                  <div class="detail-separator__content">
-                    {{ field.content }}
-                  </div>
-                </td>
-              </tr>
+              {# Verifica se ci sono campi con contenuto dopo questo separatore #}
+              {% set has_fields_after = false %}
+              {% set current_index = loop.index %}
+              {% set found_next_separator = false %}
+
+                {% for next_field_id, next_field in detail_fields %}
+                  {% if loop.index > current_index and not found_next_separator %}
+                  {# Se trovo un altro separatore, mi fermo #}
+                    {% if next_field.type == 'separator' %}
+                    {% set found_next_separator = true %}
+                  {# Se trovo un campo normale con contenuto non vuoto, segno come trovato #}
+                    {% elseif next_field_id != 'maintitle' and next_field.content is not empty %}
+                  {% set has_fields_after = true %}
+                {% endif %}
+              {% endif %}
+              {% endfor %}
+
+              {# Mostra il separatore solo se ci sono campi dopo #}
+                {% if has_fields_after %}
+                  <tr class="detail-separator"> <td colspan="2">
+                    <div class="detail-separator__content">
+                      {{ field.content }}
+                    </div>
+                  </td>
+                </tr>
+              {% endif %}
 
             {# Campo normale con label e contenuto #}
               {% else %}

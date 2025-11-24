@@ -207,7 +207,7 @@ function teasearch_get_detail_schemas()
         "type" => "location",
         "label" => "Location",
       ],
-      "field_country" => [
+      "field_country_single" => [
         "label" => "Country",
       ],
       "field_email" => [
@@ -303,37 +303,45 @@ function teasearch_get_detail_schemas()
         "label" => "Essentials",
         "type" => "contrib",
         "content_type" => "first_reference",
+        "no_author" => true,
 
       ],
       "texts" => [
         "label" => "Texts",
         "type" => "contrib",
         "content_type" => "primary_sources",
+        "no_author" => true,
       ],
       "videos" => [
         "label" => "Videos",
         "type" => "contrib",
         "content_type" => "videos",
+        "no_author" => true,
       ],
       "images" => [
         "label" => "Images",
         "type" => "contrib",
         "content_type" => "images",
+        "no_author" => true,
       ],
+
 
       "bibliography" => [
         "label" => "Bibliography",
         "type" => "contrib",
-        "content_type" => "biblography",
+        "content_type" => "bibliography",
+        "no_author" => true,
       ],
 
       "paragraph5" => "Details",
       "field_license" => [
         "label" => "License",
+        "no_author" => true,
       ],
       "systemdate" => [
         "type" => "systemdate",
         "label" => "Dates",
+        "no_author" => true,
       ]
     ],
   ];
@@ -743,6 +751,7 @@ function teasearch_get_detail_schemas()
       ],
       'field_location' => [
         'label' => 'Location',
+        
       ],
       'field_catalogue_number' => [
         'label' => 'Catalogue Number',

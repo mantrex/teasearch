@@ -316,10 +316,13 @@ function teasearch_render_location($node, $field_config, $field_identifier)
 {
   $cityArr = teasearch_get_field_value($node, 'field_city');
   $regionArr = teasearch_get_field_value($node, 'field_region');
-  $city = $cityArr && !$cityArr->isEmpty() ? $cityArr->value: FALSE;
-  $region = $regionArr && !$regionArr->isEmpty() ? $regionArr->value: FALSE;
-  return(($city && $region) ? $city . ", " . $region : ($city)) ? $city : "";
+  $city = $cityArr && !$cityArr->isEmpty() ? $cityArr->value : FALSE;
+  $region = $regionArr && !$regionArr->isEmpty() ? $regionArr->value : FALSE;
 
+  if ($city && $region) {
+    return $city . ", " . $region;
+  }
+  return $city ? $city : "";
 }
 
 /**
@@ -358,6 +361,7 @@ function teasearch_render_field_publib($node, $field_config, $field_identifier)
 {
   // Recupero il pubtype dalla configurazione (es: 'journal_article', 'book', etc.)
   $target_pubtype = $field_config['pubtype'] ?? NULL;
+  $show_only_authors = true;
 
   if (!$target_pubtype) {
     return NULL;
@@ -421,7 +425,8 @@ function teasearch_render_field_publib($node, $field_config, $field_identifier)
       }
     }
 
-    // Check field_curators
+    // Check field_curators no curatore qui
+    /*
     $curators_field = $bib->get('field_curators_ref');
     if (!$curators_field->isEmpty()) {
       foreach ($curators_field as $curator_ref) {
@@ -430,7 +435,13 @@ function teasearch_render_field_publib($node, $field_config, $field_identifier)
           break;
         }
       }
+    }*/
+
+    // Se show_only_authors è TRUE, considero solo gli autori
+    if ($show_only_authors && !$is_author) {
+      continue;
     }
+
 
     // Se non è né autore né curatore, salto
     if (!$is_author && !$is_curator) {
@@ -664,6 +675,7 @@ function teasearch_render_field_contrib($node, $field_config, $field_identifier)
 {
   // Recupero il content_type dalla configurazione
   $target_content_type = $field_config['content_type'] ?? NULL;
+  $no_author = $field_config['no_author'] ?? FALSE;
 
   if (!$target_content_type) {
     return NULL;
@@ -689,6 +701,7 @@ function teasearch_render_field_contrib($node, $field_config, $field_identifier)
 
   // Campi di riferimento da controllare con traduzioni
   $reference_fields = [
+
     'field_authors_ref' => [
       'en' => 'Author',
       'it' => 'Autore',
@@ -706,6 +719,10 @@ function teasearch_render_field_contrib($node, $field_config, $field_identifier)
       'it' => 'Soggetto rappresentato',
     ],
   ];
+
+  if ($no_author) {
+    unset($reference_fields['field_authors_ref']);
+  }
 
   foreach ($nodes as $contrib_node) {
     // Traduzione nella lingua corrente se disponibile
@@ -3372,7 +3389,7 @@ function teasearch_render_field_pdf($node, $field_config, $field_identifier)
   }
 
   $pdf_file = $pdf_item->entity;
-  $pdf_url = \Drupal::service('file_url_generator')->generateAbsoluteString($pdf_file->getFileUri());
+  $pdf_file_url = \Drupal::service('file_url_generator')->generateAbsoluteString($pdf_file->getFileUri());
 
   // ========================================================================
   // Recupera l'immagine thumbnail
@@ -3431,7 +3448,7 @@ function teasearch_render_field_pdf($node, $field_config, $field_identifier)
   $html.= '<div class="detail-pdf-container">';
 
   // Link wrapper che apre il PDF
-  $html .= '<a href="' . htmlspecialchars($pdf_url) . '" target="_blank" rel="noopener" class="detail-pdf-link">';
+  $html .= '<a href="' . htmlspecialchars($pdf_file_url) . '" target="_blank" rel="noopener" class="detail-pdf-link">';
 
   // Immagine
   $html .= '<div class="detail-pdf-image-wrapper">';
