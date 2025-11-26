@@ -1,7 +1,7 @@
 (function (Drupal) {
   "use strict";
 
-  console.log("🔍 TEASEARCH LIGHTBOX ADVANCED - VERSION 2.0 LOADED");
+  console.log("🔍 TEASEARCH LIGHTBOX ADVANCED - VERSION 3.0 LOADED");
 
   /**
    * Teasearch Image Lightbox - Advanced Version
@@ -11,7 +11,6 @@
     attach: function (context, settings) {
       console.log("🎯 Lightbox behavior attached");
 
-      // Inizializza lightbox per tutti gli elementi con data-teasearch-lightbox
       const lightboxContainers = context.querySelectorAll(
         "[data-teasearch-lightbox]",
       );
@@ -30,7 +29,6 @@
           e.preventDefault();
           console.log("🖱️ Lightbox clicked!");
 
-          // Usa data-large-src se presente, altrimenti usa img.src
           const imageUrl = container.dataset.largeSrc || img.src;
           const imageAlt = img.alt || "";
 
@@ -49,14 +47,20 @@
   let lightboxState = {
     scale: 1,
     minScale: 0.5,
-    maxScale: 5,
+    maxScale: 20,
     step: 0.25,
     isDragging: false,
     startX: 0,
     startY: 0,
-    scrollLeft: 0,
-    scrollTop: 0,
+    translateX: 0,
+    translateY: 0,
+    startTranslateX: 0,
+    startTranslateY: 0,
   };
+
+  const PAN_STEP_BASE = 40; // pixel per pressione freccia
+
+
 
   /**
    * Apre il lightbox con l'immagine
@@ -64,7 +68,6 @@
   function openLightbox(imageSrc, imageAlt) {
     console.log("✨ Opening lightbox with advanced controls");
 
-    // Crea overlay se non esiste
     let overlay = document.querySelector(".teasearch-lightbox-overlay");
     if (!overlay) {
       console.log("🏗️ Creating new lightbox overlay");
@@ -75,6 +78,8 @@
     // Reset stato
     lightboxState.scale = 1;
     lightboxState.isDragging = false;
+    lightboxState.translateX = 0;
+    lightboxState.translateY = 0;
 
     // Mostra loading
     const loading = overlay.querySelector(".teasearch-lightbox-loading");
@@ -82,33 +87,62 @@
 
     // Nascondi immagine durante caricamento
     const wrapper = overlay.querySelector(".teasearch-lightbox-image-wrapper");
+    const img = overlay.querySelector(".teasearch-lightbox-image");
+
     wrapper.style.opacity = "0";
 
     // Aggiorna immagine
-    const img = overlay.querySelector(".teasearch-lightbox-image");
     img.onload = function () {
       console.log("✅ Image loaded successfully");
       loading.style.display = "none";
+
+      // Calcola dimensioni wrapper per permettere scroll completo
+      updateWrapperSize();
+
       wrapper.style.opacity = "1";
       updateZoomLevel();
       checkResetButton();
     };
+
     img.src = imageSrc;
     img.alt = imageAlt;
 
     // Reset transform
-    wrapper.style.transform = "scale(1)";
+    img.style.transform = "translate(0, 0) scale(1)";
 
     // Mostra lightbox
     document.body.style.overflow = "hidden";
     overlay.classList.add("active");
+  }
 
-    // Centra scroll
-    const content = overlay.querySelector(".teasearch-lightbox-content");
-    setTimeout(() => {
-      content.scrollLeft = (content.scrollWidth - content.clientWidth) / 2;
-      content.scrollTop = (content.scrollHeight - content.clientHeight) / 2;
-    }, 50);
+  /**
+   * Aggiorna dimensioni del wrapper in base al maxScale
+   * QUESTO È IL TRUCCO: il wrapper deve essere abbastanza grande
+   * da contenere l'immagine al massimo zoom
+   */
+  function updateWrapperSize() {
+    const wrapper = document.querySelector(".teasearch-lightbox-image-wrapper");
+    const img = document.querySelector(".teasearch-lightbox-image");
+    if (!wrapper || !img) return;
+
+    // Aspetta che l'immagine sia caricata
+    if (!img.complete) return;
+
+    // Dimensioni dell'immagine visualizzata (dopo max-width/max-height)
+    const displayedWidth = img.offsetWidth;
+    const displayedHeight = img.offsetHeight;
+
+    // Usa lo zoom corrente, non il maxScale
+    const currentScale = lightboxState.scale || 1;
+
+    // Wrapper dimensionato sull’ingrandimento attuale
+    const wrapperWidth = displayedWidth * currentScale;
+    const wrapperHeight = displayedHeight * currentScale;
+
+    wrapper.style.width = wrapperWidth + "px";
+    wrapper.style.height = wrapperHeight + "px";
+
+    console.log(`📐 Wrapper size (scale ${currentScale}): ${wrapperWidth}x${wrapperHeight}`);
   }
 
   /**
@@ -127,19 +161,41 @@
     }
   }
 
+
+
+  function updateTransform() {
+    const img = document.querySelector(".teasearch-lightbox-image");
+    if (!img) return;
+
+    img.style.transform = `translate(${lightboxState.translateX}px, ${lightboxState.translateY}px) scale(${lightboxState.scale})`;
+  }
+
+  function centerImage() {
+    const content = document.querySelector(".teasearch-lightbox-content");
+    if (!content) return;
+
+    // se il container ha overflow:auto, riportiamo lo scroll al centro
+    content.scrollLeft = (content.scrollWidth - content.clientWidth) / 2;
+    content.scrollTop = (content.scrollHeight - content.clientHeight) / 2;
+  }
+
   /**
    * Zoom In
    */
   function zoomIn() {
-    const wrapper = document.querySelector(".teasearch-lightbox-image-wrapper");
-    if (!wrapper) return;
+    const img = document.querySelector(".teasearch-lightbox-image");
+    if (!img) return;
 
     lightboxState.scale = Math.min(
       lightboxState.scale + lightboxState.step,
       lightboxState.maxScale,
     );
     console.log("🔍 Zoom in:", Math.round(lightboxState.scale * 100) + "%");
-    wrapper.style.transform = `scale(${lightboxState.scale})`;
+
+    img.style.transform = `scale(${lightboxState.scale})`;
+
+    // 🔴 AGGIUNGI QUESTO
+    updateTransform();
     updateZoomLevel();
     checkResetButton();
   }
@@ -148,15 +204,20 @@
    * Zoom Out
    */
   function zoomOut() {
-    const wrapper = document.querySelector(".teasearch-lightbox-image-wrapper");
-    if (!wrapper) return;
+    const img = document.querySelector(".teasearch-lightbox-image");
+    if (!img) return;
 
     lightboxState.scale = Math.max(
       lightboxState.scale - lightboxState.step,
       lightboxState.minScale,
     );
     console.log("🔍 Zoom out:", Math.round(lightboxState.scale * 100) + "%");
-    wrapper.style.transform = `scale(${lightboxState.scale})`;
+
+    img.style.transform = `scale(${lightboxState.scale})`;
+
+    // 🔴 AGGIUNGI QUESTO
+    updateTransform();
+
     updateZoomLevel();
     checkResetButton();
   }
@@ -165,19 +226,26 @@
    * Reset Zoom
    */
   function resetZoom() {
-    const wrapper = document.querySelector(".teasearch-lightbox-image-wrapper");
-    if (!wrapper) return;
+    const img = document.querySelector(".teasearch-lightbox-image");
+    if (!img) return;
 
-    console.log("🔄 Reset zoom to 100%");
+    console.log("🔄 Reset zoom to 100% e recentra immagine");
+
+    // Zoom default
     lightboxState.scale = 1;
-    wrapper.style.transform = "scale(1)";
+
+    // Azzeriamo completamente il pan
+    lightboxState.translateX = 0;
+    lightboxState.translateY = 0;
+
+    // Applica trasformazione (centrata, senza offset)
+    updateTransform();
+
+    // Ricentra anche lo scroll del contenitore (se overflow:auto)
+    centerImage();
+
     updateZoomLevel();
     checkResetButton();
-
-    // Centra scroll
-    const content = document.querySelector(".teasearch-lightbox-content");
-    content.scrollLeft = (content.scrollWidth - content.clientWidth) / 2;
-    content.scrollTop = (content.scrollHeight - content.clientHeight) / 2;
   }
 
   /**
@@ -190,7 +258,6 @@
     const percentage = Math.round(lightboxState.scale * 100);
     indicator.textContent = `${percentage}%`;
 
-    // Mostra temporaneamente
     indicator.classList.add("visible");
     clearTimeout(indicator.hideTimeout);
     indicator.hideTimeout = setTimeout(() => {
@@ -250,7 +317,7 @@
     const closeBtn = overlay.querySelector(".teasearch-lightbox-close");
     closeBtn.addEventListener("click", closeLightbox);
 
-    // Click su overlay (ma non sull'immagine)
+    // Click su overlay
     overlay.addEventListener("click", function (e) {
       if (
         e.target === overlay ||
@@ -261,24 +328,67 @@
     });
 
     // Zoom buttons
-    overlay.querySelector(".zoom-in").addEventListener("click", function () {
-      console.log("➕ Zoom in button clicked");
-      zoomIn();
-    });
-    overlay.querySelector(".zoom-out").addEventListener("click", function () {
-      console.log("➖ Zoom out button clicked");
-      zoomOut();
-    });
+    overlay.querySelector(".zoom-in").addEventListener("click", zoomIn);
+    overlay.querySelector(".zoom-out").addEventListener("click", zoomOut);
 
     // Reset button
     overlay
       .querySelector(".teasearch-lightbox-reset-btn")
       .addEventListener("click", resetZoom);
 
-    // Chiudi con ESC
+    // ESC key
+    // Tastiera: ESC per chiudere, frecce per muovere, +/- per zoom
     document.addEventListener("keydown", function (e) {
+      if (!overlay.classList.contains("active")) {
+        return;
+      }
+
+      // ESC -> chiudi
       if (e.key === "Escape") {
         closeLightbox();
+        return;
+      }
+
+      const img = overlay.querySelector(".teasearch-lightbox-image");
+      if (!img) return;
+
+      let handled = false;
+
+      // Calcoliamo lo step in funzione dello zoom,
+      // così a 300% ti muovi più "veloce".
+      const panStep = PAN_STEP_BASE * (lightboxState.scale || 1);
+
+      switch (e.key) {
+        case "ArrowUp":
+          lightboxState.translateY += panStep;
+          handled = true;
+          break;
+        case "ArrowDown":
+          lightboxState.translateY -= panStep;
+          handled = true;
+          break;
+        case "ArrowLeft":
+          lightboxState.translateX += panStep;
+          handled = true;
+          break;
+        case "ArrowRight":
+          lightboxState.translateX -= panStep;
+          handled = true;
+          break;
+        case "+":
+        case "=": // tasto + senza shift su alcune tastiere
+          zoomIn();
+          handled = true;
+          break;
+        case "-":
+          zoomOut();
+          handled = true;
+          break;
+      }
+
+      if (handled) {
+        e.preventDefault(); // blocca lo scroll della pagina
+        updateTransform();
       }
     });
 
@@ -305,29 +415,35 @@
     const wrapper = overlay.querySelector(".teasearch-lightbox-image-wrapper");
 
     wrapper.addEventListener("mousedown", function (e) {
-      if (lightboxState.scale <= 1) return; // Drag solo se zoomato
+      // drag solo se sei oltre il 100%
+      if (lightboxState.scale <= 1) return;
 
+      e.preventDefault();
       lightboxState.isDragging = true;
       wrapper.classList.add("dragging");
-      lightboxState.startX = e.pageX - content.offsetLeft;
-      lightboxState.startY = e.pageY - content.offsetTop;
-      lightboxState.scrollLeft = content.scrollLeft;
-      lightboxState.scrollTop = content.scrollTop;
+
+      lightboxState.startX = e.clientX;
+      lightboxState.startY = e.clientY;
+      lightboxState.startTranslateX = lightboxState.translateX;
+      lightboxState.startTranslateY = lightboxState.translateY;
     });
 
     document.addEventListener("mousemove", function (e) {
       if (!lightboxState.isDragging) return;
+
       e.preventDefault();
 
-      const x = e.pageX - content.offsetLeft;
-      const y = e.pageY - content.offsetTop;
-      const walkX = (x - lightboxState.startX) * 2;
-      const walkY = (y - lightboxState.startY) * 2;
-      content.scrollLeft = lightboxState.scrollLeft - walkX;
-      content.scrollTop = lightboxState.scrollTop - walkY;
+      const dx = e.clientX - lightboxState.startX;
+      const dy = e.clientY - lightboxState.startY;
+
+      lightboxState.translateX = lightboxState.startTranslateX + dx;
+      lightboxState.translateY = lightboxState.startTranslateY + dy;
+
+      updateTransform();
     });
 
     document.addEventListener("mouseup", function () {
+      if (!lightboxState.isDragging) return;
       lightboxState.isDragging = false;
       wrapper.classList.remove("dragging");
     });
@@ -336,17 +452,6 @@
     // TOUCH/PINCH ZOOM (Mobile)
     // ========================================================================
     let touchDistance = 0;
-
-    wrapper.addEventListener(
-      "touchstart",
-      function (e) {
-        if (e.touches.length === 2) {
-          e.preventDefault();
-          touchDistance = getTouchDistance(e.touches);
-        }
-      },
-      { passive: false },
-    );
 
     wrapper.addEventListener(
       "touchmove",
@@ -361,7 +466,7 @@
             Math.min(lightboxState.maxScale, lightboxState.scale * scale),
           );
 
-          wrapper.style.transform = `scale(${lightboxState.scale})`;
+          updateTransform();
           updateZoomLevel();
           checkResetButton();
 

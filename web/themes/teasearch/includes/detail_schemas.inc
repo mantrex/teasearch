@@ -164,7 +164,7 @@ function teasearch_get_detail_schemas()
         'label' => 'name'
       ],
       'field_known_as' => [
-        'label' => 'Pseudonym',
+        'label' => 'Other names',
       ],
       'field_title' => [
         'label' => 'Title',
@@ -173,6 +173,10 @@ function teasearch_get_detail_schemas()
         'label' => 'Affiliation',
         //multilanguage
       ],
+      "field_orcid" => [
+        "label" => "ORCID"
+      ],
+
       "paragraph1" => "PROFILE",
       "field_bio" => [
         "label" => "About",
@@ -182,7 +186,7 @@ function teasearch_get_detail_schemas()
         //taxonomy
       ],
       "field_subjects" => [
-        "label" => "Subject Expertise"
+        "label" => "Subjects"
         //taxonomy
       ],
       "field_country2" => [
@@ -198,9 +202,6 @@ function teasearch_get_detail_schemas()
       ],
       "field_memberships" => [
         "label" => "Memberships"
-      ],
-      "field_orcid" => [
-        "label" => "ORCID"
       ],
       "paragraph2" => "Contact Information",
       "location" => [
@@ -361,9 +362,6 @@ function teasearch_get_detail_schemas()
       'maintitle' => [
         'type' => 'unified_title',
       ],
-      "field_pubtype" => [
-        "label" => "Type",
-      ],
       "authors" => [
         "type" => "authors_general",
         "field" => "field_responsibles",
@@ -449,6 +447,9 @@ function teasearch_get_detail_schemas()
       "field_online_links" => [
         "label" => "Online Access",
       ],
+      "field_access_type" => [
+        "label" => "Type",
+      ],
       "field_online_links2" => [
         "label" => "Additional Online Access",
       ],
@@ -519,7 +520,7 @@ function teasearch_get_detail_schemas()
       'maintitle' => [
         'type' => 'unified_title',
       ],
-      'field_text_genders' => [
+      'field_text_genres' => [
         'label' => 'Genre'
       ],
       'authors' => [
@@ -537,14 +538,24 @@ function teasearch_get_detail_schemas()
         'label' => 'Translated title',
       ],
 
-      'field_year_label' => [
+      'date' => [
         'label' => 'Date',
+        'type' => 'date_label'
       ],
+      
       'field_language' => [
         'label' => 'Language',
       ],
+
+      'field_place_of_publication' => [
+        'label' => 'Place of publication',
+      ],
+      'field_publisher' => [
+        'label' => 'Publisher',
+      ],
+
       'field_country' => [
-        'label' => 'Place of Creation',
+        'label' => 'Country',
       ],
 
       'paragraph1' => 'Digital Resources',
@@ -569,6 +580,9 @@ function teasearch_get_detail_schemas()
 
       'field_text_types' => [
         'label' => 'Format',
+      ],
+      'field_collected_in' => [
+        'label' => 'Collected in',
       ],
 
       'field_archive' => [
@@ -784,7 +798,7 @@ function teasearch_get_detail_schemas()
       "field_subjects" => [
         "label" => "Subjects"
       ],
-      "field_country" => [
+      "field_country2" => [
         "label" => "Geographic focus"
       ],
       "people" => [

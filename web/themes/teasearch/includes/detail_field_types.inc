@@ -51,6 +51,7 @@ function teasearch_get_field_type_registry()
     'image' => 'teasearch_render_field_image',
     'video' => 'teasearch_render_field_video',
     'pdf' => 'teasearch_render_field_pdf',
+
   ];
 }
 
@@ -2748,20 +2749,20 @@ function teasearch_format_single_author_from_general($paragraph, $language)
   if ($surname_first) {
     // SURNAME_FIRST = true
     // Formato: GIVEN_NAME_(LATIN) + SURNAME_(LATIN) [CAPS]
-    if (!empty($firstname)) {
-      $latin_name .= $firstname . ' ';
-    }
     if (!empty($lastname)) {
       $latin_name .= mb_strtoupper($lastname, 'UTF-8');
+    }
+    if (!empty($firstname)) {
+      $latin_name .= ' '. $firstname ;
     }
   } else {
     // SURNAME_FIRST = false
     // Formato: SURNAME_(LATIN) [CAPS] + GIVEN_NAME_(LATIN)
-    if (!empty($lastname)) {
-      $latin_name .= mb_strtoupper($lastname, 'UTF-8');
-    }
     if (!empty($firstname)) {
-      $latin_name .= ' ' . $firstname;
+      $latin_name .= $firstname;
+    }
+    if (!empty($lastname)) {
+      $latin_name .= ' ' . mb_strtoupper($lastname, 'UTF-8');
     }
   }
 
@@ -2851,7 +2852,7 @@ function teasearch_format_single_author_from_general($paragraph, $language)
 function teasearch_render_field_authors_general($node, $field_config, $field_identifier)
 {
   $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
-
+  $additional_label = "";
   // ========================================================================
   // STEP 1: Controlla field_anonymous (a livello nodo)
   // ========================================================================
@@ -2862,6 +2863,30 @@ function teasearch_render_field_authors_general($node, $field_config, $field_ide
       return $current_language === 'it' ? 'Anonimo' : 'Anonymous';
     }
   }
+
+  // ========================================================================
+  // STEP 1.1: Controlla field_is_editor (a livello nodo)
+  // ========================================================================
+  $additional_label = "";
+  if ($node->hasField('field_is_editor')) {
+    $editor_field = $node->get('field_is_editor');
+    if (!$editor_field->isEmpty() && $editor_field->value) {
+       $additional_label.= $current_language === 'it' ? ' (a cura di) ' : ' (ed.) ';
+    }
+  }
+
+  // ========================================================================
+  // STEP 1.2 Controlla field_is_editor (a livello nodo)
+  // ========================================================================
+  $additional_label = "";
+  if ($node->hasField('field_is_translator')) {
+    $editor_field = $node->get('field_is_translator');
+    if (!$editor_field->isEmpty() && $editor_field->value) {
+       $additional_label.= $current_language === 'it' ? ' (tradotto da)' : ' (trans.)';
+    }
+  }
+
+
 
   // ========================================================================
   // STEP 2: Recupera il campo paragraph (es. field_responsibles)
@@ -2903,7 +2928,7 @@ function teasearch_render_field_authors_general($node, $field_config, $field_ide
     }
 
     // Formatta l'autore usando l'helper
-    $formatted_author = teasearch_format_single_author_from_general($paragraph, $current_language);
+    $formatted_author = teasearch_format_single_author_from_general($paragraph, $current_language).$additional_label;
 
     if ($formatted_author) {
       // Se attributed = true, aggiungi il testo dopo ogni autore
@@ -2995,57 +3020,63 @@ function teasearch_render_field_unified_title($node, $field_config, $field_ident
     : '';
 
   // ========================================================================
-  // STEP 2: Costruisci l'array di parts
+  // STEP 2: Dates
   // ========================================================================
-  $parts = [];
-
-  // Aggiungi title se presente
-  if (!empty($title)) {
-    $parts[] = $title;
-  }
-
-  // Aggiungi field_title_original se presente
-  if (!empty($title_original)) {
-    $parts[] = $title_original;
-  }
-
-  // ========================================================================
-  // STEP 3: Gestisci field_title_translated
-  // ========================================================================
-  if (!empty($title_translated)) {
-    // Se ci sono altri campi prima, aggiungi con []
-    // Altrimenti aggiungi senza []
-    if (count($parts) > 0) {
-      $parts[] = '[' . $title_translated . ']';
-    } else {
-      $parts[] = $title_translated;
-    }
-  }
-
-  // ========================================================================
-  // STEP 4: Dates
-  // ========================================================================
-
-  $field_year_range = teasearch_get_field_value($node, 'field_year_range');
-
   $century_label = '';
+  $field_year_range = teasearch_get_field_value($node, 'field_year_range');
   if ($field_year_range && !$field_year_range->isEmpty()) {
     $first_item = $field_year_range->first();
     if ($first_item && isset($first_item->century_label)) {
       $century_label = $first_item->century_label;
-      $parts[] = $century_label;
     }
   }
 
   // ========================================================================
-  // STEP 5: Join e return
+  // STEP 3: Costruisci HTML manualmente
   // ========================================================================
-  if (empty($parts)) {
+  $html = '';
+
+  // Aggiungi title se presente
+  if (!empty($title)) {
+    $html .= htmlspecialchars($title);
+  }
+
+  // Aggiungi title_original se presente
+  if (!empty($title_original)) {
+    if (!empty($html)) {
+      $html .= $separator;
+    }
+    $html .= htmlspecialchars($title_original);
+  }
+
+  // Aggiungi title_translated - SENZA separatore prima, con o senza []
+  if (!empty($title_translated)) {
+    if (!empty($html)) {
+      // C'è già contenuto, aggiungi con []
+      $html .= '<br><small>[' . htmlspecialchars($title_translated) . ']</small>';
+    } else {
+      // Nessun contenuto prima, aggiungi senza []
+      $html .= htmlspecialchars($title_translated);
+    }
+  }
+
+  // Aggiungi century_label se presente
+  /*
+  if (!empty($century_label)) {
+    if (!empty($html)) {
+      $html .= $separator;
+    }
+    $html .= htmlspecialchars($century_label);
+  }*/
+
+  // ========================================================================
+  // STEP 4: Return
+  // ========================================================================
+  if (empty($html)) {
     return null;
   }
 
-  // Per ora 'base' e 'main' hanno lo stesso comportamento
-  return implode($separator, $parts);
+  return $html;
 }
 
 function teasearch_render_field_date_label($node, $field_config, $field_identifier)
@@ -3367,7 +3398,7 @@ function teasearch_render_field_pdf($node, $field_config, $field_identifier)
   // Recupera i nomi dei campi dalle opzioni
   $pdf_field_name = $field_config['file'] ?? null;
   $image_field_name = $field_config['image_field'] ?? 'field_main_image';
-  $portion_field_name = $field_config['portion_field'] ?? 'field_portion_of_work';
+  $portion_field_name = $field_config['portion_field'] ?? 'field_is_portion';
 
   // REQUIRED: il campo PDF deve essere specificato
   if (empty($pdf_field_name)) {
@@ -3412,23 +3443,14 @@ function teasearch_render_field_pdf($node, $field_config, $field_identifier)
   // Recupera field_portion_of_work (opzionale)
   // ========================================================================
   $portion_text = '';
+  
   $portion_field = teasearch_get_field_value($node, $portion_field_name);
-
-  if ($portion_field && !$portion_field->isEmpty()) {
-    $portion_value = strtolower(trim($portion_field->value));
+  if ($portion_field && !$portion_field->isEmpty() && $portion_field->value) {
     $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
-
-    if ($portion_value === 'selected') {
-      $portion_text = $current_language === 'it'
-        ? '(Pagine selezionate)'
-        : '(Selected pages)';
-    } elseif ($portion_value === 'excerpt') {
-      $portion_text = $current_language === 'it'
-        ? '(Estratto)'
-        : '(Excerpt)';
-    }
+    $portion_text = $current_language === 'it'
+      ? '(Pagine selezionate)'
+      : '(Selected pages)';
   }
-
   // ========================================================================
   // Icona PDF SVG
   // ========================================================================
@@ -3481,3 +3503,5 @@ function teasearch_render_field_pdf($node, $field_config, $field_identifier)
     '#markup' => Markup::create( $html),
   ];
 }
+
+
