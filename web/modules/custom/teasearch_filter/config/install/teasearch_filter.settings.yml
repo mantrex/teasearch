@@ -7,11 +7,10 @@ content_types:
     type: node
     label: 'Texts'
     results:
-      mainfield: title
-      subfield: field_description
+      function: format_texts_display
       content_threshold: 10
-      image: field_main_image
-      altimage: field_square_thumbnail
+      image: field_square_thumbnail
+      altimage: field_main_image
     filters:
       subjects:
         type: taxonomy
@@ -27,7 +26,8 @@ content_types:
     label: 'Essentials'
     results:
       mainfield: title
-      subfield: content
+      subfield: field_short_description
+      image: field_square_thumbnail
     filters:
       keywords:
         type: free_text
@@ -37,9 +37,9 @@ content_types:
     type: node
     label: 'Videos'
     results:
-      mainfield: title
-      subfield: field_content
-      image: field_image
+      function: format_videos_display
+      image: field_square_thumbnail
+      altimage: field_main_image
     filters:
       categories:
         type: taxonomy
@@ -53,9 +53,9 @@ content_types:
     type: node
     label: 'Images'
     results:
-      mainfield: title
-      subfield: field_content
-      image: field_image
+      function: format_images_display
+      image: field_square_thumbnail
+      altimage: field_main_image
     filters:
       categories:
         type: taxonomy
@@ -78,7 +78,6 @@ content_types:
     results:
       function: format_people_display
       image: field_avatar
-      image_format: rounded # significa che diventa un cerchio
     filters:
       skills:
         type: taxonomy
@@ -95,7 +94,8 @@ content_types:
     machine_name: bibliography
     results:
       function: format_bibliography_display
-     
+      image: icons
+
     filters:
       subjects:
         type: taxonomy

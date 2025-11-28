@@ -23,8 +23,8 @@
 }
 
 .detail-header__icon img {
-  width: 160px;
-  height: 160px;
+  width: 180px;
+  height: 180px;
   object-fit: cover;
   display: block;
 }
@@ -189,8 +189,22 @@
   }
 
   .detail-header__icon {
-    width: 150px;
-    height: 150px;
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+    padding: 30px 20px; /* Aumenta padding verticale */
+    min-height: 250px; /* Altezza minima del contenitore */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .detail-header__icon img {
+    width: 100%;
+    height: auto;
+    max-width: 300px; /* Aumentato da 300px a 400px */
+    max-height: 250px; /* Limite altezza per immagini molto verticali */
+    object-fit: contain;
     margin: 0 auto;
   }
 
@@ -303,7 +317,7 @@
     right: 8px;
   }
 }
-</style>
+
 
 
 

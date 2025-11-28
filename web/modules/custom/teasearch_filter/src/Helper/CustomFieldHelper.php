@@ -10,6 +10,35 @@ use Drupal\Core\Entity\EntityInterface;
 class CustomFieldHelper
 {
 
+
+  /**
+   * Helper: Aggiunge label editor se field_is_editor è true sul NODO principale
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   Il nodo principale (non il paragraph)
+   * @param string $authors_string
+   *   La stringa con tutti gli autori già uniti
+   *
+   * @return string
+   *   La stringa autori con eventuale label editor alla fine
+   */
+  private static function addEditorLabelIfNeeded(EntityInterface $entity, string $authors_string): string
+  {
+    // Ottieni lingua corrente
+    $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+
+    // Check field_is_editor sul NODO (non sul paragraph)
+    if ($entity->hasField('field_is_editor')) {
+      $editor_field = $entity->get('field_is_editor');
+      if ($editor_field && !$editor_field->isEmpty() && $editor_field->value) {
+        $editor_label = $current_language === 'it' ? ' (a cura di)' : ' (ed.)';
+        $authors_string .= $editor_label;
+      }
+    }
+
+    return $authors_string;
+  }
+
   /**
    * Execute a custom function by name.
    *
@@ -149,7 +178,7 @@ class CustomFieldHelper
       $affiliation_field = $entity->get('field_affiliation');
       if ($affiliation_field && !$affiliation_field->isEmpty()) {
         $field_affiliation = $affiliation_field->value;
-        $output[] = '<em>' . $field_affiliation . '</em>';
+        $output[] = '' . $field_affiliation . '';
       }
     }
 
@@ -160,8 +189,8 @@ class CustomFieldHelper
     $location_parts = [];
 
     // field_country (TASSONOMIA - Countries)
-    if ($entity->hasField('field_country')) {
-      $country_field = $entity->get('field_country');
+    if ($entity->hasField('field_country_single')) {
+      $country_field = $entity->get('field_country_single');
       if ($country_field && !$country_field->isEmpty()) {
         $field_country = $country_field->entity;
         if ($field_country) {
@@ -281,7 +310,7 @@ class CustomFieldHelper
 
         if ($field_responsibles && !$field_responsibles->isEmpty()) {
           $authors = [];
-          $max_authors = 3; // Mostra max 3 autori, poi "et al."
+          $max_authors = 2; // Mostra max 3 autori, poi "et al."
 
           foreach ($field_responsibles as $index => $item) {
             if ($index >= $max_authors) {
@@ -301,16 +330,16 @@ class CustomFieldHelper
               $field_is_editor = FALSE;
 
               // field_lastname_latin (Surname latin)
-              if ($author_paragraph->hasField('field_lastname_latin')) {
-                $lastname_field = $author_paragraph->get('field_lastname_latin');
+              if ($author_paragraph->hasField('field_lastname')) {
+                $lastname_field = $author_paragraph->get('field_lastname');
                 if ($lastname_field && !$lastname_field->isEmpty()) {
                   $field_lastname_latin = $lastname_field->value;
                 }
               }
 
               // field_firstname_latin (Given Name latin)
-              if ($author_paragraph->hasField('field_firstname_latin')) {
-                $firstname_field = $author_paragraph->get('field_firstname_latin');
+              if ($author_paragraph->hasField('field_firstname')) {
+                $firstname_field = $author_paragraph->get('field_firstname');
                 if ($firstname_field && !$firstname_field->isEmpty()) {
                   $field_firstname_latin = $firstname_field->value;
                 }
@@ -411,10 +440,11 @@ class CustomFieldHelper
               if ($field_is_editor) {
                 $roles[] = 'Editor';
               }
-
+              /*
               if (!empty($roles)) {
                 $author_string .= ' (' . implode(', ', $roles) . ')';
-              }
+              }*/
+
 
               $authors[] = $author_string;
             }
@@ -427,7 +457,13 @@ class CustomFieldHelper
 
           // Unisci autori
           if (!empty($authors)) {
-            $author_line_parts[] = implode('; ', $authors);
+            $authors_string = implode('; ', $authors);
+
+            // Aggiungi label editor se necessario (una volta sola alla fine)
+            $authors_string = self::addEditorLabelIfNeeded($entity, $authors_string);
+
+            $author_line_parts[] = $authors_string;
+
           }
         }
       }
@@ -439,7 +475,7 @@ class CustomFieldHelper
       if ($year_field && !$year_field->isEmpty()) {
         $field_year = $year_field->value;
         if (!empty($field_year)) {
-          $author_line_parts[] = '(' . $field_year . ')';
+          $author_line_parts[] = ' / ' . $field_year . '';
         }
       }
     }
@@ -473,7 +509,7 @@ class CustomFieldHelper
             if (!empty($icon_name_value)) {
               // Costruisci il path completo dell'icona
               $theme_path = \Drupal::service('extension.list.theme')->getPath('teasearch');
-              $icon_path = '../../' . $theme_path . '/images/bibicons/' . $icon_name_value.".png";
+              $icon_path = '../../' . $theme_path . '/images/bibicons/' . $icon_name_value . ".png";
 
               // Aggiungi la proprietà all'entità per l'uso nel template
               $entity->teasearch_bibliography_icon = $icon_path;
@@ -487,16 +523,25 @@ class CustomFieldHelper
     if ($entity->hasField('field_language')) {
       $language_field = $entity->get('field_language');
       if ($language_field && !$language_field->isEmpty()) {
-        $field_language = $language_field->entity;
-        if ($field_language) {
-          $type_lang_parts[] = $field_language->getName();
+        $languages = [];
+
+        // Itera su tutti i valori (supporta sia singolo che multivalore)
+        foreach ($language_field as $language_item) {
+          if ($language_item->entity) {
+            $languages[] = $language_item->entity->getName();
+          }
+        }
+
+        // Aggiungi tutte le lingue separate da virgola (o altro separatore)
+        if (!empty($languages)) {
+          $type_lang_parts[] = implode(', ', $languages);
         }
       }
     }
-
+    
     // Aggiungi TYPE - LANGUAGE
     if (!empty($type_lang_parts)) {
-      $output[] = '<em>' . implode(' – ', $type_lang_parts) . '</em>';
+      $output[] = '' . implode(' / ', $type_lang_parts) . '';
     }
 
     // =============================================================================
@@ -519,7 +564,7 @@ class CustomFieldHelper
   public static function render_format_texts_display(EntityInterface $entity)
   {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-   
+
     $output = [];
 
     // =============================================================================
@@ -556,7 +601,7 @@ class CustomFieldHelper
         $title_parts[] = $field_title_original;
       }
 
-      $output[] = '<h3 class="result-item-title">' . implode(' ', $title_parts) . '</h3>';
+      $output[] = '<span class="result-item-title">' . implode(' ', $title_parts) . '</span>';
 
       // Translated title in square brackets
       if (!empty($field_title_translated)) {
@@ -565,7 +610,7 @@ class CustomFieldHelper
     } else {
       // Altrimenti usa TRANSLATED_TITLE
       if (!empty($field_title_translated)) {
-        $output[] = '<h3 class="result-item-title">' . $field_title_translated . '</h3>';
+        $output[] = '<span class="result-item-title">' . $field_title_translated . '</span>';
       }
     }
 
@@ -594,7 +639,7 @@ class CustomFieldHelper
 
         if ($field_texts_authors && !$field_texts_authors->isEmpty()) {
           $authors = [];
-          $max_authors = 3; // Mostra max 3 autori, poi "et al."
+          $max_authors = 2; // Mostra max 3 autori, poi "et al."
 
           foreach ($field_texts_authors as $index => $item) {
             if ($index >= $max_authors) {
@@ -612,16 +657,16 @@ class CustomFieldHelper
               $field_attributed_authorship = FALSE;
 
               // field_lastname_latin (Surname latin)
-              if ($author_paragraph->hasField('field_lastname_latin')) {
-                $lastname_field = $author_paragraph->get('field_lastname_latin');
+              if ($author_paragraph->hasField('field_lastname')) {
+                $lastname_field = $author_paragraph->get('field_lastname');
                 if ($lastname_field && !$lastname_field->isEmpty()) {
                   $field_lastname_latin = $lastname_field->value;
                 }
               }
 
               // field_firstname_latin (Given Name latin)
-              if ($author_paragraph->hasField('field_firstname_latin')) {
-                $firstname_field = $author_paragraph->get('field_firstname_latin');
+              if ($author_paragraph->hasField('field_firstname')) {
+                $firstname_field = $author_paragraph->get('field_firstname');
                 if ($firstname_field && !$firstname_field->isEmpty()) {
                   $field_firstname_latin = $firstname_field->value;
                 }
@@ -703,7 +748,12 @@ class CustomFieldHelper
 
           // Unisci autori
           if (!empty($authors)) {
-            $author_line_parts[] = implode('; ', $authors);
+            $authors_string = implode('; ', $authors);
+
+            // Aggiungi label editor se necessario (una volta sola alla fine)
+            $authors_string = self::addEditorLabelIfNeeded($entity, $authors_string);
+
+            $author_line_parts[] = $authors_string;
           }
         }
       }
@@ -712,39 +762,39 @@ class CustomFieldHelper
     // Aggiungi YEAR_LABEL (da field_year_range)
     // Nota: field_year_range è un custom field, probabilmente ha subfields
     // Assumo che abbia un subfield 'label' o simile per il display
+
     if ($entity->hasField('field_year_range')) {
+
       $year_range_field = $entity->get('field_year_range');
       if ($year_range_field && !$year_range_field->isEmpty()) {
-        $year_range_item = $year_range_field->first();
         /** @var \Drupal\Core\Field\FieldItemInterface $year_range_item */
-        // Prova diverse proprietà comuni per year range
+        $year_range_item = $year_range_field->first();
+
         if ($year_range_item) {
           $year_from = NULL;
           $year_to = NULL;
+          $century_label = NULL;
 
-          // Prova ad accedere ai subfields
+          // Accedi ai subfields del custom field
           if ($year_range_item->__isset('year_from')) {
             $year_from = $year_range_item->year_from;
           }
           if ($year_range_item->__isset('year_to')) {
             $year_to = $year_range_item->year_to;
           }
-
-          // Costruisci label anno
-          if ($year_from !== NULL || $year_to !== NULL) {
-            if ($year_from === $year_to) {
-              $author_line_parts[] = '(' . $year_from . ')';
-            } elseif ($year_from !== NULL && $year_to !== NULL) {
-              $author_line_parts[] = '(' . $year_from . '–' . $year_to . ')';
-            } elseif ($year_from !== NULL) {
-              $author_line_parts[] = '(' . $year_from . ')';
-            } elseif ($year_to !== NULL) {
-              $author_line_parts[] = '(–' . $year_to . ')';
-            }
+          if ($year_range_item->__isset('century_label')) {
+            $century_label = $year_range_item->century_label;
           }
+
+          // Priorità: usa century_label se presente, altrimenti costruisci da year_from/year_to
+          if (!empty($century_label)) {
+            $author_line_parts[] = ' / ' . $century_label . '';
+          }
+
         }
       }
     }
+
 
     // Aggiungi linea autori all'output
     if (!empty($author_line_parts)) {
@@ -781,7 +831,7 @@ class CustomFieldHelper
 
     // Aggiungi GENRE – LANGUAGE
     if (!empty($genre_lang_parts)) {
-      $output[] = '<em>' . implode(' – ', $genre_lang_parts) . '</em>';
+      $output[] = '' . implode(' / ', $genre_lang_parts) . '';
     }
 
     // =============================================================================
@@ -839,7 +889,7 @@ class CustomFieldHelper
         $title_parts[] = $field_title_original;
       }
 
-      $output[] = '<h3 class="result-item-title">' . implode(' ', $title_parts) . '</h3>';
+      $output[] = '<span class="result-item-title">' . implode(' ', $title_parts) . '</span>';
 
       // Translated title in square brackets
       if (!empty($field_title_translated)) {
@@ -848,7 +898,7 @@ class CustomFieldHelper
     } else {
       // Altrimenti usa TRANSLATED_TITLE
       if (!empty($field_title_translated)) {
-        $output[] = '<h3 class="result-item-title">' . $field_title_translated . '</h3>';
+        $output[] = '<span class="result-item-title">' . $field_title_translated . '</span>';
       }
     }
 
@@ -877,7 +927,7 @@ class CustomFieldHelper
 
         if ($field_texts_authors && !$field_texts_authors->isEmpty()) {
           $authors = [];
-          $max_authors = 3; // Mostra max 3 autori, poi "et al."
+          $max_authors = 2; // Mostra max 3 autori, poi "et al."
 
           foreach ($field_texts_authors as $index => $item) {
             if ($index >= $max_authors) {
@@ -895,16 +945,16 @@ class CustomFieldHelper
               $field_attributed_authorship = FALSE;
 
               // field_lastname_latin (Surname latin)
-              if ($author_paragraph->hasField('field_lastname_latin')) {
-                $lastname_field = $author_paragraph->get('field_lastname_latin');
+              if ($author_paragraph->hasField('field_lastname')) {
+                $lastname_field = $author_paragraph->get('field_lastname');
                 if ($lastname_field && !$lastname_field->isEmpty()) {
                   $field_lastname_latin = $lastname_field->value;
                 }
               }
 
               // field_firstname_latin (Given Name latin)
-              if ($author_paragraph->hasField('field_firstname_latin')) {
-                $firstname_field = $author_paragraph->get('field_firstname_latin');
+              if ($author_paragraph->hasField('field_firstname')) {
+                $firstname_field = $author_paragraph->get('field_firstname');
                 if ($firstname_field && !$firstname_field->isEmpty()) {
                   $field_firstname_latin = $firstname_field->value;
                 }
@@ -986,16 +1036,22 @@ class CustomFieldHelper
 
           // Unisci autori
           if (!empty($authors)) {
-            $author_line_parts[] = implode('; ', $authors);
+            $authors_string = implode('; ', $authors);
+
+            // Aggiungi label editor se necessario (una volta sola alla fine)
+            $authors_string = self::addEditorLabelIfNeeded($entity, $authors_string);
+
+            $author_line_parts[] = $authors_string;
+
           }
         }
       }
     }
 
-    
+
     // Aggiungi YEAR_LABEL (da field_year_range)
     if ($entity->hasField('field_year_range')) {
-      
+
       $year_range_field = $entity->get('field_year_range');
       if ($year_range_field && !$year_range_field->isEmpty()) {
         /** @var \Drupal\Core\Field\FieldItemInterface $year_range_item */
@@ -1019,18 +1075,9 @@ class CustomFieldHelper
 
           // Priorità: usa century_label se presente, altrimenti costruisci da year_from/year_to
           if (!empty($century_label)) {
-            $author_line_parts[] = '(' . $century_label . ')';
-          } elseif ($year_from !== NULL || $year_to !== NULL) {
-            if ($year_from === $year_to) {
-              $author_line_parts[] = '(' . $year_from . ')';
-            } elseif ($year_from !== NULL && $year_to !== NULL) {
-              $author_line_parts[] = '(' . $year_from . '–' . $year_to . ')';
-            } elseif ($year_from !== NULL) {
-              $author_line_parts[] = '(' . $year_from . ')';
-            } elseif ($year_to !== NULL) {
-              $author_line_parts[] = '(–' . $year_to . ')';
-            }
+            $author_line_parts[] = ' / ' . $century_label . '';
           }
+
         }
       }
     }
@@ -1070,7 +1117,7 @@ class CustomFieldHelper
 
     // Aggiungi CATEGORY – COUNTRY
     if (!empty($category_country_parts)) {
-      $output[] = '<em>' . implode(' – ', $category_country_parts) . '</em>';
+      $output[] = '' . implode(' / ', $category_country_parts) . '';
     }
 
     // =============================================================================
@@ -1129,7 +1176,7 @@ class CustomFieldHelper
         $title_parts[] = $field_title_original;
       }
 
-      $output[] = '<h3 class="result-item-title">' . implode(' ', $title_parts) . '</h3>';
+      $output[] = '<span class="result-item-title">' . implode(' ', $title_parts) . '</span>';
 
       // Translated title in square brackets
       if (!empty($field_title_translated)) {
@@ -1138,7 +1185,7 @@ class CustomFieldHelper
     } else {
       // Altrimenti usa TRANSLATED_TITLE
       if (!empty($field_title_translated)) {
-        $output[] = '<h3 class="result-item-title">' . $field_title_translated . '</h3>';
+        $output[] = '<span class="result-item-title">' . $field_title_translated . '</span>';
       }
     }
 
@@ -1167,12 +1214,12 @@ class CustomFieldHelper
     } else {
       // Altrimenti processa gli autori dal paragraph
       // PARAGRAPH UTILIZZATO: field_texts_authors (tipo: texts_authors)
-      if ($entity->hasField('field_responsibiles')) {
+      if ($entity->hasField('field_responsibles')) {
         $field_texts_authors = $entity->get('field_responsibles');
 
         if ($field_texts_authors && !$field_texts_authors->isEmpty()) {
           $authors = [];
-          $max_authors = 3; // Mostra max 3 autori, poi "et al."
+          $max_authors = 2; // Mostra max 3 autori, poi "et al."
 
           foreach ($field_texts_authors as $index => $item) {
             if ($index >= $max_authors) {
@@ -1183,8 +1230,8 @@ class CustomFieldHelper
               $author_paragraph = $item->entity;
 
               // Estrai campi dal paragraph texts_authors
-              $field_lastname_latin = '';
-              $field_firstname_latin = '';
+              $field_lastname = '';
+              $field_firstname = '';
               $field_fullname = '';
               $field_pseudonym = '';
               $field_surname_first = FALSE;
@@ -1192,18 +1239,18 @@ class CustomFieldHelper
               $field_attributed_authorship = FALSE;
 
               // field_lastname_latin (Surname latin)
-              if ($author_paragraph->hasField('field_lastname_latin')) {
-                $lastname_field = $author_paragraph->get('field_lastname_latin');
+              if ($author_paragraph->hasField('field_lastname')) {
+                $lastname_field = $author_paragraph->get('field_lastname');
                 if ($lastname_field && !$lastname_field->isEmpty()) {
-                  $field_lastname_latin = $lastname_field->value;
+                  $field_lastname = $lastname_field->value;
                 }
               }
 
               // field_firstname_latin (Given Name latin)
-              if ($author_paragraph->hasField('field_firstname_latin')) {
-                $firstname_field = $author_paragraph->get('field_firstname_latin');
+              if ($author_paragraph->hasField('field_firstname')) {
+                $firstname_field = $author_paragraph->get('field_firstname');
                 if ($firstname_field && !$firstname_field->isEmpty()) {
-                  $field_firstname_latin = $firstname_field->value;
+                  $field_firstname = $firstname_field->value;
                 }
               }
 
@@ -1252,8 +1299,8 @@ class CustomFieldHelper
 
               if ($field_is_organization) {
                 // ORGANIZATION: SURNAME + FULLNAME
-                if (!empty($field_lastname_latin)) {
-                  $author_name_parts[] = $field_lastname_latin;
+                if (!empty($field_lastname)) {
+                  $author_name_parts[] = $field_lastname;
                 }
                 if (!empty($field_fullname)) {
                   $author_name_parts[] = $field_fullname;
@@ -1262,11 +1309,11 @@ class CustomFieldHelper
                 // PERSON
                 if ($field_surname_first) {
                   // SURNAME_FIRST: SURNAME + GIVEN_NAME + FULLNAME
-                  if (!empty($field_lastname_latin)) {
-                    $author_name_parts[] = $field_lastname_latin;
+                  if (!empty($field_lastname)) {
+                    $author_name_parts[] = $field_lastname;
                   }
-                  if (!empty($field_firstname_latin)) {
-                    $author_name_parts[] = $field_firstname_latin;
+                  if (!empty($field_firstname)) {
+                    $author_name_parts[] = $field_firstname;
                   }
                   if (!empty($field_fullname)) {
                     $author_name_parts[] = $field_fullname;
@@ -1274,11 +1321,11 @@ class CustomFieldHelper
                 } else {
                   // NOT SURNAME_FIRST: SURNAME, GIVEN_NAME + FULLNAME
                   $name_with_comma = [];
-                  if (!empty($field_lastname_latin)) {
-                    $name_with_comma[] = $field_lastname_latin;
+                  if (!empty($field_lastname)) {
+                    $name_with_comma[] = $field_lastname;
                   }
-                  if (!empty($field_firstname_latin)) {
-                    $name_with_comma[] = $field_firstname_latin;
+                  if (!empty($field_firstname)) {
+                    $name_with_comma[] = $field_firstname;
                   }
 
                   if (!empty($name_with_comma)) {
@@ -1315,7 +1362,12 @@ class CustomFieldHelper
 
           // Unisci autori
           if (!empty($authors)) {
-            $author_line_parts[] = implode('; ', $authors);
+            $authors_string = implode('; ', $authors);
+
+            // Aggiungi label editor se necessario (una volta sola alla fine)
+            $authors_string = self::addEditorLabelIfNeeded($entity, $authors_string);
+
+            $author_line_parts[] = $authors_string;
           }
         }
       }
@@ -1327,7 +1379,7 @@ class CustomFieldHelper
       if ($production_year_field && !$production_year_field->isEmpty()) {
         $field_production_year = $production_year_field->value;
         if (!empty($field_production_year)) {
-          $author_line_parts[] = '(' . $field_production_year . ')';
+          $author_line_parts[] = '/ ' . $field_production_year . '';
         }
       }
     }
@@ -1367,7 +1419,7 @@ class CustomFieldHelper
 
     // Aggiungi GENRE – LANGUAGE
     if (!empty($genre_lang_parts)) {
-      $output[] = '<em>' . implode(' – ', $genre_lang_parts) . '</em>';
+      $output[] = '' . implode(' / ', $genre_lang_parts) . '';
     }
 
     // =============================================================================

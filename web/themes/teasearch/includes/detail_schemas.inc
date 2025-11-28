@@ -362,6 +362,10 @@ function teasearch_get_detail_schemas()
       'maintitle' => [
         'type' => 'unified_title',
       ],
+      "field_pubtype" => [
+        "label" => "Type",
+      ],
+
       "authors" => [
         "type" => "authors_general",
         "field" => "field_responsibles",
@@ -389,6 +393,9 @@ function teasearch_get_detail_schemas()
       "field_pub_place" => [
         "label" => "Place of Publication",
       ],
+      'field_publisher' => [
+        'label' => 'Publisher',
+      ],
       "field_doi" => [
         "label" => "DOI",
       ],
@@ -398,22 +405,33 @@ function teasearch_get_detail_schemas()
       "field_isbn" => [
         "label" => "ISBN",
       ],
-      "field_pub_title" => [
-        "label" => "Book Title",
-      ],
       "editors" => [
         "label" => "Editors",
         "type" => "authors_general",
         "field" => "field_editors",
+        "options"=> [
+          "no_editor_label"=>true
+        ]
 
       ],
       "field_edition" => [
         "label" => "Edition",
       ],
-      "journal_name" => [
+      "project_name_journal" => [
         "label" => "Journal",
-        "type" => "journal_name",
+        "type" => "project_name",
+        "options"=>[
+          "filter"=>["field_project_type","journal"]
+        ]
       ],
+      "project_name_book" => [
+        "label" => "Edited Book",
+        "type" => "project_name",
+        "options" => [
+          "filter" => ["field_project_type", "book"]
+        ]
+      ],
+
       "field_issn" => [
         "label" => "issn",
       ],
@@ -468,10 +486,6 @@ function teasearch_get_detail_schemas()
       "field_curated_abstract" => [
         "label" => "Teasearch curated abstract",
       ],
-      "field_keywords" => [
-        "label" => "Keywords",
-      ],
-
       "paragraph4" => "References",
       "curated_references" => [
         "label" => "Bibliography",
@@ -490,6 +504,9 @@ function teasearch_get_detail_schemas()
       ],
       "field_country" => [
         "label" => "Geographic focus"
+      ],
+      "field_keywords" => [
+        "label" => "Keywords",
       ],
       "people" => [
         "label" => "People",
@@ -645,15 +662,16 @@ function teasearch_get_detail_schemas()
       'type' => 'square_or_main',
     ],
     "fields" => [
+      "maintitle" => [
+        "type" => "unified_title"
+      ],
       "title" => [
         "label" => "Title"
       ],
-      "field_title_original" => [
-        "label" => "Original Title"
+      "field_short_description" => [
+        "label" => "Short Description"
       ],
-      "field_title_translated" => [
-        "label" => "Translated Title"
-      ],
+
       "paragraph1" => "Content",
       "field_content" => [
         "label" => "Main Text"
@@ -734,7 +752,7 @@ function teasearch_get_detail_schemas()
       ],
 
       'field_country' => [
-        'label' => 'Country of Creation',
+        'label' => 'Country',
       ],
 
 
@@ -749,11 +767,11 @@ function teasearch_get_detail_schemas()
       'field_source' => [
         'label' => 'Source',
       ],
-      'field_usage_right' => [
-        'label' => 'Usage Right',
+      'field_usage_rights' => [
+        'label' => 'Usage Rights',
       ],
       'field_notes' => [
-        'label' => 'Usage Right',
+        'label' => 'Note',
       ],
 
       'paragraph2' => "Description",
@@ -779,9 +797,6 @@ function teasearch_get_detail_schemas()
       'field_textual_elements' => [
         'label' => 'Textual Elements',
       ],
-      'field_keywords' => [
-        'label' => 'Keywords',
-      ],
       "paragraph3" => "References",
       "curated_references" => [
         "label" => "Bibliography",
@@ -800,6 +815,9 @@ function teasearch_get_detail_schemas()
       ],
       "field_country2" => [
         "label" => "Geographic focus"
+      ],
+      'field_keywords' => [
+        'label' => 'Keywords',
       ],
       "people" => [
         "label" => "People",
@@ -852,9 +870,28 @@ function teasearch_get_detail_schemas()
       'field_language' => [
         'label' => 'Language',
       ],
-      'field_country' => [
+      'field_event' => [
+        'label' => 'Event / Context',
+      ],
+      'field_location' => [
         'label' => 'Location',
       ],
+      'field_place_of_publication' => [
+        'label' => 'Place of creation',
+      ],
+      'field_country' => [
+        'label' => 'Country',
+      ],
+      'field_recording_date' => [
+        'label' => 'Recording Date',
+      ],
+      'field_original_release_date' => [
+        'label' => 'Release Date',
+      ],
+      'field_duration' => [
+        'label' => 'Duration',
+      ],
+
       "paragraph2" => "Digital Resources",
       'video' => [
         'label' => 'Video',
@@ -874,29 +911,11 @@ function teasearch_get_detail_schemas()
         'label' => 'Usage Right',
       ],
       "paragraph3" => "Description",
-      'field_duration' => [
-        'label' => 'Duration',
-      ],
-      'field_duration' => [
-        'label' => 'Duration',
-      ],
-      'field_event' => [
-        'label' => 'Event / Context',
-      ],
-      'field_recording_date' => [
-        'label' => 'Recording Date',
-      ],
-      'field_original_release_date' => [
-        'label' => 'Release Date',
-      ],
       'field_description' => [
         'label' => 'Description',
       ],
       'field_subtitles' => [
         'label' => 'Subtitles',
-      ],
-      'field_keywords' => [
-        'label' => 'Keywords',
       ],
       "paragraph4" => "References",
       "curated_references" => [
@@ -914,9 +933,13 @@ function teasearch_get_detail_schemas()
       "field_subjects" => [
         "label" => "Subjects"
       ],
-      "field_country" => [
+      "field_country2" => [
         "label" => "Geographic focus"
       ],
+      'field_keywords' => [
+        'label' => 'Keywords',
+      ],
+
       "people" => [
         "label" => "People",
         "type" => "people_roles"

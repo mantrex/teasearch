@@ -1,0 +1,21 @@
+{#
+  /**
+  * @file
+  * Template per icone bibliography basate su tassonomia
+  *
+  * Variables:
+  * - entity: L'entità bibliography
+  * - module_path: Path del modulo
+  */
+#}
+
+{% if entity.teasearch_bibliography_icon %}
+  <div class="item-image">
+    <img src="{{ entity.teasearch_bibliography_icon }}" alt="{{ entity.label }}" class="entity-image entity-image-icon" loading="lazy">
+  </div>
+{% else %}
+  {# Icona di default se non presente #}
+  <div class="item-image">
+    <img src="{{ module_path }}/images/default-biblio.png" alt="{{ entity.label }}" class="entity-image entity-image-icon" loading="lazy">
+  </div>
+{% endif %}

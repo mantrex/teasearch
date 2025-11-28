@@ -6,7 +6,7 @@
   * Variables:
   * - entity: The entity object
   * - entity_type: Entity type (node/user)
-  * - image_field: Field machine name for the image
+  * - image_field: Field machine name for the image OR special type (e.g., 'icons')
   * - alt_image_field: Fallback image field
   * - image_format: Image format (rounded/square)
   * - module_path: Module path for default images
@@ -17,14 +17,23 @@
   {% set image_url = null %}
   {% set current_image_field = null %}
 
-  {# PRIORITÀ 1: Controlla se esiste l'icona bibliografia custom #}
-  {% if entity.teasearch_bibliography_icon is defined and entity.teasearch_bibliography_icon %}
-    {% set image_url = entity.teasearch_bibliography_icon %}
-
-    {% set current_image_field = 'bibliography_icon' %}
+  {# ========================================================================= #}
+  {# PRIORITÀ 1: Gestione tipo speciale "icons" (per bibliography) #}
+  {# ========================================================================= #}
+  {% if image_field == 'icons' %}
+    {% if entity.teasearch_bibliography_icon is defined and entity.teasearch_bibliography_icon %}
+      {% set image_url = entity.teasearch_bibliography_icon %}
+      {% set current_image_field = 'bibliography_icon' %}
+    {% else %}
+      {# Default icon per bibliography se non trovata #}
+      {% set image_url = module_path ~ '/images/default-biblio.png' %}
+      {% set current_image_field = 'default_bibliography_icon' %}
+    {% endif %}
   {% endif %}
 
+  {# ========================================================================= #}
   {# PRIORITÀ 2: Gestione immagini per utenti #}
+  {# ========================================================================= #}
   {% if not image_url and entity_type == 'user' %}
     {% if image_field == 'user_picture' and entity.user_picture.0 %}
       {% if entity.user_picture.0.entity and entity.user_picture.0.entity.fileuri %}
@@ -46,7 +55,9 @@
     {% endif %}
   {% endif %}
 
+  {# ========================================================================= #}
   {# PRIORITÀ 3: Gestione immagini per nodi - prova prima image_field #}
+  {# ========================================================================= #}
   {% if not image_url and entity_type != 'user' %}
     {% set field_data = attribute(entity, image_field) %}
     {% if field_data and field_data.0 %}
@@ -56,18 +67,20 @@
         {% set current_image_field = image_field %}
 
       {# Approccio 2: preprocess hook result (per campi con target_id) #}
-        {% elseif entity.teasearch_image_url %}
+      {% elseif entity.teasearch_image_url %}
         {% set image_url = entity.teasearch_image_url %}
         {% set current_image_field = image_field %}
 
       {# Approccio 3: uri diretto (per alcuni tipi di campo) #}
-        {% elseif field_data.0.uri %}
+      {% elseif field_data.0.uri %}
         {% set image_url = file_url(field_data.0.uri) %}
         {% set current_image_field = image_field %}
       {% endif %}
     {% endif %}
 
+    {# ========================================================================= #}
     {# FALLBACK: Se image_field non ha prodotto risultati, prova alt_image_field #}
+    {# ========================================================================= #}
     {% if not image_url and alt_image_field %}
       {% set alt_field_data = attribute(entity, alt_image_field) %}
       {% if alt_field_data and alt_field_data.0 %}
@@ -85,7 +98,9 @@
     {% endif %}
   {% endif %}
 
-  {# Fallback finale: immagine di default appropriata #}
+  {# ========================================================================= #}
+  {# FALLBACK FINALE: immagine di default appropriata #}
+  {# ========================================================================= #}
   {% if not image_url %}
     {% if entity_type == 'user' %}
       {% set image_url = module_path ~ '/images/default-avatar.png' %}
@@ -95,10 +110,17 @@
     {% set current_image_field = 'default' %}
   {% endif %}
 
-  {# Rendering dell'immagine con debug info #}
-  <img src="{{ image_url }}" alt="{{ entity.label }}" class="entity-image {{ current_image_field == 'bibliography_icon' ? 'bibliography-icon' : '' }} {{ image_format == 'rounded' ? 'rounded-circle' : 'rounded' }}" 
-width="64" 
-height="64"
- loading="lazy" 
-onerror="this.src='{{ module_path }}/images/placeholder.png'; this.onerror=null;" data-field-used="{{ current_image_field }}" title="Using: {{ current_image_field }}"></div>
-  
+  {# ========================================================================= #}
+  {# RENDERING DELL'IMMAGINE #}
+  {# ========================================================================= #}
+  <img 
+    src="{{ image_url }}" 
+    alt="{{ entity.label }}" 
+    class="entity-image {{ current_image_field == 'bibliography_icon' ? 'bibliography-icon' : '' }} {{ image_format == 'rounded' ? 'rounded-circle' : 'rounded' }}" 
+    width="64" 
+    height="64" 
+    loading="lazy" 
+    onerror="this.src='{{ module_path }}/images/placeholder.png'; this.onerror=null;" 
+    data-field-used="{{ current_image_field }}" 
+    title="Using: {{ current_image_field }}">
+</div>

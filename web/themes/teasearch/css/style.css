@@ -156,7 +156,7 @@ a {
 }
 /* Adjust brand logo, spacing, etc. */
 .navbar-brand img {
-  width: 120px;
+  width: 140px;
 }
 .navbar-nav {
   text-transform: uppercase;
@@ -372,7 +372,7 @@ a {
 }
 
 .text-below-logo {
-  font-size: x-small;
+  font-size: small;
   opacity: 1;
   transition: opacity 0.4s ease; /* durata e easing */
 }
@@ -443,4 +443,12 @@ a {
 
 .breadcrumb a:hover {
   text-decoration: underline;
+}
+
+/* tutti gli h2 delle schede di dettaglio */
+.detail-body h2 {
+  color:var(--about-title)!important;
+  text-transform: uppercase;
+  font-size:1.2em;
+  font-weight:bold;
 }

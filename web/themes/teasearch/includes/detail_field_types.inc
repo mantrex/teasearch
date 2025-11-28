@@ -24,20 +24,20 @@ function teasearch_get_field_type_registry()
     'link' => 'teasearch_render_field_link',
     'media_image' => 'teasearch_render_field_media_image',
     'media_image_round' => 'teasearch_render_field_media_image_round',
-    'image_round' => 'teasearch_render_field_image_round', 
+    'image_round' => 'teasearch_render_field_image_round',
     'people_main_title' => 'teasearch_render_field_people_main_title',
     'people_name' => 'teasearch_render_field_people_name',
     'location' => 'teasearch_render_location',
     'record_data' => 'teasearch_render_field_record_data',
     'systemdate' => 'teasearch_render_field_systemdate',
-    'publib'=>'teasearch_render_field_publib',
+    'publib' => 'teasearch_render_field_publib',
     'contrib' => 'teasearch_render_field_contrib',
     'bibliography_title' => 'teasearch_render_field_bibliography_title',
     'bibliography_icon' => 'teasearch_render_field_bibliography_icon',
     'bibliography_authors' => 'teasearch_render_field_bibliography_authors',
     'bibliography_editors' => 'teasearch_render_field_bibliography_editors',
     "people_reference_list" => 'teasearch_render_field_people_reference_list',
-    'journal_name' => 'teasearch_render_field_journal_name',
+    'project_name' => 'teasearch_render_field_project_name',
     'vol_issue' => 'teasearch_render_field_vol_issue',
     'curated_references' => 'teasearch_render_field_curated_references',
     'teasearch_references' => 'teasearch_render_field_teasearch_references',
@@ -187,40 +187,108 @@ function teasearch_render_field_people_name($node, $field_config, $field_identif
  * TYPE: text
  * Renderizza un campo di testo (plain o rich text).
  */
+
 function teasearch_render_field_text($node, $field_config, $field_identifier)
 {
-  $field = teasearch_get_field_value($node, $field_identifier);
+  $field_name = $field_config['field'] ?? $field_identifier;
+  $field = teasearch_get_field_value($node, $field_name);
 
   if (!$field || $field->isEmpty()) {
     return NULL;
   }
 
+  // Ottieni il tipo di campo per formattazione automatica
+  $field_type = $node->get($field_name)->getFieldDefinition()->getType();
+
   // Gestisce multivalore
-  if (teasearch_is_field_multiple($node, $field_identifier)) {
+  if (teasearch_is_field_multiple($node, $field_name)) {
     $values = [];
     foreach ($field as $item) {
       if (isset($item->value) && !empty($item->value)) {
-        $values[] = $item->value;
+        $processed_value = teasearch_auto_format_value($item->value, $field_type, $field_name);
+        $values[] = $processed_value;
       }
     }
     return !empty($values) ? implode(', ', $values) : NULL;
   }
 
   // Singolo valore
+  $raw_value = null;
+
   // Gestisce sia plain text che rich text
   if (isset($field->processed)) {
     // Rich text (text_long, text_with_summary)
-    return $field->processed;
+    $raw_value = $field->processed;
   } elseif (isset($field->value)) {
     // Plain text
-    $plainText = $field->value;
-    $plainText = strtr($plainText, [PHP_EOL => "<br>"]);
-
-    return $plainText;
+    $raw_value = $field->value;
   }
 
-  return NULL;
+  if ($raw_value === null) {
+    return NULL;
+  }
+
+  // Applica formattazione automatica in base al tipo
+  $formatted_value = teasearch_auto_format_value($raw_value, $field_type, $field_name);
+
+  // Converte newline in <br> solo se non è rich text
+  if (!isset($field->processed)) {
+    $formatted_value = strtr($formatted_value, [PHP_EOL => "<br>"]);
+  }
+
+  return $formatted_value;
 }
+
+/**
+ * Helper: Formatta automaticamente il valore in base al tipo di campo
+ */
+function teasearch_auto_format_value($value, $field_type, $field_name = '')
+{
+  // ========================================================================
+  // TIPO: datetime (data/ora)
+  // ========================================================================
+  if ($field_type === 'datetime') {
+    // Formato: yyyy-mm-dd
+    if (is_numeric($value)) {
+      return date('Y-m-d', $value);
+    }
+
+    $timestamp = strtotime($value);
+    if ($timestamp !== false) {
+      return date('Y-m-d', $timestamp);
+    }
+  }
+
+  // ========================================================================
+  // TIPO: timestamp o created/changed
+  // ========================================================================
+  if ($field_type === 'timestamp' || $field_type === 'created' || $field_type === 'changed' || $field_type === 'date') {
+    return date('Y-m-d', intval($value));
+  }
+
+  // ========================================================================
+  // TIPO: integer con nome campo che suggerisce durata/tempo
+  // ========================================================================
+  if (
+    $field_type === 'time' && (
+      strpos($field_name, 'duration') !== false ||
+      strpos($field_name, 'time') !== false ||
+      strpos($field_name, 'length') !== false
+    ) 
+  ) {
+    // Converti secondi in hh:mm:ss
+    $seconds = intval($value);
+    $hours = floor($seconds / 3600);
+    $minutes = floor(($seconds % 3600) / 60);
+    $secs = $seconds % 60;
+
+    return sprintf('%02d:%02d:%02d', $hours, $minutes, $secs);
+  }
+
+  // Nessuna formattazione speciale, ritorna il valore originale
+  return $value;
+}
+
 /**
  * TYPE: taxonomy
  * Renderizza termini di tassonomia separati da virgola (multilingua).
@@ -288,7 +356,7 @@ function teasearch_render_field_link($node, $field_config, $field_identifier)
 
 function teasearch_render_field_image_round($node, $field_config, $field_identifier)
 {
-  
+
   $field_name = $field_config['field'] ?? $field_identifier;
 
   $field = teasearch_get_field_value($node, $field_name);
@@ -306,7 +374,7 @@ function teasearch_render_field_image_round($node, $field_config, $field_identif
   $image_url = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
   $alt = $image->alt ?: 'Profile image';
 
-  return '<img src="' . $image_url . '" alt="' . htmlspecialchars($alt) . '" class="detail-icon-image" />';
+  return '<img src="' . $image_url . '" alt="' . htmlspecialchars($alt) . '" class="detail-icon-image-squared" />';
 
 }
 
@@ -340,14 +408,14 @@ function teasearch_render_field_systemdate($node, $field_config, $field_identifi
 
   // Formatta le date in base alla lingua
   if ($current_language === 'it') {
-    $created_formatted = date('d/m/Y', $created);
-    $changed_formatted = date('d/m/Y', $changed);
+    $created_formatted = date('Y-m-d', $created);
+    $changed_formatted = date('Y-m-d', $changed);
 
     return 'Data creazione: ' . $created_formatted . ' – Ultimo aggiornamento: ' . $changed_formatted;
   } else {
     // Inglese (default)
-    $created_formatted = date('d/m/Y', $created);
-    $changed_formatted = date('d/m/Y', $changed);
+    $created_formatted = date('Y-m-d', $created);
+    $changed_formatted = date('Y-m-d', $changed);
 
     return 'First created on: ' . $created_formatted . ' – Last updated on: ' . $changed_formatted;
   }
@@ -937,7 +1005,7 @@ function teasearch_build_contribution($node, $content_type, $role, $language)
     }
     $parts[] = $title_string;
   } elseif ($title_translated) {
-    $parts[] = "[".$title_translated."]";
+    $parts[] = "[" . $title_translated . "]";
   }
 
   // 2. AUTORI (se il paragraph field esiste per questo content type)
@@ -970,17 +1038,18 @@ function teasearch_build_contribution($node, $content_type, $role, $language)
 /**
  * Helper: Recupera il titolo per il sorting.
  */
-function teasearch_get_contribution_title_for_sort($node) {
+function teasearch_get_contribution_title_for_sort($node)
+{
   $title = $node->getTitle();
-  
+
   if (!empty($title)) {
     return $title;
   }
-  
+
   if ($node->hasField('field_title_translated') && !$node->get('field_title_translated')->isEmpty()) {
     return $node->get('field_title_translated')->value;
   }
-  
+
   return '';
 }
 
@@ -1610,29 +1679,54 @@ function teasearch_get_person_display_name($node)
 
 
 /**
- * TYPE: journal_name
+ * TYPE: project_name
  * Combina field_journal e field_journal_latin con puntino catalano.
  */
-function teasearch_render_field_journal_name($node, $field_config, $field_identifier)
+function teasearch_render_field_project_name($node, $field_config, $field_identifier)
 {
-  $journal = teasearch_get_field_value($node, 'field_journal');
-  $journal_latin = teasearch_get_field_value($node, 'field_journal_latin');
 
-  $journal_value = $journal && !$journal->isEmpty() ? $journal->value : '';
-  $journal_latin_value = $journal_latin && !$journal_latin->isEmpty() ? $journal_latin->value : '';
+  // 1. CHECK FILTRO (se presente nelle options)
+  if (isset($field_config['options']['filter'])) {
+    list($filter_field, $filter_value) = $field_config['options']['filter'];
+
+    // Controlla se il nodo ha il campo filtro
+    if ($node->hasField($filter_field)) {
+      $field_filter = $node->get($filter_field);
+
+      if ($field_filter->isEmpty()) {
+        return NULL; // Campo filtro vuoto = non mostrare
+      }
+
+      // Ottieni il valore del campo filtro
+      $current_value = $field_filter->value;
+
+      // Se non corrisponde al valore richiesto, non mostrare
+      if ($current_value !== $filter_value) {
+        return NULL;
+      }
+    } else {
+      return NULL; // Campo filtro non esiste = non mostrare
+    }
+  }
+
+  $pub_title = teasearch_get_field_value($node, 'field_pub_title');
+  $pub_title_latin = teasearch_get_field_value($node, 'field_pub_title_latin');
+
+  $pub_value = $pub_title && !$pub_title->isEmpty() ? $pub_title->value : '';
+  $pub_latin_value = $pub_title_latin && !$pub_title_latin->isEmpty() ? $pub_title_latin->value : '';
 
   // Entrambi presenti: unisci con puntino catalano
-  if (!empty($journal_value) && !empty($journal_latin_value)) {
-    return $journal_value . ' · ' . $journal_latin_value;
+  if (!empty($pub_value) && !empty($pub_latin_value)) {
+    return $pub_value . ' · ' . $pub_latin_value;
   }
 
   // Solo uno dei due
-  if (!empty($journal_value)) {
-    return $journal_value;
+  if (!empty($pub_value)) {
+    return $pub_value;
   }
 
-  if (!empty($journal_latin_value)) {
-    return $journal_latin_value;
+  if (!empty($pub_latin_value)) {
+    return $pub_latin_value;
   }
 
   return NULL;
@@ -1657,7 +1751,7 @@ function teasearch_render_field_vol_issue($node, $field_config, $field_identifie
   }
 
   if (!empty($issues_value)) {
-    $parts[] = $issues_value;
+    $parts[] = "(".$issues_value.")";
   }
 
   return !empty($parts) ? implode(' ', $parts) : NULL;
@@ -1678,6 +1772,16 @@ function teasearch_render_field_vol_issue($node, $field_config, $field_identifie
  * - Display: hanging indent
  * - Linked to related pages
  */
+/**
+ * TYPE: curated_references
+ * Renderizza field_curated_references (entity reference a Bibliography) secondo BOX-1 template.
+ * 
+ * BOX-1 template:
+ * - Formato: AUTHOR_NAME + (YEAR) + TITLE
+ * - Mostra tutti gli autori se 1-2, oppure "primo et al." se 3+
+ * - Se editor: aggiunge (ed.) o (a cura di) dopo gli autori
+ * - Sorting: per SURNAME (LATIN) primo autore, poi per YEAR
+ */
 function teasearch_render_field_curated_references($node, $field_config, $field_identifier)
 {
   $field_name = $field_config['field'] ?? 'field_curated_references';
@@ -1686,6 +1790,9 @@ function teasearch_render_field_curated_references($node, $field_config, $field_
   if (!$field || $field->isEmpty()) {
     return NULL;
   }
+
+  // Separatore nomi autori (configurabile)
+  $authors_separator = $field_config['options']['authors_separator'] ?? '; ';
 
   $references_data = [];
   $seen_surnames = [];
@@ -1708,23 +1815,104 @@ function teasearch_render_field_curated_references($node, $field_config, $field_
       $bib_node = $bib_node->getTranslation($current_language);
     }
 
+    // DEBUG: Verifica field_is_editor
+    \Drupal::logger('teasearch')->notice('Bibliography node ID: @nid, Title: @title', [
+      '@nid' => $bib_node->id(),
+      '@title' => $bib_node->getTitle(),
+    ]);
+
+    if ($bib_node->hasField('field_is_editor')) {
+      $is_editor_field = $bib_node->get('field_is_editor');
+      \Drupal::logger('teasearch')->notice('field_is_editor exists. IsEmpty: @empty, Value: @value', [
+        '@empty' => $is_editor_field->isEmpty() ? 'YES' : 'NO',
+        '@value' => !$is_editor_field->isEmpty() ? ($is_editor_field->value ? 'TRUE' : 'FALSE') : 'N/A',
+      ]);
+    } else {
+      \Drupal::logger('teasearch')->notice('field_is_editor DOES NOT EXIST on this node');
+    }
+
     // Costruisci la citazione secondo BOX-1
     $citation_parts = [];
 
-    // 1. AUTHOR NAME (dal primo autore di field_responsibles)
-    $first_author_data = teasearch_get_first_author_for_citation($bib_node);
-    if ($first_author_data) {
-      $author_string = $first_author_data['formatted_name'];
-      $surname_latin = $first_author_data['surname_latin'];
+    // 1. AUTHORS (da field_responsibles)
+    $first_surname = '';
+    if ($bib_node->hasField('field_responsibles')) {
+      $authors_field = $bib_node->get('field_responsibles');
 
-      // Check se il cognome è duplicato
-      if (isset($seen_surnames[$surname_latin])) {
-        $author_string .= ', et al.';
-      } else {
-        $seen_surnames[$surname_latin] = true;
+      if (!$authors_field->isEmpty()) {
+        $all_authors = [];
+
+        foreach ($authors_field as $paragraph_item) {
+          $paragraph = $paragraph_item->entity;
+          if (!$paragraph) {
+            continue;
+          }
+
+          // Recupera i campi
+          $surname_first = $paragraph->get('field_surname_first')->value ?? FALSE;
+          $lastname_latin = $paragraph->get('field_lastname')->value ?? '';
+          $firstname_latin = $paragraph->get('field_firstname')->value ?? '';
+          $fullname = $paragraph->get('field_fullname')->value ?? '';
+
+          // Formatta l'autore
+          $author_parts = [];
+          if ($surname_first) {
+            if (!empty($lastname_latin))
+              $author_parts[] = $lastname_latin;
+            if (!empty($firstname_latin))
+              $author_parts[] = $firstname_latin;
+            if (!empty($fullname))
+              $author_parts[] = $fullname;
+          } else {
+            if (!empty($lastname_latin) && !empty($firstname_latin)) {
+              $author_parts[] = $lastname_latin . ',';
+              $author_parts[] = $firstname_latin;
+            } elseif (!empty($lastname_latin)) {
+              $author_parts[] = $lastname_latin;
+            } elseif (!empty($firstname_latin)) {
+              $author_parts[] = $firstname_latin;
+            }
+            if (!empty($fullname))
+              $author_parts[] = $fullname;
+          }
+
+          if (!empty($author_parts)) {
+            $all_authors[] = implode(' ', $author_parts);
+            if (empty($first_surname)) {
+              $first_surname = $lastname_latin;
+            }
+          }
+        }
+
+        $authors_count = count($all_authors);
+        if ($authors_count > 0) {
+          if ($authors_count >= 3) {
+            $author_string = $all_authors[0] . ' et al.';
+          } else {
+            $author_string = implode($authors_separator, $all_authors);
+          }
+
+          // Check se il NODO bibliography ha field_is_editor
+          if ($bib_node->hasField('field_is_editor') && !$bib_node->get('field_is_editor')->isEmpty()) {
+            $is_editor = $bib_node->get('field_is_editor')->value;
+            if ($is_editor) {
+              $editor_label = $current_language === 'it' ? ' (a cura di)' : ' (ed.)';
+              $author_string .= $editor_label;
+            }
+          }
+
+          $citation_parts[] = $author_string;
+
+          // Check duplicazione cognome
+          if (isset($seen_surnames[$first_surname])) {
+            if ($authors_count < 3 && strpos($citation_parts[0], 'et al.') === false) {
+              $citation_parts[0] .= ', et al.';
+            }
+          } else {
+            $seen_surnames[$first_surname] = true;
+          }
+        }
       }
-
-      $citation_parts[] = $author_string;
     }
 
     // 2. (YEAR)
@@ -1741,23 +1929,17 @@ function teasearch_render_field_curated_references($node, $field_config, $field_
     if (!empty($main_title)) {
       $title_parts[] = $main_title;
     }
-
     $title_original_field = $bib_node->get('field_title_original');
     if (!$title_original_field->isEmpty()) {
       $title_parts[] = $title_original_field->value;
     }
-
-    $full_title = '';
     if (!empty($title_parts)) {
-      $full_title = implode(' ', $title_parts);
-      $citation_parts[] = $full_title;
+      $citation_parts[] = implode(' ', $title_parts);
     }
 
     // Costruisci la citazione completa (link)
     if (!empty($citation_parts)) {
       $citation_text = implode(' ', $citation_parts);
-
-      // Link alla pagina del nodo
       $url = $bib_node->toUrl()->toString();
       $citation_html = '<a href="' . htmlspecialchars($url) . '">' . htmlspecialchars($citation_text) . '</a>';
 
@@ -1770,7 +1952,7 @@ function teasearch_render_field_curated_references($node, $field_config, $field_
       // Salva per sorting
       $references_data[] = [
         'citation' => $citation_html,
-        'surname' => $first_author_data['surname_latin'] ?? '',
+        'surname' => $first_surname,
         'year' => $year,
       ];
     }
@@ -1794,7 +1976,6 @@ function teasearch_render_field_curated_references($node, $field_config, $field_
     return $item['citation'];
   }, $references_data);
 
-  // Restituisci con <br> e aggiungi classe CSS per hanging indent
   return '<div>' . implode('<br>', $citations) . '</div>';
 }
 
@@ -2019,7 +2200,7 @@ function teasearch_render_field_teasearch_references($node, $field_config, $fiel
     // Intestazione categoria (maiuscolo, più piccola)
     $category_label = $category_labels[$content_type][$current_language] ?? $category_labels[$content_type]['en'];
     $section_html = '<div >';
-    
+
 
     // Citazioni
     $citations = array_map(function ($item) {
@@ -2471,7 +2652,7 @@ function teasearch_get_first_author_for_citation_universal($node, $content_type)
   $lastname_latin = '';
   if ($paragraph->hasField('field_lastname') && !$paragraph->get('field_lastname_latin')->isEmpty()) {
     $lastname_latin = $paragraph->get('field_lastname')->value;
-  } 
+  }
 
   // Nome: prova field_firstname_latin, poi field_firstname
   $firstname_latin = '';
@@ -2594,7 +2775,7 @@ function teasearch_render_field_texts_title($node, $field_config, $field_identif
 
   $title_original = $title_original_field && !$title_original_field->isEmpty()
     ? $title_original_field->value
-    : ''; 
+    : '';
 
   $title_translated = $title_translated_field && !$title_translated_field->isEmpty()
     ? $title_translated_field->value
@@ -2659,12 +2840,12 @@ function teasearch_render_field_bibliography_icon($node, $field_config, $field_i
 
   // 3) Path nel tema attivo
   $active_theme_path = \Drupal::theme()->getActiveTheme()->getPath(); // es. 'themes/custom/teasearch'
-  $icons_dir_rel    = $active_theme_path . '/images/bibicons';
-  $icon_file        = $icon_name . '.png';
+  $icons_dir_rel = $active_theme_path . '/images/bibicons';
+  $icon_file = $icon_name . '.png';
 
   // 4) Verifica esistenza file e fallback a default.png
-  $fs_icon  = DRUPAL_ROOT . '/' . $icons_dir_rel . '/' . $icon_file;
-  $fs_def   = DRUPAL_ROOT . '/' . $icons_dir_rel . '/default.png';
+  $fs_icon = DRUPAL_ROOT . '/' . $icons_dir_rel . '/' . $icon_file;
+  $fs_def = DRUPAL_ROOT . '/' . $icons_dir_rel . '/default.png';
   $use_file = file_exists($fs_icon) ? $icon_file : (file_exists($fs_def) ? 'default.png' : $icon_file);
 
   $web_icon = base_path() . $icons_dir_rel . '/' . $use_file;
@@ -2676,18 +2857,18 @@ function teasearch_render_field_bibliography_icon($node, $field_config, $field_i
     \Drupal::logger('teasearch_filter')->notice(
       'BIB ICON DEBUG → term: @tid (@name) | icon_name: @icon | fs: @fs | exists: @ex | web: @web',
       [
-        '@tid'  => $term->id(),
+        '@tid' => $term->id(),
         '@name' => $term->label(),
         '@icon' => $icon_name,
-        '@fs'   => $fs_icon,
-        '@ex'   => file_exists($fs_icon) ? 'YES' : 'NO',
-        '@web'  => $web_icon,
+        '@fs' => $fs_icon,
+        '@ex' => file_exists($fs_icon) ? 'YES' : 'NO',
+        '@web' => $web_icon,
       ]
     );
   }
 
   // 6) Output <img>
-  $alt   = 'Bibliography icon';
+  $alt = 'Bibliography icon';
   $title = 'Using: bibliography_icon';
 
   return '<img src="' . htmlspecialchars($web_icon, ENT_QUOTES, 'UTF-8') . '"'
@@ -2753,7 +2934,7 @@ function teasearch_format_single_author_from_general($paragraph, $language)
       $latin_name .= mb_strtoupper($lastname, 'UTF-8');
     }
     if (!empty($firstname)) {
-      $latin_name .= ' '. $firstname ;
+      $latin_name .= ' ' . $firstname;
     }
   } else {
     // SURNAME_FIRST = false
@@ -2853,6 +3034,7 @@ function teasearch_render_field_authors_general($node, $field_config, $field_ide
 {
   $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
   $additional_label = "";
+  
   // ========================================================================
   // STEP 1: Controlla field_anonymous (a livello nodo)
   // ========================================================================
@@ -2868,21 +3050,23 @@ function teasearch_render_field_authors_general($node, $field_config, $field_ide
   // STEP 1.1: Controlla field_is_editor (a livello nodo)
   // ========================================================================
   $additional_label = "";
-  if ($node->hasField('field_is_editor')) {
+  $skip_editor_label = $field_config['options']['no_editor_label'] ?? false;
+
+  if (!$skip_editor_label && $node->hasField('field_is_editor')) {
     $editor_field = $node->get('field_is_editor');
     if (!$editor_field->isEmpty() && $editor_field->value) {
-       $additional_label.= $current_language === 'it' ? ' (a cura di) ' : ' (ed.) ';
+      $additional_label .= $current_language === 'it' ? ' (a cura di) ' : ' (ed.) ';
     }
   }
 
   // ========================================================================
   // STEP 1.2 Controlla field_is_editor (a livello nodo)
   // ========================================================================
-  $additional_label = "";
+
   if ($node->hasField('field_is_translator')) {
     $editor_field = $node->get('field_is_translator');
     if (!$editor_field->isEmpty() && $editor_field->value) {
-       $additional_label.= $current_language === 'it' ? ' (tradotto da)' : ' (trans.)';
+      $additional_label .= $current_language === 'it' ? ' (tradotto da)' : ' (trans.)';
     }
   }
 
@@ -2928,7 +3112,7 @@ function teasearch_render_field_authors_general($node, $field_config, $field_ide
     }
 
     // Formatta l'autore usando l'helper
-    $formatted_author = teasearch_format_single_author_from_general($paragraph, $current_language).$additional_label;
+    $formatted_author = teasearch_format_single_author_from_general($paragraph, $current_language);
 
     if ($formatted_author) {
       // Se attributed = true, aggiungi il testo dopo ogni autore
@@ -2947,7 +3131,13 @@ function teasearch_render_field_authors_general($node, $field_config, $field_ide
     return null;
   }
 
-  return implode(', ', $formatted_authors);
+  $final_string =  implode(', ', $formatted_authors);
+
+  if ($additional_label) {
+    $final_string .= $additional_label;
+  }
+
+  return $final_string;
 }
 
 // ============================================================================
@@ -3192,7 +3382,7 @@ function teasearch_render_field_image($node, $field_config, $field_identifier)
   if ($show_icon) {
     $theme_path = \Drupal::service('extension.list.theme')->getPath('teasearch');
     $lente_url = base_path() . $theme_path . '/images/mediaicons/image.svg';
-    $html .= '<div class="detail-image-icon"><img  src="'.$lente_url.'"></div>';
+    $html .= '<div class="detail-image-icon"><img  src="' . $lente_url . '"></div>';
   }
 
   $html .= '</div>';
@@ -3305,16 +3495,16 @@ function teasearch_render_field_video($node, $field_config, $field_identifier)
 
   if ($mode === 'inline') {
     $html = '<div class="detail-video-container detail-video-inline" id="' . $video_id . '">';
-    
+
     // Thumbnail con play button
     $html .= '<div class="detail-video-thumbnail" data-video-id="' . $video_id . '" data-youtube-code="' . htmlspecialchars($youtube_code) . '">';
     $html .= '<img src="' . htmlspecialchars($thumbnail_url) . '" alt="Video thumbnail" class="detail-video-thumbnail-img" />';
     $html .= '<div class="detail-video-play-button">' . $videoimg . '</div>';
     $html .= '</div>';
-    
+
     // Placeholder per iframe (nascosto inizialmente)
     $html .= '<div class="detail-video-player detail-video-hidden" ></div>';
-    
+
     $html .= '</div>';
 
     return [
@@ -3330,7 +3520,7 @@ function teasearch_render_field_video($node, $field_config, $field_identifier)
   // ========================================================================
   else {
     $html = '<div class="detail-video-container detail-video-popup" id="' . $video_id . '">';
-    
+
     // Thumbnail con play button
     $html .= '<div class="detail-video-thumbnail" data-video-popup="' . $video_id . '" data-youtube-code="' . htmlspecialchars($youtube_code) . '">';
     $html .= '<img src="' . htmlspecialchars($thumbnail_url) . '" alt="Video thumbnail" class="detail-video-thumbnail-img" />';
@@ -3341,7 +3531,7 @@ function teasearch_render_field_video($node, $field_config, $field_identifier)
     $html .= '</svg>';
     $html .= '</div>';
     $html .= '</div>';
-    
+
     $html .= '</div>';
 
     return [
@@ -3443,7 +3633,7 @@ function teasearch_render_field_pdf($node, $field_config, $field_identifier)
   // Recupera field_portion_of_work (opzionale)
   // ========================================================================
   $portion_text = '';
-  
+
   $portion_field = teasearch_get_field_value($node, $portion_field_name);
   if ($portion_field && !$portion_field->isEmpty() && $portion_field->value) {
     $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
@@ -3467,7 +3657,7 @@ function teasearch_render_field_pdf($node, $field_config, $field_identifier)
   // Costruisce HTML
   // ========================================================================
   $html = '<div class="detail-pdf-wrapper">';
-  $html.= '<div class="detail-pdf-container">';
+  $html .= '<div class="detail-pdf-container">';
 
   // Link wrapper che apre il PDF
   $html .= '<a href="' . htmlspecialchars($pdf_file_url) . '" target="_blank" rel="noopener" class="detail-pdf-link">';
@@ -3500,7 +3690,7 @@ function teasearch_render_field_pdf($node, $field_config, $field_identifier)
   // ========================================================================
 
   return [
-    '#markup' => Markup::create( $html),
+    '#markup' => Markup::create($html),
   ];
 }
 

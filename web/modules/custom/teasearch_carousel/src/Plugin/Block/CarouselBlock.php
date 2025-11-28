@@ -34,7 +34,7 @@ class CarouselBlock extends BlockBase
             <div class="swiper-button-next"></div>
           </div>
           <div class="carousel-view-all-wrapper">
-            <a href="http://mantrex-dev/'.$view_all_url.'" class="carousel-view-all-btn" id="carousel-view-all">' . $this->t('View All') . '</a>
+            <a href="'.$view_all_url.'" class="carousel-view-all-btn" id="carousel-view-all">' . $this->t('View All') . '</a>
           </div>
         </div>
       ',
