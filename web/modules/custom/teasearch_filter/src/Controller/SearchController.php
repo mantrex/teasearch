@@ -449,6 +449,9 @@ class SearchController extends ControllerBase
   /**
    * Apply year range filtering.
    */
+  /**
+   * Apply year range filtering.
+   */
   private function applyYearRangeFiltering($query, $filters, Request $request)
   {
     $from_field = null;
@@ -471,16 +474,31 @@ class SearchController extends ControllerBase
       return;
     }
 
+    // Ottieni i valori dalla request
     $year_from = $request->query->get('year_from');
     $year_to = $request->query->get('year_to');
 
+    // CRITICAL: Pulisci e valida i valori
+    // Converti stringhe vuote a null
+    if (is_string($year_from)) {
+      $year_from = trim($year_from);
+      $year_from = ($year_from === '') ? null : $year_from;
+    }
+
+    if (is_string($year_to)) {
+      $year_to = trim($year_to);
+      $year_to = ($year_to === '') ? null : $year_to;
+    }
+
+    // Se ENTRAMBI sono null o vuoti, non applicare alcun filtro
     if ($year_from === null && $year_to === null) {
       return;
     }
 
+    // Applica il filtro solo se almeno uno dei due valori è presente
     $this->applyNodeYearRangeFilter($query, $from_field, $to_field, $year_from, $year_to);
   }
-
+  
   /**
    * Apply year range filter to node query.
    */

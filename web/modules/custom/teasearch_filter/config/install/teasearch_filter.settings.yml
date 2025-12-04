@@ -16,6 +16,26 @@ content_types:
         type: taxonomy
         vocabulary: subjects
         label: 'Subjects'
+      country2:
+        type: taxonomy
+        vocabulary: countries
+        label: 'Geographical focus'
+      text_genres:
+        type: taxonomy
+        vocabulary: text_genres
+        label: 'Genres'
+      language:
+        type: taxonomy
+        vocabulary: languages
+        label: 'Languages'
+      country:
+        type: taxonomy
+        vocabulary: countries
+        label: 'Country'
+      text_types:
+        type: taxonomy
+        vocabulary: text_types
+        label: 'Text Types'
       century_selector:
         from: field_year_range.year_from
         to: field_year_range.year_to
@@ -29,9 +49,14 @@ content_types:
       subfield: field_short_description
       image: field_square_thumbnail
     filters:
-      keywords:
-        type: free_text
-        label: 'Keywords'
+      subjects:
+        type: taxonomy
+        vocabulary: subjects
+        label: 'Subjects'
+      country2:
+        type: taxonomy
+        vocabulary: countries
+        label: 'Geographical focus'
   video:
     machine_name: videos
     type: node
@@ -41,13 +66,26 @@ content_types:
       image: field_square_thumbnail
       altimage: field_main_image
     filters:
-      categories:
+      subjects:
         type: taxonomy
-        vocabulary: video_categories
+        vocabulary: subjects
+        label: 'Subjects'
+      country2:
+        type: taxonomy
+        vocabulary: countries
+        label: 'Geographical focus'
+      text_genres:
+        type: taxonomy
+        vocabulary: video_genres
         label: 'Video categories'
-      keywords:
+      language:
+        type: taxonomy
+        vocabulary: languages
+        label: 'Languages'
+      year:
         type: free_text
-        label: 'Keywords'
+        label: 'Year'
+
   images:
     machine_name: images
     type: node
@@ -57,13 +95,26 @@ content_types:
       image: field_square_thumbnail
       altimage: field_main_image
     filters:
-      categories:
+      subjects:
         type: taxonomy
-        vocabulary: image_categories
+        vocabulary: subjects
+        label: 'Subjects'
+      country2:
+        type: taxonomy
+        vocabulary: countries
+        label: 'Geographical focus'
+      image_category:
+        type: taxonomy
+        vocabulary: image_formats
         label: 'Image categories'
-      keywords:
-        type: free_text
-        label: 'Keywords'
+      country:
+        type: taxonomy
+        vocabulary: countries
+        label: 'Country'
+      usage_rights:
+        type: taxonomy
+        vocabulary: usage_rights
+        label: 'Usage Rights'
       century_selector:
         from: field_year_range.year_from
         to: field_year_range.year_to
@@ -79,17 +130,27 @@ content_types:
       function: format_people_display
       image: field_avatar
     filters:
-      skills:
+      subjects:
         type: taxonomy
-        vocabulary: skills
-        label: 'Skills'
-      location:
+        vocabulary: subjects
+        label: 'Subjects'
+      country2:
         type: taxonomy
-        vocabulary: location
-        label: 'Location'
-      keywords:
-        type: free_text
-        label: 'Keywords'
+        vocabulary: countries
+        label: 'Geographical focus'
+      activities:
+        type: taxonomy
+        vocabulary: activities
+        label: 'Tea Related Activities'
+      language:
+        type: taxonomy
+        vocabulary: languages
+        label: 'Languages'
+      country:
+        type: taxonomy
+        vocabulary: countries
+        label: 'Country'
+
   bibliography:
     machine_name: bibliography
     results:
@@ -101,6 +162,21 @@ content_types:
         type: taxonomy
         vocabulary: subjects
         label: 'Subjects'
+      country2:
+        type: taxonomy
+        vocabulary: countries
+        label: 'Geographical focus'
+      pubtype:
+        type: taxonomy
+        vocabulary: publication_types
+        label: 'Publication Types'
+      language:
+        type: taxonomy
+        vocabulary: languages
+        label: 'Languages'
+      year:
+        type: free_text
+        label: 'Year'
 
   # Esempio per cercare direttamente negli utenti
 #  users:

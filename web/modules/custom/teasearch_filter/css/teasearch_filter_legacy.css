@@ -367,6 +367,7 @@
   
   .no-results-actions .btn {
     min-width: 150px;
+    background: var(--actions-button);
   }
   
   /* Details State */

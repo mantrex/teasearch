@@ -208,7 +208,7 @@ function teasearch_get_detail_schemas()
         "type" => "location",
         "label" => "Location",
       ],
-      "field_country_single" => [
+      "field_country" => [
         "label" => "Country",
       ],
       "field_email" => [
@@ -396,6 +396,9 @@ function teasearch_get_detail_schemas()
       'field_publisher' => [
         'label' => 'Publisher',
       ],
+      "field_country" => [
+        "label" => "Country"
+      ],
       "field_doi" => [
         "label" => "DOI",
       ],
@@ -454,9 +457,6 @@ function teasearch_get_detail_schemas()
       "field_degree" => [
         "label" => "Degree",
       ],
-      "field_notes" => [
-        "label" => "Degree",
-      ],
       "paragraph2" => "Access Information",
 
       "field_texts_reference" => [
@@ -466,8 +466,12 @@ function teasearch_get_detail_schemas()
         "label" => "Online Access",
       ],
       "field_access_type" => [
-        "label" => "Type",
+        "label" => "Access Type",
       ],
+      "field_notes" => [
+        "label" => "Notes",
+      ],
+
       "field_online_links2" => [
         "label" => "Additional Online Access",
       ],
@@ -502,7 +506,7 @@ function teasearch_get_detail_schemas()
       "field_subjects" => [
         "label" => "Subjects"
       ],
-      "field_country" => [
+      "field_country2" => [
         "label" => "Geographic focus"
       ],
       "field_keywords" => [

@@ -1,5 +1,5 @@
 :root {
-  --body-bg: #ede8e2;
+  --body-bg: #f5f2ee;
   --body-text: #2b2727;
   --top-bar: #45392e; /* barra top con le lingue */
   --top-bar-bottom: #332a22; /* bordo marrone inferiore alla top-bar */
@@ -28,8 +28,9 @@
   --item-link-hover: #55721c;
   --block-borderline: #efefef; /* linee separatrici molto chiare */
   --about-title: #533f3a; /* sottotitoli about */
-  --filter-group-hover: #e1ebc6; /* appoggio il mouse sull'area filtri*/
-  --filter-group-open: #e4efca; /* apro l'area filtri */
+  --filter-group-hover:#e4efca; /* appoggio il mouse sull'area filtri*/
+  --filter-group-open:#cbdd9e;  /* apro l'area filtri */
+  --filter-group-close: #dde5c5; /* chiudo l'area filtri */
   --filter-actions: #d5d0cb; /* alla base dell'area filtri dove ci sono i bottoni */
   --actions-button: #628320; /* tutti i tasti */
   --actions-button-hover: #6b8e23; /* tutti i tasti hover */

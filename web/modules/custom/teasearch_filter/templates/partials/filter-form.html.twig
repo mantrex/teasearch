@@ -8,7 +8,7 @@
 <div class='element-title'>
   Filters
 </div>
-<div class="teasearch-filters">
+<div class="teasearch-filters" data-content-type="{{ content_type }}"> 
   <form method="get" class="teasearch-filter-form">
     <input type="hidden" name="content_type" value="{{ content_type }}">
 
@@ -39,7 +39,7 @@
                   </label>
                 {% endfor %}
               {% else %}
-                <input type="text" name="{{ field_name }}" class="filter-input" value="{{ filter.selected|default('') }}" placeholder="{{ 'Enter keywords...'|t }}">
+                <input type="text" name="{{ field_name }}" class="filter-input" value="{{ filter.selected|default('') }}" placeholder="{{ 'Enter value...'|t }}">
                 {% endif %}
               </div>
             </details>
@@ -48,7 +48,7 @@
           {# Special century selector - appears at the end #}
           {# Century selector - appears if configured #}
           {% if century_data and century_data.enabled %}
-            {% include 'modules/custom/teasearch_filter/templates/partials/filter-form-century.html.twig' with {
+            {% include 'modules/custom/teasearch_filter/templates/partials/filter-form-century-easy.html.twig' with {
 				'content_type': content_type,
 				'century_data': century_data
 			} %}

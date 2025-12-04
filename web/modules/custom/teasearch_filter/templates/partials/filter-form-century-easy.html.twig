@@ -1,0 +1,45 @@
+{#
+/**
+ * @file
+ * Year range filter - simplified version without century selector.
+ *
+ * Variables:
+ * - content_type: Current content type
+ * - century_data: Century configuration and data
+ */
+#}
+
+{% if century_data and century_data.enabled %}
+<details class="filter-group century-filter" data-name="century_selector">
+  <summary class="filter-title">
+    {{ 'Date Range'|t }}
+    {% if century_data.selected_from or century_data.selected_to %}
+    <span class="filter-badge">1</span>
+    {% endif %}
+  </summary>
+
+  <div class="filter-content">
+    <div class="year-inputs" style="display: flex; gap: 1rem; flex-direction: column;">
+      <div style="display: flex; gap: 0.5rem;">
+        <div class="year-input-group" style="flex: 1;">
+          <label for="year_from" class="form-label">
+            {{ 'From'|t }}
+          </label>
+          <input type="number" id="year_from" name="year_from" class="form-control" value="{{ century_data.selected_from|default('') }}" placeholder="{{ 'e.g. -500'|t }}">
+        </div>
+        
+        <div class="year-input-group" style="flex: 1;">
+          <label for="year_to" class="form-label">
+            {{ 'To'|t }}
+          </label>
+          <input type="number" id="year_to" name="year_to" class="form-control" value="{{ century_data.selected_to|default('') }}" placeholder="{{ 'e.g. 500'|t }}">
+        </div>
+      </div>
+      
+      <small class="form-text text-muted">
+        {{ 'Negative = BCE, Positive = CE'|t }}
+      </small>
+    </div>
+  </div>
+</details>
+{% endif %}

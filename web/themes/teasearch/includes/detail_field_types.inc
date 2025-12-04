@@ -2912,12 +2912,23 @@ function teasearch_format_single_author_from_general($paragraph, $language)
       }
     }
 
-    // Per organizzazioni: NO pseudonym, NO dates
     if (empty($parts)) {
       return null;
     }
 
-    return implode('', $parts);
+    $result = implode('', $parts);
+
+    // Aggiungi PSEUDONYM in parentesi se presente (anche per organizzazioni)
+    if (!empty($pseudonym)) {
+      $result .= ' (' . $pseudonym . ')';
+    }
+
+    // Aggiungi DATE in parentesi se presente (anche per organizzazioni)
+    if (!empty($dates)) {
+      $result .= ' (' . $dates . ')';
+    }
+
+    return $result;
   }
 
   // ========================================================================

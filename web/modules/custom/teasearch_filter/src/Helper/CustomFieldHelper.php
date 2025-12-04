@@ -1305,6 +1305,7 @@ class CustomFieldHelper
                 if (!empty($field_fullname)) {
                   $author_name_parts[] = $field_fullname;
                 }
+                
               } else {
                 // PERSON
                 if ($field_surname_first) {

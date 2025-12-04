@@ -12,7 +12,7 @@
 {% if century_data and century_data.enabled %}
 	<details	class="filter-group century-filter"	data-name="century_selector">
 		<summary	class="filter-title">
-			{{ 'Century Range'|t }}
+			{{ 'Date Range'|t }}
 			{% if century_data.selected_from or century_data.selected_to %}
 				<span	class="filter-badge">
 					1
@@ -83,11 +83,13 @@
 						</div>
 
 						{# Toggle Link #}
+						
 						<div	class="century-toggle">
 							<a	href="#"	id="toggle-details"	onclick="toggleCenturyMode(event)">
 								{{ 'set details'|t }}
 							</a>
 						</div>
+						
 
 						{# Hidden inputs for form submission #}
 						<input	type="hidden"	id="hidden_year_from"	name="year_from"	value="{{ century_data.selected_from|default('') }}">

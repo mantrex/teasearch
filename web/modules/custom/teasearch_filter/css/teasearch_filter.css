@@ -309,6 +309,7 @@
     color: var(--body-text);
     line-height: 1.4;
     margin-bottom: 0.75rem;
+    margin-right:0.75rem;
     flex: 1;
   }
   
@@ -354,7 +355,12 @@
   details[open] .filter-title {
     background: var(--filter-group-open);
   }
-  
+  details:not([open]) .filter-title {
+    background: var(--filter-group-close);
+   }
+    details[open] .filter-title:hover {
+      background: var(--filter-group-hover);
+    }
   /* Focus States */
   .filter-title:focus,
   .filter-option:focus,
@@ -426,8 +432,14 @@
   
   .no-results-actions .btn {
     min-width: 150px;
+    background: var(--actions-button);
+    color:var(--light);
   }
-  
+    .no-results-actions .btn:hover {
+      min-width: 150px;
+      background: var(--actions-button-hover);
+      color: var(--light);
+    }
   /* ============================================================================= 
      RESPONSIVE DESIGN
      ============================================================================= */
@@ -523,22 +535,4 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-}
-
-  /* Stile specifico per le icone bibliografia */
-.entity-image.bibliography-icon {
-  display:block;
-  width: 100px !important;  /* Ridimensiona come preferisci */
-  height: 100px !important;
-  object-fit: contain;     /* Mantiene le proporzioni */
-  border-radius: 4px;      /* Angoli leggermente arrotondati */
-  background-color: #f5f5f5; /* Sfondo grigio chiaro opzionale */
-  padding: 8px;  
-  margin-top:8px;          /* Padding interno opzionale */
-  border: 1px solid #e0e0e0; /* Bordo opzionale */
-}
-
-/* Oppure se vuoi mantenere la forma quadrata standard */
-.entity-image.bibliography-icon.rounded {
-  border-radius: 4px; /* Sovrascrive il rounded di default */
 }
