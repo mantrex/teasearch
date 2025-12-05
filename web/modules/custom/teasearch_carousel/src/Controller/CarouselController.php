@@ -55,8 +55,11 @@ class CarouselController
       'order' => 'news_first',
       'max' => 10,
       'valid_content_types' => [
-        'texts'  => ['title' => 'title',            'image' => 'field_main_image'],
-        'images' => ['title' => 'title',            'image' => 'field_main_image'],
+        'first_reference' => ['title' => 'title', 'image' => 'field_square_thumbnail'], // Essentials
+        'primary_sources' => ['title' => 'title', 'image' => 'field_main_image'], // Texts
+        'images' => ['title' => 'title', 'image' => 'field_main_image'],
+        'videos' => ['title' => 'title', 'image' => 'field_main_image'],
+        'people' => ['title' => 'title', 'image' => 'field_avatar'],
       ],
       'news_image_candidates' => ['field_main_image', 'field_image'],
       'image_style' => 'large',
@@ -68,9 +71,9 @@ class CarouselController
     $allBundles = array_merge(['news'], array_keys($config['valid_content_types']));
     $bundleLabels = $this->getBundleLabels($allBundles);
 
-    $now          = \Drupal::time()->getRequestTime();
-    $etm          = \Drupal::entityTypeManager();
-    $storage      = $etm->getStorage('node');
+    $now = \Drupal::time()->getRequestTime();
+    $etm = \Drupal::entityTypeManager();
+    $storage = $etm->getStorage('node');
     $fieldManager = \Drupal::service('entity_field.manager');
 
     // Helper inline: verifica esistenza campo.
@@ -170,63 +173,121 @@ class CarouselController
       }
 
       $news[] = [
-        'title'  => $node->label(),
-        'url'    => $node->toUrl('canonical', ['absolute' => TRUE])->toString(),
-        'image'  => $buildImageUrl($node, $imgField),
-        'date'   => $dateTs,
+        'title' => $node->label(),
+        'url' => $node->toUrl('canonical', ['absolute' => TRUE])->toString(),
+        'image' => $buildImageUrl($node, $imgField),
+        'date' => $dateTs,
         'bundle' => 'news',
-        'nid'   => $node->id(),
+        'nid' => $node->id(),
       ];
     }
 
     // ==================================
-    // 2) Altri content type (sempre on)
+// 2) Altri content type - distribuzione equa degli slot
+// ==================================
+
     // ==================================
+// 2) Altri content type - distribuzione round-robin ciclica
+// ==================================
     $others = [];
     $bundles = array_keys($config['valid_content_types']);
+
     if ($config['order'] !== 'news_only' && !empty($bundles)) {
-      $qOther = $storage->getQuery()
-        ->accessCheck(TRUE)
-        ->condition('type', $bundles, 'IN')
-        ->condition('status', 1)
-        ->sort('created', 'DESC')
-        ->sort('nid', 'DESC')
-        ->range(0, $config['max'] * 3);
+      $maxSlots = (int) $config['max'];
+      $newsCount = count($news);
+      $remainingSlots = $maxSlots - $newsCount;
 
-      $otherNids = $qOther->execute();
-      if ($otherNids) {
-        $otherNodes = $storage->loadMultiple($otherNids);
-        foreach ($otherNodes as $node) {
-          if (!$node instanceof \Drupal\node\NodeInterface) continue;
+      if ($remainingSlots > 0) {
+        // Carica un pool di elementi per ogni content type
+        $pools = [];
+        foreach ($bundles as $bundle) {
+          $qPool = $storage->getQuery()
+            ->accessCheck(TRUE)
+            ->condition('type', $bundle)
+            ->condition('status', 1)
+            ->sort('created', 'DESC')
+            ->sort('nid', 'DESC')
+            ->range(0, 20); // Pool ampio per evitare di finire elementi
 
-          $bundle = $node->bundle();
-          $map    = $config['valid_content_types'][$bundle] ?? ['title' => 'title', 'image' => null];
+          $poolNids = $qPool->execute();
 
-          $title = $node->label();
-          if (!empty($map['title']) && $node->hasField($map['title']) && !$node->get($map['title'])->isEmpty()) {
-            $title = (string) $node->get($map['title'])->value;
+          if (!empty($poolNids)) {
+            $poolNodes = $storage->loadMultiple($poolNids);
+            $pools[$bundle] = array_values($poolNodes); // Array indicizzato numericamente
+          } else {
+            $pools[$bundle] = [];
+          }
+        }
+
+        // Round-robin: cicla sui content type nell'ordine del config
+        $usedNids = []; // Traccia i NID già usati per evitare duplicati
+        $currentIndex = []; // Indice corrente per ogni bundle
+        foreach ($bundles as $bundle) {
+          $currentIndex[$bundle] = 0;
+        }
+
+        $slotsAdded = 0;
+        while ($slotsAdded < $remainingSlots) {
+          $addedInThisRound = false;
+
+          // Cicla su ogni content type in ordine
+          foreach ($bundles as $bundle) {
+            if ($slotsAdded >= $remainingSlots) {
+              break; // Raggiunto il limite di slot
+            }
+
+            // Cerca il prossimo elemento non usato da questo bundle
+            $found = false;
+            while ($currentIndex[$bundle] < count($pools[$bundle])) {
+              $node = $pools[$bundle][$currentIndex[$bundle]];
+              $nid = $node->id();
+
+              if (!in_array($nid, $usedNids)) {
+                // Elemento trovato, costruisci l'array
+                $nodeBundle = $node->bundle();
+                $map = $config['valid_content_types'][$nodeBundle] ?? ['title' => 'title', 'image' => null];
+
+                $title = $node->label();
+                if (!empty($map['title']) && $node->hasField($map['title']) && !$node->get($map['title'])->isEmpty()) {
+                  $title = (string) $node->get($map['title'])->value;
+                }
+
+                $imageUrl = $buildImageUrl($node, $map['image'] ?? null);
+
+                $others[] = [
+                  'title' => $title,
+                  'url' => $node->toUrl('canonical', ['absolute' => TRUE])->toString(),
+                  'image' => $imageUrl,
+                  'date' => $node->getCreatedTime(),
+                  'bundle' => $nodeBundle,
+                  'label' => $bundleLabels[$nodeBundle] ?? ucfirst($nodeBundle),
+                  'nid' => $nid,
+                ];
+
+                $usedNids[] = $nid;
+                $currentIndex[$bundle]++;
+                $slotsAdded++;
+                $addedInThisRound = true;
+                $found = true;
+                break;
+              }
+
+              $currentIndex[$bundle]++;
+            }
           }
 
-          $imageUrl = $buildImageUrl($node, $map['image'] ?? null);
-
-          $others[] = [
-            'title'  => $title,
-            'url'    => $node->toUrl('canonical', ['absolute' => TRUE])->toString(),
-            'image'  => $imageUrl,
-            'date'   => $node->getCreatedTime(),
-            'bundle' => $bundle,
-            'label'  => $bundleLabels[$bundle] ?? ucfirst($bundle),
-            'nid'    => $node->id(),
-          ];
+          // Se non è stato aggiunto nessun elemento in questo round, ferma il loop
+          if (!$addedInThisRound) {
+            break;
+          }
         }
       }
     }
-
     // ==========================
     // 3) Composizione / Ordinamento
     // ==========================
     $order = $config['order']; // 'random' | 'news_first' | 'news_only'
-    $max   = (int) $config['max'];
+    $max = (int) $config['max'];
 
     if ($order === 'news_only') {
       $items = array_slice($news, 0, $max);
@@ -257,9 +318,9 @@ class CarouselController
    */
   private function getBundleLabels(array $bundles): array
   {
-    $storage   = \Drupal::entityTypeManager()->getStorage('node');
-    $repo      = \Drupal::service('entity.repository');
-    $langcode  = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    $storage = \Drupal::entityTypeManager()->getStorage('node');
+    $repo = \Drupal::service('entity.repository');
+    $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
 
     $nids = $storage->getQuery()
       ->accessCheck(TRUE)
@@ -387,8 +448,11 @@ class CarouselController
 
     $config = [
       'valid_content_types' => [
-        'texts'  => ['title' => 'title', 'image' => 'field_main_image'],
+        'first_reference' => ['title' => 'title', 'image' => 'field_square_thumbnail'], // Essentials
+        'primary_sources' => ['title' => 'title', 'image' => 'field_main_image'], // Texts
         'images' => ['title' => 'title', 'image' => 'field_main_image'],
+        'videos' => ['title' => 'title', 'image' => 'field_main_image'],
+        'people' => ['title' => 'title', 'image' => 'field_avatar'],
       ],
       'news_image_candidates' => ['field_main_image', 'field_image'],
       'image_style' => 'large',
@@ -460,7 +524,8 @@ class CarouselController
 
     $news = [];
     foreach ($newsNodes as $node) {
-      if (!$node instanceof \Drupal\node\NodeInterface) continue;
+      if (!$node instanceof \Drupal\node\NodeInterface)
+        continue;
 
       $imgField = null;
       foreach ($config['news_image_candidates'] as $cand) {
@@ -506,7 +571,8 @@ class CarouselController
       if ($otherNids) {
         $otherNodes = $storage->loadMultiple($otherNids);
         foreach ($otherNodes as $node) {
-          if (!$node instanceof \Drupal\node\NodeInterface) continue;
+          if (!$node instanceof \Drupal\node\NodeInterface)
+            continue;
 
           $bundle = $node->bundle();
           $map = $config['valid_content_types'][$bundle] ?? ['title' => 'title', 'image' => null];
@@ -614,7 +680,8 @@ class CarouselController
 
     $news = [];
     foreach ($newsNodes as $node) {
-      if (!$node instanceof \Drupal\node\NodeInterface) continue;
+      if (!$node instanceof \Drupal\node\NodeInterface)
+        continue;
 
       $imgField = null;
       foreach ($config['news_image_candidates'] as $cand) {
