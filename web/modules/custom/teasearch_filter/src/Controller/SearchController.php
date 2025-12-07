@@ -5,18 +5,29 @@ namespace Drupal\teasearch_filter\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+
 use Drupal\Core\Url;
+use Drupal\Core\Form\FormBuilderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Drupal\teasearch_filter\Helper\CustomFieldHelper;
 
+use Drupal\teasearch_filter\Helper\CustomFieldHelper;
+use Drupal\teasearch_filter\Helper\SearchHelper; 
 /**
  * Search controller for teasearch_filter module.
  */
 class SearchController extends ControllerBase
 {
+
+  /**
+   * The search helper.
+   *
+   * @var \Drupal\teasearch_filter\Helper\SearchHelper
+   */
+  protected $searchHelper;
+
 
   /**
    * The config factory service.
@@ -40,10 +51,16 @@ class SearchController extends ControllerBase
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager)
-  {
-    $this->configFactory = $config_factory;
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    ConfigFactoryInterface $config_factory,
+    FormBuilderInterface $form_builder,
+    SearchHelper $search_helper // AGGIUNGERE QUESTO PARAMETRO
+  ) {
     $this->entityTypeManager = $entity_type_manager;
+    $this->configFactory = $config_factory;
+    $this->formBuilder = $form_builder;
+    $this->searchHelper = $search_helper; // AGGIUNGERE QUESTA RIGA
   }
 
   private function getPaginatorConfig()
@@ -64,10 +81,14 @@ class SearchController extends ControllerBase
   public static function create(ContainerInterface $container)
   {
     return new static(
+      $container->get('entity_type.manager'),
       $container->get('config.factory'),
-      $container->get('entity_type.manager')
+      $container->get('form_builder'),
+      $container->get('teasearch_filter.search_helper') // AGGIUNGERE QUESTA RIGA
     );
   }
+
+  
 
   /**
    * Handle legacy redirects.
@@ -1064,9 +1085,10 @@ class SearchController extends ControllerBase
    */
   public function freeSearchResults(Request $request)
   {
-    $search_query = trim($request->query->get('query', ''));
+    $search_query = trim($request->query->get('q', ''));
     $content_type_filter = $request->query->get('content_type', 'all');
 
+    // Validate search query
     if (empty($search_query)) {
       return [
         '#theme' => 'teasearch_free_search',
@@ -1075,141 +1097,195 @@ class SearchController extends ControllerBase
         '#content_type_filter' => $content_type_filter,
         '#total_results' => 0,
         '#page_title' => $this->t('Search Results'),
-        '#module_path' => $request->getBasePath() . '/' . \Drupal::service('extension.list.module')->getPath('teasearch_filter'),
-        '#cache' => [
-          'contexts' => ['url.query_args'],
-        ],
       ];
     }
 
+    // Load configuration
     $config = $this->configFactory->get('teasearch_filter.settings');
     $content_types = $config->get('content_types') ?: [];
 
     $all_entities = [];
-    $total_results = 0;
 
-    // Cerca in tutti i content type configurati o in quello selezionato
-    foreach ($content_types as $content_type_key => $content_type_config) {
-      // Se è selezionato un content type specifico, cerca solo in quello
-      if ($content_type_filter !== 'all' && $content_type_filter !== $content_type_key) {
-        continue;
+    // Search based on content_type_filter
+    if ($content_type_filter === 'all') {
+      // Search in ALL content types
+      foreach ($content_types as $content_type => $content_type_config) {
+        $entities = $this->searchInContentType($content_type, $content_type_config, $search_query);
+        $all_entities = array_merge($all_entities, $entities);
       }
-
-      $entity_type = $content_type_config['type'] ?? 'node';
-
-      if ($entity_type === 'user') {
-        $entities = $this->searchUsersForFreeSearch($content_type_config, $search_query);
-      } else {
-        $entities = $this->searchNodesForFreeSearch($content_type_config, $search_query);
+    } else {
+      // Search in specific content type
+      if (isset($content_types[$content_type_filter])) {
+        $content_type_config = $content_types[$content_type_filter];
+        $all_entities = $this->searchInContentType($content_type_filter, $content_type_config, $search_query);
       }
-
-      // Aggiungi label del content type agli entity per il template
-      /*
-      foreach ($entities as &$entity) {
-        $entity->teasearch_content_type_label = $content_type_config['label'] ?? ucfirst($content_type_key);
-
-        // Aggiungi contenuto processato per la descrizione
-        if ($entity_type === 'node') {
-          $entity->teasearch_processed_content = $this->getProcessedContentForEntity($entity, $content_type_config);
-        }
-      }*/
-
-      foreach ($entities as &$entity) {
-        $entity->teasearch_content_type_label = $content_type_config['label'] ?? ucfirst($content_type_key);
-        $entity = $this->processEntityForDisplay($entity, $content_type_config);
-      }
-
-      $all_entities = array_merge($all_entities, $entities);
     }
 
-    // Ordina per data di creazione (più recenti prima)
-    usort($all_entities, function ($a, $b) {
-      $time_a = $a->created ? $a->created->value : $a->getCreatedTime();
-      $time_b = $b->created ? $b->created->value : $b->getCreatedTime();
-      return $time_b - $time_a;
-    });
+    // Process entities for display
+    foreach ($all_entities as $entity) {
+      // Add content type label for display
+      $bundle = $entity->bundle();
+      foreach ($content_types as $ct_key => $ct_config) {
+        if ($ct_config['machine_name'] === $bundle) {
+          $entity->teasearch_content_type_label = $ct_config['label'] ?? ucfirst($ct_key);
+          break;
+        }
+      }
+    }
 
-    // Limita i risultati
-    $limit = 50;
-    $total_results = count($all_entities);
-    $all_entities = array_slice($all_entities, 0, $limit);
+    // If specific content type selected, show with filters
+    if ($content_type_filter !== 'all' && isset($content_types[$content_type_filter])) {
+      return $this->buildFilteredSearchResults($content_type_filter, $all_entities, $search_query, $request);
+    }
 
+    // Otherwise show simple list without filters
     return [
       '#theme' => 'teasearch_free_search',
       '#entities' => $all_entities,
       '#search_query' => $search_query,
       '#content_type_filter' => $content_type_filter,
-      '#total_results' => $total_results,
+      '#total_results' => count($all_entities),
       '#page_title' => $this->t('Search Results'),
-      '#module_path' => $request->getBasePath() . '/' . \Drupal::service('extension.list.module')->getPath('teasearch_filter'),
+      '#module_path' => \Drupal::service('extension.list.module')->getPath('teasearch_filter'),
+    ];
+  }
+
+  /**
+   * Search in a specific content type using SearchHelper.
+   *
+   * @param string $content_type
+   *   The content type key.
+   * @param array $content_type_config
+   *   The content type configuration.
+   * @param string $search_query
+   *   The search query.
+   *
+   * @return array
+   *   Array of entities.
+   */
+  protected function searchInContentType($content_type, array $content_type_config, $search_query)
+  {
+    $entity_type = $content_type_config['type'] ?? 'node';
+    $machine_name = $content_type_config['machine_name'];
+
+    // Build WHERE conditions from config
+    $where_conditions = [];
+    if (!empty($content_type_config['where'])) {
+      $where_json = json_decode($content_type_config['where'], TRUE);
+      if (is_array($where_json)) {
+        $where_conditions = $where_json;
+      }
+    }
+
+    // Use SearchHelper for dynamic search
+    $entity_ids = $this->searchHelper->buildDynamicSearchQuery(
+      $entity_type,
+      $machine_name,
+      $search_query,
+      $where_conditions
+    );
+
+    if (empty($entity_ids)) {
+      return [];
+    }
+
+    // Load entities
+    $entities = $this->entityTypeManager->getStorage($entity_type)->loadMultiple($entity_ids);
+
+    // Process entities for display
+    foreach ($entities as $entity) {
+      $this->processEntityForDisplay($entity, $content_type_config);
+    }
+
+    return $entities;
+  }
+
+  /**
+   * Build filtered search results page (with sidebar filters).
+   *
+   * @param string $content_type
+   *   The content type.
+   * @param array $entities
+   *   The search results.
+   * @param string $search_query
+   *   The search query.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request object.
+   *
+   * @return array
+   *   Render array.
+   */
+  protected function buildFilteredSearchResults($content_type, array $entities, $search_query, Request $request)
+  {
+    $config = $this->configFactory->get('teasearch_filter.settings');
+    $content_types = $config->get('content_types') ?: [];
+    $content_type_config = $content_types[$content_type];
+
+    $filters = $content_type_config['filters'] ?: [];
+    $page_title = $this->getCategoryTitle($content_type);
+
+    // Build filter form
+    $form = $this->formBuilder()->getForm(
+      'Drupal\teasearch_filter\Form\SearchFilterForm',
+      $content_type
+    );
+
+    // Prepare data for templates
+    $grouped_filters = $this->prepareGroupedFilters($filters, $content_type_config, $request);
+    $century_data = $this->prepareCenturyData($filters, $content_type_config, $request);
+    $date_data = $this->prepareDateData($filters, $content_type_config, $request);
+
+    // Get paginator configuration
+    $paginator_config = $this->getPaginatorConfig();
+    $page = (int) $request->query->get('page', 0);
+    $per_page = $request->query->get('per_page');
+
+    // Session management for per_page
+    $session = $request->getSession();
+    $session_key = "teasearch_filter.{$content_type}.per_page";
+
+    if ($per_page === null) {
+      $per_page = $session->get($session_key, $paginator_config['results_default']);
+    } else {
+      $per_page = (int) $per_page;
+      $session->set($session_key, $per_page);
+    }
+
+    // Pagination
+    $total_results = count($entities);
+    $offset = $page * $per_page;
+    $paginated_entities = array_slice($entities, $offset, $per_page);
+
+    // Build paginator data
+    $paginator_data = $this->buildPaginatorData($total_results, $page, $per_page, $paginator_config);
+
+    $entity_type = $content_type_config['type'] ?? 'node';
+
+    return [
+      '#theme' => 'teasearch',
+      '#filter_form' => $form,
+      '#entities' => $paginated_entities,
+      '#content_type_config' => $content_type_config,
+      '#entity_type' => $entity_type,
+      '#content_type' => $content_type,
+      '#total_results' => $total_results,
+      '#has_filters' => FALSE, // No filters applied from search
+      '#grouped_filters' => $grouped_filters,
+      '#century_data' => $century_data,
+      '#date_data' => $date_data,
+      '#paginator_data' => $paginator_data,
+      '#current_query' => $request->query->all(),
+      '#page_title' => $page_title,
+      '#search_query' => $search_query,
+      '#attached' => [
+        'library' => ['teasearch_filter/teasearch_filter_styles'],
+      ],
       '#cache' => [
         'contexts' => ['url.query_args'],
         'tags' => ['node_list', 'user_list', 'config:teasearch_filter.settings'],
       ],
     ];
   }
-
-  /**
-   * Search nodes for free search.
-   */
-  private function searchNodesForFreeSearch($config, $search_query)
-  {
-    $machine_name = $config['machine_name'];
-
-    $query = $this->entityTypeManager->getStorage('node')->getQuery()
-      ->accessCheck(TRUE)
-      ->condition('type', $machine_name)
-      ->condition('status', 1);
-
-    // Apply WHERE conditions from config
-    $this->applyWhereConditions($query, $config);
-
-    // Search in title and body
-    $search_group = $query->orConditionGroup();
-    $search_group->condition('title', "%{$search_query}%", 'LIKE');
-    $search_group->condition('body.value', "%{$search_query}%", 'LIKE');
-
-    $query->condition($search_group);
-
-    $ids = $query->sort('created', 'DESC')
-      ->range(0, 100) // Limit per content type
-      ->execute();
-
-    return $this->entityTypeManager->getStorage('node')->loadMultiple($ids);
-  }
-
-  /**
-   * Search users for free search.
-   */
-  private function searchUsersForFreeSearch($config, $search_query)
-  {
-    $query = $this->entityTypeManager->getStorage('user')->getQuery()
-      ->accessCheck(TRUE)
-      ->condition('status', 1);
-
-    // Search in username and bio-like fields
-    $search_group = $query->orConditionGroup();
-    $search_group->condition('name', "%{$search_query}%", 'LIKE');
-
-    // Add common bio fields
-    $bio_fields = ['field_bio', 'field_biography', 'field_description'];
-    foreach ($bio_fields as $field) {
-      $search_group->condition("{$field}.value", "%{$search_query}%", 'LIKE');
-    }
-
-    $query->condition($search_group);
-
-    $ids = $query->sort('created', 'DESC')
-      ->range(0, 50) // Limit per content type
-      ->execute();
-
-    return $this->entityTypeManager->getStorage('user')->loadMultiple($ids);
-  }
-
-
-
-
-
 
 
 

@@ -1,0 +1,4 @@
+services:
+  teasearch_filter.search_helper:
+    class: Drupal\teasearch_filter\Helper\SearchHelper
+    arguments: ['@entity_type.manager', '@entity_field.manager', '@database', '@logger.factory']
