@@ -1081,12 +1081,22 @@ class SearchController extends ControllerBase
 
 
   /**
-   * Free search results across all content types.
+   * FIX PER SearchController::freeSearchResults()
+   * 
+   * SOSTITUIRE IL METODO freeSearchResults() in SearchController.php
+   * con questa versione che include debug logging
    */
+
   public function freeSearchResults(Request $request)
   {
     $search_query = trim($request->query->get('q', ''));
     $content_type_filter = $request->query->get('content_type', 'all');
+
+    // DEBUG LOG
+    \Drupal::logger('teasearch_filter')->notice('Free search called: q=@q, content_type=@ct', [
+      '@q' => $search_query,
+      '@ct' => $content_type_filter,
+    ]);
 
     // Validate search query
     if (empty($search_query)) {
@@ -1104,13 +1114,28 @@ class SearchController extends ControllerBase
     $config = $this->configFactory->get('teasearch_filter.settings');
     $content_types = $config->get('content_types') ?: [];
 
+    // DEBUG LOG
+    \Drupal::logger('teasearch_filter')->notice('Content types found: @count', [
+      '@count' => count($content_types),
+    ]);
+
     $all_entities = [];
 
     // Search based on content_type_filter
     if ($content_type_filter === 'all') {
       // Search in ALL content types
       foreach ($content_types as $content_type => $content_type_config) {
+        \Drupal::logger('teasearch_filter')->notice('Searching in content type: @ct', [
+          '@ct' => $content_type,
+        ]);
+
         $entities = $this->searchInContentType($content_type, $content_type_config, $search_query);
+
+        \Drupal::logger('teasearch_filter')->notice('Found @count entities in @ct', [
+          '@count' => count($entities),
+          '@ct' => $content_type,
+        ]);
+
         $all_entities = array_merge($all_entities, $entities);
       }
     } else {
@@ -1120,6 +1145,11 @@ class SearchController extends ControllerBase
         $all_entities = $this->searchInContentType($content_type_filter, $content_type_config, $search_query);
       }
     }
+
+    // DEBUG LOG TOTALE
+    \Drupal::logger('teasearch_filter')->notice('Total entities found: @count', [
+      '@count' => count($all_entities),
+    ]);
 
     // Process entities for display
     foreach ($all_entities as $entity) {
@@ -1149,6 +1179,11 @@ class SearchController extends ControllerBase
       '#module_path' => \Drupal::service('extension.list.module')->getPath('teasearch_filter'),
     ];
   }
+
+
+
+
+
 
   /**
    * Search in a specific content type using SearchHelper.

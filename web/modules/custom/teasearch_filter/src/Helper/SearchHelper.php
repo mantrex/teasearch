@@ -195,12 +195,22 @@ class SearchHelper
   protected function addTextFieldConditions($group, array $fields, $keyword)
   {
     foreach ($fields as $field_name) {
-      // Handle both simple string fields and complex text fields
-      if (strpos($field_name, 'field_') === 0 || $field_name === 'body') {
-        $group->condition("{$field_name}.value", "%{$keyword}%", 'LIKE');
-      } else {
-        // Base fields like 'title', 'name'
-        $group->condition($field_name, "%{$keyword}%", 'LIKE');
+      try {
+        // Handle both simple string fields and complex text fields
+        if (strpos($field_name, 'field_') === 0 || $field_name === 'body') {
+          // Custom fields - use .value
+          $group->condition("{$field_name}.value", "%{$keyword}%", 'LIKE');
+        } elseif (in_array($field_name, ['title', 'name'])) {
+          // Base searchable fields
+          $group->condition($field_name, "%{$keyword}%", 'LIKE');
+        }
+        // Skip other base fields that are not searchable
+      } catch (\Exception $e) {
+        // Log but continue - don't let one bad field break the whole search
+        $this->logger->warning('Error searching in field @field: @message', [
+          '@field' => $field_name,
+          '@message' => $e->getMessage(),
+        ]);
       }
     }
   }
@@ -377,6 +387,11 @@ class SearchHelper
       'content_translation_uid',
       'content_translation_created',
       'content_translation_changed',
+      'menu_link',  // Menu link reference - causes query errors
+      'path',       // Path alias
+      'uid',        // User ID reference
+      'type',       // Bundle field
+      'nid',        // Node ID
     ];
 
     return in_array($field_name, $skip_fields);
