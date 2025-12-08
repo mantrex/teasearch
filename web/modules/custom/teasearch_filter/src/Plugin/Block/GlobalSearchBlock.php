@@ -87,6 +87,13 @@ class GlobalSearchBlock extends BlockBase implements ContainerFactoryPluginInter
     $current_query = $current_request->query->get('q', '');
     $current_content_type = $current_request->query->get('content_type', 'all');
 
+
+    
+    \Drupal::logger('teasearch_filter')->notice(
+      'GlobalSearchBlock: URL query content_type = @ct',
+      ['@ct' => $current_content_type]
+    );
+
     return [
       '#theme' => 'teasearch_global_search_block',
       '#content_type_options' => $content_type_options,

@@ -6,86 +6,85 @@
 #}
 
 <div class='element-title'>
-  Filters
+	Filters
 </div>
 
 <div class="teasearch-filters" data-content-type="{{ content_type }}">
-  <form method="get" class="teasearch-filter-form" action="{{ is_free_search is defined and is_free_search ? url('teasearch_filter.free_search_results') : '' }}">
+	<form
+		method="get" class="teasearch-filter-form" action="{{ is_free_search is defined and is_free_search ? url('teasearch_filter.free_search_results') : '' }}">
 
-    {# Pass search query for free search #}
-    {% if is_free_search is defined and is_free_search and search_query %}
-      <input type="hidden" name="q" value="{{ search_query }}">
-        <input
-        type="hidden" name="content_type" value="all">
-          {% else %}
-          <input type="hidden" name="content_type" value="{{ content_type }}">
-          {% endif %}
+		{# Pass search query for free search #}
+		{% if is_free_search is defined and is_free_search and search_query %}
+			<input type="hidden" name="q" value="{{ search_query }}">
+			<input type="hidden" name="content_type" value="{{ content_type }}">
+		{% else %}
+			<input type="hidden" name="content_type" value="{{ content_type }}">
+		{% endif %}
 
-          {% for field_name, filter in grouped_filters %}
-            <details class="filter-group" data-name="{{ field_name }}" {{ filter.is_open ? 'open' : '' }}>
-              <summary class="filter-title">
-                {{ filter.label|t }}
-                {% if filter.selected|length > 0 %}
-                  <span class="filter-badge">
-                    {{ filter.selected|length }}
-                  </span>
-                {% endif %}
-              </summary>
+		{% for field_name, filter in grouped_filters %}
+			<details class="filter-group" data-name="{{ field_name }}" {{ filter.is_open ? 'open' : '' }}>
+				<summary class="filter-title">
+					{{ filter.label|t }}
+					{% if filter.selected|length > 0 %}
+						<span class="filter-badge">
+							{{ filter.selected|length }}
+						</span>
+					{% endif %}
+				</summary>
 
-              <div class="filter-content">
-                {% if filter.type in ['taxonomy', 'user_roles', 'user_status'] %}
-                  {% for value, option in filter.options %}
-                    <label class="filter-option">
-                      <input type="checkbox" name="{{ field_name }}" value="{{ value }}" {{ option.selected ? 'checked' : '' }}>
-                        <span class="option-text">
-                          {{ option.label }}
-                          <small>
-                            (
-                            {{ option.count }}
-                            )
-                          </small>
-                        </span>
-                      </label>
-                    {% endfor %}
-                  {% else %}
-                    <input type="text" name="{{ field_name }}" class="filter-input" value="{{ filter.selected|default('') }}" placeholder="{{ 'Enter value...'|t }}">
-                    {% endif %}
-                  </div>
-                </details>
-              {% endfor %}
+				<div class="filter-content">
+					{% if filter.type in ['taxonomy', 'user_roles', 'user_status'] %}
+						{% for value, option in filter.options %}
+							<label class="filter-option">
+								<input type="checkbox" name="{{ field_name }}" value="{{ value }}" {{ option.selected ? 'checked' : '' }}>
+								<span class="option-text">
+									{{ option.label }}
+									<small>
+										(
+										{{ option.count }}
+										)
+									</small>
+								</span>
+							</label>
+						{% endfor %}
+					{% else %}
+						<input type="text" name="{{ field_name }}" class="filter-input" value="{{ filter.selected|default('') }}" placeholder="{{ 'Enter value...'|t }}">
+					{% endif %}
+				</div>
+			</details>
+		{% endfor %}
 
-              {# Century selector #}
-              {% if century_data and century_data.enabled %}
-                {% include 'modules/custom/teasearch_filter/templates/partials/filter-form-century-easy.html.twig' with {
+		{# Century selector #}
+		{% if century_data and century_data.enabled %}
+			{% include 'modules/custom/teasearch_filter/templates/partials/filter-form-century-easy.html.twig' with {
         'content_type': content_type,
         'century_data': century_data
       } %}
-              {% endif %}
+		{% endif %}
 
-              {# Date selector #}
-              {% if date_data and date_data.enabled %}
-                {% include 'modules/custom/teasearch_filter/templates/partials/filter-form-date.html.twig' with {
+		{# Date selector #}
+		{% if date_data and date_data.enabled %}
+			{% include 'modules/custom/teasearch_filter/templates/partials/filter-form-date.html.twig' with {
         'content_type': content_type,
         'date_data': date_data
       } %}
-              {% endif %}
+		{% endif %}
 
-              <div class="filter-actions">
-                <button type="submit" class="fbtn fbtn-primary">
-                  {{ 'Search'|t }}
-                </button>
+		<div class="filter-actions">
+			<button type="submit" class="fbtn fbtn-primary">
+				{{ 'Search'|t }}
+			</button>
 
-                {# Clear button - route corretta in base al contesto #}
-                {% if is_free_search is defined and is_free_search %}
-                  <a href="{{ url('teasearch_filter.free_search_results', {}, {'query': {'q': search_query, 'content_type': 'all' }}) }}" class="fbtn fbtn-primary">
-                    {{ 'Clear'|t }}
-                  </a>
-                {% else %}
-                  <a href="{{ url('teasearch_filter.search', {'content_type': content_type}) }}" class="fbtn fbtn-primary">
-                    {{ 'Clear'|t }}
-                  </a>
-                {% endif %}
-              </div>
-            </form>
-          </div>
-          
+			{# Clear button - route corretta in base al contesto #}
+			{% if is_free_search is defined and is_free_search %}
+				<a href="{{ url('teasearch_filter.free_search_results', {}, {'query': {'q': '', 'content_type': 'all' }}) }}" class="fbtn fbtn-primary">
+					{{ 'Clear'|t }}
+				</a>
+			{% else %}
+				<a href="{{ url('teasearch_filter.search', {'content_type': content_type}) }}" class="fbtn fbtn-primary">
+					{{ 'Clear'|t }}
+				</a>
+			{% endif %}
+		</div>
+	</form>
+</div>
