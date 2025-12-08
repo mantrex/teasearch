@@ -36,7 +36,7 @@
 {% if paginator_data and paginator_data.total_pages > 0 %}
 
   {# Determina quale route usare #}
-  {% set search_route = is_free_search is defined and is_free_search ? 'teasearch_filter.free_search' : 'teasearch_filter.search' %}
+  {% set search_route = is_free_search is defined and is_free_search ? 'teasearch_filter.free_search_results' : 'teasearch_filter.search' %}
   {% set route_params = is_free_search is defined and is_free_search ? {} : {'content_type': content_type} %}
 
   <div class="teasearch-paginator">

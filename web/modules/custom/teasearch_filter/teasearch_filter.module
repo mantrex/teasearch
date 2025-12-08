@@ -33,6 +33,8 @@ function teasearch_filter_theme($existing, $type, $theme, $path)
         'current_query' => NULL,
         'mixed_content_types' => null,
         'search_query' => null,
+        'is_free_search' => NULL,
+        'show_global_filters' => NULL
       ],
       'template' => 'teasearch',
     ],

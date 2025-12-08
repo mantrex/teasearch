@@ -199,3 +199,14 @@ content_types:
 # Mappatura per retrocompatibilità
 legacy_mappings:
   people: people
+global_search:
+  show_filters: true
+  filters:
+    subjects:
+      type: taxonomy
+      vocabulary: subjects
+      label: 'Subjects'
+    country2:
+      type: taxonomy
+      vocabulary: countries
+      label: 'Geographical focus'

@@ -1100,13 +1100,20 @@ class SearchController extends ControllerBase
     // Load configuration
     $config = $this->configFactory->get('teasearch_filter.settings');
     $content_types = $config->get('content_types') ?: [];
+    $global_search_config = $config->get('global_search') ?: [];
 
     $all_entities = [];
     $mixed_content_types = FALSE;
+    $show_global_filters = FALSE;
+    $global_filters_config = [];
 
     // Search based on content_type_filter
     if ($content_type_filter === 'all') {
       $mixed_content_types = TRUE;
+
+      // Check if global filters are enabled
+      $show_global_filters = $global_search_config['show_filters'] ?? false;
+      $global_filters_config = $global_search_config['filters'] ?? [];
 
       // Search in ALL content types
       foreach ($content_types as $content_type => $content_type_config) {
@@ -1122,10 +1129,15 @@ class SearchController extends ControllerBase
         $all_entities = array_merge($all_entities, $entities);
       }
 
+      // APPLICARE FILTRI GLOBALI SE ATTIVI
+      if ($show_global_filters && !empty($global_filters_config)) {
+        $all_entities = $this->applyGlobalFilters($all_entities, $global_filters_config, $request);
+      }
+
       // Use first content type config as base (only for structure)
       $first_content_type = array_key_first($content_types);
       $content_type_config = $content_types[$first_content_type];
-      $actual_content_type = $first_content_type;
+      $actual_content_type = 'all';
 
     } else {
       // Search in specific content type
@@ -1140,7 +1152,7 @@ class SearchController extends ControllerBase
       // Process entities
       foreach ($all_entities as $entity) {
         $this->processEntityForDisplay($entity, $content_type_config);
-        $entity->teasearch_results_config = $content_type_config['results'] ?? [];  // ← AGGIUNGI QUESTA
+        $entity->teasearch_results_config = $content_type_config['results'] ?? [];
       }
     }
 
@@ -1171,12 +1183,20 @@ class SearchController extends ControllerBase
     $entity_type = $content_type_config['type'] ?? 'node';
     $page_title = $this->t('Search Results');
 
-    // Prepare filters (empty for "all", real for specific content type)
+    // Prepare filters
     $grouped_filters = [];
     $century_data = NULL;
     $date_data = NULL;
 
-    if (!$mixed_content_types) {
+    if ($show_global_filters && !empty($global_filters_config)) {
+      // Prepare DYNAMIC global filters based on results
+      $grouped_filters = $this->prepareGlobalFiltersFromResults(
+        $all_entities,
+        $global_filters_config,
+        $request
+      );
+    } elseif (!$mixed_content_types) {
+      // Standard filters for specific content type
       $filters = $content_type_config['filters'] ?: [];
       $grouped_filters = $this->prepareGroupedFilters($filters, $content_type_config, $request);
       $century_data = $this->prepareCenturyData($filters, $content_type_config, $request);
@@ -1197,11 +1217,12 @@ class SearchController extends ControllerBase
       '#century_data' => $century_data,
       '#date_data' => $date_data,
       '#paginator_data' => $paginator_data,
-      '#is_free_search' => TRUE,
       '#current_query' => $request->query->all(),
       '#page_title' => $page_title,
       '#search_query' => $search_query,
       '#mixed_content_types' => $mixed_content_types,
+      '#show_global_filters' => $show_global_filters,
+      '#is_free_search' => TRUE,
       '#module_path' => \Drupal::service('extension.list.module')->getPath('teasearch_filter'),
       '#attached' => [
         'library' => ['teasearch_filter/teasearch_filter_styles'],
@@ -1426,5 +1447,166 @@ class SearchController extends ControllerBase
     }
 
     return NULL;
+  }
+
+
+
+  // AGGIUNGERE questi 2 metodi alla classe SearchController
+
+  /**
+   * Apply global filters to search results.
+   */
+  protected function applyGlobalFilters(array $entities, array $filters_config, Request $request)
+  {
+    $filtered_entities = [];
+
+    foreach ($entities as $entity) {
+      $include = TRUE;
+
+      // Check each filter
+      foreach ($filters_config as $filter_key => $filter_config) {
+        $selected_values = $request->query->get($filter_key);
+
+        if (empty($selected_values)) {
+          continue; // No filter applied for this field
+        }
+
+        if (!is_array($selected_values)) {
+          $selected_values = [$selected_values];
+        }
+
+        // Check if entity has ANY of the selected values
+        $field_name = 'field_' . $filter_key;
+
+        if (!$entity->hasField($field_name)) {
+          $include = FALSE;
+          break;
+        }
+
+        $field_values = $entity->get($field_name);
+
+        if ($field_values->isEmpty()) {
+          $include = FALSE;
+          break;
+        }
+
+        $entity_has_value = FALSE;
+        foreach ($field_values as $item) {
+          if (isset($item->target_id) && in_array($item->target_id, $selected_values)) {
+            $entity_has_value = TRUE;
+            break;
+          }
+        }
+
+        if (!$entity_has_value) {
+          $include = FALSE;
+          break;
+        }
+      }
+
+      if ($include) {
+        $filtered_entities[] = $entity;
+      }
+    }
+
+    return $filtered_entities;
+  }
+
+  /**
+   * Prepare dynamic global filters based on actual search results.
+   */
+  protected function prepareGlobalFiltersFromResults(array $entities, array $filters_config, Request $request)
+  {
+    $grouped_filters = [];
+
+    foreach ($filters_config as $filter_key => $filter_config) {
+      $filter_type = $filter_config['type'] ?? 'taxonomy';
+
+      if ($filter_type !== 'taxonomy') {
+        continue; // Only taxonomy filters supported for now
+      }
+
+      $field_name = 'field_' . $filter_key;
+      $vocabulary = $filter_config['vocabulary'] ?? '';
+
+      if (empty($vocabulary)) {
+        continue;
+      }
+
+      // Collect all term IDs from results
+      $term_counts = [];
+
+      foreach ($entities as $entity) {
+        if (!$entity->hasField($field_name)) {
+          continue;
+        }
+
+        $field_values = $entity->get($field_name);
+
+        if ($field_values->isEmpty()) {
+          continue;
+        }
+
+        foreach ($field_values as $item) {
+          if (isset($item->target_id)) {
+            $tid = $item->target_id;
+            $term_counts[$tid] = ($term_counts[$tid] ?? 0) + 1;
+          }
+        }
+      }
+
+      if (empty($term_counts)) {
+        continue; // No terms found, skip this filter
+      }
+
+      // Load term entities
+      $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
+      $terms = $term_storage->loadMultiple(array_keys($term_counts));
+
+      // Get selected values
+      $selected_values = $request->query->get($filter_key);
+      if (!is_array($selected_values)) {
+        $selected_values = $selected_values ? [$selected_values] : [];
+      }
+
+      // Convert to integers for comparison
+      $selected_values = array_map('intval', $selected_values);
+
+      // Build filter options with counts
+      $options = [];
+      $language_manager = \Drupal::languageManager();
+      $current_language = $language_manager->getCurrentLanguage()->getId();
+
+      foreach ($terms as $term) {
+        // Get translated term
+        if ($term->hasTranslation($current_language)) {
+          $term = $term->getTranslation($current_language);
+        }
+
+        $tid = $term->id();
+        $count = $term_counts[$tid] ?? 0;
+
+        $options[] = [
+          'value' => $tid,
+          'label' => $term->getName(),
+          'count' => $count,
+          'selected' => in_array((int) $tid, $selected_values, TRUE), // strict comparison con cast
+        ];
+      }
+
+      // Sort by name
+      usort($options, function ($a, $b) {
+        return strcmp($a['label'], $b['label']);
+      });
+
+      $grouped_filters[] = [
+        'key' => $filter_key,
+        'label' => $filter_config['label'] ?? ucfirst($filter_key),
+        'type' => 'taxonomy',
+        'options' => $options,
+      ];
+    }
+
+    return $grouped_filters;
   }
 }

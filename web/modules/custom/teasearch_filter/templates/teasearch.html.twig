@@ -2,40 +2,27 @@
   /**
   * @file
   * Teasearch filter page template.
-  *
-  * Variables:
-  * - filter_form: Filter form render array
-  * - entities: Array of loaded entities (nodes or users)
-  * - content_type_config: Complete content type configuration
-  * - entity_type: Entity type (node or user)
-  * - total_results: Total number of results
-  * - has_filters: Whether there are active filters
-  * - grouped_filters: Prepared filters for display
-  * - century_data: Century selector configuration
-  * - date_data: Date selector configuration
   */
 #}
 
-<div class="teasearch-wrapper {% if mixed_content_types %}teasearch-no-sidebar{% endif %}">
+<div class="teasearch-wrapper {% if mixed_content_types and not show_global_filters %}teasearch-no-sidebar{% endif %}">
 
-  {# Sidebar with filters - NASCOSTA se mixed_content_types #}
-  {% if not mixed_content_types %}
+  {# Sidebar with filters - Mostrata anche con All se show_global_filters è true #}
+  {% if grouped_filters %}
     <aside class="teasearch-sidebar">
-      {% if grouped_filters %}
-        {% include 'modules/custom/teasearch_filter/templates/partials/filter-form.html.twig' with {
-          'grouped_filters': grouped_filters,
-          'content_type': content_type,
-          'century_data': century_data,
-          'date_data': date_data
-        } %}
-      {% else %}
-        {{ filter_form }}
-      {% endif %}
+      {% include 'modules/custom/teasearch_filter/templates/partials/filter-form.html.twig' with {
+        'grouped_filters': grouped_filters,
+        'content_type': content_type,
+        'century_data': century_data,
+        'date_data': date_data,
+        'is_free_search': is_free_search|default(false),
+        'search_query': search_query|default('')
+      } %}
     </aside>
   {% endif %}
 
   {# Main results area #}
-  <main class="teasearch-results {% if mixed_content_types %}teasearch-results-full{% endif %}">
+  <main class="teasearch-results {% if mixed_content_types and not show_global_filters %}teasearch-results-full{% endif %}">
 
     {# Search info header per ricerca all #}
     {% if mixed_content_types and search_query %}
@@ -85,5 +72,4 @@
     {% endif %}
   </main>
 </div>
-
 
