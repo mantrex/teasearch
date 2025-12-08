@@ -105,7 +105,7 @@
 }
 
 .info-section-links a:hover {
-  color: var(--item-primary);
+  color: var(--item-link-hover);
 }
 
 /* SIDEBAR DESTRA */

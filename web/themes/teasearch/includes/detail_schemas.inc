@@ -390,6 +390,13 @@ function teasearch_get_detail_schemas()
       "field_language" => [
         "label" => "Language",
       ],
+      "contained_in" => [
+        "label" => "Contained in",
+        "type" => "curated_references",
+        "field" => "field_contained_in"
+      ],
+
+
       "field_pub_place" => [
         "label" => "Place of Publication",
       ],
@@ -398,15 +405,6 @@ function teasearch_get_detail_schemas()
       ],
       "field_country" => [
         "label" => "Country"
-      ],
-      "field_doi" => [
-        "label" => "DOI",
-      ],
-      "field_dewey" => [
-        "label" => "Dewey",
-      ],
-      "field_isbn" => [
-        "label" => "ISBN",
       ],
       "editors" => [
         "label" => "Editors",
@@ -434,10 +432,6 @@ function teasearch_get_detail_schemas()
           "filter" => ["field_project_type", "book"]
         ]
       ],
-
-      "field_issn" => [
-        "label" => "issn",
-      ],
       "volissue" => [
         "label" => "Vol (Issue)",
         "type" => "vol_issue",
@@ -445,6 +439,19 @@ function teasearch_get_detail_schemas()
       "field_pages" => [
         "label" => "Pages",
       ],
+      "field_issn" => [
+        "label" => "issn",
+      ],
+      "field_doi" => [
+        "label" => "DOI",
+      ],
+      "field_dewey" => [
+        "label" => "Dewey",
+      ],
+      "field_isbn" => [
+        "label" => "ISBN",
+      ],
+
       "field_status" => [
         "label" => "Status",
       ],
@@ -482,13 +489,13 @@ function teasearch_get_detail_schemas()
       "paragraph3" => "Description",
 
       "field_original_abstract" => [
-        "label" => "Original Abstract",
+        "label" => "Abstract",
       ],
       "field_table_of_content" => [
         "label" => "Table of content",
       ],
       "field_curated_abstract" => [
-        "label" => "Teasearch curated abstract",
+        "label" => "Curator's Note",
       ],
       "paragraph4" => "References",
       "curated_references" => [
