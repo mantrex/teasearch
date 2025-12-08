@@ -1083,7 +1083,7 @@ class SearchController extends ControllerBase
   /**
    * SearchController::freeSearchResults()
    * 
-   */
+   **/
 
   public function freeSearchResults(Request $request)
   {
@@ -1105,15 +1105,19 @@ class SearchController extends ControllerBase
     $all_entities = [];
     $mixed_content_types = FALSE;
     $show_global_filters = FALSE;
-    $global_filters_config = [];
+    $filters_config = [];
+    $content_type_config = null;
+    $actual_content_type = $content_type_filter;
 
-    // Search based on content_type_filter
+    // ========================================================================
+    // CASE 1: Search ALL content types
+    // ========================================================================
     if ($content_type_filter === 'all') {
       $mixed_content_types = TRUE;
 
       // Check if global filters are enabled
       $show_global_filters = $global_search_config['show_filters'] ?? false;
-      $global_filters_config = $global_search_config['filters'] ?? [];
+      $filters_config = $global_search_config['filters'] ?? [];
 
       // Search in ALL content types
       foreach ($content_types as $content_type => $content_type_config) {
@@ -1130,29 +1134,38 @@ class SearchController extends ControllerBase
       }
 
       // APPLICARE FILTRI GLOBALI SE ATTIVI
-      if ($show_global_filters && !empty($global_filters_config)) {
-        $all_entities = $this->applyGlobalFilters($all_entities, $global_filters_config, $request);
+      if ($show_global_filters && !empty($filters_config)) {
+        $all_entities = $this->applyGlobalFilters($all_entities, $filters_config, $request);
       }
 
       // Use first content type config as base (only for structure)
       $first_content_type = array_key_first($content_types);
       $content_type_config = $content_types[$first_content_type];
-      $actual_content_type = 'all';
 
-    } else {
-      // Search in specific content type
+    }
+    // ========================================================================
+    // CASE 2: Search in SPECIFIC content type (from global search bar)
+    // ========================================================================
+    else {
       if (!isset($content_types[$content_type_filter])) {
         throw new NotFoundHttpException('Content type not found.');
       }
 
       $content_type_config = $content_types[$content_type_filter];
       $all_entities = $this->searchInContentType($content_type_filter, $content_type_config, $search_query);
-      $actual_content_type = $content_type_filter;
 
       // Process entities
       foreach ($all_entities as $entity) {
         $this->processEntityForDisplay($entity, $content_type_config);
         $entity->teasearch_results_config = $content_type_config['results'] ?? [];
+      }
+
+      // Use content type's own filters
+      $filters_config = $content_type_config['filters'] ?? [];
+
+      // APPLICARE FILTRI SE SELEZIONATI
+      if (!empty($filters_config)) {
+        $all_entities = $this->applyContentTypeFilters($all_entities, $filters_config, $request, $content_type_config);
       }
     }
 
@@ -1183,24 +1196,26 @@ class SearchController extends ControllerBase
     $entity_type = $content_type_config['type'] ?? 'node';
     $page_title = $this->t('Search Results');
 
-    // Prepare filters
+    // ========================================================================
+    // PREPARE FILTERS based on mode
+    // ========================================================================
     $grouped_filters = [];
     $century_data = NULL;
     $date_data = NULL;
 
-    if ($show_global_filters && !empty($global_filters_config)) {
-      // Prepare DYNAMIC global filters based on results
-      $grouped_filters = $this->prepareGlobalFiltersFromResults(
+    if ($mixed_content_types && $show_global_filters && !empty($filters_config)) {
+      // GLOBAL FILTERS - dynamic from results
+      $grouped_filters = $this->prepareGlobalFiltersFromResults($all_entities, $filters_config, $request);
+    } elseif (!$mixed_content_types && !empty($filters_config)) {
+      // CONTENT TYPE FILTERS - dynamic from results
+      $grouped_filters = $this->prepareContentTypeFiltersFromResults(
         $all_entities,
-        $global_filters_config,
+        $filters_config,
+        $content_type_config,
         $request
       );
-    } elseif (!$mixed_content_types) {
-      // Standard filters for specific content type
-      $filters = $content_type_config['filters'] ?: [];
-      $grouped_filters = $this->prepareGroupedFilters($filters, $content_type_config, $request);
-      $century_data = $this->prepareCenturyData($filters, $content_type_config, $request);
-      $date_data = $this->prepareDateData($filters, $content_type_config, $request);
+      $century_data = $this->prepareCenturyData($filters_config, $content_type_config, $request);
+      $date_data = $this->prepareDateData($filters_config, $content_type_config, $request);
     }
 
     // Always use teasearch.html.twig template
@@ -1212,7 +1227,7 @@ class SearchController extends ControllerBase
       '#entity_type' => $entity_type,
       '#content_type' => $actual_content_type,
       '#total_results' => $total_results,
-      '#has_filters' => FALSE,
+      '#has_filters' => !empty($grouped_filters),
       '#grouped_filters' => $grouped_filters,
       '#century_data' => $century_data,
       '#date_data' => $date_data,
@@ -1225,15 +1240,14 @@ class SearchController extends ControllerBase
       '#is_free_search' => TRUE,
       '#module_path' => \Drupal::service('extension.list.module')->getPath('teasearch_filter'),
       '#attached' => [
-        'library' => ['teasearch_filter/teasearch_filter_styles'],
-      ],
+          'library' => ['teasearch_filter/teasearch_filter_styles'],
+        ],
       '#cache' => [
         'contexts' => ['url.query_args'],
         'tags' => ['node_list', 'user_list', 'config:teasearch_filter.settings'],
       ],
     ];
   }
-
 
 
 
@@ -1371,8 +1385,8 @@ class SearchController extends ControllerBase
       '#page_title' => $page_title,
       '#search_query' => $search_query,
       '#attached' => [
-        'library' => ['teasearch_filter/teasearch_filter_styles'],
-      ],
+          'library' => ['teasearch_filter/teasearch_filter_styles'],
+        ],
       '#cache' => [
         'contexts' => ['url.query_args'],
         'tags' => ['node_list', 'user_list', 'config:teasearch_filter.settings'],
@@ -1451,56 +1465,224 @@ class SearchController extends ControllerBase
 
 
 
-  // AGGIUNGERE questi 2 metodi alla classe SearchController
+
+/**
+ * Apply global filters to search results.
+ */
+protected function applyGlobalFilters(array $entities, array $filters_config, Request $request)
+{
+  $filtered_entities = [];
+
+  foreach ($entities as $entity) {
+    $include = TRUE;
+
+    // Check each filter
+    foreach ($filters_config as $filter_key => $filter_config) {
+      $selected_values = $request->query->get($filter_key);
+      
+      if (empty($selected_values)) {
+        continue; // No filter applied for this field
+      }
+
+      if (!is_array($selected_values)) {
+        $selected_values = [$selected_values];
+      }
+
+      // Check if entity has ANY of the selected values
+      $field_name = 'field_' . $filter_key;
+      
+      if (!$entity->hasField($field_name)) {
+        $include = FALSE;
+        break;
+      }
+
+      $field_values = $entity->get($field_name);
+      
+      if ($field_values->isEmpty()) {
+        $include = FALSE;
+        break;
+      }
+
+      $entity_has_value = FALSE;
+      foreach ($field_values as $item) {
+        if (isset($item->target_id) && in_array($item->target_id, $selected_values)) {
+          $entity_has_value = TRUE;
+          break;
+        }
+      }
+
+      if (!$entity_has_value) {
+        $include = FALSE;
+        break;
+      }
+    }
+
+    if ($include) {
+      $filtered_entities[] = $entity;
+    }
+  }
+
+  return $filtered_entities;
+}
+
+/**
+ * Prepare dynamic global filters based on actual search results.
+ */
+protected function prepareGlobalFiltersFromResults(array $entities, array $filters_config, Request $request)
+{
+  $grouped_filters = [];
+
+  foreach ($filters_config as $filter_key => $filter_config) {
+    $filter_type = $filter_config['type'] ?? 'taxonomy';
+    
+    if ($filter_type !== 'taxonomy') {
+      continue; // Only taxonomy filters supported for now
+    }
+
+    $field_name = 'field_' . $filter_key;
+    $vocabulary = $filter_config['vocabulary'] ?? '';
+    
+    if (empty($vocabulary)) {
+      continue;
+    }
+
+    // Collect all term IDs from results
+    $term_counts = [];
+    
+    foreach ($entities as $entity) {
+      if (!$entity->hasField($field_name)) {
+        continue;
+      }
+
+      $field_values = $entity->get($field_name);
+      
+      if ($field_values->isEmpty()) {
+        continue;
+      }
+
+      foreach ($field_values as $item) {
+        if (isset($item->target_id)) {
+          $tid = $item->target_id;
+          $term_counts[$tid] = ($term_counts[$tid] ?? 0) + 1;
+        }
+      }
+    }
+
+    if (empty($term_counts)) {
+      continue; // No terms found, skip this filter
+    }
+
+    // Load term entities
+    $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
+    $terms = $term_storage->loadMultiple(array_keys($term_counts));
+
+    // Get selected values
+    $selected_values = $request->query->get($filter_key);
+    if (!is_array($selected_values)) {
+      $selected_values = $selected_values ? [$selected_values] : [];
+    }
+    
+    // Convert to integers for comparison
+    $selected_values = array_map('intval', $selected_values);
+
+    // Build filter options with counts
+    $options = [];
+    $language_manager = \Drupal::languageManager();
+    $current_language = $language_manager->getCurrentLanguage()->getId();
+
+    foreach ($terms as $term) {
+      // Get translated term
+      if ($term->hasTranslation($current_language)) {
+        $term = $term->getTranslation($current_language);
+      }
+
+      $tid = $term->id();
+      $count = $term_counts[$tid] ?? 0;
+
+      $options[$tid] = [
+        'label' => $term->getName(),
+        'count' => $count,
+        'selected' => in_array((int)$tid, $selected_values, TRUE), // strict comparison con cast
+      ];
+    }
+
+    // Sort by name
+    uasort($options, function($a, $b) {
+      return strcmp($a['label'], $b['label']);
+    });
+
+    $grouped_filters[$filter_key] = [
+      'label' => $filter_config['label'] ?? ucfirst($filter_key),
+      'type' => 'taxonomy',
+      'options' => $options,
+      'selected' => $selected_values,
+      'is_open' => !empty($selected_values),
+    ];
+  }
+
+  return $grouped_filters;
+}
+
+
 
   /**
-   * Apply global filters to search results.
+   * Apply content type specific filters to search results.
    */
-  protected function applyGlobalFilters(array $entities, array $filters_config, Request $request)
+  protected function applyContentTypeFilters(array $entities, array $filters_config, Request $request, array $content_type_config)
   {
     $filtered_entities = [];
+    $entity_type = $content_type_config['type'] ?? 'node';
 
     foreach ($entities as $entity) {
       $include = TRUE;
 
       // Check each filter
       foreach ($filters_config as $filter_key => $filter_config) {
+        $filter_type = $filter_config['type'] ?? 'taxonomy';
+
+        // Skip century/date filters (handled separately)
+        if ($filter_key === 'century_selector' || $filter_key === 'date_selector') {
+          continue;
+        }
+
         $selected_values = $request->query->get($filter_key);
 
         if (empty($selected_values)) {
-          continue; // No filter applied for this field
+          continue; // No filter applied
         }
 
         if (!is_array($selected_values)) {
           $selected_values = [$selected_values];
         }
 
-        // Check if entity has ANY of the selected values
-        $field_name = 'field_' . $filter_key;
+        // Apply taxonomy filter
+        if ($filter_type === 'taxonomy') {
+          $field_name = $entity_type === 'user' ? $filter_key : 'field_' . $filter_key;
 
-        if (!$entity->hasField($field_name)) {
-          $include = FALSE;
-          break;
-        }
-
-        $field_values = $entity->get($field_name);
-
-        if ($field_values->isEmpty()) {
-          $include = FALSE;
-          break;
-        }
-
-        $entity_has_value = FALSE;
-        foreach ($field_values as $item) {
-          if (isset($item->target_id) && in_array($item->target_id, $selected_values)) {
-            $entity_has_value = TRUE;
+          if (!$entity->hasField($field_name)) {
+            $include = FALSE;
             break;
           }
-        }
 
-        if (!$entity_has_value) {
-          $include = FALSE;
-          break;
+          $field_values = $entity->get($field_name);
+
+          if ($field_values->isEmpty()) {
+            $include = FALSE;
+            break;
+          }
+
+          $entity_has_value = FALSE;
+          foreach ($field_values as $item) {
+            if (isset($item->target_id) && in_array($item->target_id, $selected_values)) {
+              $entity_has_value = TRUE;
+              break;
+            }
+          }
+
+          if (!$entity_has_value) {
+            $include = FALSE;
+            break;
+          }
         }
       }
 
@@ -1513,20 +1695,28 @@ class SearchController extends ControllerBase
   }
 
   /**
-   * Prepare dynamic global filters based on actual search results.
+   * Prepare dynamic content type filters from search results.
    */
-  protected function prepareGlobalFiltersFromResults(array $entities, array $filters_config, Request $request)
+  protected function prepareContentTypeFiltersFromResults(array $entities, array $filters_config, array $content_type_config, Request $request)
   {
     $grouped_filters = [];
+    $entity_type = $content_type_config['type'] ?? 'node';
+    $language_manager = \Drupal::languageManager();
+    $current_language = $language_manager->getCurrentLanguage()->getId();
 
     foreach ($filters_config as $filter_key => $filter_config) {
       $filter_type = $filter_config['type'] ?? 'taxonomy';
 
-      if ($filter_type !== 'taxonomy') {
-        continue; // Only taxonomy filters supported for now
+      // Skip century/date selectors
+      if ($filter_key === 'century_selector' || $filter_key === 'date_selector') {
+        continue;
       }
 
-      $field_name = 'field_' . $filter_key;
+      if ($filter_type !== 'taxonomy') {
+        continue; // Only taxonomy filters for now
+      }
+
+      $field_name = $entity_type === 'user' ? $filter_key : 'field_' . $filter_key;
       $vocabulary = $filter_config['vocabulary'] ?? '';
 
       if (empty($vocabulary)) {
@@ -1556,7 +1746,7 @@ class SearchController extends ControllerBase
       }
 
       if (empty($term_counts)) {
-        continue; // No terms found, skip this filter
+        continue;
       }
 
       // Load term entities
@@ -1568,15 +1758,10 @@ class SearchController extends ControllerBase
       if (!is_array($selected_values)) {
         $selected_values = $selected_values ? [$selected_values] : [];
       }
-
-      // Convert to integers for comparison
       $selected_values = array_map('intval', $selected_values);
 
       // Build filter options with counts
       $options = [];
-      $language_manager = \Drupal::languageManager();
-      $current_language = $language_manager->getCurrentLanguage()->getId();
-
       foreach ($terms as $term) {
         // Get translated term
         if ($term->hasTranslation($current_language)) {
@@ -1586,24 +1771,24 @@ class SearchController extends ControllerBase
         $tid = $term->id();
         $count = $term_counts[$tid] ?? 0;
 
-        $options[] = [
-          'value' => $tid,
+        $options[$tid] = [
           'label' => $term->getName(),
           'count' => $count,
-          'selected' => in_array((int) $tid, $selected_values, TRUE), // strict comparison con cast
+          'selected' => in_array((int) $tid, $selected_values, TRUE),
         ];
       }
 
       // Sort by name
-      usort($options, function ($a, $b) {
+      uasort($options, function ($a, $b) {
         return strcmp($a['label'], $b['label']);
       });
 
-      $grouped_filters[] = [
-        'key' => $filter_key,
+      $grouped_filters[$filter_key] = [
         'label' => $filter_config['label'] ?? ucfirst($filter_key),
         'type' => 'taxonomy',
         'options' => $options,
+        'selected' => $selected_values,
+        'is_open' => !empty($selected_values),
       ];
     }
 
