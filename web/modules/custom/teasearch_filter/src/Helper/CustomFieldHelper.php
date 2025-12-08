@@ -509,8 +509,7 @@ class CustomFieldHelper
             if (!empty($icon_name_value)) {
               // Costruisci il path completo dell'icona
               $theme_path = \Drupal::service('extension.list.theme')->getPath('teasearch');
-              $icon_path = '../../' . $theme_path . '/images/bibicons/' . $icon_name_value . ".png";
-
+              $icon_path = base_path() . $theme_path . '/images/bibicons/' . $icon_name_value . ".png";
               // Aggiungi la proprietà all'entità per l'uso nel template
               $entity->teasearch_bibliography_icon = $icon_path;
             }

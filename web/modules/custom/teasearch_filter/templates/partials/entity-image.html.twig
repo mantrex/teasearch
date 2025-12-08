@@ -113,14 +113,14 @@
   {# ========================================================================= #}
   {# RENDERING DELL'IMMAGINE #}
   {# ========================================================================= #}
-  <img 
-    src="{{ image_url }}" 
-    alt="{{ entity.label }}" 
-    class="entity-image {{ current_image_field == 'bibliography_icon' ? 'bibliography-icon' : '' }} {{ image_format == 'rounded' ? 'rounded-circle' : 'rounded' }}" 
-    width="64" 
-    height="64" 
-    loading="lazy" 
-    onerror="this.src='{{ module_path }}/images/placeholder.png'; this.onerror=null;" 
-    data-field-used="{{ current_image_field }}" 
-    title="Using: {{ current_image_field }}">
+ <img 
+  src="{{ image_url }}" 
+  alt="{{ entity.label }}" 
+  class="entity-image {{ current_image_field == 'bibliography_icon' ? 'bibliography-icon' : '' }} {{ image_format == 'rounded' ? 'rounded-circle' : 'rounded' }}" 
+  width="64" 
+  height="64" 
+  loading="lazy" 
+  onerror="this.src='../modules/custom/teasearch_filter/images/default.png'; this.onerror=null;" 
+  data-field-used="{{ current_image_field }}" 
+  title="Using: {{ current_image_field }}">
 </div>

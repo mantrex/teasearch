@@ -20,8 +20,25 @@
   * - content_type: Current content type
   */
 #}
+{#
+  /**
+  * @file
+  * Paginator template for teasearch filter results.
+  *
+  * Variables:
+  * - paginator_data: Object containing pagination info
+  * - content_type: Current content type
+  * - is_free_search: Boolean, true if free search mode
+  * - current_query: Current query parameters
+  */
+#}
 
 {% if paginator_data and paginator_data.total_pages > 0 %}
+
+  {# Determina quale route usare #}
+  {% set search_route = is_free_search is defined and is_free_search ? 'teasearch_filter.free_search' : 'teasearch_filter.search' %}
+  {% set route_params = is_free_search is defined and is_free_search ? {} : {'content_type': content_type} %}
+
   <div class="teasearch-paginator">
 
     {# Navigazione pagine - sinistra #}
@@ -29,22 +46,14 @@
 
       {# First page button [<<] #}
       {% if paginator_data.has_first %}
-        <a href="{{ path('teasearch_filter.search', {
-        'content_type': content_type
-      }, {
-        'query': current_query|merge({'page': 0})
-      }) }}" class="paginator-btn paginator-first" title="{{ 'First page'|t }}">
+        <a href="{{ path(search_route, route_params, {'query': current_query|merge({'page': 0})}) }}" class="paginator-btn paginator-first" title="{{ 'First page'|t }}">
           &laquo;
         </a>
       {% endif %}
 
       {# Previous page button [<] #}
       {% if paginator_data.has_prev %}
-        <a href="{{ path('teasearch_filter.search', {
-        'content_type': content_type
-      }, {
-        'query': current_query|merge({'page': paginator_data.current_page - 1})
-      }) }}" class="paginator-btn paginator-prev" title="{{ 'Previous page'|t }}">
+        <a href="{{ path(search_route, route_params, {'query': current_query|merge({'page': paginator_data.current_page - 1})}) }}" class="paginator-btn paginator-prev" title="{{ 'Previous page'|t }}">
           &lsaquo;
         </a>
       {% endif %}
@@ -63,11 +72,7 @@
             {{ page_num + 1 }}
           </span>
         {% else %}
-          <a href="{{ path('teasearch_filter.search', {
-          'content_type': content_type
-        }, {
-          'query': current_query|merge({'page': page_num})
-        }) }}" class="paginator-page">
+          <a href="{{ path(search_route, route_params, {'query': current_query|merge({'page': page_num})}) }}" class="paginator-page">
             {{ page_num + 1 }}
           </a>
         {% endif %}
@@ -82,22 +87,14 @@
 
       {# Next page button [>] #}
       {% if paginator_data.has_next %}
-        <a href="{{ path('teasearch_filter.search', {
-        'content_type': content_type
-      }, {
-        'query': current_query|merge({'page': paginator_data.current_page + 1})
-      }) }}" class="paginator-btn paginator-next" title="{{ 'Next page'|t }}">
+        <a href="{{ path(search_route, route_params, {'query': current_query|merge({'page': paginator_data.current_page + 1})}) }}" class="paginator-btn paginator-next" title="{{ 'Next page'|t }}">
           &rsaquo;
         </a>
       {% endif %}
 
       {# Last page button [>>] #}
       {% if paginator_data.has_last %}
-        <a href="{{ path('teasearch_filter.search', {
-        'content_type': content_type
-      }, {
-        'query': current_query|merge({'page': paginator_data.total_pages - 1})
-      }) }}" class="paginator-btn paginator-last" title="{{ 'Last page'|t }}">
+        <a href="{{ path(search_route, route_params, {'query': current_query|merge({'page': paginator_data.total_pages - 1})}) }}" class="paginator-btn paginator-last" title="{{ 'Last page'|t }}">
           &raquo;
         </a>
       {% endif %}
@@ -117,11 +114,7 @@
               {{ option }}
             </span>
           {% else %}
-            <a href="{{ path('teasearch_filter.search', {
-          'content_type': content_type
-        }, {
-          'query': current_query|merge({'per_page': option, 'page': 0})
-        }) }}" class="paginator-per-page-btn">
+            <a href="{{ path(search_route, route_params, {'query': current_query|merge({'per_page': option, 'page': 0})}) }}" class="paginator-per-page-btn">
               {{ option }}
             </a>
           {% endif %}

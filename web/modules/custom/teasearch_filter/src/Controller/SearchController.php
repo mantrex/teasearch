@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Drupal\teasearch_filter\Helper\CustomFieldHelper;
-use Drupal\teasearch_filter\Helper\SearchHelper; 
+use Drupal\teasearch_filter\Helper\SearchHelper;
 /**
  * Search controller for teasearch_filter module.
  */
@@ -88,7 +88,7 @@ class SearchController extends ControllerBase
     );
   }
 
-  
+
 
   /**
    * Handle legacy redirects.
@@ -1081,10 +1081,8 @@ class SearchController extends ControllerBase
 
 
   /**
-   * FIX PER SearchController::freeSearchResults()
+   * SearchController::freeSearchResults()
    * 
-   * SOSTITUIRE IL METODO freeSearchResults() in SearchController.php
-   * con questa versione che include debug logging
    */
 
   public function freeSearchResults(Request $request)
@@ -1092,21 +1090,10 @@ class SearchController extends ControllerBase
     $search_query = trim($request->query->get('q', ''));
     $content_type_filter = $request->query->get('content_type', 'all');
 
-    // DEBUG LOG
-    \Drupal::logger('teasearch_filter')->notice('Free search called: q=@q, content_type=@ct', [
-      '@q' => $search_query,
-      '@ct' => $content_type_filter,
-    ]);
-
     // Validate search query
     if (empty($search_query)) {
       return [
-        '#theme' => 'teasearch_free_search',
-        '#entities' => [],
-        '#search_query' => $search_query,
-        '#content_type_filter' => $content_type_filter,
-        '#total_results' => 0,
-        '#page_title' => $this->t('Search Results'),
+        '#markup' => '<div class="no-search-query">' . $this->t('Please enter a search term.') . '</div>',
       ];
     }
 
@@ -1114,71 +1101,121 @@ class SearchController extends ControllerBase
     $config = $this->configFactory->get('teasearch_filter.settings');
     $content_types = $config->get('content_types') ?: [];
 
-    // DEBUG LOG
-    \Drupal::logger('teasearch_filter')->notice('Content types found: @count', [
-      '@count' => count($content_types),
-    ]);
-
     $all_entities = [];
+    $mixed_content_types = FALSE;
 
     // Search based on content_type_filter
     if ($content_type_filter === 'all') {
+      $mixed_content_types = TRUE;
+
       // Search in ALL content types
       foreach ($content_types as $content_type => $content_type_config) {
-        \Drupal::logger('teasearch_filter')->notice('Searching in content type: @ct', [
-          '@ct' => $content_type,
-        ]);
-
         $entities = $this->searchInContentType($content_type, $content_type_config, $search_query);
 
-        \Drupal::logger('teasearch_filter')->notice('Found @count entities in @ct', [
-          '@count' => count($entities),
-          '@ct' => $content_type,
-        ]);
+        // Process each entity with its specific config
+        foreach ($entities as $entity) {
+          $this->processEntityForDisplay($entity, $content_type_config);
+          $entity->teasearch_content_type_label = $content_type_config['label'] ?? ucfirst($content_type);
+          $entity->teasearch_results_config = $content_type_config['results'] ?? [];
+        }
 
         $all_entities = array_merge($all_entities, $entities);
       }
+
+      // Use first content type config as base (only for structure)
+      $first_content_type = array_key_first($content_types);
+      $content_type_config = $content_types[$first_content_type];
+      $actual_content_type = $first_content_type;
+
     } else {
       // Search in specific content type
-      if (isset($content_types[$content_type_filter])) {
-        $content_type_config = $content_types[$content_type_filter];
-        $all_entities = $this->searchInContentType($content_type_filter, $content_type_config, $search_query);
+      if (!isset($content_types[$content_type_filter])) {
+        throw new NotFoundHttpException('Content type not found.');
+      }
+
+      $content_type_config = $content_types[$content_type_filter];
+      $all_entities = $this->searchInContentType($content_type_filter, $content_type_config, $search_query);
+      $actual_content_type = $content_type_filter;
+
+      // Process entities
+      foreach ($all_entities as $entity) {
+        $this->processEntityForDisplay($entity, $content_type_config);
+        $entity->teasearch_results_config = $content_type_config['results'] ?? [];  // ← AGGIUNGI QUESTA
       }
     }
 
-    // DEBUG LOG TOTALE
-    \Drupal::logger('teasearch_filter')->notice('Total entities found: @count', [
-      '@count' => count($all_entities),
-    ]);
+    // Get paginator configuration
+    $paginator_config = $this->getPaginatorConfig();
+    $page = (int) $request->query->get('page', 0);
+    $per_page = $request->query->get('per_page');
 
-    // Process entities for display
-    foreach ($all_entities as $entity) {
-      // Add content type label for display
-      $bundle = $entity->bundle();
-      foreach ($content_types as $ct_key => $ct_config) {
-        if ($ct_config['machine_name'] === $bundle) {
-          $entity->teasearch_content_type_label = $ct_config['label'] ?? ucfirst($ct_key);
-          break;
-        }
-      }
+    // Session management for per_page
+    $session = $request->getSession();
+    $session_key = "teasearch_filter.search.per_page";
+
+    if ($per_page === null) {
+      $per_page = $session->get($session_key, $paginator_config['results_default']);
+    } else {
+      $per_page = (int) $per_page;
+      $session->set($session_key, $per_page);
     }
 
-    // If specific content type selected, show with filters
-    if ($content_type_filter !== 'all' && isset($content_types[$content_type_filter])) {
-      return $this->buildFilteredSearchResults($content_type_filter, $all_entities, $search_query, $request);
+    // Pagination
+    $total_results = count($all_entities);
+    $offset = $page * $per_page;
+    $paginated_entities = array_slice($all_entities, $offset, $per_page);
+
+    // Build paginator data
+    $paginator_data = $this->preparePaginatorData($total_results, $page, $per_page, $paginator_config);
+
+    $entity_type = $content_type_config['type'] ?? 'node';
+    $page_title = $this->t('Search Results');
+
+    // Prepare filters (empty for "all", real for specific content type)
+    $grouped_filters = [];
+    $century_data = NULL;
+    $date_data = NULL;
+
+    if (!$mixed_content_types) {
+      $filters = $content_type_config['filters'] ?: [];
+      $grouped_filters = $this->prepareGroupedFilters($filters, $content_type_config, $request);
+      $century_data = $this->prepareCenturyData($filters, $content_type_config, $request);
+      $date_data = $this->prepareDateData($filters, $content_type_config, $request);
     }
 
-    // Otherwise show simple list without filters
+    // Always use teasearch.html.twig template
     return [
-      '#theme' => 'teasearch_free_search',
-      '#entities' => $all_entities,
+      '#theme' => 'teasearch',
+      '#filter_form' => NULL,
+      '#entities' => $paginated_entities,
+      '#content_type_config' => $content_type_config,
+      '#entity_type' => $entity_type,
+      '#content_type' => $actual_content_type,
+      '#total_results' => $total_results,
+      '#has_filters' => FALSE,
+      '#grouped_filters' => $grouped_filters,
+      '#century_data' => $century_data,
+      '#date_data' => $date_data,
+      '#paginator_data' => $paginator_data,
+      '#is_free_search' => TRUE,
+      '#current_query' => $request->query->all(),
+      '#page_title' => $page_title,
       '#search_query' => $search_query,
-      '#content_type_filter' => $content_type_filter,
-      '#total_results' => count($all_entities),
-      '#page_title' => $this->t('Search Results'),
+      '#mixed_content_types' => $mixed_content_types,
       '#module_path' => \Drupal::service('extension.list.module')->getPath('teasearch_filter'),
+      '#attached' => [
+        'library' => ['teasearch_filter/teasearch_filter_styles'],
+      ],
+      '#cache' => [
+        'contexts' => ['url.query_args'],
+        'tags' => ['node_list', 'user_list', 'config:teasearch_filter.settings'],
+      ],
     ];
   }
+
+
+
+
 
 
 
@@ -1292,7 +1329,7 @@ class SearchController extends ControllerBase
     $paginated_entities = array_slice($entities, $offset, $per_page);
 
     // Build paginator data
-    $paginator_data = $this->buildPaginatorData($total_results, $page, $per_page, $paginator_config);
+    $paginator_data = $this->preparePaginatorData($total_results, $page, $per_page, $paginator_config);
 
     $entity_type = $content_type_config['type'] ?? 'node';
 

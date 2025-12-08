@@ -16,34 +16,67 @@
   */
 #}
 
-<div class="teasearch-wrapper">
-  {# Sidebar with filters #}
-  <aside class="teasearch-sidebar">
-    {% if grouped_filters %}
-      {% include 'modules/custom/teasearch_filter/templates/partials/filter-form.html.twig' with {
-				'grouped_filters': grouped_filters,
-				'content_type': content_type,
-				'century_data': century_data,
-				'date_data': date_data
-			} %}
-    {% else %}
-      {{ filter_form }}
-    {% endif %}
-  </aside>
+<div class="teasearch-wrapper {% if mixed_content_types %}teasearch-no-sidebar{% endif %}">
+
+  {# Sidebar with filters - NASCOSTA se mixed_content_types #}
+  {% if not mixed_content_types %}
+    <aside class="teasearch-sidebar">
+      {% if grouped_filters %}
+        {% include 'modules/custom/teasearch_filter/templates/partials/filter-form.html.twig' with {
+          'grouped_filters': grouped_filters,
+          'content_type': content_type,
+          'century_data': century_data,
+          'date_data': date_data
+        } %}
+      {% else %}
+        {{ filter_form }}
+      {% endif %}
+    </aside>
+  {% endif %}
 
   {# Main results area #}
-  <main class="teasearch-results">
+  <main class="teasearch-results {% if mixed_content_types %}teasearch-results-full{% endif %}">
+
+    {# Search info header per ricerca all #}
+    {% if mixed_content_types and search_query %}
+      <div class="search-info-header">
+        <h1 class="search-results-title">
+          {{ 'Search Results'|t }}
+          {% if total_results %}
+            <span class="results-count">
+              (
+              {{ total_results }}
+              )
+            </span>
+          {% endif %}
+        </h1>
+        <div class="search-meta">
+          <span class="search-query-display">
+            {{ 'Search term:'|t }}
+            <strong>
+              "
+              {{ search_query }}
+              "
+            </strong>
+          </span>
+        </div>
+      </div>
+    {% endif %}
+
     {% if entities %}
-      {% include 'modules/custom/teasearch_filter/templates/partials/results-header.html.twig' %}
+      {% if not mixed_content_types %}
+        {% include 'modules/custom/teasearch_filter/templates/partials/results-header.html.twig' %}
+      {% endif %}
+
       {% include 'modules/custom/teasearch_filter/templates/partials/results-list.html.twig' %}
 
       {# Paginator #}
       {% if paginator_data %}
-       
         {% include 'modules/custom/teasearch_filter/templates/partials/paginator.html.twig' with {
           'paginator_data': paginator_data,
           'content_type': content_type,
-          'current_query': current_query
+          'current_query': current_query,
+          'is_free_search': is_free_search|default(false)
         } %}
       {% endif %}
 
@@ -52,3 +85,5 @@
     {% endif %}
   </main>
 </div>
+
+

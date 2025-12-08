@@ -713,3 +713,88 @@
     display: none;
   }
 }
+
+
+/* GESTIONE ricerca free con ALL */
+
+/* 
+ * AGGIUNGERE QUESTO CSS a web/modules/custom/teasearch_filter/css/teasearch_filter.css
+ * Gestione layout senza sidebar per ricerca "all"
+ */
+
+/* Layout normale con sidebar (default) */
+
+.content-type-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: #6c757d;
+  background-color: transparent;
+  padding: 0;
+  margin-left: 0.5rem;
+  font-weight: normal;
+  float:right;
+}
+
+.teasearch-wrapper {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Layout senza sidebar per ricerca "all" */
+.teasearch-wrapper.teasearch-no-sidebar {
+  grid-template-columns: 1fr;
+}
+
+.teasearch-results-full {
+  max-width: 100%;
+  width:100%;
+  margin: 0 auto;
+}
+
+/* Header info per ricerca all */
+.search-info-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--light-border);
+}
+
+.search-results-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--body-text);
+  margin: 0 0 0.5rem 0;
+}
+
+.results-count {
+  font-weight: normal;
+  color: var(--light-text);
+  font-size: 1.25rem;
+}
+
+.search-meta {
+  font-size: 0.9rem;
+  color: var(--light-text);
+}
+
+.search-query-display strong {
+  color: var(--body-text);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .teasearch-wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .teasearch-sidebar {
+    order: 2;
+  }
+
+  .teasearch-results {
+    order: 1;
+  }
+}
