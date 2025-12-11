@@ -51,7 +51,7 @@ function teasearch_get_field_type_registry()
     'image' => 'teasearch_render_field_image',
     'video' => 'teasearch_render_field_video',
     'pdf' => 'teasearch_render_field_pdf',
-
+    'news_type_badge' => 'teasearch_render_field_news_type_badge',
   ];
 }
 
@@ -3704,5 +3704,59 @@ function teasearch_render_field_pdf($node, $field_config, $field_identifier)
     '#markup' => Markup::create($html),
   ];
 }
+
+function teasearch_render_field_news_type_badge($node, $field_config, $field_identifier)
+{
+  $output_parts = [];
+
+  // ========================================================================
+  // PARTE 1: DATA (field_date)
+  // ========================================================================
+  if ($node->hasField('field_date') && !$node->get('field_date')->isEmpty()) {
+    $date_value = $node->get('field_date')->value;
+
+    if ($date_value) {
+      // Formatta la data se necessario (già dovrebbe essere YYYY-MM-DD)
+      $output_parts[] = '<div class="news-badge-date">' . htmlspecialchars($date_value) . '</div>';
+    }
+  }
+
+  // ========================================================================
+  // PARTE 2: NEWS TYPE (field_news_type)
+  // ========================================================================
+  if ($node->hasField('field_news_type') && !$node->get('field_news_type')->isEmpty()) {
+    $news_type_field = $node->get('field_news_type');
+    $news_type = null;
+
+    $first_item = $news_type_field->first();
+    if ($first_item) {
+      // Caso 1: Campo taxonomy (entity reference)
+      if (isset($first_item->entity)) {
+        $term = $first_item->entity;
+        if ($term) {
+          $news_type = $term->getName();
+        }
+      }
+      // Caso 2: Campo text semplice
+      elseif (isset($first_item->value)) {
+        $news_type = $first_item->value;
+      }
+    }
+
+    if ($news_type) {
+      $output_parts[] = '<div class="news-badge-type">News type: ' . htmlspecialchars($news_type) . '</div>';
+    }
+  }
+
+  // ========================================================================
+  // RITORNA IL BOX COMPLETO
+  // ========================================================================
+  if (empty($output_parts)) {
+    return NULL;
+  }
+
+  return '<div class="news-type-badge-box">' . implode('', $output_parts) . '</div>';
+}
+
 
 

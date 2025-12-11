@@ -83,6 +83,7 @@
   /* Dimensioni - Mobile (max-width: 480px) */
   --paginator-size-small: 2rem;
   --paginator-padding-small: 0.3rem 0.5rem;
+  --news-box:#dae6bc;
 }
 
 body {

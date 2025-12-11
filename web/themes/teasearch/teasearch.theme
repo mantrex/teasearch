@@ -297,7 +297,7 @@ function teasearch_theme_suggestions_node_alter(array &$suggestions, array $vari
     $suggestions[] = 'node__' . $content_type . '__detail';
   }
 }*/
-
+/*
 function teasearch_theme_suggestions_node_alter(array &$suggestions, array $variables)
 {
   $node = $variables['elements']['#node'];
@@ -319,7 +319,38 @@ function teasearch_theme_suggestions_node_alter(array &$suggestions, array $vari
       $suggestions[] = 'node__detail';
     }
   }
+}*/
+
+function teasearch_theme_suggestions_node_alter(array &$suggestions, array $variables)
+{
+  $node = $variables['elements']['#node'];
+  $view_mode = $variables['elements']['#view_mode'];
+
+  if ($view_mode === 'full') {
+    $content_type = $node->bundle();
+
+    // Template speciale per about
+    if (in_array($content_type, ['about'])) {
+      $suggestions[] = 'node__info';
+      return;
+    }
+    
+    // Carica lo schema
+    $schemas = teasearch_get_detail_schemas();
+
+    // Se esiste schema, suggerisci template appropriato
+    if (isset($schemas[$content_type])) {
+      // NEWS: Template speciale per layout a 2 colonne
+      if ($content_type === 'news') {
+        $suggestions[] = 'node__news_detail';
+      } else {
+        // Altri content type: template standard
+        $suggestions[] = 'node__detail';
+      }
+    }
+  }
 }
+
 
 
 function teasearch_preprocess_node__info(array &$variables): void
@@ -428,7 +459,7 @@ function teasearch_preprocess_node__info(array &$variables): void
 }
 
 
-
+/*
 function teasearch_preprocess_node(&$variables)
 {
   $node = $variables['node'];
@@ -461,7 +492,85 @@ function teasearch_preprocess_node(&$variables)
       }
     }
   }
+}*/
+
+function teasearch_preprocess_node(&$variables)
+{
+  $node = $variables['node'];
+  $view_mode = $variables['view_mode'];
+
+  // Solo per view mode 'full' (pagina di dettaglio)
+  if ($view_mode === 'full') {
+    $content_type = $node->bundle();
+
+    // Carica lo schema per questo content type
+    $schemas = teasearch_get_detail_schemas();
+
+    if (isset($schemas[$content_type])) {
+      $schema = $schemas[$content_type];
+
+      // Carica libreria CSS
+      $variables['#attached']['library'][] = 'teasearch/detail-page';
+
+      // Aggiungi la label del content type
+      $variables['content_type_label'] = teasearch_get_content_type_label($content_type);
+
+      // Processare icon se presente
+      if (isset($schema['icon'])) {
+        $variables['detail_icon'] = teasearch_render_icon($node, $schema['icon']);
+      }
+
+      // Processare fields
+      if (isset($schema['fields'])) {
+        
+        // ===================================================================
+        // NEWS: Layout speciale con separazione per posizione
+        // ===================================================================
+        if ($content_type === 'news') {
+          $all_fields = teasearch_render_fields($node, $schema['fields']);
+          
+          // Inizializza array separati per posizione
+          $variables['news_left_box'] = [];
+          $variables['news_right_fields'] = [];
+          $variables['news_main_fields'] = [];
+          $variables['detail_fields'] = []; // Campi tabella standard
+          
+          // Separa i campi in base alla posizione
+          foreach ($all_fields as $field_id => $field_data) {
+            // Recupera la posizione dallo schema
+            $position = $schema['fields'][$field_id]['position'] ?? 'default';
+            
+            if ($position === 'left_box') {
+              // Box arrotondato sinistra
+              $variables['news_left_box'][$field_id] = $field_data;
+            } 
+            elseif ($position === 'right') {
+              // Info evento destra
+              $variables['news_right_fields'][$field_id] = $field_data;
+            } 
+            elseif ($position === 'main') {
+              // Contenuto principale (immagine, testo)
+              $variables['news_main_fields'][$field_id] = $field_data;
+            } 
+            else {
+              // Tabella standard in fondo
+              $variables['detail_fields'][$field_id] = $field_data;
+            }
+          }
+        } 
+        // ===================================================================
+        // ALTRI CONTENT TYPE: Comportamento standard
+        // ===================================================================
+        else {
+          $variables['detail_fields'] = teasearch_render_fields($node, $schema['fields']);
+        }
+      }
+    }
+  }
 }
+
+
+
 
 
 /**

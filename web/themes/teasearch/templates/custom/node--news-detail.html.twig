@@ -1,0 +1,303 @@
+{#
+/**
+ * @file
+ * Template per News con layout a 2 colonne verticale completo.
+ * 
+ * Layout:
+ * - Header verde con titolo
+ * - Box "News type" flottante in alto a sinistra del contenuto
+ * - Colonna sinistra: immagine + body text
+ * - Sidebar destra: tutti i metadati (data, temi, keywords, etc)
+ * 
+ * Variabili disponibili:
+ * - news_left_box: Box "News type" verde
+ * - news_right_fields: Campi sidebar destra
+ * - news_main_fields: Contenuto principale (immagine, testo)
+ * - detail_fields: Altri campi (references, etc)
+ * - content_type_label: Label "NEWS"
+ */
+#}
+
+{{ attach_library('teasearch/detail-page') }}
+
+<article{{attributes.addClass('node','node--type-news','node--news-detail')}}>
+
+	{# HEADER verde con titolo #}
+	<div class="detail-header">
+		<div class="detail-header__title-section">
+			{% if content_type_label %}
+				<div class="detail-header__content-type">
+					{{ content_type_label|upper }}
+				</div>
+			{% endif %}
+
+			{% if detail_fields.maintitle %}
+				<h1 class="detail-header__main-title">
+					{{ detail_fields.maintitle.content|raw }}
+				</h1>
+			{% endif %}
+		</div>
+	</div>
+
+	{# LAYOUT A 2 COLONNE: Contenuto principale + Sidebar #}
+	<div
+		class="news-layout-wrapper">
+
+		{# COLONNA SINISTRA: Box news type + Immagine + Body text #}
+		<div
+			class="news-main-column">
+
+			{# Box "News type" flottante in alto #}
+			{% if news_left_box %}
+				<div class="news-type-box-wrapper">
+					{% for field_id, field in news_left_box %}
+						{{ field.content|raw }}
+					{% endfor %}
+				</div>
+			{% endif %}
+
+			{# Contenuto principale (immagine + testo) #}
+			<div class="news-main-content">
+				{% for field_id, field in news_main_fields %}
+					{% if field.content %}
+						<div class="news-content-block news-content-block--{{ field_id }}">
+							{{ field.content|raw }}
+						</div>
+					{% endif %}
+				{% endfor %}
+			</div>
+
+		</div>
+
+		{# SIDEBAR DESTRA: Metadati #}
+		<aside class="news-sidebar">
+			{% if news_right_fields %}
+				{% for field_id, field in news_right_fields %}
+					{% if field.content %}
+						<div class="news-sidebar-item">
+							<div class="news-sidebar-label">{{ field.label }}</div>
+							<div class="news-sidebar-value">{{ field.content|raw }}</div>
+						</div>
+					{% endif %}
+				{% endfor %}
+			{% endif %}
+		</aside>
+
+	</div>
+
+	{# SEZIONE INFERIORE: References e Details - USA LE CLASSI STANDARD #}
+	{% if detail_fields %}
+		<div class="detail-body">
+			<table class="detail-table">
+				<tbody>
+					{% for field_id, field in detail_fields %}
+
+						{# Salta maintitle (già mostrato sopra) #}
+						{% if field_id == 'maintitle' %}
+							{# Skip #}
+
+							{# Separatore (es. "RELATED RESOURCES", "DETAILS") #}
+						{% elseif field.type == 'separator' %}
+							{# Verifica se ci sono campi con contenuto dopo questo separatore #}
+							{% set has_fields_after = false %}
+							{% set current_index = loop.index %}
+							{% set found_next_separator = false %}
+
+							{% for next_field_id, next_field in detail_fields %}
+								{% if loop.index > current_index and not found_next_separator %}
+									{# Se trovo un altro separatore, mi fermo #}
+									{% if next_field.type == 'separator' %}
+										{% set found_next_separator = true %}
+										{# Se trovo un campo normale con contenuto non vuoto, segno come trovato #}
+									{% elseif next_field_id != 'maintitle' and next_field.content is not empty %}
+										{% set has_fields_after = true %}
+									{% endif %}
+								{% endif %}
+							{% endfor %}
+
+							{# Mostra il separatore solo se ci sono campi dopo #}
+							{% if has_fields_after %}
+								<tr class="detail-separator">
+									<td colspan="2">
+										<div class="detail-separator__content">
+											{{ field.content }}
+										</div>
+									</td>
+								</tr>
+							{% endif %}
+
+							{# Campo normale #}
+						{% elseif field.content %}
+							<tr class="detail-field detail-field--{{ field_id }}">
+								<td class="detail-field__label">
+									{{ field.label|upper }}
+								</td>
+								<td class="detail-field__content">
+									{{ field.content|raw }}
+								</td>
+							</tr>
+						{% endif %}
+
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	{% endif %}
+
+</article>
+
+{# CSS per il layout news a 2 colonne verticale #}
+<style>
+	/* Layout principale a 2 colonne */
+	.news-layout-wrapper {
+		display: grid;
+		grid-template-columns: 1fr 320px;
+		gap: 3rem;
+		background: var(--light);
+
+		position: relative;
+	}
+
+	/* COLONNA SINISTRA */
+	.news-main-column {
+		position: relative;
+		padding-left: 1rem;
+		padding-top: 1rem;
+	}
+
+	/* Box "News type" flottante in alto a sinistra */
+	.news-type-box-wrapper {
+		float: left;
+		margin: 0 2rem 1rem 0;
+		max-width: 310px;
+	}
+
+	.news-type-badge-box {
+		background: var(--news-box);
+		border-radius: 20px;
+		padding: 1.25rem 1.5rem;
+		font-size: 0.9rem;
+		line-height: 1.5;
+	}
+
+	.news-badge-date {
+		font-weight: normal;
+		margin-bottom: 0.5rem;
+	}
+
+	.news-badge-type {
+		font-weight: bold;
+	}
+
+	/* Contenuto principale */
+	.news-main-content {
+		clear: none;
+	}
+
+	.news-content-block {
+		margin-bottom: 2rem;
+	}
+
+	.news-content-block--image {
+		clear: both;
+		padding-top: 1rem;
+	}
+
+	.news-content-block--image img {
+		width: 100%;
+		height: auto;
+		border-radius: 8px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.news-content-block--field_content {
+		font-size: 1.05rem;
+		line-height: 1.7;
+		color: var(--body-text);
+	}
+
+	/* SIDEBAR DESTRA */
+	.news-sidebar {
+		background: var(--light-bg);
+		padding: 2rem;
+		position: sticky;
+		top: 86px;
+		align-self: start;
+		max-height: calc(100vh - 4rem);
+		overflow-y: auto;
+	}
+
+	.news-sidebar-item {
+		margin-bottom: 0.75rem;
+		padding-bottom: 0.75rem;
+		border-bottom: 1px solid var(--light-border);
+	}
+
+	.news-sidebar-item:last-child {
+		margin-bottom: 0;
+		padding-bottom: 0;
+		border-bottom: none;
+	}
+
+	.news-sidebar-label {
+		font-weight: 600;
+		color: var(--item-title);
+		margin-bottom: 0.5rem;
+		font-size: 0.9rem;
+		text-transform: capitalize;
+	}
+
+	.news-sidebar-value {
+		color: var(--body-text);
+		font-size: 0.95rem;
+		line-height: 1.5;
+	}
+
+	/* Link nella sidebar */
+	.news-sidebar-value a {
+		color: var(--item-link);
+		text-decoration: none;
+	}
+
+	.news-sidebar-value a:hover {
+		text-decoration: underline;
+	}
+
+	/* Responsive */
+	@media(max-width: 1024px) {
+		.news-layout-wrapper {
+			grid-template-columns: 1fr 280px;
+			gap: 2rem;
+		}
+
+		.news-sidebar {
+			padding: 1.5rem;
+		}
+	}
+
+	@media(max-width: 768px) {
+		.news-layout-wrapper {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+		}
+
+		.news-type-box-wrapper {
+			float: none;
+			margin: 0 0 1.5rem;
+			max-width: 100%;
+		}
+
+		.news-type-badge-box {
+			max-width: 300px;
+		}
+
+		.news-sidebar {
+			position: static;
+			max-height: none;
+		}
+
+		.news-content-block--image {
+			clear: both;
+		}
+	}
+</style>

@@ -147,7 +147,7 @@ function teasearch_translations()
 }
 function teasearch_get_detail_schemas()
 {
-  $people =  [
+  $people = [
 
     'icon' => [
       'type' => 'image_round',
@@ -354,7 +354,7 @@ function teasearch_get_detail_schemas()
     'icon' => [
       'type' => 'bibliography_icon',
       'field' => 'field_pubtype',
-      'debug'  => TRUE
+      'debug' => TRUE
     ],
 
     'fields' => [
@@ -410,8 +410,8 @@ function teasearch_get_detail_schemas()
         "label" => "Editors",
         "type" => "authors_general",
         "field" => "field_editors",
-        "options"=> [
-          "no_editor_label"=>true
+        "options" => [
+          "no_editor_label" => true
         ]
 
       ],
@@ -421,8 +421,8 @@ function teasearch_get_detail_schemas()
       "project_name_journal" => [
         "label" => "Journal",
         "type" => "project_name",
-        "options"=>[
-          "filter"=>["field_project_type","journal"]
+        "options" => [
+          "filter" => ["field_project_type", "journal"]
         ]
       ],
       "project_name_book" => [
@@ -570,7 +570,7 @@ function teasearch_get_detail_schemas()
         'label' => 'Date',
         'type' => 'date_label'
       ],
-      
+
       'field_language' => [
         'label' => 'Language',
       ],
@@ -794,7 +794,7 @@ function teasearch_get_detail_schemas()
       ],
       'field_location' => [
         'label' => 'Location',
-        
+
       ],
       'field_catalogue_number' => [
         'label' => 'Catalogue Number',
@@ -971,12 +971,154 @@ function teasearch_get_detail_schemas()
 
 
 
+  /**
+   * Schema per NEWS - da aggiungere in detail_schemas.inc
+   * 
+   * Aggiungere alla funzione teasearch_get_detail_schemas():
+   * return [
+   *   "people" => $people,
+   *   "bibliography" => $bibliography,
+   *   ...
+   *   "news" => $news,  // <-- AGGIUNGERE QUESTA RIGA
+   * ];
+   */
+
+  $news = [
+    'fields' => [
+      // Titolo principale (header verde)
+      'maintitle' => [
+        'type' => 'unified_title',
+      ],
+
+      // =======================================================
+      // BOX "NEWS TYPE" FLOTTANTE IN ALTO A SINISTRA
+      // =======================================================
+      'news_type_badge' => [
+        'type' => 'news_type_badge',
+        'position' => 'left_box',
+      ],
+
+      // =======================================================
+      // SIDEBAR DESTRA - METADATI EVENTO
+      // =======================================================
+
+      // Date (event)
+      'field_date' => [
+        'label' => 'Date',
+        'position' => 'right',
+      ],
+      'field_time' => [
+        'label' => 'Time',
+        'position' => 'right',
+      ],
+
+      'field_event_format' => [
+        'label' => 'Event format',
+        'position' => 'right',
+      ],
+      'field_language' => [
+        'label' => 'Language',
+        'position' => 'right',
+      ],
+      'field_location' => [
+        'label' => 'Location',
+        'position' => 'right',
+      ],
+      'field_country' => [
+        'label' => 'Country',
+        'position' => 'right',
+      ],
+      'field_organizer' => [
+        'label' => 'Organiser',
+        'position' => 'right',
+      ],
+      'field_contacts' => [
+        'label' => 'Contacts',
+        'position' => 'right',
+      ],
+
+      // =======================================================
+      // CONTENUTO PRINCIPALE (colonna sinistra)
+      // =======================================================
+      'image' => [
+        'type' => 'image',
+        'field' => 'field_image',
+        'position' => 'main',
+      ],
+
+      'field_content' => [
+        'label' => 'Body Texts',
+        'position' => 'main',
+      ],
+
+      // =======================================================
+      // SEZIONE BOTTOM (full width sotto le 2 colonne)
+      // Usa le stesse classi CSS degli altri content type
+      // =======================================================
+
+      // Separatore "RELATED RESOURCES"
+      "paragraph1" => "Related Resources",
+
+      "texts_ref" => [
+        "label" => "Texts",
+        "type" => "teasearch_references",
+      ],
+
+      "bibliography_ref" => [
+        "label" => "Bibliography",
+        "type" => "curated_references",
+      ],
+
+      // Separatore "DETAILS"
+      "paragraph2" => "Details",
+
+      "field_subjects" => [
+        "label" => "Subjects"
+      ],
+
+      "field_country2" => [
+        "label" => "Geographic focus"
+      ],
+
+      "field_keywords" => [
+        "label" => "Keywords",
+      ],
+
+      "people" => [
+        "label" => "People",
+        "type" => "people_roles"
+      ],
+
+      "field_links" => [
+        "label" => "External Resources",
+      ],
+
+      "field_license" => [
+        "label" => "License"
+      ],
+
+      "systemdate" => [
+        "type" => "systemdate",
+        "label" => "Dates",
+      ],
+
+      "referenced_in" => [
+        "type" => "referenced_in",
+        "label" => "Referenced in",
+      ],
+    ],
+  ];
+
+
+
   return [
     "people" => $people,
     "bibliography" => $bibliography,
     "primary_sources" => $primary_sources,
     "first_reference" => $first_reference,
     "images" => $images,
-    "videos" => $videos
+    "videos" => $videos,
+    "news" => $news,
+
   ];
 }
