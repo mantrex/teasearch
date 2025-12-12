@@ -1003,18 +1003,38 @@ function teasearch_get_detail_schemas()
       // =======================================================
 
       // Date (event)
-      'field_date' => [
+      'date' => [
         'label' => 'Date',
         'position' => 'right',
+        'type'=>'aggregator',
+        'template'=>'{field_event_start_date} {hyphen} {field_event_end_date}',
+        "options"=> [
+          "date_format"=>"j F Y"
+        ]
       ],
-      'field_time' => [
-        'label' => 'Time',
+      'field_deadline' => [
+        'label' => 'Deadline',
         'position' => 'right',
       ],
 
-      'field_event_format' => [
-        'label' => 'Event format',
+      'time' => [
+        'label' => 'Time',
         'position' => 'right',
+        'type' => 'aggregator',
+        'template' => '{field_event_start_time} {hyphen} {field_event_end_time}{break}{field_time_zone}'
+
+      ],
+      'attendance' => [
+        'label' => 'Attendance',
+        'position' => 'right',
+        'type'=>'aggregator',
+        'template'=>'{field_attendance_mode}{break}{field_fee_cost}{break}{field_notes}'
+      ],
+      'media' => [
+        'label' => 'Media',
+        'position' => 'right',
+        'type'=>'aggregator',
+        "template" => "Type: {field_media_type}{break}{field_pub_title}",
       ],
       'field_language' => [
         'label' => 'Language',
@@ -1024,21 +1044,30 @@ function teasearch_get_detail_schemas()
         'label' => 'Location',
         'position' => 'right',
         'type'=>'aggregator',
-        "template" => "Location: {field_location} {break} Date: {field_date} {break} Email: {field_email}",
-        "options"=> [
-          "date_format"=>"j F Y"
-        ]
+        'template'=>'{field_venue}{break}{field_address}{break}{field_map_view}'
       ],
       'field_country' => [
         'label' => 'Country',
+        'position' => 'right',        
+      ],
+      'field_link' => [
+        'label' => 'Link',
         'position' => 'right',
+        'type' => 'aggregator',
+        'template' => '{field_online_event}{break}{field_link_notes}'
       ],
       'field_organizer' => [
-        'label' => 'Organiser',
+        'label' => 'Organizer',
         'position' => 'right',
       ],
-      'field_contacts' => [
+      'contacts' => [
         'label' => 'Contacts',
+        'position' => 'right',
+        'type' => 'aggregator',
+        'template' => 'Website:{field_links}{break}Email:{field_email}{break}Tel:{field_telephone}{break} Contact person: {field_contacts}'
+      ],
+      'field_related_resources' => [
+        'label' => 'Related Resources',
         'position' => 'right',
       ],
 
@@ -1061,28 +1090,14 @@ function teasearch_get_detail_schemas()
       // Usa le stesse classi CSS degli altri content type
       // =======================================================
 
-      // Separatore "RELATED RESOURCES"
-      "paragraph1" => "Related Resources",
-
-      "texts_ref" => [
-        "label" => "Texts",
-        "type" => "teasearch_references",
-      ],
-
-      "bibliography_ref" => [
-        "label" => "Bibliography",
-        "type" => "curated_references",
-      ],
-
-      // Separatore "DETAILS"
-      "paragraph2" => "Details",
+      "paragraph1" => "Entry Details",
 
       "field_subjects" => [
-        "label" => "Subjects"
+        "label" => "Subjects",
       ],
 
       "field_country2" => [
-        "label" => "Geographic focus"
+        "label" => "Geographic Focus",
       ],
 
       "field_keywords" => [
@@ -1094,10 +1109,6 @@ function teasearch_get_detail_schemas()
         "type" => "people_roles"
       ],
 
-      "field_links" => [
-        "label" => "External Resources",
-      ],
-
       "field_license" => [
         "label" => "License"
       ],
@@ -1105,11 +1116,6 @@ function teasearch_get_detail_schemas()
       "systemdate" => [
         "type" => "systemdate",
         "label" => "Dates",
-      ],
-
-      "referenced_in" => [
-        "type" => "referenced_in",
-        "label" => "Referenced in",
       ],
     ],
   ];
