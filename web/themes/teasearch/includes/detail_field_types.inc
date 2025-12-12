@@ -52,6 +52,7 @@ function teasearch_get_field_type_registry()
     'video' => 'teasearch_render_field_video',
     'pdf' => 'teasearch_render_field_pdf',
     'news_type_badge' => 'teasearch_render_field_news_type_badge',
+    'aggregator' => 'teasearch_render_field_aggregator',
   ];
 }
 

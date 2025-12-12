@@ -1020,9 +1020,14 @@ function teasearch_get_detail_schemas()
         'label' => 'Language',
         'position' => 'right',
       ],
-      'field_location' => [
+      'location' => [
         'label' => 'Location',
         'position' => 'right',
+        'type'=>'aggregator',
+        "template" => "Location: {field_location} {break} Date: {field_date} {break} Email: {field_email}",
+        "options"=> [
+          "date_format"=>"j F Y"
+        ]
       ],
       'field_country' => [
         'label' => 'Country',
