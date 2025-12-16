@@ -84,7 +84,10 @@
   --paginator-size-small: 2rem;
   --paginator-padding-small: 0.3rem 0.5rem;
   --news-box:#dae6bc;
+  --search-button-hover: #ecfadf;
+  --search-button-active: rgb(176, 207, 176);
 }
+
 
 body {
   border: 0;
@@ -213,25 +216,32 @@ a {
 }
 
 .footer01-logobase {
-  padding-bottom: 1rem;
+  width:200px;
 }
 
-.footer-cf-logo-wrapper .cf-text {
+.region-footer .university-logo img {
+  width: 160px;
+}
+.region-footer .cf-text {
   line-height: 1.3em;
+  font-size:0.7em;
+  width:145px;
+  margin-left:15px;
+}
+.region-footer .tea-association {
+  margin-top: 2.0em
+}
+.region-footer .tea-association img {
+ display:block;
+ margin-left:15px;
+ width:120px;
+}
+.region.footer .footer-content {
+  font-size:0.8em;
+
 }
 
-/* Adjust brand logo, spacing, etc. */
-.navbar-brand img {
-  width: 140px;
-}
 
-.navbar-nav {
-  text-transform: uppercase;
-}
-
-.region-footer .footer-logo img {
-  width: 150px;
-}
 
 .footer-email {
   margin-bottom: 1em;
@@ -360,6 +370,18 @@ a {
   color: var(--light);
   text-decoration: underline;
 }
+
+
+/* Adjust brand logo, spacing, etc. */
+.navbar-brand img {
+  width: 140px;
+}
+
+.navbar-nav {
+  text-transform: uppercase;
+}
+
+
 
 /* Responsive */
 @media (max-width: 768px) {
