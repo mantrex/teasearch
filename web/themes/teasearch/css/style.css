@@ -213,19 +213,18 @@ a {
   color: var(--light);
   padding: 20px 0;
   height: 280px;
+  font-size:0.8em;
 }
 
-.footer01-logobase {
-  width:200px;
-}
 
+/* COLUMN 1 */
 .region-footer .university-logo img {
   width: 160px;
 }
 .region-footer .cf-text {
   line-height: 1.3em;
-  font-size:0.7em;
-  width:145px;
+
+  width:150px;
   margin-left:15px;
 }
 .region-footer .tea-association {
@@ -233,16 +232,31 @@ a {
 }
 .region-footer .tea-association img {
  display:block;
+ width:140px;
+
  margin-left:15px;
- width:120px;
-}
-.region.footer .footer-content {
-  font-size:0.8em;
-
 }
 
+/* COLUMN 2*/
+.column2 {
+  padding-top:1em;
+}
+.region-footer .teasearch-logo {
+  width:120px;
+}
+.region-footer .association-text {
+  margin-top: 1em;
+}
 
+.region-footer .project-description{
+  margin-top: 1em;
+}
+/* COLUMN 3 */
 
+.column3 {
+  padding-top:1em;
+  text-align:right;
+}
 .footer-email {
   margin-bottom: 1em;
 }
