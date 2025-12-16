@@ -21,9 +21,7 @@
 
 			{# Content type selector #}
 			<div class="content-type-selector">
-				<span class="selector-prefix">
-					
-				</span>
+				<span class="selector-prefix"></span>
 				<select name="content_type" class="form-select content-type-dropdown">
 					{% for value, label in content_type_options %}
 						<option value="{{ value }}" {% if value == current_content_type %} selected {% endif %}>
@@ -36,7 +34,8 @@
 			{# Search button #}
 			<button type="submit" class="btn btn-primary search-button">
 				<span class="search-icon">
-					<img style='width:40px' src="{{ directory }}/images/search_lens.svg">
+<img style='width:40px' src="{{ file_url(directory ~ '/images/search_lens.svg') }}">
+
 
 				</span>
 			</button>
