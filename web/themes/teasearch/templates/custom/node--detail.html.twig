@@ -64,78 +64,99 @@
 
 
 
+<article{{attributes.addClass('node','node--type-'~node.bundle|clean_class,'node--view-mode-'~view_mode|clean_class,'node--detail')}}>
 
-<article{{ attributes.addClass('node','node--type-'~node.bundle|clean_class,'node--view-mode-'~view_mode|clean_class,'node--detail') }}>
+	{# Header con icona e titolo principale #}
+	<div
+		class="detail-header">
+		{# Icona a sinistra (se presente) #}
+		{% if detail_icon %}
+			<div class="detail-header__icon">
+				{{ detail_icon | raw }}
+			</div>
+		{% endif %}
 
-  {# Header con icona e titolo principale #}
-  <div class="detail-header">
-    {# Icona a sinistra (se presente) #}
-    {% if detail_icon %}
-      <div class="detail-header__icon">
-        {{ detail_icon | raw }}
-      </div>
-    {% endif %}
+		{# Sezione verde con content type label e titolo principale #}
+		<div
+			class="detail-header__title-section">
+			{# Label del content type (es. PEOPLE, ARTICLE, etc.) #}
+			{% if content_type_label %}
+				<div class="detail-header__content-type">
+					{{ content_type_label|upper }}
+				</div>
+			{% endif %}
 
-    {# Sezione verde con content type label e titolo principale #}
-    <div class="detail-header__title-section">
-      {# Label del content type (es. PEOPLE, ARTICLE, etc.) #}
-      {% if content_type_label %}
-        <div class="detail-header__content-type">
-          {{ content_type_label|upper }}
-        </div>
-      {% endif %}
+			{# Titolo principale (maintitle se esiste) #}
+			{% if detail_fields.maintitle %}
+				<h1 class="detail-header__main-title">
+					{{ detail_fields.maintitle.content|raw }}
+				</h1>
+			{% endif %}
+		</div>
+	</div>
 
-      {# Titolo principale (maintitle se esiste) #}
-      {% if detail_fields.maintitle %}
-        <h1 class="detail-header__main-title">
-          {{ detail_fields.maintitle.content|raw }}
-        </h1>
-      {% endif %}
-    </div>
-  </div>
+	{# Corpo con i campi in formato tabella #}
+	<div class="detail-body">
+		<table class="detail-table">
+			<tbody>
+				{% set current_separator = null %}
+				{% set separator_has_content = false %}
 
-  {# Corpo con i campi in formato tabella #}
-  <div class="detail-body">
-    <table class="detail-table">
-      <tbody>
-        {% for field_id, field in detail_fields %}
+				{% for field_id, field in detail_fields %}
 
-          {# Salta il maintitle perché già mostrato nell'header #}
-          {% if field_id == 'maintitle' %}
-            {# Non fare nulla, già mostrato sopra #}
+					{# Salta il maintitle perché già mostrato nell'header #}
+					{% if field_id == 'maintitle' %}
+						{# Non fare nulla, già mostrato sopra #}
 
-              {# Separatore (es. PROFILE, DETAILS, etc.) #}
-              {% elseif field.type == 'separator' %}
-                <tr class="detail-separator"> <td colspan="2">
-                  <div class="detail-separator__content">
-                    {{ field.content }}
-                  </div>
-                </td>
-              </tr>
+						{# Separatore - memorizzalo ma non mostrarlo ancora #}
+					{% elseif field.type == 'separator' %}
+						{# Se c'era un separatore precedente senza contenuto, non mostrarlo #}
+						{% if current_separator and not separator_has_content %}
+							{# Separatore vuoto, non fare nulla #}
+						{% endif %}
 
-            {# Campo normale con label e contenuto #}
-              {% else %}
-              <tr class="detail-field detail-field--{{ field_id|clean_class }} detail-field--type-{{ field.type|clean_class }} {{ field.wrapper_class }}">
-                {# Label a sinistra #}
-                {% if field.label %}
-                  <td class="detail-field__label">
-                    {{ field.label }}
-                  </td>
-                {% else %}
-                  <td class="detail-field__label detail-field__label--empty"></td>
-                {% endif %}
+						{# Memorizza il nuovo separatore #}
+						{% set current_separator = field %}
+						{% set separator_has_content = false %}
 
-                {# Contenuto a destra #}
-                <td class="detail-field__content">
-                  {{ field.content|raw }}
-                </td>
-              </tr>
-            {% endif %}
+						{# Campo normale - controlla se ha contenuto #}
+					{% else %}
+						{% if field.content %}
+							{# Se c'è un separatore in attesa e questo campo ha contenuto, mostra il separatore #}
+							{% if current_separator and not separator_has_content %}
+								<tr class="detail-separator">
+									<td colspan="2">
+										<div class="detail-separator__content">
+											{{ current_separator.content }}
+										</div>
+									</td>
+								</tr>
+								{% set separator_has_content = true %}
+							{% endif %}
 
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+							{# Mostra il campo #}
+							<tr
+								class="detail-field detail-field--{{ field_id|clean_class }} detail-field--type-{{ field.type|clean_class }} {{ field.wrapper_class }}">
+								{# Label a sinistra #}
+								{% if field.label %}
+									<td class="detail-field__label">
+										{{ field.label }}
+									</td>
+								{% else %}
+									<td class="detail-field__label detail-field__label--empty"></td>
+								{% endif %}
 
-  </article>
-  
+								{# Contenuto a destra #}
+								<td class="detail-field__content">
+									{{ field.content|raw }}
+								</td>
+							</tr>
+						{% endif %}
+					{% endif %}
+
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+
+</article>

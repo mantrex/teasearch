@@ -6,9 +6,7 @@
 	<div
 		class="row">
 		<!-- COLONNA 1: University Logo + Project Description -->
-		<div
-			class="col-md-4">
-			<!-- Field: Logo / Project name -->
+		<div class="col-12 col-md-4 order-2 order-md-1">
 			<div class="column1">
 				<div class="d-flex flex-column footer-cf-logo-wrapper">
 					<div class='university-logo'>
@@ -16,15 +14,11 @@
 					</div>
 					<div class="cf-text">
 						{{'Department of Asian and North African Studies' | t}}
-
-
 					</div>
 
 					<div class='tea-association'>
 						<img src='{{ ass }}'/>
 					</div>
-
-
 				</div>
 			</div>
 
@@ -34,79 +28,30 @@
 		</div>
 
 		<!-- COLONNA 2: Main Logo + Body Content -->
-		<div class="col-md-4">
+		<div class="col-12 col-md-4 order-1 order-md-2">
 			<div class="column2">
 				<div class='teasearch-logo'>
 					<img src="{{ logo }}" alt="Teasearch" class="footer-logo-img"/>
-
 				</div>
 				<div class='association-text'>
 					Tea Science & Culture Hub
 				</div>
 			</div>
 
-			<!-- Field: University / Sponsor Logos -->
 			<div class="project-description">
 				{{ content.body }}
 			</div>
-
-
 		</div>
 
 		<!-- COLONNA 3: Newsletter, Social, Privacy -->
-		<div
-			class="col-md-4 ">
-			<!-- Email Contact -->
+		<div class="col-12 col-md-4 order-3 order-md-3">
 			<div class='column3'>
 				<div class="footer-email">
 					<a class="href-white" href="mailto:info@teasearch.org">
 						info@teasearch.org
 					</a>
 				</div>
-
-				<!-- Newsletter Section -->
-				<!--
-											<div class="newsletter-section">
-												<div class="newsletter-title">
-													Newsletter
-												</div>
-												<div class="newsletter-form">
-													<input type="email" placeholder="your-email@example.com" class="newsletter-input">
-													<button type="button" class="newsletter-btn">
-														JOIN
-													</button>
-												</div>
-											</div>
-								
-											
-											<div class="social-section d-flex align-items-center">
-								
-												<div class="social-title">
-													Find us on
-												</div>
-												<div class="social-icons">
-													<a href="#" class="social-icon facebook">
-														<i class="fa fa-facebook-f"></i>
-													</a>
-													<a href="#" class="social-icon twitter">
-														<i class="fab fa-twitter"></i>
-													</a>
-													<a href="#" class="social-icon youtube">
-														<i class="fab fa-youtube"></i>
-													</a>
-													<a href="#" class="social-icon instagram">
-														<i class="fab fa-instagram"></i>
-													</a>
-												</div>
-											</div>
-								
-								
-											<div class="privacy-section">
-												<a href="#" class="privacy-link">
-													Privacy / Cookies / Legal notes
-												</a>
-											</div>
-										</div>-->
 			</div>
 		</div>
 	</div>
+</div>

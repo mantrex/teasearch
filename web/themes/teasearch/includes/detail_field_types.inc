@@ -2324,9 +2324,10 @@ function teasearch_build_box2_citation($node, $content_type, $current_language, 
   // 4. TITLE_(LATIN) + TITLE_(ORIGINAL_NON-LATIN) (già inclusi nel punto 1)
 
   // 5. (Category) - solo per BOX-4
+  $citation_part_category = "";
   if ($add_category) {
     $category_label = teasearch_get_category_label_for_box4($content_type, $current_language);
-    $citation_parts[] = '(' . $category_label . ')';
+    $citation_part_category = ' (' . $category_label . ')';
   }
 
   if (empty($citation_parts)) {
@@ -2338,7 +2339,7 @@ function teasearch_build_box2_citation($node, $content_type, $current_language, 
 
   // Link alla pagina del nodo
   $url = $node->toUrl()->toString();
-  $citation_html = '<a href="' . htmlspecialchars($url) . '">' . htmlspecialchars($citation_text) . '</a>';
+  $citation_html = '<a href="' . htmlspecialchars($url) . '">' . htmlspecialchars($citation_text) . '</a>'. $citation_part_category;
 
   return [
     'citation' => $citation_html,

@@ -376,7 +376,7 @@ function teasearch_get_detail_schemas()
         'label' => 'Other names',
       ],
       'field_title' => [
-        'label' => 'Title',
+        'label' => 'Position',
       ],
       'field_affiliation' => [
         'label' => 'Affiliation',
@@ -474,7 +474,7 @@ function teasearch_get_detail_schemas()
         "pubtype" => "legal_and_policy",
       ],
       "standard" => [
-        "label" => "Standard",
+        "label" => "Standards",
         "type" => "publib",
         "pubtype" => "standard",
       ],
@@ -783,12 +783,12 @@ function teasearch_get_detail_schemas()
       'field_language' => [
         'label' => 'Language',
       ],
+      'field_publisher' => [
+        'label' => 'Publisher',
+      ],
 
       'field_place_of_publication' => [
         'label' => 'Place of publication',
-      ],
-      'field_publisher' => [
-        'label' => 'Publisher',
       ],
 
       'field_country' => [
@@ -823,7 +823,7 @@ function teasearch_get_detail_schemas()
       ],
 
       'field_archive' => [
-        'label' => 'Location / Collection',
+        'label' => 'Repository',
       ],
 
       'field_catalogue_number' => [
@@ -1002,7 +1002,7 @@ function teasearch_get_detail_schemas()
         'label' => 'Dimensions',
       ],
       'field_location' => [
-        'label' => 'Location',
+        'label' => 'Repository',
 
       ],
       'field_catalogue_number' => [
@@ -1094,7 +1094,7 @@ function teasearch_get_detail_schemas()
         'label' => 'Event / Context',
       ],
       'field_location' => [
-        'label' => 'Location',
+        'label' => 'Venue',
       ],
       'field_place_of_publication' => [
         'label' => 'Place of creation',
@@ -1234,7 +1234,7 @@ function teasearch_get_detail_schemas()
 
       ],
       'attendance' => [
-        'label' => 'Attendance',
+        'label' => 'Attendance mode',
         'position' => 'right',
         'type'=>'aggregator',
         'template'=>'{field_attendance_mode}{break}{field_fee_cost}{break}{field_notes}'
