@@ -68,18 +68,42 @@ class GlobalSearchBlock extends BlockBase implements ContainerFactoryPluginInter
    */
   public function build()
   {
-    // Get all configured content types
+    // Load teasearch_filter configuration
     $config = $this->configFactory->get('teasearch_filter.settings');
     $content_types = $config->get('content_types') ?: [];
 
-    // Build options for dropdown
+    // Load categories nodes to get weights
+    $category_weights = $this->getCategoryWeights();
+
+    
+    // Add content types with their weights for sorting
+    $content_types_with_weight = [];
+    foreach ($content_types as $machine_name => $content_type_config) {
+      $label = $content_type_config['label'] ?? ucfirst($machine_name);
+
+      // Get weight from categories node
+      // Se non trova il peso, usa -9999 così va in fondo
+      $weight = $category_weights[$machine_name] ?? -9999;
+
+      $content_types_with_weight[] = [
+        'machine_name' => $machine_name,
+        'label' => $this->t($label),
+        'weight' => $weight,
+      ];
+    }
+
+    // Sort by weight DESCENDING: higher weight = first position
+    usort($content_types_with_weight, function ($a, $b) {
+      return $b['weight'] <=> $a['weight'];
+    });
+
+    // Build final options array in sorted order
     $content_type_options = [
       'all' => $this->t('All'),
     ];
 
-    foreach ($content_types as $machine_name => $content_type_config) {
-      $label = $content_type_config['label'] ?? ucfirst($machine_name);
-      $content_type_options[$machine_name] = $this->t($label);
+    foreach ($content_types_with_weight as $item) {
+      $content_type_options[$item['machine_name']] = $item['label'];
     }
 
     // Get current query parameters if we're on search page
@@ -88,11 +112,15 @@ class GlobalSearchBlock extends BlockBase implements ContainerFactoryPluginInter
     $current_content_type = $current_request->query->get('content_type', 'all');
 
 
-    
-    \Drupal::logger('teasearch_filter')->notice(
-      'GlobalSearchBlock: URL query content_type = @ct',
-      ['@ct' => $current_content_type]
-    );
+    // Subito dopo getCategoryWeights()
+    \Drupal::logger('teasearch_filter')->notice('Weights: @weights', ['@weights' => print_r($category_weights, TRUE)]);
+
+    // Subito dopo usort
+    \Drupal::logger('teasearch_filter')->notice('Sorted: @sorted', [
+      '@sorted' => print_r(array_map(function ($item) {
+        return $item['machine_name'] . ' (weight: ' . $item['weight'] . ')';
+      }, $content_types_with_weight), TRUE)
+    ]);
 
     return [
       '#theme' => 'teasearch_global_search_block',
@@ -102,11 +130,67 @@ class GlobalSearchBlock extends BlockBase implements ContainerFactoryPluginInter
       '#current_content_type' => $current_content_type,
       '#cache' => [
         'contexts' => ['url.query_args'],
-        'tags' => ['config:teasearch_filter.settings'],
+        'tags' => ['config:teasearch_filter.settings', 'node_list:categories'],
       ],
     ];
   }
 
+  /**
+   * Get weights from categories nodes.
+   *
+   * @return array
+   *   Array of weights keyed by category machine name.
+   */
+  protected function getCategoryWeights()
+  {
+    $weights = [];
+
+    // Mapping tra field_category_menu_list (nei nodi) e machine_name (nel config)
+    $mapping = [
+      'first_reference' => 'essentials',
+      'primary_sources' => 'texts',
+      'videos' => 'video',
+      'images' => 'images',
+      'bibliography' => 'bibliography',
+      'people' => 'people',
+      'contributors' => 'people', // Se contributors = people
+    ];
+
+    $storage = \Drupal::entityTypeManager()->getStorage('node');
+
+    // Get all categories nodes
+    $query = $storage->getQuery()
+      ->condition('type', 'categories')
+      ->condition('status', 1)
+      ->accessCheck(TRUE);
+
+    $nids = $query->execute();
+
+    if (empty($nids)) {
+      return $weights;
+    }
+
+    $nodes = $storage->loadMultiple($nids);
+
+    foreach ($nodes as $node) {
+      // Get category selector (valore da field_category_menu_list)
+      if ($node->hasField('field_category_menu_list') && !$node->get('field_category_menu_list')->isEmpty()) {
+        $category_selector = $node->get('field_category_menu_list')->value;
+
+        // Get weight (default 0 if not set)
+        $weight = 0;
+        if ($node->hasField('field_weight') && !$node->get('field_weight')->isEmpty()) {
+          $weight = (int) $node->get('field_weight')->value;
+        }
+
+        // Usa il mapping per convertire al machine_name del config
+        $config_machine_name = $mapping[$category_selector] ?? $category_selector;
+        $weights[$config_machine_name] = $weight;
+      }
+    }
+
+    return $weights;
+  }
   /**
    * {@inheritdoc}
    */
@@ -114,4 +198,22 @@ class GlobalSearchBlock extends BlockBase implements ContainerFactoryPluginInter
   {
     return ['url.query_args'];
   }
+
+
+  /*
+  public function access(\Drupal\Core\Session\AccountInterface $account, $return_as_object = FALSE)
+  {
+    $request = \Drupal::request();
+    $current_path = $request->getPathInfo();
+
+    // Nascondi il blocco se siamo in una pagina di dettaglio (es: /category/texts/123 o /en/category/texts/title)
+    // Pattern: /category/{content_type}/{anything}
+    if (preg_match('#^/([a-z]{2}/)?category/[^/]+/.+#', $current_path)) {
+      $access = \Drupal\Core\Access\AccessResult::forbidden();
+    } else {
+      $access = \Drupal\Core\Access\AccessResult::allowed();
+    }
+
+    return $return_as_object ? $access : $access->isAllowed();
+  }*/
 }

@@ -352,6 +352,7 @@
 /*gestione container immagini e icona lente*/
 .detail-image-container {
   position: relative;
+
 }
 .detail-image-icon {
   position: absolute;

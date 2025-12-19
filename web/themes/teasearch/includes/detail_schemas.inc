@@ -783,7 +783,7 @@ function teasearch_get_detail_schemas()
       'field_language' => [
         'label' => 'Language',
       ],
-      'field_publisher' => [
+      'field_text_publisher' => [
         'label' => 'Publisher',
       ],
 
@@ -1230,7 +1230,7 @@ function teasearch_get_detail_schemas()
         'label' => 'Time',
         'position' => 'right',
         'type' => 'aggregator',
-        'template' => '{field_event_start_time} {hyphen} {field_event_end_time}{break}{field_time_zone}'
+        'template' => '{field_start_time} {hyphen} {field_end_time}{break}{field_time_zone}'
 
       ],
       'attendance' => [
@@ -1266,7 +1266,7 @@ function teasearch_get_detail_schemas()
         'template' => '{field_online_event}{break}{field_link_notes}'
       ],
       'field_organizer' => [
-        'label' => 'Organizer',
+        'label' => 'Organiser',
         'position' => 'right',
       ],
       'contacts' => [
@@ -1321,11 +1321,15 @@ function teasearch_get_detail_schemas()
       "field_license" => [
         "label" => "License"
       ],
+      "field_teasearch_contributors" => [
+        "label" => "Contributors",
+      ],
 
       "systemdate" => [
         "type" => "systemdate",
         "label" => "Dates",
       ],
+    
     ],
   ];
 

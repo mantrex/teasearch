@@ -283,7 +283,7 @@ function teasearch_auto_format_value($value, $field_type, $field_name = '')
     $minutes = floor(($seconds % 3600) / 60);
     $secs = $seconds % 60;
 
-    return sprintf('%02d:%02d:%02d', $hours, $minutes, $secs);
+    return sprintf('%02d:%02d', $hours, $minutes, $secs);
   }
 
   // Nessuna formattazione speciale, ritorna il valore originale
@@ -1487,11 +1487,13 @@ function teasearch_render_field_referenced_in($node, $field_config, $field_ident
   $current_node_id = $node->id();
   $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
 
+  \Drupal::logger('teasearch')->notice('REFERENCED_IN: Looking for references to node @nid', ['@nid' => $current_node_id]);
+
   // Configurazione content types da cercare
   $content_types_config = [
     'first_reference' => [
       'field' => 'field_teasearch_references',
-      'template' => 'box4', // BOX-4 con categoria
+      'template' => 'box4',
     ],
     'primary_sources' => [
       'field' => 'field_teasearch_references',
@@ -1506,8 +1508,8 @@ function teasearch_render_field_referenced_in($node, $field_config, $field_ident
       'template' => 'box4',
     ],
     'bibliography' => [
-      'field' => 'field_curated_references',
-      'template' => 'box3', // BOX-3 (come BOX-1 ma con categoria)
+      'fields' => ['field_curated_references', 'field_teasearch_references'],
+      'template' => 'box3',
     ],
   ];
 
@@ -1520,48 +1522,85 @@ function teasearch_render_field_referenced_in($node, $field_config, $field_ident
     'bibliography' => [],
   ];
 
+  $seen_nids = [];
   $seen_surnames = [];
 
   // Per ogni content type, cerca dove il nodo corrente è referenziato
   foreach ($content_types_config as $content_type => $config) {
-    $field_name = $config['field'];
     $template = $config['template'];
 
-    // Query per trovare tutti i nodi di questo content type che referenziano il nodo corrente
-    $query = \Drupal::entityTypeManager()->getStorage('node')->getQuery();
-    $query->condition('type', $content_type)
-      ->condition('status', 1)
-      ->condition($field_name, $current_node_id)
-      ->accessCheck(TRUE);
+    // Gestione campo singolo o multipli
+    $fields_to_check = isset($config['fields']) ? $config['fields'] : [$config['field']];
 
-    $nids = $query->execute();
+    foreach ($fields_to_check as $field_name) {
+      \Drupal::logger('teasearch')->notice('  Checking @type.@field', [
+        '@type' => $content_type,
+        '@field' => $field_name
+      ]);
 
-    if (empty($nids)) {
-      continue;
+      // Query per trovare tutti i nodi di questo content type che referenziano il nodo corrente
+      $query = \Drupal::entityTypeManager()->getStorage('node')->getQuery();
+      $query->condition('type', $content_type)
+        ->condition('status', 1)
+        ->condition($field_name, $current_node_id)
+        ->accessCheck(TRUE);
+
+      $nids = $query->execute();
+
+      \Drupal::logger('teasearch')->notice('    Found @count nids: @nids', [
+        '@count' => count($nids),
+        '@nids' => implode(', ', $nids)
+      ]);
+
+      if (empty($nids)) {
+        continue;
+      }
+
+      // Carica i nodi
+      $nodes = \Drupal::entityTypeManager()->getStorage('node')->loadMultiple($nids);
+
+      foreach ($nodes as $ref_node) {
+        $ref_nid = $ref_node->id();
+
+        \Drupal::logger('teasearch')->notice('    Processing node @nid (already seen: @seen)', [
+          '@nid' => $ref_nid,
+          '@seen' => isset($seen_nids[$ref_nid]) ? 'YES' : 'NO'
+        ]);
+
+        // Skip se già processato (evita duplicati)
+        if (isset($seen_nids[$ref_nid])) {
+          continue;
+        }
+        $seen_nids[$ref_nid] = TRUE;
+
+        // Ottieni traduzione nella lingua corrente
+        if ($ref_node->hasTranslation($current_language)) {
+          $ref_node = $ref_node->getTranslation($current_language);
+        }
+
+        // Costruisci la citazione secondo il template
+        if ($template === 'box4') {
+          $citation_data = teasearch_build_box2_citation($ref_node, $content_type, $current_language, $seen_surnames, true);
+        } else {
+          $citation_data = teasearch_build_box1_citation($ref_node, $current_language, $seen_surnames, true);
+        }
+
+        if ($citation_data) {
+          \Drupal::logger('teasearch')->notice('    Citation built: @title', ['@title' => $citation_data['title_sort']]);
+          $grouped_by_category[$content_type][] = $citation_data;
+        } else {
+          \Drupal::logger('teasearch')->warning('    Citation NOT built for node @nid', ['@nid' => $ref_nid]);
+        }
+      }
     }
+  }
 
-    // Carica i nodi
-    $nodes = \Drupal::entityTypeManager()->getStorage('node')->loadMultiple($nids);
-
-    foreach ($nodes as $ref_node) {
-      // Ottieni traduzione nella lingua corrente
-      if ($ref_node->hasTranslation($current_language)) {
-        $ref_node = $ref_node->getTranslation($current_language);
-      }
-
-      // Costruisci la citazione secondo il template
-      if ($template === 'box4') {
-        // BOX-2 + categoria
-        $citation_data = teasearch_build_box2_citation($ref_node, $content_type, $current_language, $seen_surnames, true);
-      } else {
-        // BOX-3: come BOX-1 + categoria (per bibliography)
-        $citation_data = teasearch_build_box1_citation($ref_node, $current_language, $seen_surnames, true);
-      }
-
-      if ($citation_data) {
-        $grouped_by_category[$content_type][] = $citation_data;
-      }
-    }
+  // Log finale
+  foreach ($grouped_by_category as $ct => $items) {
+    \Drupal::logger('teasearch')->notice('Final @type: @count items', [
+      '@type' => $ct,
+      '@count' => count($items)
+    ]);
   }
 
   // Ordina all'interno di ogni categoria
@@ -1617,8 +1656,7 @@ function teasearch_render_field_referenced_in($node, $field_config, $field_ident
       return $item['citation'];
     }, $items);
 
-    // Formato: List of Chinese essays on tea (Essentials)
-    // Senza intestazione h3, solo lista inline
+    // Formato: senza intestazione h3, solo lista inline
     $section_html = '<div class="referenced-in-category">';
     $section_html .= implode('<br>', $citations);
     $section_html .= '</div>';
@@ -1632,7 +1670,6 @@ function teasearch_render_field_referenced_in($node, $field_config, $field_ident
 
   return implode("\n", $output_sections);
 }
-
 
 
 /**
@@ -3746,7 +3783,8 @@ function teasearch_render_field_news_type_badge($node, $field_config, $field_ide
     }
 
     if ($news_type) {
-      $output_parts[] = '<div class="news-badge-type">News type: ' . htmlspecialchars($news_type) . '</div>';
+      $category_label = t('Category');
+      $output_parts[] = '<div class="news-badge-type">'.$category_label. ": " . htmlspecialchars($news_type) . '</div>';
     }
   }
 
