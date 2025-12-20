@@ -100,6 +100,96 @@ function getContentTypeNameByMachineName($machine_name, $language = NULL)
 }
 
 /**
+ * Ottiene la label tradotta di una categoria dal bundle (machine name).
+ * 
+ * Cerca nei nodi "categories" usando field_category_menu_list per trovare
+ * il bundle corrispondente e restituisce field_link_title tradotto.
+ * 
+ * @param string $bundle
+ *   Il bundle/machine name (es. 'first_reference', 'primary_sources').
+ * @param string|null $language
+ *   La lingua desiderata. Se NULL, usa la lingua corrente.
+ * 
+ * @return string
+ *   La label tradotta, oppure il bundle formattato se non trovato.
+ * 
+ * @example
+ * ```php
+ * $label = getCategoryLabelByBundle('first_reference', 'it');
+ * // Risultato: "Fondamenti"
+ * ```
+ */
+function getCategoryLabelByBundle($bundle, $language = NULL)
+{
+  // Se non specificata, usa la lingua corrente
+  if ($language === NULL) {
+    $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  }
+
+  // Cache statica
+  static $cache = [];
+  $cache_key = $bundle . ':' . $language;
+
+  if (isset($cache[$cache_key])) {
+    return $cache[$cache_key];
+  }
+
+  try {
+    $storage = \Drupal::entityTypeManager()->getStorage('node');
+
+    $all_nids = $storage->getQuery()
+      ->accessCheck(TRUE)
+      ->condition('type', 'categories')
+      ->condition('status', 1)
+      ->execute();
+
+    if (empty($all_nids)) {
+      $fallback = ucfirst(str_replace('_', ' ', $bundle));
+      $cache[$cache_key] = $fallback;
+      return $fallback;
+    }
+
+    $all_nodes = $storage->loadMultiple($all_nids);
+
+    foreach ($all_nodes as $node) {
+      if (!$node->hasField('field_category_menu_list') || $node->get('field_category_menu_list')->isEmpty()) {
+        continue;
+      }
+
+      // Cerca il bundle nella lista
+      foreach ($node->get('field_category_menu_list') as $item) {
+        $machine_name = $item->value;
+
+        if (trim(strtolower($machine_name)) === trim(strtolower($bundle))) {
+          // Trovato! Prendi field_link_title tradotto
+          if (!$node->hasField('field_link_title') || $node->get('field_link_title')->isEmpty()) {
+            continue;
+          }
+
+          $translated = $node->hasTranslation($language)
+            ? $node->getTranslation($language)
+            : $node;
+
+          $label = $translated->get('field_link_title')->value;
+          $cache[$cache_key] = $label;
+          return $label;
+        }
+      }
+    }
+
+  } catch (\Throwable $e) {
+    \Drupal::logger('teasearch_helpers')->error('Error in getCategoryLabelByBundle: @message', [
+      '@message' => $e->getMessage()
+    ]);
+  }
+
+  // Fallback
+  $fallback = ucfirst(str_replace('_', ' ', $bundle));
+  $cache[$cache_key] = $fallback;
+  return $fallback;
+}
+
+/**
  * Ottiene i nomi tradotti di un content type in tutte le lingue disponibili.
  * 
  * @param string $machine_name

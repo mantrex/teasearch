@@ -77,11 +77,9 @@
 }
 
 .carousel-view-all-container .carousel-item-content {
-  flex: 1;
+
   padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+
 }
 
 .carousel-view-all-container .carousel-item-title {
@@ -89,12 +87,15 @@
   font-weight: 600;
   color: var(--item-title);
   line-height: 1.4;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0rem;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.carousel-view-all-container .carousel-item-details {
+  font-size:0.9rem;
 }
 
 .carousel-view-all-container .carousel-item-meta {

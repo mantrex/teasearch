@@ -8,46 +8,65 @@
   */
 #}
 
-<div class="carousel-view-all-container">
+<div
+	class="carousel-view-all-container">
 
-  {# Sezione NEWS #}
-  <div class="carousel-section">
-    <h2 class="carousel-section-title">
-      {{ 'NEWS'|t }}
-    </h2>
+	{# Sezione NEWS #}
+	<div class="carousel-section">
+		<h2 class="carousel-section-title">
+			{{ 'NEWS'|t }}
+		</h2>
 
-    {% if news|length > 0 %}
-      <div class="carousel-items-grid">
-        {% for item in news %}
-          <a href="{{ item.url }}" class="carousel-item">
-            <div class="carousel-item-image">
-              <img src="{{ item.image }}" alt="{{ item.title }}" loading="lazy"></div>
-              <div class="carousel-item-content">
-                <h3 class="carousel-item-title">
-                  {{ item.title }}
-                </h3>
-                <div class="carousel-item-meta">
-                  {% if item.location %}
-                    <span class="carousel-item-location">
-                      {{ item.location }}
-                    </span>
-                  {% endif %}
-                  {% if item.formatted_date %}
-                    <span class="carousel-item-date">
-                      {{ item.formatted_date }}
-                    </span>
-                  {% endif %}
-                </div>
-              </div>
-          </a>
-        {% endfor %}
-      </div>
-    {% else %}
-      <div class="carousel-empty-section">
-        <p>
-          {{ 'No news items available'|t }}
-        </p>
-      </div>
-    {% endif %}
-  </div>
+		{% if news|length > 0 %}
+			<div class="carousel-items-grid">
+				{% for item in news %}
+					<a href="{{ item.url }}" class="carousel-item">
+						<div class="carousel-item-image">
+							<img src="{{ item.image }}" alt="{{ item.title }}" loading="lazy">
+						</div>
+						<div class="carousel-item-content">
+							<h3 class="carousel-item-title">
+								{{ item.title }}
+							</h3>
+
+							{# News type e data pubblicazione #}
+							{% if item.news_type or item.formatted_date %}
+								<div class="carousel-item-details">
+									{% if item.news_type %}
+										<span class="news-type">{{ item.news_type }}</span>
+									{% endif %}
+
+									{% if item.news_type and item.formatted_date %}
+										<span class="separator">
+											/
+										</span>
+									{% endif %}
+
+									{% if item.formatted_date %}
+										<span class="news-date">{{ item.formatted_date }}</span>
+									{% endif %}
+								</div>
+							{% endif %}
+
+							{# Location (se presente) #}
+							{% if item.location %}
+								<div class="carousel-item-meta">
+									<span class="carousel-item-location">
+						
+									</span>
+								</div>
+							{% endif %}
+						</div>
+					</a>
+				{% endfor %}
+			</div>
+		{% else %}
+			<div class="carousel-empty-section">
+				<p>
+					{{ 'No news items available'|t }}
+				</p>
+			</div>
+		{% endif %}
+	</div>
 </div>
+

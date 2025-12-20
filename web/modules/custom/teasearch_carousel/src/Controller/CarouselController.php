@@ -9,39 +9,6 @@ use Drupal\image\Entity\ImageStyle;
 class CarouselController
 {
 
-  /*
-  public function getData()
-  {
-    $query = \Drupal::entityTypeManager()->getStorage('node')->getQuery()
-      ->accessCheck(FALSE)
-      ->condition('type', 'news')
-      ->condition('status', 1)
-      ->range(0, 10)
-      ->sort('created', 'DESC');
-
-    $nids = $query->execute();
-    $nodes = Node::loadMultiple($nids);
-
-    $data = [];
-
-    foreach ($nodes as $node) {
-      $image_url = '';
-      if ($node->hasField('field_image') && !$node->get('field_image')->isEmpty()) {
-        $file = $node->get('field_image')->entity;
-        //$image_url = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
-        $image_url = ImageStyle::load("large")->buildUrl($file->getFileUri());
-      }
-
-      $data[] = [
-        'title' => $node->label(),
-        'url' => $node->toUrl()->toString(),
-        'image' => $image_url,
-      ];
-    }
-
-    return new JsonResponse($data);
-  }*/
-
   public function getData(): \Symfony\Component\HttpFoundation\JsonResponse
   {
     $base = \Drupal::request()->getSchemeAndHttpHost() . \Drupal::request()->getBasePath();
@@ -64,14 +31,11 @@ class CarouselController
       'news_image_candidates' => ['field_main_image', 'field_image'],
       'image_style' => 'large',
       'default_image' => $base . '/' . $modulePath . '/assets/default-card.png',
-      'start_date_constraint' => false
-
     ];
 
     $allBundles = array_merge(['news'], array_keys($config['valid_content_types']));
     $bundleLabels = $this->getBundleLabels($allBundles);
 
-    $now = \Drupal::time()->getRequestTime();
     $etm = \Drupal::entityTypeManager();
     $storage = $etm->getStorage('node');
     $fieldManager = \Drupal::service('entity_field.manager');
@@ -102,58 +66,20 @@ class CarouselController
         }
         return \Drupal::service('file_url_generator')->generateAbsoluteString($uri);
       }
-
-      // 👉 Fallback se non c'è immagine sul nodo
       return $config['default_image'];
     };
 
     // ==========================
-    // 1) NEWS con filtri speciali
+    // 1) NEWS con filtri date
     // ==========================
-    $qNews = $storage->getQuery()
-      ->accessCheck(TRUE)          // identico per anonimo e loggato (solo pubblicate)
-      ->condition('type', 'news')
-      ->condition('status', 1);
-
-    if ($hasField('news', 'field_hide')) {
-      // Escludi nascoste: field_hide != 1
-      $qNews->condition('field_hide', 1, '<>');
-    }
-
-    if ($hasField('news', 'field_end_date')) {
-      $this->addDateTimeCondition($qNews, 'news', 'field_end_date', '>=', true);
-    }
-
-    if ($config['start_date_constraint'] && $hasField('news', 'field_start_date')) {
-      $this->addDateTimeCondition($qNews, 'news', 'field_start_date', '<=', false);
-    }
-
-    // Ordine naturale per le news (usato anche in news_first)
-    if ($hasField('news', 'field_date')) {
-      $qNews->sort('field_date', 'DESC');
-    } else {
-      $qNews->sort('created', 'DESC');
-    }
-    $qNews->sort('nid', 'DESC');
-
-    $qNews->range(0, $config['max'] * 3); // pool ampio per random
-
-    $newsNids = $qNews->execute();
-    $newsNodes = $storage->loadMultiple($newsNids);
-    //debug
-    /*
-    foreach ($newsNodes as $node) {
-      if ($node->hasField('field_start_date')) {
-        $startDateValue = $node->get('field_start_date')->value;
-        error_log('NEWS: ' . $node->label() . ' | field_start_date: ' . ($startDateValue ?? 'EMPTY'));
-      }
-    }*/
+    $newsNodes = $this->getFilteredNewsNodes($storage, $hasField);
 
     $news = [];
     foreach ($newsNodes as $node) {
       if (!$node instanceof \Drupal\node\NodeInterface) {
         continue;
       }
+
       // Scegli campo immagine fra i candidati
       $imgField = null;
       foreach ($config['news_image_candidates'] as $cand) {
@@ -162,10 +88,11 @@ class CarouselController
           break;
         }
       }
+
       // Data per payload: usa field_date se c'è, altrimenti created
       $dateTs = $node->getCreatedTime();
       if ($hasField('news', 'field_date') && !$node->get('field_date')->isEmpty()) {
-        $val = $node->get('field_date')->value; // 'YYYY-MM-DD' o 'YYYY-MM-DDTHH:MM:SS'
+        $val = $node->get('field_date')->value;
         $tmp = strtotime($val);
         if ($tmp) {
           $dateTs = $tmp;
@@ -182,12 +109,9 @@ class CarouselController
       ];
     }
 
-    // ==================================
-// 2) Altri content type - distribuzione equa degli slot
-// ==================================
-// ==================================
-// 2) Altri content type - distribuzione round-robin ciclica con randomizzazione
-// ==================================
+    // ==========================
+    // 2) Altri content type - distribuzione round-robin con randomizzazione
+    // ==========================
     $others = [];
     $bundles = array_keys($config['valid_content_types']);
 
@@ -206,24 +130,22 @@ class CarouselController
             ->condition('status', 1)
             ->sort('created', 'DESC')
             ->sort('nid', 'DESC')
-            ->range(0, 20); // Pool ampio per evitare di finire elementi
+            ->range(0, 20);
 
           $poolNids = $qPool->execute();
 
           if (!empty($poolNids)) {
             $poolNodes = $storage->loadMultiple($poolNids);
-            $pools[$bundle] = array_values($poolNodes); // Array indicizzato numericamente
-
-            // RANDOMIZZA ogni pool prima del round-robin
+            $pools[$bundle] = array_values($poolNodes);
             shuffle($pools[$bundle]);
           } else {
             $pools[$bundle] = [];
           }
         }
 
-        // Round-robin: cicla sui content type nell'ordine del config
-        $usedNids = []; // Traccia i NID già usati per evitare duplicati
-        $currentIndex = []; // Indice corrente per ogni bundle
+        // Round-robin: cicla sui content type
+        $usedNids = [];
+        $currentIndex = [];
         foreach ($bundles as $bundle) {
           $currentIndex[$bundle] = 0;
         }
@@ -232,19 +154,16 @@ class CarouselController
         while ($slotsAdded < $remainingSlots) {
           $addedInThisRound = false;
 
-          // Cicla su ogni content type in ordine
           foreach ($bundles as $bundle) {
             if ($slotsAdded >= $remainingSlots) {
-              break; // Raggiunto il limite di slot
+              break;
             }
 
-            // Cerca il prossimo elemento non usato da questo bundle
             while ($currentIndex[$bundle] < count($pools[$bundle])) {
               $node = $pools[$bundle][$currentIndex[$bundle]];
               $nid = $node->id();
 
               if (!in_array($nid, $usedNids)) {
-                // Elemento trovato, costruisci l'array
                 $nodeBundle = $node->bundle();
                 $map = $config['valid_content_types'][$nodeBundle] ?? ['title' => 'title', 'image' => null];
 
@@ -276,7 +195,6 @@ class CarouselController
             }
           }
 
-          // Se non è stato aggiunto nessun elemento in questo round, ferma il loop
           if (!$addedInThisRound) {
             break;
           }
@@ -287,16 +205,14 @@ class CarouselController
     // ==========================
     // 3) Composizione / Ordinamento
     // ==========================
-    $order = $config['order']; // 'random' | 'news_first' | 'news_only'
+    $order = $config['order'];
     $max = (int) $config['max'];
 
     if ($order === 'news_only') {
       $items = array_slice($news, 0, $max);
     } elseif ($order === 'news_first') {
-      // news già ordinate (field_date DESC / created DESC, poi nid DESC)
-      // altre per created DESC, poi nid DESC
       $items = array_slice(array_merge($news, $others), 0, $max);
-    } else { // random (default)
+    } else {
       $pool = array_merge($news, $others);
       shuffle($pool);
       $items = array_slice($pool, 0, $max);
@@ -306,7 +222,6 @@ class CarouselController
     // 4) Response
     // ==========================
     $resp = new \Symfony\Component\HttpFoundation\JsonResponse($items);
-    // Disabilita cache per evitare risposte stale dal proxy/browser.
     $resp->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     $resp->headers->set('Pragma', 'no-cache');
     $resp->headers->set('Expires', '0');
@@ -314,8 +229,99 @@ class CarouselController
   }
 
   /**
-   * Mappa i bundle (es. news, texts, images) al titolo tradotto preso dai nodi "categories".
-   * Usa il campo list "field_category" per capire quale bundle rappresenta.
+   * Filtra le news in base a field_start_date e field_end_date
+   * 
+   * LOGICA:
+   * - Nessun campo → sempre visibile
+   * - Solo field_start_date → visibile da quella data in poi
+   * - Entrambi → visibile nell'intervallo
+   */
+  private function getFilteredNewsNodes($storage, $hasField): array
+  {
+    $qNews = $storage->getQuery()
+      ->accessCheck(TRUE)
+      ->condition('type', 'news')
+      ->condition('status', 1);
+
+
+    if ($hasField('news', 'field_date')) {
+      $qNews->sort('field_date', 'DESC');
+    } else {
+      $qNews->sort('created', 'DESC');
+    }
+    $qNews->sort('nid', 'DESC');
+
+    $allNewsNids = $qNews->execute();
+
+    if (empty($allNewsNids)) {
+      return [];
+    }
+
+    $allNewsNodes = $storage->loadMultiple($allNewsNids);
+    $now = new \DateTime('now', new \DateTimeZone('UTC'));
+    $nowString = $now->format('Y-m-d');
+
+    $filteredNodes = [];
+
+    foreach ($allNewsNodes as $node) {
+
+      \Drupal::logger('teasearch_carousel')->notice('News: @title | Start: @start | End: @end | Now: @now', [
+        '@title' => $node->label(),
+        '@start' => $node->hasField('field_start_date') && !$node->get('field_start_date')->isEmpty() ? $node->get('field_start_date')->value : 'EMPTY',
+        '@end' => $node->hasField('field_end_date') && !$node->get('field_end_date')->isEmpty() ? $node->get('field_end_date')->value : 'EMPTY',
+        '@now' => $nowString,
+      ]);
+
+
+      $hasStartDate = $hasField('news', 'field_start_date')
+        && $node->hasField('field_start_date')
+        && !$node->get('field_start_date')->isEmpty();
+
+      $hasEndDate = $hasField('news', 'field_end_date')
+        && $node->hasField('field_end_date')
+        && !$node->get('field_end_date')->isEmpty();
+
+      // CASO 1: Nessuna data → sempre visibile
+      if (!$hasStartDate && !$hasEndDate) {
+        $filteredNodes[] = $node;
+        continue;
+      }
+
+      // CASO 2: Solo start_date → visibile da quella data in poi
+      if ($hasStartDate && !$hasEndDate) {
+        $startDate = $node->get('field_start_date')->value;
+        if ($startDate <= $nowString) {
+          $filteredNodes[] = $node;
+        }
+        continue;
+      }
+
+      // CASO 3: Solo end_date → visibile fino a quella data
+      if (!$hasStartDate && $hasEndDate) {
+        $endDate = $node->get('field_end_date')->value;
+        if ($endDate >= $nowString) {
+          $filteredNodes[] = $node;
+        }
+        continue;
+      }
+
+      // CASO 4: Entrambe le date → visibile nell'arco di tempo
+      if ($hasStartDate && $hasEndDate) {
+        $startDate = $node->get('field_start_date')->value;
+        $endDate = $node->get('field_end_date')->value;
+
+        if ($startDate <= $nowString && $endDate >= $nowString) {
+          $filteredNodes[] = $node;
+        }
+        continue;
+      }
+    }
+
+    return $filteredNodes;
+  }
+
+  /**
+   * Mappa i bundle al titolo tradotto da nodi "categories"
    */
   private function getBundleLabels(array $bundles): array
   {
@@ -334,13 +340,10 @@ class CarouselController
     $labels = [];
     if ($nids) {
       foreach ($storage->loadMultiple($nids) as $n) {
-        // Traduzione sicura per D11 (fallback automatico se non esiste la traduzione).
-        /** @var \Drupal\node\NodeInterface $t */
         $t = $repo->getTranslationFromContext($n, $langcode);
         $title = $t->label();
 
         if ($t->hasField('field_category_menu_list') && !$t->get('field_category_menu_list')->isEmpty()) {
-          // field_category è un list(text) → leggo i values.
           foreach ($t->get('field_category_menu_list')->getValue() as $item) {
             $bundle = (string) ($item['value'] ?? '');
             if ($bundle && !isset($labels[$bundle])) {
@@ -354,52 +357,12 @@ class CarouselController
   }
 
   /**
-   * Applica una condizione di confronto data su un campo datetime.
-   * 
-   * @param bool $allowEmpty Se true, include i nodi con campo vuoto (OR condition)
+   * View all carousel
    */
-  private function addDateTimeCondition($query, string $bundle, string $fieldName, string $operator, bool $allowEmpty = false): void
-  {
-    $fieldManager = \Drupal::service('entity_field.manager');
-    $defs = $fieldManager->getFieldDefinitions('node', $bundle);
-
-    if (!isset($defs[$fieldName])) {
-      return; // Campo non esiste
-    }
-
-    $fc = \Drupal\field\Entity\FieldConfig::loadByName('node', $bundle, $fieldName);
-    if ($fc) {
-      $storage = $fc->getFieldStorageDefinition();
-      $datetime_type = $storage->getSetting('datetime_type') ?? 'date';
-
-      $nowValue = ($datetime_type === 'date')
-        ? gmdate('Y-m-d')
-        : gmdate('Y-m-d\TH:i:s');
-
-      if ($allowEmpty) {
-        // Campo vuoto O condizione soddisfatta
-        $group = $query->orConditionGroup()
-          ->notExists($fieldName)
-          ->condition($fieldName . '.value', $nowValue, $operator);
-        $query->condition($group);
-      } else {
-        // Solo condizione (campo deve essere compilato)
-        $query->condition($fieldName . '.value', $nowValue, $operator);
-      }
-    }
-  }
-
-
-
-
-
-  /* view all */
   public function viewAll()
   {
-    // Recupera tutti i dati senza limiti
     $allData = $this->getAllCarouselData();
 
-    // Filtra per IDs specifici se passati via GET
     $request = \Drupal::request();
     $filterIds = $request->query->get('ids');
 
@@ -413,7 +376,7 @@ class CarouselController
       });
     }
 
-    $dataToReturn = [
+    return [
       '#theme' => 'carousel_view_all',
       '#news' => $allData['news'],
       '#highlights' => $allData['highlights'],
@@ -423,10 +386,11 @@ class CarouselController
         ],
       ],
     ];
-
-    return $dataToReturn;
   }
 
+  /**
+   * News only page
+   */
   public function newsOnly()
   {
     $newsData = $this->getNewsOnlyData();
@@ -442,6 +406,9 @@ class CarouselController
     ];
   }
 
+  /**
+   * Recupera tutti i dati per carousel-all
+   */
   private function getAllCarouselData(): array
   {
     $base = \Drupal::request()->getSchemeAndHttpHost() . \Drupal::request()->getBasePath();
@@ -449,8 +416,8 @@ class CarouselController
 
     $config = [
       'valid_content_types' => [
-        'first_reference' => ['title' => 'title', 'image' => 'field_square_thumbnail'], // Essentials
-        'primary_sources' => ['title' => 'title', 'image' => 'field_main_image'], // Texts
+        'first_reference' => ['title' => 'title', 'image' => 'field_square_thumbnail'],
+        'primary_sources' => ['title' => 'title', 'image' => 'field_main_image'],
         'images' => ['title' => 'title', 'image' => 'field_main_image'],
         'videos' => ['title' => 'title', 'image' => 'field_main_image'],
         'people' => ['title' => 'title', 'image' => 'field_avatar'],
@@ -458,7 +425,6 @@ class CarouselController
       'news_image_candidates' => ['field_main_image', 'field_image'],
       'image_style' => 'large',
       'default_image' => $base . '/' . $modulePath . '/assets/default-card.png',
-      'start_date_constraint' => false
     ];
 
     $allBundles = array_merge(['news'], array_keys($config['valid_content_types']));
@@ -495,33 +461,8 @@ class CarouselController
       return $config['default_image'];
     };
 
-    // Recupera tutte le news
-    $qNews = $storage->getQuery()
-      ->accessCheck(TRUE)
-      ->condition('type', 'news')
-      ->condition('status', 1);
-
-    if ($hasField('news', 'field_hide')) {
-      $qNews->condition('field_hide', 1, '<>');
-    }
-
-    if ($hasField('news', 'field_end_date')) {
-      $this->addDateTimeCondition($qNews, 'news', 'field_end_date', '>=', true);
-    }
-
-    if ($config['start_date_constraint'] && $hasField('news', 'field_start_date')) {
-      $this->addDateTimeCondition($qNews, 'news', 'field_start_date', '<=', false);
-    }
-
-    if ($hasField('news', 'field_date')) {
-      $qNews->sort('field_date', 'DESC');
-    } else {
-      $qNews->sort('created', 'DESC');
-    }
-    $qNews->sort('nid', 'DESC');
-
-    $newsNids = $qNews->execute();
-    $newsNodes = $storage->loadMultiple($newsNids);
+    // Recupera news filtrate
+    $newsNodes = $this->getFilteredNewsNodes($storage, $hasField);
 
     $news = [];
     foreach ($newsNodes as $node) {
@@ -545,6 +486,20 @@ class CarouselController
         }
       }
 
+
+      $newsType = '';
+      if ($node->hasField('field_news_type') && !$node->get('field_news_type')->isEmpty()) {
+        $term = $node->get('field_news_type')->entity;
+        if ($term) {
+          // Traduzione del termine
+          $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+          if ($term->hasTranslation($langcode)) {
+            $term = $term->getTranslation($langcode);
+          }
+          $newsType = $term->getName();
+        }
+      }
+
       $news[] = [
         'title' => $node->label(),
         'url' => $node->toUrl('canonical', ['absolute' => TRUE])->toString(),
@@ -554,10 +509,11 @@ class CarouselController
         'nid' => $node->id(),
         'location' => $this->getNodeLocation($node),
         'formatted_date' => date('d/m/Y', $dateTs),
+        'news_type' => $newsType
       ];
     }
 
-    // Recupera tutti gli highlights
+    // Recupera highlights
     $highlights = [];
     $bundles = array_keys($config['valid_content_types']);
     if (!empty($bundles)) {
@@ -582,6 +538,13 @@ class CarouselController
           if (!empty($map['title']) && $node->hasField($map['title']) && !$node->get($map['title'])->isEmpty()) {
             $title = (string) $node->get($map['title'])->value;
           }
+          $categoryLabel = '';
+
+          if (function_exists('getCategoryLabelByBundle')) {
+            $categoryLabel = getCategoryLabelByBundle($bundle);
+          } else {
+            $categoryLabel = $bundleLabels[$bundle] ?? ucfirst($bundle);
+          }
 
           $highlights[] = [
             'title' => $title,
@@ -589,7 +552,7 @@ class CarouselController
             'image' => $buildImageUrl($node, $map['image'] ?? null),
             'date' => $node->getCreatedTime(),
             'bundle' => $bundle,
-            'label' => $bundleLabels[$bundle] ?? ucfirst($bundle),
+            'label' => $categoryLabel, 
             'nid' => $node->id(),
             'location' => $this->getNodeLocation($node),
             'formatted_date' => date('d/m/Y', $node->getCreatedTime()),
@@ -604,9 +567,8 @@ class CarouselController
     ];
   }
 
-
   /**
-   * Recupera solo le news per la pagina /news
+   * Recupera solo news per la pagina /news
    */
   private function getNewsOnlyData(): array
   {
@@ -617,7 +579,6 @@ class CarouselController
       'news_image_candidates' => ['field_main_image', 'field_image'],
       'image_style' => 'large',
       'default_image' => $base . '/' . $modulePath . '/assets/default-card.png',
-      'start_date_constraint' => false
     ];
 
     $etm = \Drupal::entityTypeManager();
@@ -651,33 +612,8 @@ class CarouselController
       return $config['default_image'];
     };
 
-    // Recupera tutte le news
-    $qNews = $storage->getQuery()
-      ->accessCheck(TRUE)
-      ->condition('type', 'news')
-      ->condition('status', 1);
-
-    if ($hasField('news', 'field_hide')) {
-      $qNews->condition('field_hide', 1, '<>');
-    }
-
-    if ($hasField('news', 'field_end_date')) {
-      $this->addDateTimeCondition($qNews, 'news', 'field_end_date', '>=', true);
-    }
-
-    if ($config['start_date_constraint'] && $hasField('news', 'field_start_date')) {
-      $this->addDateTimeCondition($qNews, 'news', 'field_start_date', '<=', false);
-    }
-
-    if ($hasField('news', 'field_date')) {
-      $qNews->sort('field_date', 'DESC');
-    } else {
-      $qNews->sort('created', 'DESC');
-    }
-    $qNews->sort('nid', 'DESC');
-
-    $newsNids = $qNews->execute();
-    $newsNodes = $storage->loadMultiple($newsNids);
+    // Recupera news filtrate
+    $newsNodes = $this->getFilteredNewsNodes($storage, $hasField);
 
     $news = [];
     foreach ($newsNodes as $node) {
@@ -701,6 +637,18 @@ class CarouselController
         }
       }
 
+      $newsType = '';
+      if ($node->hasField('field_news_type') && !$node->get('field_news_type')->isEmpty()) {
+        $term = $node->get('field_news_type')->entity;
+        if ($term) {
+          $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+          if ($term->hasTranslation($langcode)) {
+            $term = $term->getTranslation($langcode);
+          }
+          $newsType = $term->getName();
+        }
+      }
+
       $news[] = [
         'title' => $node->label(),
         'url' => $node->toUrl('canonical', ['absolute' => TRUE])->toString(),
@@ -709,6 +657,7 @@ class CarouselController
         'bundle' => 'news',
         'nid' => $node->id(),
         'location' => $this->getNodeLocation($node),
+        'news_type' => $newsType,
         'formatted_date' => date('d/m/Y', $dateTs),
       ];
     }
@@ -716,13 +665,11 @@ class CarouselController
     return $news;
   }
 
-
   /**
-   * Recupera la location di un nodo (se presente)
+   * Recupera la location di un nodo
    */
   private function getNodeLocation(\Drupal\node\NodeInterface $node): string
   {
-    // Controlla diversi possibili campi location
     $locationFields = ['field_location', 'field_place', 'field_city'];
 
     foreach ($locationFields as $fieldName) {
