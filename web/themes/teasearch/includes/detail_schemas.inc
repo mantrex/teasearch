@@ -123,6 +123,7 @@ function teasearch_translations(){
       "field_publisher" => "Editore",
       "field_country" => "Paese",
       "editors" => "Curatori",
+      "authors" => "Autori",
       "field_edition" => "Edizione",
       "project_name_journal" => "Rivista",
       "project_name_book" => "Volume",
@@ -599,11 +600,6 @@ function teasearch_get_detail_schemas()
       "field_language" => [
         "label" => "Language",
       ],
-      "contained_in" => [
-        "label" => "Contained in",
-        "type" => "curated_references",
-        "field" => "field_contained_in"
-      ],
 
 
       "field_pub_place" => [
@@ -615,31 +611,49 @@ function teasearch_get_detail_schemas()
       "field_country" => [
         "label" => "Country"
       ],
-      "editors" => [
-        "label" => "Editors",
-        "type" => "authors_general",
-        "field" => "field_editors",
-        "options" => [
-          "no_editor_label" => true
-        ]
 
+      "contained_in" => [
+        "label" => "Contained in",
+        "type" => "curated_references",
+        "field" => "field_contained_in"
       ],
-      "field_edition" => [
-        "label" => "Edition",
-      ],
+
       "project_name_journal" => [
-        "label" => "Journal",
+        "label" => "Contained in",
         "type" => "project_name",
         "options" => [
           "filter" => ["field_project_type", "journal"]
         ]
       ],
       "project_name_book" => [
-        "label" => "Edited Book",
+        "label" => "Contained in",
         "type" => "project_name",
         "options" => [
           "filter" => ["field_project_type", "book"]
         ]
+      ],
+
+
+      "editors" => [
+        "label" => "Editors",
+        "type" => "authors_general",
+        "field" => "field_editors",
+        "options" => [
+          "no_editor_label" => true,
+          "is_author"=>false,
+        ]
+      ],
+      "authors_general" => [
+        "label" => "Authors",
+        "type" => "authors_general",
+        "field" => "field_editors",
+        "options" => [
+          "no_editor_label" => true,
+          "is_author" => true,
+        ]
+      ],
+      "field_edition" => [
+        "label" => "Edition",
       ],
       "volissue" => [
         "label" => "Vol (Issue)",

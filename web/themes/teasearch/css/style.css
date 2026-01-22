@@ -190,16 +190,16 @@ a {
 
 .site-green-bar.is-compact {
   box-shadow: 0 2px 6px var(--box-shadow);
-  height: 60px;
+  height: 70px;
 }
 
 .site-green-bar.is-compact .navbar {
-  height: 60px;
+  height: 70px;
 }
 
 /* Riduzione logo/brand quando compatto (se presente) */
 .site-green-bar.is-compact .navbar-brand img {
-  width: 96px;
+  width: 100px;
   /* da 120px a 96px */
   transition: width 180ms ease;
 }
@@ -395,7 +395,7 @@ a {
 
 /* Adjust brand logo, spacing, etc. */
 .navbar-brand img {
-  width: 140px;
+  width: 180px;
 }
 
 .navbar-nav {
@@ -486,7 +486,7 @@ a {
 }
 
 .text-below-logo {
-  font-size: small;
+  font-size: 14px;
   opacity: 1;
   transition: opacity 0.4s ease;
   /* durata e easing */

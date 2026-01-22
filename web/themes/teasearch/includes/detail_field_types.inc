@@ -174,11 +174,11 @@ function teasearch_render_field_people_name($node, $field_config, $field_identif
   // Se entrambi esistono, unisci con " – " (dash con spazi)
   // Usa <strong> per il bold del fullname
   if (!empty($western_name) && !empty($fullname_value)) {
-    return $western_name . ' – <strong>' . $fullname_value . '</strong>';
+    return $western_name . ' – ' . $fullname_value . '';
   } elseif (!empty($western_name)) {
     return $western_name;
   } elseif (!empty($fullname_value)) {
-    return '<strong>' . $fullname_value . '</strong>';
+    return '' . $fullname_value . '';
   }
 
   return NULL;
@@ -858,7 +858,7 @@ function teasearch_render_field_contrib($node, $field_config, $field_identifier)
 
   // Estraggo solo le contributions ordinate
   $contributions = array_map(function ($item) {
-    return $item['contribution'];
+    return html_entity_decode($item['contribution'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
   }, $contributions_data);
 
   // Restituisco le contributions separate da <br>
@@ -1752,18 +1752,24 @@ function teasearch_render_field_project_name($node, $field_config, $field_identi
   $pub_value = $pub_title && !$pub_title->isEmpty() ? $pub_title->value : '';
   $pub_latin_value = $pub_title_latin && !$pub_title_latin->isEmpty() ? $pub_title_latin->value : '';
 
+  
+  if ($filter_value == "journal") {
+    $addLabel = " (Journal)";
+  } else {
+    $addLabel = " (Book)";
+  }
   // Entrambi presenti: unisci con puntino catalano
   if (!empty($pub_value) && !empty($pub_latin_value)) {
-    return $pub_value . ' · ' . $pub_latin_value;
+    return $pub_value . ' · ' . $pub_latin_value.$addLabel;
   }
 
   // Solo uno dei due
   if (!empty($pub_value)) {
-    return $pub_value;
+    return $pub_value.$addLabel;
   }
 
   if (!empty($pub_latin_value)) {
-    return $pub_latin_value;
+    return $pub_latin_value.$addLabel;
   }
 
   return NULL;
@@ -2573,6 +2579,8 @@ function teasearch_build_box1_citation($node, $current_language, &$seen_surnames
   }
 
   // 3. TITLE (LATIN) + TITLE (ORIGINAL NON-LATIN)
+  // VECCHIO CODICE - usava i campi della rivista invece dell'articolo
+  /*
   $title_latin_field = $node->get('field_pub_title_latin');
   $title_original_field = $node->get('field_pub_title');
 
@@ -2592,7 +2600,36 @@ function teasearch_build_box1_citation($node, $current_language, &$seen_surnames
 
   if (!empty($title_parts)) {
     $citation_parts[] = implode(' ', $title_parts);
+  }*/
+
+    
+  // NUOVO CODICE - usa il titolo dell'articolo specifico
+  $title_parts = [];
+  $title_for_sort = '';
+
+  // Titolo principale del nodo (campo base "title")
+  $title_main = $node->getTitle();
+  if (!empty($title_main)) {
+    $title_parts[] = $title_main;
+    $title_for_sort = $title_main;
   }
+
+  // Titolo originale (field_title_original)
+  if ($node->hasField('field_title_original')) {
+    $title_original_field = $node->get('field_title_original');
+    if (!$title_original_field->isEmpty()) {
+      $title_parts[] = $title_original_field->value;
+      // Se non c'era title_main, usa title_original per il sorting
+      if (empty($title_for_sort)) {
+        $title_for_sort = $title_original_field->value;
+      }
+    }
+  }
+
+  if (!empty($title_parts)) {
+    $citation_parts[] = implode(' ', $title_parts);
+  }
+
 
   // 4. (Category) - solo se richiesto (BOX-3)
   $citation_label = "";
@@ -2623,7 +2660,7 @@ function teasearch_build_box1_citation($node, $current_language, &$seen_surnames
 /**
  * Helper: Ottiene il display name del content type per BOX-3.
  */
-function teasearch_get_content_type_display_name($content_type)
+  function teasearch_get_content_type_display_name($content_type)
 {
   $map = [
     'first_reference' => 'Essential',
@@ -3154,6 +3191,7 @@ function teasearch_render_field_authors_general($node, $field_config, $field_ide
   // STEP 4: Itera sui paragraph e formatta ogni autore
   // ========================================================================
   $formatted_authors = [];
+  $filter_is_author = $field_config['options']['is_author'] ?? null;
 
   foreach ($authors_field as $item) {
     if ($item->isEmpty()) {
@@ -3163,6 +3201,21 @@ function teasearch_render_field_authors_general($node, $field_config, $field_ide
     $paragraph = $item->entity;
     if (!$paragraph) {
       continue;
+    }
+
+    if ($filter_is_author !== null) {
+      if ($node->hasField('field_is_author')) {
+        $type_is_author_field = $node->get('field_is_author');
+        if (!$type_is_author_field->isEmpty()) {
+          $type_is_author_value = (bool)$type_is_author_field->value;
+
+          // Se filter_is_author è true ma il paragraph ha is_author = false, skippa
+          // Se filter_is_author è false ma il paragraph ha is_author = true, skippa
+          if ($type_is_author_value !== $filter_is_author) {
+            continue;
+          }
+        }
+      }
     }
 
     // Formatta l'autore usando l'helper

@@ -22,7 +22,7 @@
 
 .carousel-view-all-container .carousel-section-title {
   font-size: 1rem;
- 
+
   color: var(--body-text);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -94,8 +94,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .carousel-view-all-container .carousel-item-details {
-  font-size:0.9rem;
+  font-size: 0.9rem;
 }
 
 .carousel-view-all-container .carousel-item-meta {
@@ -137,7 +138,7 @@
 .carousel-view-all-container .carousel-back-link a {
   display: inline-block;
   padding: 12px 24px;
-  background: var(--item-primary);
+  background: var(--actions-button);
   color: var(--light) !important;
   text-decoration: none !important;
   border-radius: 25px;
@@ -149,12 +150,13 @@
 }
 
 .carousel-view-all-container .carousel-back-link a:hover {
-  background: var(--item-secondary);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px var(--box-shadow);
-  text-decoration: none !important;
-  color: var(--light) !important;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(37, 154, 0, 0.3);
+  text-decoration: none;
+  color: var(--light);
+  border-color: rgba(255, 255, 255, 0.2);
 }
+
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -223,6 +225,7 @@
 
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
+
   .carousel-view-all-container .carousel-item,
   .carousel-view-all-container .carousel-item-image img,
   .carousel-view-all-container .carousel-back-link a {
@@ -240,7 +243,7 @@
   .carousel-view-all-container .carousel-back-link {
     display: none;
   }
-  
+
   .carousel-view-all-container .carousel-item {
     break-inside: avoid;
     box-shadow: none;

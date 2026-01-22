@@ -90,7 +90,7 @@ class SearchHelper
         // Categorize by field type
         if ($this->isTextField($field_type)) {
           $searchable_fields['text'][] = $field_name;
-        } elseif ($field_type === 'entity_reference') {
+        } elseif ($field_type === 'entity_reference' || $field_type === 'entity_reference_revisions') {
           // Check if it's taxonomy or generic entity reference
           $target_type = $field_definition->getSetting('target_type');
           if ($target_type === 'taxonomy_term') {
@@ -150,6 +150,15 @@ class SearchHelper
     // Get searchable fields
     $searchable_fields = $this->getAllSearchableFields($entity_type, $bundle);
 
+    // LOG DEBUG: Vediamo quali campi sono stati trovati
+    $this->logger->notice('SEARCH DEBUG - Bundle: @bundle, Keyword: @keyword', [
+      '@bundle' => $bundle,
+      '@keyword' => $keyword,
+    ]);
+    $this->logger->notice('SEARCH DEBUG - Entity reference fields: @fields', [
+      '@fields' => implode(', ', $searchable_fields['entity_reference']),
+    ]);
+
     // Create OR group for all searchable conditions
     $or_group = $query->orConditionGroup();
 
@@ -160,7 +169,7 @@ class SearchHelper
     $this->addTaxonomyFieldConditions($or_group, $searchable_fields['taxonomy'], $keyword, $entity_type);
 
     // Add entity reference conditions
-    $this->addEntityReferenceConditions($or_group, $searchable_fields['entity_reference'], $keyword, $entity_type);
+    $this->addEntityReferenceConditions($or_group, $searchable_fields['entity_reference'], $keyword, $entity_type, $bundle);
 
     // Add numeric field conditions (exact match)
     $this->addNumericFieldConditions($or_group, $searchable_fields['numeric'], $keyword);
@@ -258,23 +267,35 @@ class SearchHelper
    * @param string $entity_type
    *   The entity type.
    */
-  protected function addEntityReferenceConditions($group, array $fields, $keyword, $entity_type)
+  protected function addEntityReferenceConditions($group, array $fields, $keyword, $entity_type, $bundle)
   {
     if (empty($fields)) {
       return;
     }
 
+    $this->logger->notice('SEARCH DEBUG - addEntityReferenceConditions called with @count fields', [
+      '@count' => count($fields),
+    ]);
+
     // For each entity reference field, search in referenced entities
     foreach ($fields as $field_name) {
-      $matching_entity_ids = $this->searchReferencedEntities($field_name, $keyword, $entity_type);
+      $this->logger->notice('SEARCH DEBUG - Processing field: @field', [
+        '@field' => $field_name,
+      ]);
+
+      $matching_entity_ids = $this->searchReferencedEntities($field_name, $keyword, $entity_type, $bundle);
+
+      $this->logger->notice('SEARCH DEBUG - Field @field returned @count IDs', [
+        '@field' => $field_name,
+        '@count' => count($matching_entity_ids),
+      ]);
 
       if (!empty($matching_entity_ids)) {
         $group->condition("{$field_name}.target_id", $matching_entity_ids, 'IN');
       }
     }
   }
-
-  /**
+    /**
    * Add numeric field conditions to query group.
    *
    * @param \Drupal\Core\Entity\Query\ConditionInterface $group
@@ -322,25 +343,88 @@ class SearchHelper
     }
   }
 
-  /**
-   * Search in referenced entities.
-   *
-   * @param string $field_name
-   *   The entity reference field name.
-   * @param string $keyword
-   *   The search keyword.
-   * @param string $source_entity_type
-   *   The source entity type.
-   *
-   * @return array
-   *   Array of matching entity IDs.
-   */
-  protected function searchReferencedEntities($field_name, $keyword, $source_entity_type)
+  protected function searchReferencedEntities($field_name, $keyword, $source_entity_type, $bundle)
   {
-    // This is a simplified version - in reality you'd need to determine
-    // the target entity type from field configuration
     try {
-      // Search in nodes (most common case)
+      // LOG 1: Vediamo cosa stiamo cercando
+      $this->logger->notice('SEARCH DEBUG - searchReferencedEntities - Field: @field, Keyword: @keyword, Bundle: @bundle', [
+        '@field' => $field_name,
+        '@keyword' => $keyword,
+        '@bundle' => $bundle,
+      ]);
+
+      // USA IL BUNDLE INVECE DI NULL
+      $field_definitions = $this->entityFieldManager->getFieldDefinitions($source_entity_type, $bundle);
+
+      if (!isset($field_definitions[$field_name])) {
+        $this->logger->notice('SEARCH DEBUG - Field definition NOT FOUND for @field in bundle @bundle', [
+          '@field' => $field_name,
+          '@bundle' => $bundle,
+        ]);
+
+        // Fallback: cerca nei nodi
+        $query = $this->entityTypeManager->getStorage('node')->getQuery()
+          ->accessCheck(TRUE)
+          ->condition('status', 1)
+          ->condition('title', "%{$keyword}%", 'LIKE')
+          ->range(0, 50);
+        return $query->execute();
+      }
+
+      $field_definition = $field_definitions[$field_name];
+      $target_type = $field_definition->getSetting('target_type');
+
+      // LOG 2: Vediamo il target_type
+      $this->logger->notice('SEARCH DEBUG - Field @field has target_type: @target', [
+        '@field' => $field_name,
+        '@target' => $target_type,
+      ]);
+
+      // Se è paragraph, cerca nei campi del paragraph
+      if ($target_type === 'paragraph') {
+        $this->logger->notice('SEARCH DEBUG - Searching in PARAGRAPHS for keyword: @keyword', [
+          '@keyword' => $keyword,
+        ]);
+
+        $paragraph_ids = [];
+
+        // Campi da cercare nei paragraph authors_general
+        $search_fields = ['field_lastname', 'field_firstname', 'field_fullname', 'field_pseudonym'];
+
+        foreach ($search_fields as $para_field) {
+          $query = $this->entityTypeManager->getStorage('paragraph')->getQuery()
+            ->accessCheck(TRUE)
+            ->condition("{$para_field}.value", "%{$keyword}%", 'LIKE')
+            ->range(0, 100);
+
+          $results = $query->execute();
+
+          // LOG 3: Vediamo i risultati per ogni campo
+          $this->logger->notice('SEARCH DEBUG - Paragraph field @field found @count results', [
+            '@field' => $para_field,
+            '@count' => count($results),
+          ]);
+
+          if (!empty($results)) {
+            $paragraph_ids = array_merge($paragraph_ids, $results);
+          }
+        }
+
+        // LOG 4: Totale paragraph trovati
+        $unique_ids = array_unique($paragraph_ids);
+        $this->logger->notice('SEARCH DEBUG - Total unique paragraphs: @count - IDs: @ids', [
+          '@count' => count($unique_ids),
+          '@ids' => !empty($unique_ids) ? implode(', ', $unique_ids) : 'NONE',
+        ]);
+
+        return $unique_ids;
+      }
+
+      // Altrimenti cerca nei nodi
+      $this->logger->notice('SEARCH DEBUG - Searching in NODES (not paragraphs) for @field', [
+        '@field' => $field_name,
+      ]);
+
       $query = $this->entityTypeManager->getStorage('node')->getQuery()
         ->accessCheck(TRUE)
         ->condition('status', 1)
