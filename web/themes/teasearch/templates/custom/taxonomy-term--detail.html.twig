@@ -1,0 +1,77 @@
+{#
+/**
+ * @file
+ * Template per la visualizzazione dettaglio delle tassonomie.
+ *
+ * Variabili disponibili:
+ * - detail_fields: Array di campi renderizzati
+ * - taxonomy_term: Il termine di tassonomia completo
+ * - vocabulary_label: Label del vocabolario (es. "SUBJECTS")
+ */
+#}
+
+<article{{ attributes.addClass('taxonomy-term', 'taxonomy-term--' ~ taxonomy_term.bundle|clean_class, 'taxonomy-term--detail') }}>
+
+  {# Header con titolo principale #}
+  <div class="detail-header">
+    {# Sezione verde con vocabulary label e titolo principale #}
+    <div class="detail-header__title-section">
+      {# Label del vocabolario (es. SUBJECTS) #}
+      {% if vocabulary_label %}
+        <div class="detail-header__content-type">
+          {{ vocabulary_label }}
+        </div>
+      {% endif %}
+
+      {# Titolo principale (nome del termine) #}
+      {% for field_id, field in detail_fields %}
+        {% if field.type == 'taxonomy_main_title' %}
+          <h1 class="detail-header__main-title">
+            {{ field.content }}
+          </h1>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  {# Body - Tabella con i campi #}
+  <div class="detail-body">
+    <table class="detail-table">
+      <tbody>
+        {% for field_id, field in detail_fields %}
+          {# Skip maintitle (già mostrato nell'header) #}
+          {% if field.type == 'taxonomy_main_title' %}
+            {# Already shown in header, skip #}
+          
+          {# Separatore #}
+          {% elseif field.type == 'separator' %}
+            <tr class="detail-separator">
+              <td colspan="2">
+                <div class="detail-separator__content">
+                  {{ field.content }}
+                </div>
+              </td>
+            </tr>
+          
+          {# Campo normale #}
+          {% else %}
+            <tr class="detail-field detail-field--{{ field_id|clean_class }} detail-field--type-{{ field.type|clean_class }}">
+              {# Label (colonna sinistra) #}
+              <td class="detail-field__label {% if not field.label %}detail-field__label--empty{% endif %}">
+                {% if field.label %}
+                  {{ field.label }}
+                {% endif %}
+              </td>
+              
+              {# Content (colonna destra) #}
+              <td class="detail-field__content">
+                {{ field.content|raw }}
+              </td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</article>

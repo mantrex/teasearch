@@ -9,7 +9,7 @@ include_once __DIR__ . '/includes/detail_schemas.inc';
 include_once __DIR__ . '/includes/detail_field_types.inc';
 include_once __DIR__ . '/includes/detail_helpers.inc';
 include_once __DIR__ . '/includes/detail_aggregator.inc';
-
+include_once __DIR__ . '/includes/detail_schemas_taxonomies.inc';
 
 
 use Drupal\Core\Language\LanguageInterface;
@@ -660,3 +660,135 @@ function teasearch_render_fields($node, $fields_config)
   return $rendered_fields;
 }
 
+
+/**
+ * Implements hook_theme_suggestions_taxonomy_term_alter().
+ */
+function teasearch_theme_suggestions_taxonomy_term_alter(array &$suggestions, array $variables)
+{
+  $term = $variables['elements']['#taxonomy_term'];
+  $view_mode = $variables['elements']['#view_mode'];
+
+  // Solo per view mode 'full' (pagina di dettaglio)
+  if ($view_mode === 'full') {
+    // Controlla se esiste uno schema per questa tassonomia
+    $schema = teasearch_get_taxonomy_detail_schema();
+
+    if (!empty($schema)) {
+      // Suggerisci il template taxonomy-term--detail.html.twig
+      // IMPORTANTE: Drupal converte automaticamente __ in --
+      $suggestions[] = 'taxonomy_term__detail';
+    }
+  }
+}
+
+/**
+ * Implements template_preprocess_taxonomy_term().
+ */
+function teasearch_preprocess_taxonomy_term(&$variables)
+{
+  $term = $variables['elements']['#taxonomy_term'];
+  $view_mode = $variables['elements']['#view_mode'];
+
+  if ($view_mode === 'full') {
+    $vocabulary_id = $term->bundle();
+    $schema = teasearch_get_taxonomy_detail_schema();
+
+    if (!empty($schema)) {
+      $variables['#attached']['library'][] = 'teasearch/detail-page';
+      $variables['vocabulary_label'] = teasearch_get_vocabulary_label($vocabulary_id);
+      $variables['taxonomy_term'] = $term;
+
+      if (isset($schema['fields'])) {
+        $variables['detail_fields'] = teasearch_render_taxonomy_fields($term, $schema['fields']);
+      }
+    }
+  }
+
+  foreach ($variables['content'] as $key => $value) {
+    if (substr($key, 0, 1) !== '#') {
+      unset($variables['content'][$key]);
+    }
+  }
+}
+
+function teasearch_render_taxonomy_fields($term, $fields_config)
+{
+  $rendered_fields = [];
+  $vocabulary_id = $term->bundle();
+  $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+
+  // Ottieni la traduzione del termine se esiste
+  if ($term->hasTranslation($current_language)) {
+    $term = $term->getTranslation($current_language);
+  }
+
+  foreach ($fields_config as $field_identifier => $field_config) {
+
+    // Caso 1: Separatore (stringa semplice)
+    if (is_string($field_config)) {
+      $rendered_fields[$field_identifier] = [
+        'type' => 'separator',
+        'content' => $field_config,
+        'label' => NULL,
+        'wrapper_class' => 'separator',
+      ];
+      continue;
+    }
+
+    // Caso 2: Campo normale (array)
+    $type = $field_config['type'] ?? 'text';
+
+    // Ottieni la funzione render per il type
+    $render_function = teasearch_get_type_render_function($type);
+
+    if (!function_exists($render_function)) {
+      \Drupal::logger('teasearch')->warning('Taxonomy render function not found for type @type', [
+        '@type' => $type
+      ]);
+      continue;
+    }
+
+    // Chiama la funzione render passando il term invece del node
+    $content = $render_function($term, $field_config, $field_identifier);
+
+    // Se il contenuto è NULL o vuoto, salta il campo
+    if ($content === NULL || $content === '') {
+      continue;
+    }
+
+    // Ottiene la label
+    $label = $field_config['label'] ?? NULL;
+
+    // Costruisce l'array strutturato
+    $rendered_fields[$field_identifier] = [
+      'type' => $type,
+      'label' => $label,
+      'content' => $content,
+      'wrapper_class' => $field_config['wrapper_class'] ?? '',
+    ];
+  }
+
+  return $rendered_fields;
+}
+
+/**
+ * Ottiene la label del vocabolario tradotta.
+ * 
+ * @param string $vocabulary_id
+ *   Machine name del vocabolario.
+ * 
+ * @return string
+ *   Label del vocabolario in uppercase.
+ */
+function teasearch_get_vocabulary_label($vocabulary_id)
+{
+  $vocabulary = \Drupal\taxonomy\Entity\Vocabulary::load($vocabulary_id);
+
+  if (!$vocabulary) {
+    return strtoupper($vocabulary_id);
+  }
+
+  // Vocabulary non è traducibile, usa direttamente la label
+  return strtoupper($vocabulary->label());
+}

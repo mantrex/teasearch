@@ -53,6 +53,11 @@ function teasearch_get_field_type_registry()
     'pdf' => 'teasearch_render_field_pdf',
     'news_type_badge' => 'teasearch_render_field_news_type_badge',
     'aggregator' => 'teasearch_render_field_aggregator',
+    'taxonomy_main_title' => 'teasearch_render_field_taxonomy_main_title',
+    'taxonomy_name' => 'teasearch_render_field_taxonomy_name',
+    'taxonomy_alternatives' => 'teasearch_render_field_taxonomy_alternatives',
+    'taxonomy_external_mapping' => 'teasearch_render_field_taxonomy_external_mapping',
+    'taxonomy_resources' => 'teasearch_render_field_taxonomy_resources',
   ];
 }
 
@@ -3874,4 +3879,206 @@ function teasearch_render_field_news_type_badge($node, $field_config, $field_ide
   return '<div class="news-type-badge-wrapper"><div class="news-type-badge-box">' . implode('', $output_parts) . '</div>' . $publication_date . '</div>';
 }
 
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************  TASSONOMIE ************* */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
+/*************************************** */
 
+function teasearch_render_field_taxonomy_main_title($term, $field_config, $field_identifier)
+{
+  $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+
+  // Ottieni la traduzione del termine se esiste
+  if ($term->hasTranslation($current_language)) {
+    $term = $term->getTranslation($current_language);
+  }
+
+  return $term->getName();
+}
+
+/**
+ * TYPE: taxonomy_name
+ * Renderizza il campo "Label" nella tabella.
+ * 
+ * Mostra il nome del termine tradotto.
+ */
+function teasearch_render_field_taxonomy_name($term, $field_config, $field_identifier)
+{
+  $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+
+  if ($term->hasTranslation($current_language)) {
+    $term = $term->getTranslation($current_language);
+  }
+
+  return $term->getName();
+}
+
+/**
+ * TYPE: taxonomy_alternatives
+ * Renderizza il campo field_alternative_labels (Variants).
+ * 
+ * Mostra le label alternative separate da virgola.
+ */
+function teasearch_render_field_taxonomy_alternatives($term, $field_config, $field_identifier)
+{
+  if (!$term->hasField('field_alternative_labels')) {
+    return NULL;
+  }
+
+  $field = $term->get('field_alternative_labels');
+
+  if ($field->isEmpty()) {
+    return NULL;
+  }
+
+  $alternatives = [];
+  foreach ($field as $item) {
+    if (!empty($item->value)) {
+      $alternatives[] = $item->value;
+    }
+  }
+
+  return !empty($alternatives) ? implode(', ', $alternatives) : NULL;
+}
+
+/**
+ * TYPE: taxonomy_external_mapping
+ * Renderizza il campo field_external_authority_mapping.
+ * 
+ * Mostra gli external authority mapping con link se disponibili.
+ * Formato: LCSH: Aesthetics (close match)
+ */
+function teasearch_render_field_taxonomy_external_mapping($term, $field_config, $field_identifier)
+{
+  if (!$term->hasField('field_external_authority_mapping')) {
+    return NULL;
+  }
+
+  $field = $term->get('field_external_authority_mapping');
+
+  if ($field->isEmpty()) {
+    return NULL;
+  }
+
+  $mappings = [];
+
+  foreach ($field as $item) {
+    if ($item->isEmpty()) {
+      continue;
+    }
+
+    // Determina il tipo di campo e gestiscilo di conseguenza
+    $field_type = $item->getFieldDefinition()->getType();
+
+    if ($field_type === 'link') {
+      // Campo link
+      $url = $item->getUrl();
+      $title = $item->title ?: $url->toString();
+      $mappings[] = '<a href="' . $url->toString() . '" target="_blank">' . htmlspecialchars($title) . '</a>';
+    } elseif ($field_type === 'entity_reference_revisions') {
+      // Paragrafo - renderizza il contenuto
+      if ($item->entity) {
+        $view_builder = \Drupal::entityTypeManager()->getViewBuilder('paragraph');
+        $render_array = $view_builder->view($item->entity, 'default');
+        $rendered = \Drupal::service('renderer')->renderPlain($render_array);
+        $mappings[] = $rendered;
+      }
+    } elseif ($field_type === 'string' || $field_type === 'string_long' || $field_type === 'text' || $field_type === 'text_long') {
+      // Campo di testo semplice
+      if (!empty($item->value)) {
+        $mappings[] = htmlspecialchars($item->value);
+      }
+    } else {
+      // Fallback: prova a ottenere il valore come stringa
+      if (isset($item->value) && !empty($item->value)) {
+        $mappings[] = htmlspecialchars($item->value);
+      }
+    }
+  }
+
+  return !empty($mappings) ? implode('<br>', $mappings) : NULL;
+}
+
+/**
+ * TYPE: taxonomy_resources
+ * Renderizza la lista di risorse che usano questa tassonomia.
+ * 
+ * Trova tutti i nodi di un content type specifico che hanno questa tassonomia
+ * nel campo specificato e mostra titolo + link.
+ * 
+ * Configurazione schema:
+ * 'essentials' => [
+ *   'label' => 'Essentials',
+ *   'type' => 'taxonomy_resources',
+ *   'content_type' => 'first_reference',
+ *   'field' => 'field_subjects',
+ * ],
+ */
+function teasearch_render_field_taxonomy_resources($term, $field_config, $field_identifier)
+{
+  $content_type = $field_config['content_type'] ?? NULL;
+  $field_name = $field_config['field'] ?? NULL;
+
+  if (!$content_type || !$field_name) {
+    \Drupal::logger('teasearch')->error('taxonomy_resources: missing content_type or field in config for @id', [
+      '@id' => $field_identifier
+    ]);
+    return NULL;
+  }
+
+  $term_id = $term->id();
+  $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+
+  // Query per trovare nodi che referenziano questa tassonomia
+  $query = \Drupal::entityQuery('node')
+    ->accessCheck(TRUE)
+    ->condition('type', $content_type)
+    ->condition('status', 1)
+    ->condition($field_name, $term_id);
+
+  $nids = $query->execute();
+
+  if (empty($nids)) {
+    return NULL;
+  }
+
+  $nodes = \Drupal\node\Entity\Node::loadMultiple($nids);
+
+  $items = [];
+  foreach ($nodes as $node) {
+    // Ottieni la traduzione del nodo se esiste
+    if ($node->hasTranslation($current_language)) {
+      $node = $node->getTranslation($current_language);
+    }
+
+    $title = $node->getTitle();
+    $url = $node->toUrl()->toString();
+
+    $items[] = '<a href="' . $url . '">' . htmlspecialchars($title) . '</a>';
+  }
+
+  return !empty($items) ? implode('<br>', $items) : NULL;
+}
