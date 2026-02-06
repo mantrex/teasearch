@@ -299,6 +299,10 @@ function teasearch_auto_format_value($value, $field_type, $field_name = '')
  * TYPE: taxonomy
  * Renderizza termini di tassonomia separati da virgola (multilingua).
  */
+/**
+ * TYPE: taxonomy
+ * Renderizza un campo tassonomia con link alle pagine dei termini.
+ */
 function teasearch_render_field_taxonomy($node, $field_config, $field_identifier)
 {
   $field = teasearch_get_field_value($node, $field_identifier);
@@ -319,7 +323,12 @@ function teasearch_render_field_taxonomy($node, $field_config, $field_identifier
       if ($term->hasTranslation($current_language)) {
         $term = $term->getTranslation($current_language);
       }
-      $terms[] = $term->getName();
+
+      // Genera il link alla pagina del termine
+      $url = $term->toUrl()->toString();
+      $name = $term->getName();
+      
+      $terms[] = '<a href="' . $url . '">' . htmlspecialchars($name) . '</a>';
     }
   }
 
@@ -3970,6 +3979,30 @@ function teasearch_render_field_taxonomy_alternatives($term, $field_config, $fie
  * 
  * Mostra gli external authority mapping con link se disponibili.
  * Formato: LCSH: Aesthetics (close match)
+ *//**
+ * Render taxonomy external authority mapping field.
+ */
+/**
+ * TYPE: taxonomy_external_mapping
+ * Renderizza il campo field_external_authority_mapping.
+ * 
+ * Mostra gli external authority mapping con formato:
+ * {field_authority_scheme}: {field_authority_uri} [link] ({field_match_type})
+ * 
+ * Match type viene trasformato da camelCase a spazi:
+ * closeMatch -> close match
+ * broadMatch -> broad match
+ */
+/**
+ * TYPE: taxonomy_external_mapping
+ * Renderizza il campo field_external_authority_mapping.
+ * 
+ * Mostra gli external authority mapping con formato:
+ * {field_authority_scheme}: {field_authority_uri} [link] ({field_match_type})
+ * 
+ * Match type viene trasformato da camelCase a spazi:
+ * closeMatch -> close match
+ * broadMatch -> broad match
  */
 function teasearch_render_field_taxonomy_external_mapping($term, $field_config, $field_identifier)
 {
@@ -3983,45 +4016,60 @@ function teasearch_render_field_taxonomy_external_mapping($term, $field_config, 
     return NULL;
   }
 
-  $mappings = [];
+  $items = [];
 
-  foreach ($field as $item) {
-    if ($item->isEmpty()) {
-      continue;
+  // Carica i paragraph
+  foreach ($field->referencedEntities() as $paragraph) {
+    $scheme = '';
+    $uri = '';
+    $uri_title = '';
+    $match_type = '';
+
+    // Field authority scheme
+    if ($paragraph->hasField('field_authority_scheme') && !$paragraph->get('field_authority_scheme')->isEmpty()) {
+      $scheme = $paragraph->get('field_authority_scheme')->value;
     }
 
-    // Determina il tipo di campo e gestiscilo di conseguenza
-    $field_type = $item->getFieldDefinition()->getType();
+    // Field authority URI (link)
+    if ($paragraph->hasField('field_authority_uri') && !$paragraph->get('field_authority_uri')->isEmpty()) {
+      $link = $paragraph->get('field_authority_uri')->first();
+      $uri = $link->getUrl()->toString();
+      $uri_title = $link->title ?: $uri;
+    }
 
-    if ($field_type === 'link') {
-      // Campo link
-      $url = $item->getUrl();
-      $title = $item->title ?: $url->toString();
-      $mappings[] = '<a href="' . $url->toString() . '" target="_blank">' . htmlspecialchars($title) . '</a>';
-    } elseif ($field_type === 'entity_reference_revisions') {
-      // Paragrafo - renderizza il contenuto
-      if ($item->entity) {
-        $view_builder = \Drupal::entityTypeManager()->getViewBuilder('paragraph');
-        $render_array = $view_builder->view($item->entity, 'default');
-        $rendered = \Drupal::service('renderer')->renderPlain($render_array);
-        $mappings[] = $rendered;
+    // Field match type
+    if ($paragraph->hasField('field_match_type') && !$paragraph->get('field_match_type')->isEmpty()) {
+      $match_type_raw = $paragraph->get('field_match_type')->value;
+      
+      // Trasforma closeMatch -> close match, broadMatch -> broad match
+      if ($match_type_raw === 'closematch') {
+        $match_type = 'close match';
+      } elseif ($match_type_raw === 'broadmatch') {
+        $match_type = 'broad match';
+      } elseif ($match_type_raw === 'relatedmatch') {
+        $match_type = 'related match';
+      } else {
+        // Fallback generico per altri valori
+        $match_type = strtolower(preg_replace('/([a-z])([A-Z])/', '$1 $2', $match_type_raw));
       }
-    } elseif ($field_type === 'string' || $field_type === 'string_long' || $field_type === 'text' || $field_type === 'text_long') {
-      // Campo di testo semplice
-      if (!empty($item->value)) {
-        $mappings[] = htmlspecialchars($item->value);
+    }
+
+    // Costruisci l'item
+    if ($scheme && $uri) {
+      // Mantieni maiuscolo per LCSH, ICSH, ecc.
+      $link_html = '<a href="' . htmlspecialchars($uri) . '" target="_blank">' . htmlspecialchars($uri_title) . '</a>';
+      $item_text = strtoupper(htmlspecialchars($scheme)) . ': ' . $link_html;
+
+      if ($match_type) {
+        $item_text .= ' (' . htmlspecialchars($match_type) . ')';
       }
-    } else {
-      // Fallback: prova a ottenere il valore come stringa
-      if (isset($item->value) && !empty($item->value)) {
-        $mappings[] = htmlspecialchars($item->value);
-      }
+
+      $items[] = $item_text;
     }
   }
 
-  return !empty($mappings) ? implode('<br>', $mappings) : NULL;
+  return !empty($items) ? implode('<br>', $items) : NULL;
 }
-
 /**
  * TYPE: taxonomy_resources
  * Renderizza la lista di risorse che usano questa tassonomia.

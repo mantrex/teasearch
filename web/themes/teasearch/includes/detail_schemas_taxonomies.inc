@@ -29,7 +29,7 @@ function teasearch_get_taxonomy_detail_schema()
       ],
 
       // Scope note
-      'field_scope_note' => [
+      'field_description' => [
         'label' => 'Scope Note',
       ],
 
