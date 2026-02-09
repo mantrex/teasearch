@@ -208,3 +208,25 @@ function teasearch_get_content_type_label($content_type)
   // Fallback: usa il nome del content type con prima lettera maiuscola
   return ucfirst(str_replace('_', ' ', $content_type));
 }
+
+function teasearch_get_taxonomy_field_label($field_config, $field_identifier, $vocabulary_id)
+{
+  // Se non c'è label specificata, non mostrare nulla
+  if (!isset($field_config['label'])) {
+    return NULL;
+  }
+
+  $label = $field_config['label'];
+
+  // Ottieni traduzioni dal sistema custom per tassonomie
+  $translations = teasearch_taxonomy_translations();
+  $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+
+  // Se esiste traduzione nel sistema custom, usala
+  if (isset($translations[$vocabulary_id][$current_language][$field_identifier])) {
+    return $translations[$vocabulary_id][$current_language][$field_identifier];
+  }
+
+  // Altrimenti usa la label dallo schema (già in inglese di default)
+  return $label;
+}

@@ -9,10 +9,16 @@
 
 	{# HEADER H1 CON RIQUADRO VERDE #}
 	<div class="info-title-section">
+		<div class='info-title-upper'>
+			{% if node.label|lower !='about' and node.label|lower !='il progetto' %}
+				{{ "ABOUT"|t }}
+			{% endif %}
+		</div>
+
 		<div class="container-fluid">
-			<h1 class="info-title">
+			<div class="info-title">
 				{{ node.label }}
-			</h1>
+			</div>
 		</div>
 	</div>
 

@@ -4,6 +4,8 @@
  * @file
  * Functions to support theming.
  */
+require_once __DIR__ . '/includes/jsonld_generators.inc';
+require_once __DIR__ . '/includes/jsonld_attach.inc';
 
 include_once __DIR__ . '/includes/detail_schemas.inc';
 include_once __DIR__ . '/includes/detail_field_types.inc';
@@ -253,74 +255,6 @@ function teasearch_preprocess_views_view__category_selector(&$variables)
   $variables['categories_data'] = $categories_data;
 }
 
-/*
-function teasearch_suggestions_teasearch_alter(array &$suggestions, array $variables)
-{
-  if (!empty($variables['content_type'])) {
-    // Mappa content_type → template
-    $template_mapping = [
-      'news' => 'card_layout',
-      'events' => 'card_layout',
-      'announcements' => 'card_layout',
-
-      'texts' => 'list_layout',
-      'documents' => 'list_layout',
-
-      'images' => 'gallery_layout',
-      'videos' => 'gallery_layout',
-
-      // Fallback: se non è nella mappa, usa il nome del content_type
-    ];
-
-    $content_type = $variables['content_type'];
-
-    if (isset($template_mapping[$content_type])) {
-      // Usa il template mappato
-      $suggestions[] = 'teasearch__' . $template_mapping[$content_type];
-    } else {
-      // Fallback: usa il nome del content_type
-      $suggestions[] = 'teasearch__' . str_replace('-', '_', $content_type);
-    }
-  }
-}*/
-
-/*
-function teasearch_theme_suggestions_node_alter(array &$suggestions, array $variables)
-{
-  $node = $variables['elements']['#node'];
-  $view_mode = $variables['elements']['#view_mode'];
-
-  // Solo per view mode 'full' (pagina di dettaglio)
-  if ($view_mode === 'full') {
-    $content_type = $node->bundle();
-
-    // Suggerisci template node--{content_type}--detail.html.twig
-    $suggestions[] = 'node__' . $content_type . '__detail';
-  }
-}*/
-/*
-function teasearch_theme_suggestions_node_alter(array &$suggestions, array $variables)
-{
-  $node = $variables['elements']['#node'];
-  $view_mode = $variables['elements']['#view_mode'];
-
-  if ($view_mode === 'full') {
-    $content_type = $node->bundle();
-
-    // Template speciale per about e news
-    if (in_array($content_type, ['about'])) {
-      $suggestions[] = 'node__info';
-      return;
-    }
-    // Carica lo schema
-    $schemas = teasearch_get_detail_schemas();
-
-    // SOLO se esiste schema, suggerisci node__detail
-    if (isset($schemas[$content_type])) {
-      $suggestions[] = 'node__detail';
-    }
-  }
-}*/
 
 function teasearch_theme_suggestions_node_alter(array &$suggestions, array $variables)
 {
@@ -671,8 +605,10 @@ function teasearch_theme_suggestions_taxonomy_term_alter(array &$suggestions, ar
 
   // Solo per view mode 'full' (pagina di dettaglio)
   if ($view_mode === 'full') {
-    // Controlla se esiste uno schema per questa tassonomia
-    $schema = teasearch_get_taxonomy_detail_schema();
+    $vocabulary_id = $term->bundle();
+    
+    // MODIFICA: Passa il vocabulary_id allo schema
+    $schema = teasearch_get_taxonomy_detail_schema($vocabulary_id);
 
     if (!empty($schema)) {
       // Suggerisci il template taxonomy-term--detail.html.twig
@@ -681,6 +617,7 @@ function teasearch_theme_suggestions_taxonomy_term_alter(array &$suggestions, ar
     }
   }
 }
+
 
 /**
  * Implements template_preprocess_taxonomy_term().
@@ -692,7 +629,9 @@ function teasearch_preprocess_taxonomy_term(&$variables)
 
   if ($view_mode === 'full') {
     $vocabulary_id = $term->bundle();
-    $schema = teasearch_get_taxonomy_detail_schema();
+    
+    // MODIFICA: Passa il vocabulary_id allo schema
+    $schema = teasearch_get_taxonomy_detail_schema($vocabulary_id);
 
     if (!empty($schema)) {
       $variables['#attached']['library'][] = 'teasearch/detail-page';
@@ -727,9 +666,18 @@ function teasearch_render_taxonomy_fields($term, $fields_config)
 
     // Caso 1: Separatore (stringa semplice)
     if (is_string($field_config)) {
+      // MODIFICA: Traduci anche i separatori usando il sistema di traduzioni
+      $separator_label = $field_config;
+      
+      // Prova a ottenere traduzione per il separatore
+      $translations = teasearch_taxonomy_translations();
+      if (isset($translations[$vocabulary_id][$current_language][$field_identifier])) {
+        $separator_label = $translations[$vocabulary_id][$current_language][$field_identifier];
+      }
+      
       $rendered_fields[$field_identifier] = [
         'type' => 'separator',
-        'content' => $field_config,
+        'content' => $separator_label,
         'label' => NULL,
         'wrapper_class' => 'separator',
       ];
@@ -757,8 +705,8 @@ function teasearch_render_taxonomy_fields($term, $fields_config)
       continue;
     }
 
-    // Ottiene la label
-    $label = $field_config['label'] ?? NULL;
+    // MODIFICA: Ottiene la label tradotta usando la nuova funzione
+    $label = teasearch_get_taxonomy_field_label($field_config, $field_identifier, $vocabulary_id);
 
     // Costruisce l'array strutturato
     $rendered_fields[$field_identifier] = [
@@ -771,6 +719,8 @@ function teasearch_render_taxonomy_fields($term, $fields_config)
 
   return $rendered_fields;
 }
+
+
 
 /**
  * Ottiene la label del vocabolario tradotta.
@@ -792,3 +742,12 @@ function teasearch_get_vocabulary_label($vocabulary_id)
   // Vocabulary non è traducibile, usa direttamente la label
   return strtoupper($vocabulary->label());
 }
+
+function teasearch_page_attachments(array &$attachments)
+{
+  // Chiama la funzione definita in jsonld_attach.inc
+  if (function_exists('teasearch_jsonld_page_attachments')) {
+    teasearch_jsonld_page_attachments($attachments);
+  }
+}
+

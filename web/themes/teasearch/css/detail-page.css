@@ -39,6 +39,16 @@
   justify-content: top;
   min-height: 180px;
 }
+.detail-header__title-section_taxonomy {
+  flex: 1;
+  background-color: var(--details-bg);
+  padding: 16px 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: top;
+  min-height:110px;
+  
+}
 
 .detail-header__content-type {
   font-size: 11px;

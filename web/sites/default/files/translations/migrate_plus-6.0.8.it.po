@@ -1,10 +1,10 @@
-# Italian translation of Migrate Plus (6.0.5)
-# Copyright (c) 2024 by the Italian translation team
+# Italian translation of Migrate Plus (6.0.8)
+# Copyright (c) 2025 by the Italian translation team
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Migrate Plus (6.0.5)\n"
-"POT-Creation-Date: 2024-11-20 18:46+0000\n"
+"Project-Id-Version: Migrate Plus (6.0.8)\n"
+"POT-Creation-Date: 2025-07-28 21:35+0000\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Language-Team: Italian\n"
 "MIME-Version: 1.0\n"
