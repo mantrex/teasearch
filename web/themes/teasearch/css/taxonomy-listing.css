@@ -1,3 +1,10 @@
+/* Lista termini taxonomy - solo stili specifici lista */
+.taxonomy-wrapper {
+  background:white;
+}
+.taxonomy-wrapper .term-name a {
+  color:var(--details-link);
+}
 .taxonomy-terms-list {
   list-style: none;
   padding: 0;
@@ -5,8 +12,8 @@
 }
 
 .taxonomy-term-item {
-  padding: 1rem 0;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 1.5rem 1.2rem;
+  border-bottom: 1px solid var(--details-border);
 }
 
 .taxonomy-term-item:last-child {
@@ -14,17 +21,19 @@
 }
 
 .taxonomy-term-item a {
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: var(--bs-dark);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--body-text);
   text-decoration: none;
 }
 
 .taxonomy-term-item a:hover {
-  color: var(--bs-primary);
+  color: var(--details-link);
 }
 
 .taxonomy-term-item p {
-  margin-top: 0.5rem;
-  color: var(--bs-gray-600);
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+  color: var(--body-text);
+  line-height: 1.6;
 }

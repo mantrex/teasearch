@@ -1,16 +1,19 @@
 {#
 /**
  * @file
- * Template per listing automatici taxonomy (/taxonomy/{vocabulary_id})
- * Stile identico a node--info.html.twig
+ * Template per listing taxonomy (/taxonomy/{vocabulary_id})
  */
 #}
 
-<article
-	class="node node--type-info node--info">
+<article class="taxonomy-term taxonomy-term--detail taxonomy-wrapper">
 
-	{# HEADER H1 CON RIQUADRO VERDE #}
+
 	<div class="info-title-section">
+		<div class='info-title-upper'>
+			{{ 'Taxonomy' }}
+
+
+		</div>
 		<div class="container-fluid">
 			<div class="info-title">
 				{{ vocabulary_label }}
@@ -18,39 +21,23 @@
 		</div>
 	</div>
 
-	{# CONTENUTO: 2 COLONNE #}
-	<div class="info-main">
+
+	{# LISTA TERMINI #}
+	<div class="detail-body">
 		<div class="container-fluid">
-			<div
-				class="row g-3">
-
-				{# COLONNA SINISTRA: Lista termini #}
-				<div class="col-lg-9 left-col-wrapper">
-					<div class="info-left-col">
-
-						<div class="info-section">
-							<div class="info-section-body">
-								<ul class="taxonomy-terms-list">
-									{% for term in taxonomy_terms %}
-										<li class="taxonomy-term-item">
-											<a href="{{ term.url }}">{{ term.name }}</a>
-											{% if term.description %}
-												<p>{{ term.description|striptags }}</p>
-											{% endif %}
-										</li>
-									{% endfor %}
-								</ul>
+			<div class="taxonomy-terms-listing">
+				{% for term in taxonomy_terms %}
+					<div class="taxonomy-term-item">
+						<h3 class="term-name">
+							<a href="{{ term.url }}">{{ term.name }}</a>
+						</h3>
+						{% if term.description %}
+							<div class="term-description">
+								{{ term.description|striptags }}
 							</div>
-						</div>
-
+						{% endif %}
 					</div>
-				</div>
-
-				{# COLONNA DESTRA: vuota o menu #}
-				<div
-					class="col-lg-3">{# Eventualmente qui puoi mettere altro #}
-				</div>
-
+				{% endfor %}
 			</div>
 		</div>
 	</div>

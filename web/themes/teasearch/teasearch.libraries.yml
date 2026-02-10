@@ -54,3 +54,5 @@ taxonomy-listing:
   css:
     theme:
       css/taxonomy-listing.css: {}
+  dependencies:
+    - teasearch/info-page

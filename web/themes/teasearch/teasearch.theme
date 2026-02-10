@@ -836,6 +836,7 @@ if (!preg_match('#^/[a-z]{2}/taxonomy/([a-z_]+)$#', $current_path, $matches)) {
   $variables['vocabulary_id'] = $vocabulary_id;
   $variables['vocabulary_label'] = $vocabulary->label();
   $variables['taxonomy_terms'] = $terms_data;
+  $variables['#attached']['library'][] = 'teasearch/info-page';
   $variables['#attached']['library'][] = 'teasearch/taxonomy-listing';
 
   $theme_path = \Drupal::theme()->getActiveTheme()->getPath();
