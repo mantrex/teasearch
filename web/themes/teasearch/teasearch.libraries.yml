@@ -50,3 +50,7 @@ video-player:
     js/video-player.js: {}
   dependencies:
     - core/drupal
+taxonomy-listing:
+  css:
+    theme:
+      css/taxonomy-listing.css: {}

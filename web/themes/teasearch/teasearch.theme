@@ -16,6 +16,11 @@ include_once __DIR__ . '/includes/detail_schemas_taxonomies.inc';
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Breadcrumb\Breadcrumb;
+use Drupal\Core\Link;
+use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Routing\RouteMatchInterface;
+
 
 /**
  * Preprocess per la pagina (site header, language switcher, ecc.).
@@ -104,6 +109,8 @@ function teasearch_preprocess_page(array &$variables): void
     'route_name'        => $route_name,
     'route_parameters'  => $route_parameters,
   ];
+
+   teasearch_handle_taxonomy_listing_preprocess($variables);
 }
 
 
@@ -743,11 +750,140 @@ function teasearch_get_vocabulary_label($vocabulary_id)
   return strtoupper($vocabulary->label());
 }
 
-function teasearch_page_attachments(array &$attachments)
+function teasearch_page_attachments_alter(array &$attachments)
 {
+
   // Chiama la funzione definita in jsonld_attach.inc
   if (function_exists('teasearch_jsonld_page_attachments')) {
     teasearch_jsonld_page_attachments($attachments);
   }
+
+  $request = \Drupal::request();
+  $current_path = $request->getPathInfo();
+  
+  // Intercetta /en/taxonomy/{vocabulary_id}
+  if (preg_match('#^/[a-z]{2}/taxonomy/([a-z_]+)$#', $current_path, $matches)) {
+    $vocabulary_id = $matches[1];
+    
+    $vocabulary = \Drupal::entityTypeManager()
+      ->getStorage('taxonomy_vocabulary')
+      ->load($vocabulary_id);
+    if ($vocabulary) {
+      // Imposta breadcrumb manualmente bypassando Easy Breadcrumb
+      $breadcrumb = [
+        '<a href="/">Home</a>',
+        $vocabulary->label(),
+      ];
+      \Drupal::messenger()->addStatus('Breadcrumb: Home > ' . $vocabulary->label());
+    }
+  }
 }
 
+
+
+
+/**
+ * Preprocess per pagine listing taxonomy (/taxonomy/{vocabulary_id}).
+ */
+/**
+ * Helper: Gestisce il preprocess per pagine taxonomy listing.
+ */
+function teasearch_handle_taxonomy_listing_preprocess(array &$variables): void
+{
+  
+$request = \Drupal::request();
+  $current_path = $request->getPathInfo();
+
+  // Intercetta SOLO /taxonomy/{vocabulary_id}
+if (!preg_match('#^/[a-z]{2}/taxonomy/([a-z_]+)$#', $current_path, $matches)) {
+        return;
+  }
+
+  $vocabulary_id = $matches[1];
+
+  // Carica il vocabolario
+  $vocabulary_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_vocabulary');
+  $vocabulary = $vocabulary_storage->load($vocabulary_id);
+
+  if (!$vocabulary) {
+    return;
+  }
+  // Lingua corrente
+  $language_manager = \Drupal::languageManager();
+  $current_language = $language_manager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
+  
+  // Carica tutti i termini
+  $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  $term_tree = $term_storage->loadTree($vocabulary_id, 0, NULL, TRUE);
+  // Prepara array termini
+  $terms_data = [];
+  foreach ($term_tree as $term) {
+    if ($term->hasTranslation($current_language)) {
+      $translated_term = $term->getTranslation($current_language);
+    } else {
+      $translated_term = $term;
+    }
+    
+    $terms_data[] = [
+      'name' => $translated_term->getName(),
+      'url' => $translated_term->toUrl()->toString(),
+      'description' => $translated_term->getDescription(),
+    ];
+  }
+
+  // Passa dati al template
+  $variables['is_taxonomy_listing'] = TRUE;
+  $variables['vocabulary_id'] = $vocabulary_id;
+  $variables['vocabulary_label'] = $vocabulary->label();
+  $variables['taxonomy_terms'] = $terms_data;
+  $variables['#attached']['library'][] = 'teasearch/taxonomy-listing';
+
+  $theme_path = \Drupal::theme()->getActiveTheme()->getPath();
+  $template_path = $theme_path . '/templates/custom/page--taxonomy-listing.html.twig';
+  
+  // Renderizza direttamente il nostro template
+  $twig = \Drupal::service('twig');
+  $template = $twig->load($template_path);
+  $rendered = $template->render($variables);
+  
+  // Sostituisci il contenuto della pagina
+  $variables['page']['content'] = [
+    '#markup' => $rendered,
+  ];
+
+
+}
+
+/**
+ * Implements hook_system_breadcrumb_alter().
+ */
+/**
+ * Implements hook_preprocess_easy_breadcrumb().
+ */
+function teasearch_preprocess_easy_breadcrumb(&$variables) {
+  $request = \Drupal::request();
+  $current_path = $request->getPathInfo();
+  
+  // Intercetta /en/taxonomy/{vocabulary_id}
+  if (preg_match('#^/[a-z]{2}/taxonomy/([a-z_]+)$#', $current_path, $matches)) {
+    $vocabulary_id = $matches[1];
+    
+    $vocabulary = \Drupal::entityTypeManager()
+      ->getStorage('taxonomy_vocabulary')
+      ->load($vocabulary_id);
+    
+    if ($vocabulary) {
+      // Sovrascrivi breadcrumb
+      $variables['breadcrumb'] = [
+        [
+          'text' => t('Home'),
+          'url' => '/',
+        ],
+        [
+          'text' => $vocabulary->label(),
+          'url' => '',  // vuoto = no link
+        ],
+      ];
+    }
+  }
+}

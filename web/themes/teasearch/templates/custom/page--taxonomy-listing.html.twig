@@ -1,0 +1,58 @@
+{#
+/**
+ * @file
+ * Template per listing automatici taxonomy (/taxonomy/{vocabulary_id})
+ * Stile identico a node--info.html.twig
+ */
+#}
+
+<article
+	class="node node--type-info node--info">
+
+	{# HEADER H1 CON RIQUADRO VERDE #}
+	<div class="info-title-section">
+		<div class="container-fluid">
+			<div class="info-title">
+				{{ vocabulary_label }}
+			</div>
+		</div>
+	</div>
+
+	{# CONTENUTO: 2 COLONNE #}
+	<div class="info-main">
+		<div class="container-fluid">
+			<div
+				class="row g-3">
+
+				{# COLONNA SINISTRA: Lista termini #}
+				<div class="col-lg-9 left-col-wrapper">
+					<div class="info-left-col">
+
+						<div class="info-section">
+							<div class="info-section-body">
+								<ul class="taxonomy-terms-list">
+									{% for term in taxonomy_terms %}
+										<li class="taxonomy-term-item">
+											<a href="{{ term.url }}">{{ term.name }}</a>
+											{% if term.description %}
+												<p>{{ term.description|striptags }}</p>
+											{% endif %}
+										</li>
+									{% endfor %}
+								</ul>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				{# COLONNA DESTRA: vuota o menu #}
+				<div
+					class="col-lg-3">{# Eventualmente qui puoi mettere altro #}
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+</article>

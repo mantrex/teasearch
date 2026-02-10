@@ -533,6 +533,683 @@ function teasearch_generate_jsonld_people($node)
 
 /**
  * =============================================================================
+ * BIBLIOGRAPHY - Schema.org ScholarlyArticle / Book
+ * =============================================================================
+ */
+
+/**
+ * Genera JSON-LD ScholarlyArticle o Book per un nodo bibliography.
+ * 
+ * @param \Drupal\node\Entity\Node $node
+ *   Il nodo bibliography.
+ * 
+ * @return array
+ *   Array strutturato per JSON-LD con ScholarlyArticle o Book.
+ */
+function teasearch_generate_jsonld_bibliography($node)
+{
+  $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  
+  // Ottieni la traduzione del nodo se esiste
+  if ($node->hasTranslation($current_language)) {
+    $node = $node->getTranslation($current_language);
+  }
+
+  $nid = $node->id();
+  $base_url = \Drupal::request()->getSchemeAndHttpHost();
+  
+  // URI della risorsa
+  $alias = \Drupal::service('path_alias.manager')->getAliasByPath('/node/' . $nid, $current_language);
+  $alias = ltrim($alias, '/');
+  $webpage_uri = $base_url . '/web/' . $current_language . '/' . $alias;
+  $publication_uri = $base_url . '/web/node/' . $nid;
+
+  // ========================================
+  // DETERMINA IL TIPO (@type)
+  // ========================================
+  
+  // Default: ScholarlyArticle
+  $type = 'schema:ScholarlyArticle';
+  
+  // Controlla field_pubtype per determinare il tipo
+  if ($node->hasField('field_pubtype') && !$node->get('field_pubtype')->isEmpty()) {
+    $pubtype_term = $node->get('field_pubtype')->entity;
+    if ($pubtype_term) {
+      $pubtype_name = strtolower($pubtype_term->getName());
+      
+      // Mapping tipi di pubblicazione -> Schema.org types
+      if (strpos($pubtype_name, 'book') !== false || 
+          strpos($pubtype_name, 'monograph') !== false) {
+        $type = 'schema:Book';
+      } elseif (strpos($pubtype_name, 'thesis') !== false || 
+                strpos($pubtype_name, 'dissertation') !== false) {
+        $type = 'schema:Thesis';
+      } elseif (strpos($pubtype_name, 'chapter') !== false) {
+        $type = 'schema:Chapter';
+      }
+      // Altrimenti rimane ScholarlyArticle
+    }
+  }
+
+  // ========================================
+  // COSTRUISCI LA PUBBLICAZIONE
+  // ========================================
+  
+  $publication = [
+    '@id' => $publication_uri,
+    '@type' => $type,
+  ];
+
+  // OBBLIGATORI
+
+  // name - Titolo
+  $publication['schema:name'] = $node->getTitle();
+
+  // author - Autori
+  $authors = teasearch_jsonld_get_authors($node, 'field_responsibles');
+  if (!empty($authors)) {
+    $publication['schema:author'] = [];
+    foreach ($authors as $author_name) {
+      $publication['schema:author'][] = [
+        '@type' => 'schema:Person',
+        'schema:name' => $author_name
+      ];
+    }
+  }
+
+  // RACCOMANDATI
+
+  // datePublished - Data di pubblicazione
+  if ($node->hasField('field_date') && !$node->get('field_date')->isEmpty()) {
+    $date = $node->get('field_date')->value;
+    if (!empty($date)) {
+      $publication['schema:datePublished'] = $date;
+    }
+  } elseif ($node->hasField('field_year') && !$node->get('field_year')->isEmpty()) {
+    $year = $node->get('field_year')->value;
+    if (!empty($year)) {
+      $publication['schema:datePublished'] = $year;
+    }
+  }
+
+  // publisher - Editore
+  if ($node->hasField('field_publisher') && !$node->get('field_publisher')->isEmpty()) {
+    $publisher = $node->get('field_publisher')->value;
+    if (!empty($publisher)) {
+      $publication['schema:publisher'] = [
+        '@type' => 'schema:Organization',
+        'schema:name' => $publisher
+      ];
+    }
+  }
+
+  // inLanguage - Lingua
+  if ($node->hasField('field_language') && !$node->get('field_language')->isEmpty()) {
+    $languages = [];
+    foreach ($node->get('field_language')->referencedEntities() as $term) {
+      $languages[] = strtolower($term->getName());
+    }
+    if (!empty($languages)) {
+      $publication['schema:inLanguage'] = $languages;
+    }
+  }
+
+  // about - Soggetti (link a taxonomy SKOS)
+  $subjects = teasearch_jsonld_get_taxonomy_uris($node, 'field_subjects');
+  if (!empty($subjects)) {
+    $publication['schema:about'] = [];
+    foreach ($subjects as $uri) {
+      $publication['schema:about'][] = ['@id' => $uri];
+    }
+  }
+
+  // UTILI
+
+  // isbn - ISBN
+  if ($node->hasField('field_isbn') && !$node->get('field_isbn')->isEmpty()) {
+    $isbn = $node->get('field_isbn')->value;
+    if (!empty($isbn)) {
+      $publication['schema:isbn'] = $isbn;
+    }
+  }
+
+  // issn - ISSN
+  if ($node->hasField('field_issn') && !$node->get('field_issn')->isEmpty()) {
+    $issn = $node->get('field_issn')->value;
+    if (!empty($issn)) {
+      $publication['schema:issn'] = $issn;
+    }
+  }
+
+  // abstract - Abstract
+  if ($node->hasField('field_original_abstract') && !$node->get('field_original_abstract')->isEmpty()) {
+    $abstract = strip_tags($node->get('field_original_abstract')->value);
+    if (!empty($abstract)) {
+      $publication['schema:abstract'] = $abstract;
+    }
+  }
+
+  // keywords - Parole chiave
+  if ($node->hasField('field_keywords') && !$node->get('field_keywords')->isEmpty()) {
+    $keywords = $node->get('field_keywords')->value;
+    if (!empty($keywords)) {
+      $publication['schema:keywords'] = $keywords;
+    }
+  }
+
+  // numberOfPages - Numero di pagine
+  if ($node->hasField('field_pages') && !$node->get('field_pages')->isEmpty()) {
+    $pages = $node->get('field_pages')->value;
+    if (!empty($pages)) {
+      $publication['schema:numberOfPages'] = $pages;
+    }
+  }
+
+  // url - Link di accesso online
+  if ($node->hasField('field_online_links') && !$node->get('field_online_links')->isEmpty()) {
+    $link = $node->get('field_online_links')->first();
+    if ($link) {
+      $url = $link->getUrl()->toString();
+      if (!empty($url)) {
+        $publication['schema:url'] = $url;
+      }
+    }
+  }
+
+  // editor - Editori (field_editors)
+  if ($node->hasField('field_editors') && !$node->get('field_editors')->isEmpty()) {
+    $editors = teasearch_jsonld_get_authors($node, 'field_editors');
+    if (!empty($editors)) {
+      $publication['schema:editor'] = [];
+      foreach ($editors as $editor_name) {
+        $publication['schema:editor'][] = [
+          '@type' => 'schema:Person',
+          'schema:name' => $editor_name
+        ];
+      }
+    }
+  }
+
+  // ========================================
+  // COSTRUISCI LA WEBPAGE
+  // ========================================
+  
+  $webpage = [
+    '@id' => $webpage_uri,
+    '@type' => 'schema:WebPage',
+    'schema:url' => $webpage_uri,
+    'schema:inLanguage' => $current_language,
+    'schema:name' => $node->getTitle(),
+    'schema:mainEntity' => ['@id' => $publication_uri]
+  ];
+
+  // ========================================
+  // ASSEMBLA IL GRAPH
+  // ========================================
+  
+  $jsonld = [
+    '@context' => ['schema' => 'https://schema.org/'],
+    '@graph' => [$webpage, $publication]
+  ];
+
+  return $jsonld;
+}
+
+/**
+ * =============================================================================
+ * PRIMARY_SOURCES (Texts) - Schema.org CreativeWork
+ * =============================================================================
+ */
+
+/**
+ * Genera JSON-LD CreativeWork per un nodo primary_sources.
+ * 
+ * @param \Drupal\node\Entity\Node $node
+ *   Il nodo primary_sources.
+ * 
+ * @return array
+ *   Array strutturato per JSON-LD con CreativeWork.
+ */
+function teasearch_generate_jsonld_primary_sources($node)
+{
+  $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  
+  // Ottieni la traduzione del nodo se esiste
+  if ($node->hasTranslation($current_language)) {
+    $node = $node->getTranslation($current_language);
+  }
+
+  $nid = $node->id();
+  $base_url = \Drupal::request()->getSchemeAndHttpHost();
+  
+  // URI della risorsa
+  $alias = \Drupal::service('path_alias.manager')->getAliasByPath('/node/' . $nid, $current_language);
+  $alias = ltrim($alias, '/');
+  $webpage_uri = $base_url . '/web/' . $current_language . '/' . $alias;
+  $work_uri = $base_url . '/web/node/' . $nid;
+
+  // ========================================
+  // COSTRUISCI IL CREATIVEWORK
+  // ========================================
+  
+  $work = [
+    '@id' => $work_uri,
+    '@type' => 'schema:CreativeWork',
+  ];
+
+  // name - Titolo
+  $work['schema:name'] = $node->getTitle();
+
+  // author - Autori
+  $authors = teasearch_jsonld_get_authors($node, 'field_responsibles');
+  if (!empty($authors)) {
+    $work['schema:author'] = [];
+    foreach ($authors as $author_name) {
+      $work['schema:author'][] = [
+        '@type' => 'schema:Person',
+        'schema:name' => $author_name
+      ];
+    }
+  }
+
+  // inLanguage - Lingua
+  if ($node->hasField('field_language') && !$node->get('field_language')->isEmpty()) {
+    $languages = [];
+    foreach ($node->get('field_language')->referencedEntities() as $term) {
+      $languages[] = strtolower($term->getName());
+    }
+    if (!empty($languages)) {
+      $work['schema:inLanguage'] = $languages;
+    }
+  }
+
+  // genre - Genere
+  if ($node->hasField('field_text_genres') && !$node->get('field_text_genres')->isEmpty()) {
+    $genres = [];
+    foreach ($node->get('field_text_genres')->referencedEntities() as $term) {
+      $genres[] = $term->getName();
+    }
+    if (!empty($genres)) {
+      $work['schema:genre'] = $genres;
+    }
+  }
+
+  // about - Soggetti (link a taxonomy SKOS)
+  $subjects = teasearch_jsonld_get_taxonomy_uris($node, 'field_subjects');
+  if (!empty($subjects)) {
+    $work['schema:about'] = [];
+    foreach ($subjects as $uri) {
+      $work['schema:about'][] = ['@id' => $uri];
+    }
+  }
+
+  // description - Descrizione
+  if ($node->hasField('field_description') && !$node->get('field_description')->isEmpty()) {
+    $description = strip_tags($node->get('field_description')->value);
+    if (!empty($description)) {
+      $work['schema:description'] = $description;
+    }
+  }
+
+  // keywords - Parole chiave
+  if ($node->hasField('field_keywords') && !$node->get('field_keywords')->isEmpty()) {
+    $keywords = $node->get('field_keywords')->value;
+    if (!empty($keywords)) {
+      $work['schema:keywords'] = $keywords;
+    }
+  }
+
+  // locationCreated - Luogo di creazione
+  if ($node->hasField('field_country') && !$node->get('field_country')->isEmpty()) {
+    $country_uris = teasearch_jsonld_get_taxonomy_uris($node, 'field_country');
+    if (!empty($country_uris)) {
+      $work['schema:locationCreated'] = ['@id' => $country_uris[0]];
+    }
+  }
+
+  // spatialCoverage - Geographic focus
+  if ($node->hasField('field_country2') && !$node->get('field_country2')->isEmpty()) {
+    $spatial_coverage = [];
+    foreach (teasearch_jsonld_get_taxonomy_uris($node, 'field_country2') as $uri) {
+      $spatial_coverage[] = ['@id' => $uri];
+    }
+    if (!empty($spatial_coverage)) {
+      $work['schema:spatialCoverage'] = $spatial_coverage;
+    }
+  }
+
+  // dateCreated - Data (da field_year_range se presente)
+  if ($node->hasField('field_year_range') && !$node->get('field_year_range')->isEmpty()) {
+    $year_from = $node->get('field_year_range')->year_from;
+    if (!empty($year_from)) {
+      $work['schema:dateCreated'] = $year_from;
+    }
+  }
+
+  // publisher - Editore
+  if ($node->hasField('field_text_publisher') && !$node->get('field_text_publisher')->isEmpty()) {
+    $publisher = $node->get('field_text_publisher')->value;
+    if (!empty($publisher)) {
+      $work['schema:publisher'] = [
+        '@type' => 'schema:Organization',
+        'schema:name' => $publisher
+      ];
+    }
+  }
+
+  // ========================================
+  // COSTRUISCI LA WEBPAGE
+  // ========================================
+  
+  $webpage = [
+    '@id' => $webpage_uri,
+    '@type' => 'schema:WebPage',
+    'schema:url' => $webpage_uri,
+    'schema:inLanguage' => $current_language,
+    'schema:name' => $node->getTitle(),
+    'schema:mainEntity' => ['@id' => $work_uri]
+  ];
+
+  // ========================================
+  // ASSEMBLA IL GRAPH
+  // ========================================
+  
+  $jsonld = [
+    '@context' => ['schema' => 'https://schema.org/'],
+    '@graph' => [$webpage, $work]
+  ];
+
+  return $jsonld;
+}
+
+/**
+ * =============================================================================
+ * FIRST_REFERENCE (Essentials) - Schema.org Article
+ * =============================================================================
+ */
+
+/**
+ * Genera JSON-LD Article per un nodo first_reference.
+ * 
+ * @param \Drupal\node\Entity\Node $node
+ *   Il nodo first_reference.
+ * 
+ * @return array
+ *   Array strutturato per JSON-LD con Article.
+ */
+function teasearch_generate_jsonld_first_reference($node)
+{
+  $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  
+  // Ottieni la traduzione del nodo se esiste
+  if ($node->hasTranslation($current_language)) {
+    $node = $node->getTranslation($current_language);
+  }
+
+  $nid = $node->id();
+  $base_url = \Drupal::request()->getSchemeAndHttpHost();
+  
+  // URI della risorsa
+  $alias = \Drupal::service('path_alias.manager')->getAliasByPath('/node/' . $nid, $current_language);
+  $alias = ltrim($alias, '/');
+  $webpage_uri = $base_url . '/web/' . $current_language . '/' . $alias;
+  $article_uri = $base_url . '/web/node/' . $nid;
+
+  // ========================================
+  // COSTRUISCI L'ARTICLE
+  // ========================================
+  
+  $article = [
+    '@id' => $article_uri,
+    '@type' => 'schema:Article',
+  ];
+
+  // name - Titolo
+  $article['schema:name'] = $node->getTitle();
+
+  // author - Autori (field_authors_ref - entity reference a people)
+  if ($node->hasField('field_authors_ref') && !$node->get('field_authors_ref')->isEmpty()) {
+    $article['schema:author'] = [];
+    foreach ($node->get('field_authors_ref')->referencedEntities() as $person) {
+      $article['schema:author'][] = [
+        '@type' => 'schema:Person',
+        'schema:name' => $person->getTitle()
+      ];
+    }
+  }
+
+  // description - Short description
+  if ($node->hasField('field_short_description') && !$node->get('field_short_description')->isEmpty()) {
+    $description = strip_tags($node->get('field_short_description')->value);
+    if (!empty($description)) {
+      $article['schema:description'] = $description;
+    }
+  }
+
+  // articleBody - Main content
+  if ($node->hasField('field_content') && !$node->get('field_content')->isEmpty()) {
+    $content = strip_tags($node->get('field_content')->value);
+    if (!empty($content)) {
+      $article['schema:articleBody'] = $content;
+    }
+  }
+
+  // about - Soggetti (link a taxonomy SKOS)
+  $subjects = teasearch_jsonld_get_taxonomy_uris($node, 'field_subjects');
+  if (!empty($subjects)) {
+    $article['schema:about'] = [];
+    foreach ($subjects as $uri) {
+      $article['schema:about'][] = ['@id' => $uri];
+    }
+  }
+
+  // keywords - Parole chiave
+  if ($node->hasField('field_keywords') && !$node->get('field_keywords')->isEmpty()) {
+    $keywords = $node->get('field_keywords')->value;
+    if (!empty($keywords)) {
+      $article['schema:keywords'] = $keywords;
+    }
+  }
+
+  // spatialCoverage - Geographic focus
+  if ($node->hasField('field_country2') && !$node->get('field_country2')->isEmpty()) {
+    $spatial_coverage = [];
+    foreach (teasearch_jsonld_get_taxonomy_uris($node, 'field_country2') as $uri) {
+      $spatial_coverage[] = ['@id' => $uri];
+    }
+    if (!empty($spatial_coverage)) {
+      $article['schema:spatialCoverage'] = $spatial_coverage;
+    }
+  }
+
+  // datePublished - Data creazione
+  $created = $node->getCreatedTime();
+  if ($created) {
+    $article['schema:datePublished'] = teasearch_jsonld_timestamp_to_iso8601($created);
+  }
+
+  // dateModified - Data ultima modifica
+  $changed = $node->getChangedTime();
+  if ($changed) {
+    $article['schema:dateModified'] = teasearch_jsonld_timestamp_to_iso8601($changed);
+  }
+
+  // ========================================
+  // COSTRUISCI LA WEBPAGE
+  // ========================================
+  
+  $webpage = [
+    '@id' => $webpage_uri,
+    '@type' => 'schema:WebPage',
+    'schema:url' => $webpage_uri,
+    'schema:inLanguage' => $current_language,
+    'schema:name' => $node->getTitle(),
+    'schema:mainEntity' => ['@id' => $article_uri]
+  ];
+
+  // ========================================
+  // ASSEMBLA IL GRAPH
+  // ========================================
+  
+  $jsonld = [
+    '@context' => ['schema' => 'https://schema.org/'],
+    '@graph' => [$webpage, $article]
+  ];
+
+  return $jsonld;
+}
+
+/**
+ * =============================================================================
+ * IMAGES - Schema.org ImageObject
+ * =============================================================================
+ */
+
+/**
+ * Genera JSON-LD ImageObject per un nodo images.
+ * 
+ * @param \Drupal\node\Entity\Node $node
+ *   Il nodo images.
+ * 
+ * @return array
+ *   Array strutturato per JSON-LD con ImageObject.
+ */
+function teasearch_generate_jsonld_images($node)
+{
+  $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  
+  // Ottieni la traduzione del nodo se esiste
+  if ($node->hasTranslation($current_language)) {
+    $node = $node->getTranslation($current_language);
+  }
+
+  $nid = $node->id();
+  $base_url = \Drupal::request()->getSchemeAndHttpHost();
+  
+  // URI della risorsa
+  $alias = \Drupal::service('path_alias.manager')->getAliasByPath('/node/' . $nid, $current_language);
+  $alias = ltrim($alias, '/');
+  $webpage_uri = $base_url . '/web/' . $current_language . '/' . $alias;
+  $image_uri = $base_url . '/web/node/' . $nid;
+
+  // ========================================
+  // COSTRUISCI L'IMAGEOBJECT
+  // ========================================
+  
+  $image_obj = [
+    '@id' => $image_uri,
+    '@type' => 'schema:ImageObject',
+  ];
+
+  // name - Titolo
+  $image_obj['schema:name'] = $node->getTitle();
+
+  // contentUrl - URL dell'immagine principale
+  $content_url = teasearch_jsonld_get_image_url($node, 'field_main_image');
+  if (!$content_url) {
+    $content_url = teasearch_jsonld_get_image_url($node, 'field_large_image');
+  }
+  if ($content_url) {
+    $image_obj['schema:contentUrl'] = $content_url;
+  }
+
+  // thumbnailUrl - Thumbnail
+  $thumbnail = teasearch_jsonld_get_image_url($node, 'field_square_thumbnail');
+  if ($thumbnail) {
+    $image_obj['schema:thumbnailUrl'] = $thumbnail;
+  }
+
+  // creator - Creatori
+  $creators = teasearch_jsonld_get_authors($node, 'field_responsibles');
+  if (!empty($creators)) {
+    $image_obj['schema:creator'] = [];
+    foreach ($creators as $creator_name) {
+      $image_obj['schema:creator'][] = [
+        '@type' => 'schema:Person',
+        'schema:name' => $creator_name
+      ];
+    }
+  }
+
+  // dateCreated - Data creazione (da field_year_range)
+  if ($node->hasField('field_year_range') && !$node->get('field_year_range')->isEmpty()) {
+    $year_from = $node->get('field_year_range')->year_from;
+    if (!empty($year_from)) {
+      $image_obj['schema:dateCreated'] = $year_from;
+    }
+  }
+
+  // about - Soggetti (link a taxonomy SKOS)
+  $subjects = teasearch_jsonld_get_taxonomy_uris($node, 'field_subjects');
+  if (!empty($subjects)) {
+    $image_obj['schema:about'] = [];
+    foreach ($subjects as $uri) {
+      $image_obj['schema:about'][] = ['@id' => $uri];
+    }
+  }
+
+  // description - Descrizione
+  if ($node->hasField('field_description') && !$node->get('field_description')->isEmpty()) {
+    $description = strip_tags($node->get('field_description')->value);
+    if (!empty($description)) {
+      $image_obj['schema:description'] = $description;
+    }
+  }
+
+  // license - Licenza
+  if ($node->hasField('field_license') && !$node->get('field_license')->isEmpty()) {
+    $license_uris = teasearch_jsonld_get_taxonomy_uris($node, 'field_license');
+    if (!empty($license_uris)) {
+      $image_obj['schema:license'] = $license_uris[0];
+    }
+  }
+
+  // keywords - Parole chiave
+  if ($node->hasField('field_keywords') && !$node->get('field_keywords')->isEmpty()) {
+    $keywords = $node->get('field_keywords')->value;
+    if (!empty($keywords)) {
+      $image_obj['schema:keywords'] = $keywords;
+    }
+  }
+
+  // spatialCoverage - Geographic focus
+  if ($node->hasField('field_country2') && !$node->get('field_country2')->isEmpty()) {
+    $spatial_coverage = [];
+    foreach (teasearch_jsonld_get_taxonomy_uris($node, 'field_country2') as $uri) {
+      $spatial_coverage[] = ['@id' => $uri];
+    }
+    if (!empty($spatial_coverage)) {
+      $image_obj['schema:spatialCoverage'] = $spatial_coverage;
+    }
+  }
+
+  // ========================================
+  // COSTRUISCI LA WEBPAGE
+  // ========================================
+  
+  $webpage = [
+    '@id' => $webpage_uri,
+    '@type' => 'schema:WebPage',
+    'schema:url' => $webpage_uri,
+    'schema:inLanguage' => $current_language,
+    'schema:name' => $node->getTitle(),
+    'schema:mainEntity' => ['@id' => $image_uri]
+  ];
+
+  // ========================================
+  // ASSEMBLA IL GRAPH
+  // ========================================
+  
+  $jsonld = [
+    '@context' => ['schema' => 'https://schema.org/'],
+    '@graph' => [$webpage, $image_obj]
+  ];
+
+  return $jsonld;
+}
+
+/**
+ * =============================================================================
  * HELPER FUNCTIONS
  * =============================================================================
  */

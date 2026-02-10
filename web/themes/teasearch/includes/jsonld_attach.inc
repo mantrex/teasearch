@@ -8,10 +8,14 @@
  * strutturati JSON-LD nel <head> delle pagine.
  */
 
+// IMPORTANTE: Carica le funzioni generatrici
+require_once __DIR__ . '/jsonld_generators.inc';
+
 /**
- * Implements hook_page_attachments().
+ * Implements hook_page_attachments_alter() proxy.
  * 
- * Inietta JSON-LD nel <head> delle pagine di dettaglio.
+ * Questa funzione viene chiamata da teasearch_page_attachments_alter()
+ * definita in teasearch.theme.
  */
 function teasearch_jsonld_page_attachments(array &$attachments)
 {
@@ -42,8 +46,8 @@ function teasearch_jsonld_page_attachments(array &$attachments)
       ];
       
       if (isset($generators[$content_type])) {
+
         $generator_function = $generators[$content_type];
-        
         if (function_exists($generator_function)) {
           $jsonld = $generator_function($node);
         }
