@@ -56,3 +56,10 @@ taxonomy-listing:
       css/taxonomy-listing.css: {}
   dependencies:
     - teasearch/info-page
+menu-keyboard:
+  version: 1.x
+  js:
+    js/menu-keyboard-nav.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery

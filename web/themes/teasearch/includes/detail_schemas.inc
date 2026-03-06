@@ -103,7 +103,7 @@ function teasearch_translations(){
       "videos" => "Video",
       "images" => "Immagini",
       "bibliography" => "Bibliografia",
-      "field_license" => "Licenza",
+      "field_license" => "Licenza editoriale",
       "systemdate" => "Date",
     ],
   ];
@@ -157,7 +157,7 @@ function teasearch_translations(){
       "field_country2" => "Ambito geografico",
       "field_keywords" => "Parole chiave",
       "people" => "Persone",
-      "field_license" => "Licenza",
+      "field_license" => "Licenza editoriale",
       "systemdate" => "Date",
       "referenced_in" => "Citato in",
     ],
@@ -185,7 +185,7 @@ function teasearch_translations(){
       "field_collected_in" => "Raccolto in",
       "field_archive" => "Luogo di conservazione",
       "field_catalogue_number" => "Numero di catalogo",
-      "field_description" => "Descrizione del contenuto",
+      "field_description" => "Note del curatore",
       "field_text_excerpts" => "Estratti del testo",
       "field_keywords" => "Parole chiave",
 
@@ -198,7 +198,7 @@ function teasearch_translations(){
       "field_subjects" => "Temi",
       "field_country2" => "Ambito geografico",
       "people" => "Persone",
-      "field_license" => "Licenza",
+      "field_license" => "Licenza editoriale",
       "systemdate" => "Date",
       "referenced_in" => "Citato in",
     ],
@@ -222,7 +222,7 @@ function teasearch_translations(){
       "field_subjects" => "Temi",
       "field_country2" => "Ambito geografico",
       "people" => "Persone",
-      "field_license" => "Licenza",
+      "field_license" => "Licenza editoriale",
       "systemdate" => "Date",
       "referenced_in" => "Citato in",
     ],
@@ -250,7 +250,7 @@ function teasearch_translations(){
       "field_dimensions" => "Dimensioni",
       "field_location" => "Luogo di conservazione",
       "field_catalogue_number" => "Numero di catalogo",
-      "field_description" => "Descrizione del contenuto",
+      "field_description" => "Note del curatore",
       "field_details" => "Dettagli dell'immagine",
       "field_textual_elements" => "Elementi testuali",
 
@@ -264,7 +264,7 @@ function teasearch_translations(){
       "field_country2" => "Ambito geografico",
       "field_keywords" => "Parole chiave",
       "people" => "Persone",
-      "field_license" => "Licenza",
+      "field_license" => "Licenza editoriale",
       "systemdate" => "Date",
       "referenced_in" => "Citato in",
     ],
@@ -308,7 +308,7 @@ function teasearch_translations(){
       "field_country2" => "Ambito geografico",
       "field_keywords" => "Parole chiave",
       "people" => "Persone",
-      "field_license" => "Licenza",
+      "field_license" => "Licenza editoriale",
       "systemdate" => "Date",
       "referenced_in" => "Citato in",
     ],
@@ -339,7 +339,7 @@ function teasearch_translations(){
       "field_country2" => "Ambito geografico",
       "field_keywords" => "Parole chiave",
       "people" => "Persone",
-      "field_license" => "Licenza",
+      "field_license" => "Licenza editoriale",
       "systemdate" => "Date",
     ],
   ];
@@ -546,7 +546,7 @@ function teasearch_get_detail_schemas()
 
       "paragraph5" => "Details",
       "field_license" => [
-        "label" => "License",
+        "label" => "Editorial License",
         "no_author" => true,
       ],
       "systemdate" => [
@@ -747,7 +747,7 @@ function teasearch_get_detail_schemas()
         "type" => "people_roles"
       ],
       "field_license" => [
-        "label" => "License"
+        "label" => "Editorial License"
       ],
       "systemdate" => [
         "type" => "systemdate",
@@ -845,7 +845,7 @@ function teasearch_get_detail_schemas()
       ],
 
       'field_description' => [
-        'label' => 'Content Description',
+        'label' => 'Curators\' note',
       ],
 
       'field_text_excerpts' => [
@@ -878,7 +878,7 @@ function teasearch_get_detail_schemas()
         "type" => "people_roles"
       ],
       "field_license" => [
-        "label" => "License"
+        "label" => "Editorial License"
       ],
       "systemdate" => [
         "type" => "systemdate",
@@ -937,7 +937,7 @@ function teasearch_get_detail_schemas()
         "type" => "people_roles"
       ],
       "field_license" => [
-        "label" => "License"
+        "label" => "Editorial License"
       ],
       "systemdate" => [
         "type" => "systemdate",
@@ -1023,7 +1023,7 @@ function teasearch_get_detail_schemas()
         'label' => 'Catalogue Number',
       ],
       'field_description' => [
-        'label' => 'Content Description',
+        'label' => 'Curator\'s note',
       ],
       'field_details' => [
         'label' => 'Image Details',
@@ -1058,7 +1058,7 @@ function teasearch_get_detail_schemas()
         "type" => "people_roles"
       ],
       "field_license" => [
-        "label" => "License"
+        "label" => "Editorial License"
       ],
       "systemdate" => [
         "type" => "systemdate",
@@ -1179,7 +1179,7 @@ function teasearch_get_detail_schemas()
         "type" => "people_roles"
       ],
       "field_license" => [
-        "label" => "License"
+        "label" => "Editorial License"
       ],
       "systemdate" => [
         "type" => "systemdate",
@@ -1333,7 +1333,7 @@ function teasearch_get_detail_schemas()
       ],
 
       "field_license" => [
-        "label" => "License"
+        "label" => "Editorial License"
       ],
       "field_teasearch_contributors" => [
         "label" => "Contributors",
