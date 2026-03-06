@@ -1,0 +1,37 @@
+{#
+/**
+ * @file
+ * Partial: dropdown di ordinamento risultati.
+ *
+ * Variables:
+ * - sort_options:   array delle opzioni disponibili { key: {label, label_it} }
+ * - current_sort:   chiave dell'opzione attiva
+ * - content_type:   machine name del content type corrente
+ * - is_free_search: boolean, true se siamo nella pagina /search
+ * - current_query:  array dei query params correnti (per preservare filtri attivi)
+ * - current_lang:   codice lingua corrente ('it' | 'en')
+ */
+#}
+
+{% if sort_options and sort_options|length > 1 %}
+	<div class="teasearch-sort-wrapper">
+		<label class="sort-label" for="sort-select-{{ content_type }}">
+			{{ 'Sort by'|t }}
+		</label>
+
+		<div class="sort-select-container">
+			<select id="sort-select-{{ content_type }}" class="sort-select" data-content-type="{{ content_type }}" data-is-free-search="{{ is_free_search ? '1' : '0' }}" aria-label="{{ 'Sort results'|t }}">
+				{% for key, option in sort_options %}
+					{% set label = (current_lang == 'it' and option.label_it) ? option.label_it : option.label %}
+					<option value="{{ key }}" {% if key == current_sort %} selected="selected" {% endif %}>
+						{{ label }}
+					</option>
+				{% endfor %}
+			</select>
+
+			{# Icona freccia decorativa #}
+			<span class="sort-select-arrow" aria-hidden="true">&#x25BE;</span>
+		</div>
+	</div>
+{% endif %}
+

@@ -1,22 +1,43 @@
-<header class="results-header">
-  <div class="results-title">
-    {{ page_title }}
-    {% if total_results %}
-    {% endif %}
-  </div>
 {#
-<span class="results-count">
-  (
-  {{ total_results }}
-  )
-</span>
+/**
+ * @file
+ * Partial: header della lista risultati.
+ * Include il dropdown di sort in alto a destra.
+ *
+ * Variables aggiuntive rispetto alla versione originale:
+ * - sort_options:   array opzioni sort (da SortConfig)
+ * - current_sort:   chiave sort attiva
+ * - current_lang:   lingua corrente ('it' | 'en')
+ * - is_free_search: boolean
+ * - current_query:  array query params
+ */
 #}
 
-  {% if has_filters %}
-    <div class="results-status">
-      <span class="status-text">
-        {{ 'Filtered results'|t }}
-      </span>
-    </div>
-  {% endif %}
+<header class="results-header">
+
+	<div class="results-title">
+		{{ page_title }}
+	</div>
+
+	{% if has_filters %}
+		<div class="results-status">
+			<span class="status-text">
+				{{ 'Filtered results'|t }}
+			</span>
+		</div>
+	{% endif %}
+
+	{# Sort dropdown — mostrato solo se ci sono opzioni per questo content type #}
+	{% if sort_options %}
+		{% include 'modules/custom/teasearch_filter/templates/partials/sort-dropdown.html.twig' with {
+      'sort_options':   sort_options,
+      'current_sort':   current_sort,
+      'content_type':   content_type,
+      'is_free_search': is_free_search|default(false),
+      'current_query':  current_query|default({}),
+      'current_lang':   current_lang|default('en')
+    } %}
+	{% endif %}
+
 </header>
+

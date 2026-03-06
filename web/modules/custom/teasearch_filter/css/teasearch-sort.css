@@ -1,0 +1,117 @@
+/**
+ * @file
+ * teasearch-sort.css
+ *
+ * Stili per il dropdown di ordinamento risultati.
+ * Posizionato in alto a destra dell'header risultati.
+ */
+
+/* =========================================================
+   RESULTS HEADER — layout con sort a destra
+   ========================================================= */
+
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--details-border, #ddd);
+  margin-bottom: 1rem;
+}
+
+.results-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--body-text, #333);
+  flex: 1 1 auto;
+}
+
+/* =========================================================
+   SORT WRAPPER
+   ========================================================= */
+
+.teasearch-sort-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+}
+
+.sort-label {
+  font-size: 0.8rem;
+  color: var(--light-text, #666);
+  white-space: nowrap;
+  font-weight: 400;
+  cursor: default;
+  user-select: none;
+}
+
+/* =========================================================
+   SELECT CONTAINER
+   ========================================================= */
+
+.sort-select-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.sort-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--light, #fff);
+  border: 1px solid var(--details-border, #ccc);
+  border-radius: 4px;
+  padding: 0.3rem 2rem 0.3rem 0.65rem;
+  font-size: 0.82rem;
+  color: var(--body-text, #333);
+  cursor: pointer;
+  line-height: 1.4;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  min-width: 170px;
+  max-width: 250px;
+}
+
+.sort-select:hover {
+  border-color: var(--details-link, #555);
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: var(--details-link, #555);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
+}
+
+/* Freccia decorativa custom */
+.sort-select-arrow {
+  position: absolute;
+  right: 0.55rem;
+  pointer-events: none;
+  font-size: 0.65rem;
+  color: var(--light-text, #888);
+  line-height: 1;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .results-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .teasearch-sort-wrapper {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .sort-select {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+}

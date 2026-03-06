@@ -5,12 +5,13 @@
   */
 #}
 
-<div class="teasearch-wrapper {% if mixed_content_types and not show_global_filters %}teasearch-no-sidebar{% endif %}">
+<div
+	class="teasearch-wrapper {% if mixed_content_types and not show_global_filters %}teasearch-no-sidebar{% endif %}">
 
-  {# Sidebar with filters - Mostrata anche con All se show_global_filters è true #}
-  {% if grouped_filters %}
-    <aside class="teasearch-sidebar">
-      {% include 'modules/custom/teasearch_filter/templates/partials/filter-form.html.twig' with {
+	{# Sidebar with filters - Mostrata anche con All se show_global_filters è true #}
+	{% if grouped_filters %}
+		<aside class="teasearch-sidebar">
+			{% include 'modules/custom/teasearch_filter/templates/partials/filter-form.html.twig' with {
         'grouped_filters': grouped_filters,
         'content_type': content_type,
         'century_data': century_data,
@@ -18,58 +19,65 @@
         'is_free_search': is_free_search|default(false),
         'search_query': search_query|default('')
       } %}
-    </aside>
-  {% endif %}
+		</aside>
+	{% endif %}
 
-  {# Main results area #}
-  <main class="teasearch-results {% if mixed_content_types and not show_global_filters %}teasearch-results-full{% endif %}">
+	{# Main results area #}
+	<main
+		class="teasearch-results {% if mixed_content_types and not show_global_filters %}teasearch-results-full{% endif %}">
 
-    {# Search info header per ricerca all #}
-    {% if mixed_content_types and search_query %}
-      <div class="search-info-header">
-        <h1 class="search-results-title">
-          {{ 'Search Results'|t }}
-          {% if total_results %}
-            <span class="results-count">
-              (
-              {{ total_results }}
-              )
-            </span>
-          {% endif %}
-        </h1>
-        <div class="search-meta">
-          <span class="search-query-display">
-            {{ 'Search term:'|t }}
-            <strong>
-              "
-              {{ search_query }}
-              "
-            </strong>
-          </span>
-        </div>
-      </div>
-    {% endif %}
+		{# Search info header per ricerca all #}
+		{% if mixed_content_types and search_query %}
+			<div class="search-info-header">
+				<h1 class="search-results-title">
+					{{ 'Search Results'|t }}
+					{% if total_results %}
+						<span class="results-count">
+							(
+							{{ total_results }}
+							)
+						</span>
+					{% endif %}
+				</h1>
+				<div class="search-meta">
+					<span class="search-query-display">
+						{{ 'Search term:'|t }}
+						<strong>
+							"
+							{{ search_query }}
+							"
+						</strong>
+					</span>
+				</div>
+			</div>
+		{% endif %}
 
-    {% if entities %}
-      {% if not mixed_content_types %}
-        {% include 'modules/custom/teasearch_filter/templates/partials/results-header.html.twig' %}
-      {% endif %}
+		{% if entities %}
+			{% if not mixed_content_types %}
+				{% include 'modules/custom/teasearch_filter/templates/partials/results-header.html.twig' with {
+    'sort_options':   sort_options,
+    'current_sort':   current_sort,
+    'current_lang':   current_lang|default('en'),
+    'is_free_search': is_free_search|default(false),
+    'current_query':  current_query|default({})
+} %}
+			{% endif %}
 
-      {% include 'modules/custom/teasearch_filter/templates/partials/results-list.html.twig' %}
 
-      {# Paginator #}
-      {% if paginator_data %}
-        {% include 'modules/custom/teasearch_filter/templates/partials/paginator.html.twig' with {
+			{% include 'modules/custom/teasearch_filter/templates/partials/results-list.html.twig' %}
+
+			{# Paginator #}
+			{% if paginator_data %}
+				{% include 'modules/custom/teasearch_filter/templates/partials/paginator.html.twig' with {
           'paginator_data': paginator_data,
           'content_type': content_type,
           'current_query': current_query,
           'is_free_search': is_free_search|default(false)
         } %}
-      {% endif %}
+			{% endif %}
 
-    {% else %}
-      {% include 'modules/custom/teasearch_filter/templates/partials/no-results.html.twig' %}
-    {% endif %}
-  </main>
+		{% else %}
+			{% include 'modules/custom/teasearch_filter/templates/partials/no-results.html.twig' %}
+		{% endif %}
+	</main>
 </div>
-

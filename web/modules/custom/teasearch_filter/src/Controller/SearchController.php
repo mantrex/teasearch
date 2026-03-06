@@ -17,6 +17,8 @@ use Drupal\teasearch_filter\Helper\CustomFieldHelper;
 use Drupal\teasearch_filter\Helper\SearchHelper;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\node\NodeInterface;
+use Drupal\teasearch_filter\Config\SortConfig;
+use Drupal\teasearch_filter\Helper\SortHelper;
 
 /**
  * Search controller for teasearch_filter module.
@@ -48,33 +50,28 @@ class SearchController extends ControllerBase
 
   /**
    * Constructs a new SearchController.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
    */
   public function __construct(
     EntityTypeManagerInterface $entity_type_manager,
     ConfigFactoryInterface $config_factory,
     FormBuilderInterface $form_builder,
-    SearchHelper $search_helper // AGGIUNGERE QUESTO PARAMETRO
+    SearchHelper $search_helper
   ) {
     $this->entityTypeManager = $entity_type_manager;
     $this->configFactory = $config_factory;
     $this->formBuilder = $form_builder;
-    $this->searchHelper = $search_helper; // AGGIUNGERE QUESTA RIGA
+    $this->searchHelper = $search_helper;
   }
 
   private function getPaginatorConfig()
   {
     return [
-      'paginator' => TRUE,  // Abilita/disabilita il paginatore
-      'results' => [10, 25, 50],  // Opzioni per risultati per pagina (vuoto = solo default)
-      'results_default' => 10,  // Numero default di risultati per pagina
-      'pages' => 5,  // Numero massimo di pagine mostrate prima di [>]
-      'additional_buttons' => TRUE,  // Mostra [<<] e [>>]
-      'always_show' => TRUE,  // Se TRUE, mostra sempre il paginatore anche con 1 sola pagina
+      'paginator' => TRUE,
+      'results' => [10, 25, 50],
+      'results_default' => 10,
+      'pages' => 5,
+      'additional_buttons' => TRUE,
+      'always_show' => TRUE,
     ];
   }
 
@@ -87,11 +84,9 @@ class SearchController extends ControllerBase
       $container->get('entity_type.manager'),
       $container->get('config.factory'),
       $container->get('form_builder'),
-      $container->get('teasearch_filter.search_helper') // AGGIUNGERE QUESTA RIGA
+      $container->get('teasearch_filter.search_helper')
     );
   }
-
-
 
   /**
    * Handle legacy redirects.
@@ -130,7 +125,7 @@ class SearchController extends ControllerBase
   }
 
   /**
-   * Main search page.
+   * Main search page — /category/{content_type}
    */
   public function search($content_type, Request $request)
   {
@@ -159,15 +154,13 @@ class SearchController extends ControllerBase
     $century_data = $this->prepareCenturyData($filters, $content_type_config, $request);
     $date_data = $this->prepareDateData($filters, $content_type_config, $request);
 
-    // INIZIO MODIFICHE PAGINATORE
-    // Get paginator configuration
+    // Paginator config
     $paginator_config = $this->getPaginatorConfig();
 
-    // Get pagination parameters from request or session
+    // Pagination params
     $page = (int) $request->query->get('page', 0);
     $per_page = $request->query->get('per_page');
 
-    // Gestione sessione per per_page
     $session = $request->getSession();
     $session_key = "teasearch_filter.{$content_type}.per_page";
 
@@ -177,31 +170,38 @@ class SearchController extends ControllerBase
       $per_page = (int) $per_page;
       $session->set($session_key, $per_page);
     }
-    // FINE MODIFICHE PAGINATORE
+
+    // -------------------------------------------------------------------------
+    // SORT: risolvi il sort attivo dalla request
+    // -------------------------------------------------------------------------
+    $sort_resolved = SortHelper::resolveFromRequest($content_type, $request);
 
     // Search entities
     $entity_type = $content_type_config['type'] ?? 'node';
     if ($entity_type === 'user') {
-      $entities = $this->searchUsers($content_type_config, $request, $page, $per_page);
+      $entities = $this->searchUsers($content_type_config, $request, $page, $per_page, $sort_resolved);
       $total = count($entities);
     } else {
-      list($entities, $total) = $this->searchNodes($content_type_config, $request, $page, $per_page);
+      list($entities, $total) = $this->searchNodes($content_type_config, $request, $page, $per_page, $sort_resolved);
     }
 
-    // Process entities for display with custom functions support
+    // Process entities for display
     foreach ($entities as &$entity) {
       $entity = $this->processEntityForDisplay($entity, $content_type_config);
     }
 
-    // INIZIO MODIFICHE PAGINATORE
-    // Prepare paginator data
+    // Paginator data
     $paginator_data = $this->preparePaginatorData(
       $total,
       $page,
       $per_page,
       $paginator_config
     );
-    // FINE MODIFICHE PAGINATORE
+
+    // -------------------------------------------------------------------------
+    // SORT: prepara dati per il template
+    // -------------------------------------------------------------------------
+    $sort_data = $this->prepareSortData($content_type, $sort_resolved);
 
     // Build render array
     return [
@@ -219,17 +219,20 @@ class SearchController extends ControllerBase
       '#century_data' => $century_data,
       '#date_data' => $date_data,
       '#module_path' => $request->getBasePath() . '/' . \Drupal::service('extension.list.module')->getPath('teasearch_filter'),
-      // INIZIO MODIFICHE PAGINATORE
       '#paginator_config' => $paginator_config,
       '#paginator_data' => $paginator_data,
       '#current_page' => $page,
       '#current_query' => $request->query->all(),
       '#per_page' => $per_page,
-      // FINE MODIFICHE PAGINATORE
+      // Sort
+      '#sort_options' => $sort_data['options'] ?? NULL,
+      '#current_sort' => $sort_data['current_key'] ?? NULL,
+      '#current_lang' => \Drupal::languageManager()->getCurrentLanguage()->getId(),
       '#attached' => [
         'library' => [
           'teasearch_filter/teasearch_filter_styles',
           'teasearch_filter/teasearch_filter_details_state',
+          'teasearch_filter/teasearch_sort',
         ],
       ],
       '#cache' => [
@@ -238,6 +241,7 @@ class SearchController extends ControllerBase
       ],
     ];
   }
+
   /**
    * Get category title from categories entity.
    */
@@ -270,14 +274,11 @@ class SearchController extends ControllerBase
         $field_definition = $menu_field->getFieldDefinition();
         $allowed_values = $field_definition->getSetting('allowed_values');
 
-        // ✅ Itera su tutti i valori della lista
         foreach ($menu_field as $item) {
-          $machine_name = $item->value; // es. "first_reference"
-          $label = $allowed_values[$machine_name] ?? ''; // es. "Texts"
+          $machine_name = $item->value;
+          $label = $allowed_values[$machine_name] ?? '';
 
-          // ✅ Confronta la LABEL in minuscolo
           if (strtolower($label) === $content_type_lower) {
-            // ✅ MATCH! Prendi field_link_title tradotto
             if (!$node->hasField('field_link_title') || $node->get('field_link_title')->isEmpty()) {
               continue;
             }
@@ -300,7 +301,6 @@ class SearchController extends ControllerBase
     return $this->getCategoryTitleFallback($content_type);
   }
 
-  
   private function getCategoryTitleFallback(string $content_type): string
   {
     $config = $this->configFactory->get('teasearch_filter.settings');
@@ -309,10 +309,9 @@ class SearchController extends ControllerBase
   }
 
   /**
-   * Search nodes.
+   * Search nodes con supporto sort.
    */
-
-  private function searchNodes($config, Request $request, $page = 0, $per_page = 20)
+  private function searchNodes($config, Request $request, $page = 0, $per_page = 20, ?array $sort_resolved = NULL)
   {
     $machine_name = $config['machine_name'];
     $filters = $config['filters'] ?: [];
@@ -322,35 +321,40 @@ class SearchController extends ControllerBase
       ->condition('type', $machine_name)
       ->condition('status', 1);
 
-    // Apply WHERE conditions from config
     $this->applyWhereConditions($query, $config);
-
-    // Apply user filters
     $this->applyFiltersToQuery($query, $filters, $request, 'node');
-
-    // Apply year range filtering
     $this->applyYearRangeFiltering($query, $filters, $request);
 
-    // Get total count
+    // Count totale PRIMA della paginazione
     $total_query = clone $query;
     $total = $total_query->count()->execute();
 
-    // Apply pagination
     $limit = $per_page;
     $offset = $page * $limit;
 
-    $ids = $query->sort('created', 'DESC')
-      ->range($offset, $limit)
-      ->execute();
+    // Applica sort DB per campi diretti (non nested, non internal_references)
+    if ($sort_resolved && !SortHelper::requiresInMemorySort($sort_resolved)) {
+      SortHelper::applyToQuery($query, $sort_resolved, 'node');
+    } else {
+      // Fallback se nessun sort configurato o sort in memoria
+      $query->sort('created', 'DESC');
+    }
 
+    $ids = $query->range($offset, $limit)->execute();
     $entities = $this->entityTypeManager->getStorage('node')->loadMultiple($ids);
+
+    // Sort in memoria per internal_references o nested (applicato DOPO il load)
+    if ($sort_resolved && SortHelper::requiresInMemorySort($sort_resolved)) {
+      $entities = SortHelper::sortEntitiesInMemory($entities, $sort_resolved, 'node');
+    }
 
     return [$entities, $total];
   }
+
   /**
-   * Search users.
+   * Search users con supporto sort.
    */
-  private function searchUsers($config, Request $request, $page = 0, $per_page = 20)
+  private function searchUsers($config, Request $request, $page = 0, $per_page = 20, ?array $sort_resolved = NULL)
   {
     $filters = $config['filters'] ?: [];
 
@@ -360,44 +364,55 @@ class SearchController extends ControllerBase
 
     $this->applyFiltersToQuery($query, $filters, $request, 'user');
 
-    // Get total count
+    // Count totale
     $total_query = clone $query;
     $total = $total_query->count()->execute();
 
-    // Apply pagination
     $limit = $per_page;
     $offset = $page * $limit;
 
-    $ids = $query->sort('created', 'DESC')
-      ->range($offset, $limit)
-      ->execute();
+    if ($sort_resolved && !SortHelper::requiresInMemorySort($sort_resolved)) {
+      SortHelper::applyToQuery($query, $sort_resolved, 'user');
+    } else {
+      $query->sort('created', 'DESC');
+    }
 
+    $ids = $query->range($offset, $limit)->execute();
     $entities = $this->entityTypeManager->getStorage('user')->loadMultiple($ids);
+
+    if ($sort_resolved && SortHelper::requiresInMemorySort($sort_resolved)) {
+      $entities = SortHelper::sortEntitiesInMemory($entities, $sort_resolved, 'user');
+    }
 
     return [$entities, $total];
   }
 
-
-
   /**
-   * SOSTITUIRE IL METODO preparePaginatorData() in SearchController.php
+   * Prepara i dati del sort per il template.
    */
+  private function prepareSortData(string $content_type, ?array $sort_resolved): array
+  {
+    if (!$sort_resolved) {
+      return [];
+    }
+    return [
+      'current_key' => $sort_resolved['key'],
+      'options' => $sort_resolved['options'],
+    ];
+  }
 
   private function preparePaginatorData($total_results, $current_page, $per_page, $config)
   {
-    // Se il paginatore è disabilitato, ritorna NULL
     if (!$config['paginator']) {
       return NULL;
     }
 
-    // Se non ci sono risultati, ritorna NULL
     if ($total_results == 0) {
       return NULL;
     }
 
     $total_pages = (int) ceil($total_results / $per_page);
 
-    // Se always_show è FALSE e c'è solo 1 pagina, non mostrare il paginatore
     if (!isset($config['always_show']) || !$config['always_show']) {
       if ($total_pages <= 1) {
         return NULL;
@@ -406,11 +421,9 @@ class SearchController extends ControllerBase
 
     $max_pages_display = $config['pages'];
 
-    // Calcola range pagine da mostrare
     $start_page = max(0, $current_page - floor($max_pages_display / 2));
     $end_page = min($total_pages - 1, $start_page + $max_pages_display - 1);
 
-    // Aggiusta start se siamo vicini alla fine
     if ($end_page - $start_page < $max_pages_display - 1) {
       $start_page = max(0, $end_page - $max_pages_display + 1);
     }
@@ -435,8 +448,6 @@ class SearchController extends ControllerBase
       'show_more_next' => $end_page < $total_pages - 1,
     ];
   }
-
-
 
   /**
    * Apply WHERE conditions from configuration.
@@ -477,13 +488,11 @@ class SearchController extends ControllerBase
    */
   private function resolveFieldValue($field_name, $value, $config)
   {
-    // Try to find vocabulary for taxonomy fields
     $vocabulary = $this->getVocabularyForField($field_name, $config);
     if ($vocabulary) {
       return $this->getTermIdByName($value, $vocabulary);
     }
 
-    // Try to find node by title for entity reference
     if (strpos($field_name, 'field_') === 0) {
       $nodes = $this->entityTypeManager->getStorage('node')->getQuery()
         ->accessCheck(TRUE)
@@ -504,7 +513,6 @@ class SearchController extends ControllerBase
    */
   private function getVocabularyForField($field_name, $config)
   {
-    // Check in current config filters
     if (!empty($config['filters'])) {
       foreach ($config['filters'] as $filter_field => $filter_config) {
         if (
@@ -516,7 +524,6 @@ class SearchController extends ControllerBase
       }
     }
 
-    // Common field mappings
     $field_vocabulary_mapping = [
       'field_roles' => 'roles',
       'field_categories' => 'categories',
@@ -529,7 +536,6 @@ class SearchController extends ControllerBase
       return $field_vocabulary_mapping[$field_name];
     }
 
-    // Try to infer from field name
     $clean_field_name = str_replace('field_', '', $field_name);
     $vocabularies = $this->entityTypeManager->getStorage('taxonomy_vocabulary')->loadMultiple();
 
@@ -622,22 +628,16 @@ class SearchController extends ControllerBase
   /**
    * Apply year range filtering.
    */
-  /**
-   * Apply year range filtering.
-   */
   private function applyYearRangeFiltering($query, $filters, Request $request)
   {
     $from_field = null;
     $to_field = null;
 
-    // Check century_selector
     if (isset($filters['century_selector'])) {
       $century_config = $filters['century_selector'];
       $from_field = $century_config['from'] ?? 'year_from';
       $to_field = $century_config['to'] ?? 'year_to';
-    }
-    // Check date_selector
-    elseif (isset($filters['date_selector'])) {
+    } elseif (isset($filters['date_selector'])) {
       $date_config = $filters['date_selector'];
       $from_field = $date_config['from'] ?? 'year_from';
       $to_field = $date_config['to'] ?? 'year_to';
@@ -647,12 +647,9 @@ class SearchController extends ControllerBase
       return;
     }
 
-    // Ottieni i valori dalla request
     $year_from = $request->query->get('year_from');
     $year_to = $request->query->get('year_to');
 
-    // CRITICAL: Pulisci e valida i valori
-    // Converti stringhe vuote a null
     if (is_string($year_from)) {
       $year_from = trim($year_from);
       $year_from = ($year_from === '') ? null : $year_from;
@@ -663,12 +660,10 @@ class SearchController extends ControllerBase
       $year_to = ($year_to === '') ? null : $year_to;
     }
 
-    // Se ENTRAMBI sono null o vuoti, non applicare alcun filtro
     if ($year_from === null && $year_to === null) {
       return;
     }
 
-    // Applica il filtro solo se almeno uno dei due valori è presente
     $this->applyNodeYearRangeFilter($query, $from_field, $to_field, $year_from, $year_to);
   }
 
@@ -680,7 +675,6 @@ class SearchController extends ControllerBase
     $year_group = $query->orConditionGroup();
 
     if ($year_from !== null && $year_to !== null) {
-      // Entity range overlaps with selected range
       $overlap1 = $query->andConditionGroup()
         ->condition($from_field, $year_from, '>=')
         ->condition($from_field, $year_to, '<=');
@@ -787,7 +781,6 @@ class SearchController extends ControllerBase
       }
     }
 
-    // Check year range
     return !empty($request->query->get('year_from')) || !empty($request->query->get('year_to'));
   }
 
@@ -880,14 +873,13 @@ class SearchController extends ControllerBase
       $data['max_year'] = $year_range['max'];
     }
 
-    // Generate century options for SELECT
     $data['century_options'] = $this->generateCenturyOptions($data['min_year'], $data['max_year']);
 
     return $data;
   }
 
   /**
-   * Prepare date selector data (new).
+   * Prepare date selector data.
    */
   private function prepareDateData($filters, $config, Request $request)
   {
@@ -915,32 +907,27 @@ class SearchController extends ControllerBase
   {
     $centuries = [];
 
-    // Determine the range of centuries
     $start_century = floor($min_year / 100);
     $end_century = ceil($max_year / 100);
 
-    // Add "Before X Century BC" for very old dates
     if ($start_century < -10) {
       $before_century = abs($start_century);
       $centuries[] = [
         'label' => "Before {$before_century} Century BC",
-        'start_year' => -10000, // Very old date
+        'start_year' => -10000,
         'end_year' => ($start_century * 100) - 1
       ];
-      $start_century = -10; // Start from 10th century BC
+      $start_century = -10;
     }
 
-    // Generate century options
     for ($century = $start_century; $century <= $end_century; $century++) {
       $century_start = $century * 100;
       $century_end = $century_start + 99;
 
       if ($century < 0) {
-        // BC centuries
         $abs_century = abs($century);
         $label = "{$abs_century} Century BC";
       } else {
-        // AD/CE centuries
         $label = ($century == 0) ? "1 Century AD" : "{$century} Century AD";
       }
 
@@ -1113,26 +1100,20 @@ class SearchController extends ControllerBase
     }
   }
 
-
-
   /**
-   * SearchController::freeSearchResults()
-   * 
-   **/
-
+   * Free search results — /search?q=...&content_type=...
+   */
   public function freeSearchResults(Request $request)
   {
     $search_query = trim($request->query->get('q', ''));
     $content_type_filter = $request->query->get('content_type', 'all');
 
-    // Validate search query
     if (empty($search_query)) {
       return [
         '#markup' => '<div class="no-search-query">' . $this->t('Please enter a search term.') . '</div>',
       ];
     }
 
-    // Load configuration
     $config = $this->configFactory->get('teasearch_filter.settings');
     $content_types = $config->get('content_types') ?: [];
     $global_search_config = $config->get('global_search') ?: [];
@@ -1144,21 +1125,23 @@ class SearchController extends ControllerBase
     $content_type_config = null;
     $actual_content_type = $content_type_filter;
 
+    // -------------------------------------------------------------------------
+    // Sort per ricerca specifica — inizializzato qui per scope corretto
+    // -------------------------------------------------------------------------
+    $sort_resolved_free = NULL;
+
     // ========================================================================
-    // CASE 1: Search ALL content types
+    // CASE 1: Search ALL content types — sort non applicato (risultati misti)
     // ========================================================================
     if ($content_type_filter === 'all') {
       $mixed_content_types = TRUE;
 
-      // Check if global filters are enabled
       $show_global_filters = $global_search_config['show_filters'] ?? false;
       $filters_config = $global_search_config['filters'] ?? [];
 
-      // Search in ALL content types
       foreach ($content_types as $content_type => $content_type_config) {
         $entities = $this->searchInContentType($content_type, $content_type_config, $search_query);
 
-        // Process each entity with its specific config
         foreach ($entities as $entity) {
           $this->processEntityForDisplay($entity, $content_type_config);
           $entity->teasearch_content_type_label = $content_type_config['label'] ?? ucfirst($content_type);
@@ -1168,18 +1151,15 @@ class SearchController extends ControllerBase
         $all_entities = array_merge($all_entities, $entities);
       }
 
-      // APPLICARE FILTRI GLOBALI SE ATTIVI
       if ($show_global_filters && !empty($filters_config)) {
         $all_entities = $this->applyGlobalFilters($all_entities, $filters_config, $request);
       }
 
-      // Use first content type config as base (only for structure)
       $first_content_type = array_key_first($content_types);
       $content_type_config = $content_types[$first_content_type];
-
     }
     // ========================================================================
-    // CASE 2: Search in SPECIFIC content type (from global search bar)
+    // CASE 2: Search su content_type SPECIFICO — sort applicato in memoria
     // ========================================================================
     else {
       if (!isset($content_types[$content_type_filter])) {
@@ -1189,27 +1169,37 @@ class SearchController extends ControllerBase
       $content_type_config = $content_types[$content_type_filter];
       $all_entities = $this->searchInContentType($content_type_filter, $content_type_config, $search_query);
 
+      // -----------------------------------------------------------------------
+      // SORT in memoria: searchInContentType non supporta sort DB,
+      // quindi ordiniamo l'intero set PRIMA della paginazione
+      // -----------------------------------------------------------------------
+      $sort_resolved_free = SortHelper::resolveFromRequest($content_type_filter, $request);
+      if ($sort_resolved_free) {
+        $all_entities = SortHelper::sortEntitiesInMemory(
+          $all_entities,
+          $sort_resolved_free,
+          $content_type_config['type'] ?? 'node'
+        );
+      }
+
       // Process entities
       foreach ($all_entities as $entity) {
         $this->processEntityForDisplay($entity, $content_type_config);
         $entity->teasearch_results_config = $content_type_config['results'] ?? [];
       }
 
-      // Use content type's own filters
       $filters_config = $content_type_config['filters'] ?? [];
 
-      // APPLICARE FILTRI SE SELEZIONATI
       if (!empty($filters_config)) {
         $all_entities = $this->applyContentTypeFilters($all_entities, $filters_config, $request, $content_type_config);
       }
     }
 
-    // Get paginator configuration
+    // Paginator
     $paginator_config = $this->getPaginatorConfig();
     $page = (int) $request->query->get('page', 0);
     $per_page = $request->query->get('per_page');
 
-    // Session management for per_page
     $session = $request->getSession();
     $session_key = "teasearch_filter.search.per_page";
 
@@ -1220,29 +1210,23 @@ class SearchController extends ControllerBase
       $session->set($session_key, $per_page);
     }
 
-    // Pagination
     $total_results = count($all_entities);
     $offset = $page * $per_page;
     $paginated_entities = array_slice($all_entities, $offset, $per_page);
 
-    // Build paginator data
     $paginator_data = $this->preparePaginatorData($total_results, $page, $per_page, $paginator_config);
 
     $entity_type = $content_type_config['type'] ?? 'node';
     $page_title = $this->t('Search Results');
 
-    // ========================================================================
-    // PREPARE FILTERS based on mode
-    // ========================================================================
+    // Filters
     $grouped_filters = [];
     $century_data = NULL;
     $date_data = NULL;
 
     if ($mixed_content_types && $show_global_filters && !empty($filters_config)) {
-      // GLOBAL FILTERS - dynamic from results
       $grouped_filters = $this->prepareGlobalFiltersFromResults($all_entities, $filters_config, $request);
     } elseif (!$mixed_content_types && !empty($filters_config)) {
-      // CONTENT TYPE FILTERS - dynamic from results
       $grouped_filters = $this->prepareContentTypeFiltersFromResults(
         $all_entities,
         $filters_config,
@@ -1253,7 +1237,14 @@ class SearchController extends ControllerBase
       $date_data = $this->prepareDateData($filters_config, $content_type_config, $request);
     }
 
-    // Always use teasearch.html.twig template
+    // -------------------------------------------------------------------------
+    // SORT: dati per il template (solo per ricerca su content_type specifico)
+    // -------------------------------------------------------------------------
+    $sort_data_free = $this->prepareSortData(
+      $content_type_filter !== 'all' ? $content_type_filter : '',
+      $sort_resolved_free
+    );
+
     return [
       '#theme' => 'teasearch',
       '#filter_form' => NULL,
@@ -1274,9 +1265,16 @@ class SearchController extends ControllerBase
       '#show_global_filters' => $show_global_filters,
       '#is_free_search' => TRUE,
       '#module_path' => \Drupal::service('extension.list.module')->getPath('teasearch_filter'),
+      // Sort — NULL se modalità 'all' (mixed)
+      '#sort_options' => $sort_data_free['options'] ?? NULL,
+      '#current_sort' => $sort_data_free['current_key'] ?? NULL,
+      '#current_lang' => \Drupal::languageManager()->getCurrentLanguage()->getId(),
       '#attached' => [
-          'library' => ['teasearch_filter/teasearch_filter_styles'],
+        'library' => [
+          'teasearch_filter/teasearch_filter_styles',
+          'teasearch_filter/teasearch_sort',
         ],
+      ],
       '#cache' => [
         'contexts' => ['url.query_args'],
         'tags' => ['node_list', 'user_list', 'config:teasearch_filter.settings'],
@@ -1284,33 +1282,14 @@ class SearchController extends ControllerBase
     ];
   }
 
-
-
-
-
-
-
-
-
   /**
    * Search in a specific content type using SearchHelper.
-   *
-   * @param string $content_type
-   *   The content type key.
-   * @param array $content_type_config
-   *   The content type configuration.
-   * @param string $search_query
-   *   The search query.
-   *
-   * @return array
-   *   Array of entities.
    */
   protected function searchInContentType($content_type, array $content_type_config, $search_query)
   {
     $entity_type = $content_type_config['type'] ?? 'node';
     $machine_name = $content_type_config['machine_name'];
 
-    // Build WHERE conditions from config
     $where_conditions = [];
     if (!empty($content_type_config['where'])) {
       $where_json = json_decode($content_type_config['where'], TRUE);
@@ -1319,7 +1298,6 @@ class SearchController extends ControllerBase
       }
     }
 
-    // Use SearchHelper for dynamic search
     $entity_ids = $this->searchHelper->buildDynamicSearchQuery(
       $entity_type,
       $machine_name,
@@ -1331,10 +1309,8 @@ class SearchController extends ControllerBase
       return [];
     }
 
-    // Load entities
     $entities = $this->entityTypeManager->getStorage($entity_type)->loadMultiple($entity_ids);
 
-    // Process entities for display
     foreach ($entities as $entity) {
       $this->processEntityForDisplay($entity, $content_type_config);
     }
@@ -1344,18 +1320,6 @@ class SearchController extends ControllerBase
 
   /**
    * Build filtered search results page (with sidebar filters).
-   *
-   * @param string $content_type
-   *   The content type.
-   * @param array $entities
-   *   The search results.
-   * @param string $search_query
-   *   The search query.
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The request object.
-   *
-   * @return array
-   *   Render array.
    */
   protected function buildFilteredSearchResults($content_type, array $entities, $search_query, Request $request)
   {
@@ -1364,26 +1328,21 @@ class SearchController extends ControllerBase
     $content_type_config = $content_types[$content_type];
 
     $filters = $content_type_config['filters'] ?: [];
-
     $page_title = $this->getCategoryTitle($content_type);
 
-    // Build filter form
     $form = $this->formBuilder()->getForm(
       'Drupal\teasearch_filter\Form\SearchFilterForm',
       $content_type
     );
 
-    // Prepare data for templates
     $grouped_filters = $this->prepareGroupedFilters($filters, $content_type_config, $request);
     $century_data = $this->prepareCenturyData($filters, $content_type_config, $request);
     $date_data = $this->prepareDateData($filters, $content_type_config, $request);
 
-    // Get paginator configuration
     $paginator_config = $this->getPaginatorConfig();
     $page = (int) $request->query->get('page', 0);
     $per_page = $request->query->get('per_page');
 
-    // Session management for per_page
     $session = $request->getSession();
     $session_key = "teasearch_filter.{$content_type}.per_page";
 
@@ -1394,12 +1353,10 @@ class SearchController extends ControllerBase
       $session->set($session_key, $per_page);
     }
 
-    // Pagination
     $total_results = count($entities);
     $offset = $page * $per_page;
     $paginated_entities = array_slice($entities, $offset, $per_page);
 
-    // Build paginator data
     $paginator_data = $this->preparePaginatorData($total_results, $page, $per_page, $paginator_config);
 
     $entity_type = $content_type_config['type'] ?? 'node';
@@ -1412,7 +1369,7 @@ class SearchController extends ControllerBase
       '#entity_type' => $entity_type,
       '#content_type' => $content_type,
       '#total_results' => $total_results,
-      '#has_filters' => FALSE, // No filters applied from search
+      '#has_filters' => FALSE,
       '#grouped_filters' => $grouped_filters,
       '#century_data' => $century_data,
       '#date_data' => $date_data,
@@ -1421,8 +1378,8 @@ class SearchController extends ControllerBase
       '#page_title' => $page_title,
       '#search_query' => $search_query,
       '#attached' => [
-          'library' => ['teasearch_filter/teasearch_filter_styles'],
-        ],
+        'library' => ['teasearch_filter/teasearch_filter_styles'],
+      ],
       '#cache' => [
         'contexts' => ['url.query_args'],
         'tags' => ['node_list', 'user_list', 'config:teasearch_filter.settings'],
@@ -1430,26 +1387,16 @@ class SearchController extends ControllerBase
     ];
   }
 
-
-
-
-
   protected function processEntityForDisplay($entity, array $config)
   {
     $results_config = $config['results'] ?? [];
 
-    // Check if custom function is specified
     if (!empty($results_config['function'])) {
       $function_name = $results_config['function'];
-
-      // Usa l'helper direttamente
       $entity->teasearch_custom_content = CustomFieldHelper::execute($function_name, $entity);
       $entity->teasearch_uses_function = TRUE;
     } else {
-      // Standard processing with mainfield/subfield
       $entity->teasearch_uses_function = FALSE;
-
-      // Process subfield for description (existing logic)
       $entity->teasearch_processed_content = $this->getProcessedContentForEntity($entity, $config);
     }
 
@@ -1465,7 +1412,6 @@ class SearchController extends ControllerBase
       return NULL;
     }
 
-    // Support comma-separated fallback fields
     $fields = array_map('trim', explode(',', $sub_field));
 
     foreach ($fields as $field_name) {
@@ -1480,7 +1426,6 @@ class SearchController extends ControllerBase
         continue;
       }
 
-      // Try different property access patterns
       if ($first_item->__isset('summary') && !empty($first_item->summary)) {
         return $first_item->summary;
       }
@@ -1489,7 +1434,6 @@ class SearchController extends ControllerBase
         return $first_item->value;
       }
 
-      // Try direct value access
       $value = $first_item->getValue();
       if (isset($value['value']) && !empty($value['value'])) {
         return $value['value'];
@@ -1499,167 +1443,152 @@ class SearchController extends ControllerBase
     return NULL;
   }
 
+  /**
+   * Apply global filters to search results.
+   */
+  protected function applyGlobalFilters(array $entities, array $filters_config, Request $request)
+  {
+    $filtered_entities = [];
 
+    foreach ($entities as $entity) {
+      $include = TRUE;
 
+      foreach ($filters_config as $filter_key => $filter_config) {
+        $selected_values = $request->query->get($filter_key);
 
-/**
- * Apply global filters to search results.
- */
-protected function applyGlobalFilters(array $entities, array $filters_config, Request $request)
-{
-  $filtered_entities = [];
+        if (empty($selected_values)) {
+          continue;
+        }
 
-  foreach ($entities as $entity) {
-    $include = TRUE;
+        if (!is_array($selected_values)) {
+          $selected_values = [$selected_values];
+        }
 
-    // Check each filter
-    foreach ($filters_config as $filter_key => $filter_config) {
-      $selected_values = $request->query->get($filter_key);
-      
-      if (empty($selected_values)) {
-        continue; // No filter applied for this field
-      }
+        $field_name = 'field_' . $filter_key;
 
-      if (!is_array($selected_values)) {
-        $selected_values = [$selected_values];
-      }
+        if (!$entity->hasField($field_name)) {
+          $include = FALSE;
+          break;
+        }
 
-      // Check if entity has ANY of the selected values
-      $field_name = 'field_' . $filter_key;
-      
-      if (!$entity->hasField($field_name)) {
-        $include = FALSE;
-        break;
-      }
+        $field_values = $entity->get($field_name);
 
-      $field_values = $entity->get($field_name);
-      
-      if ($field_values->isEmpty()) {
-        $include = FALSE;
-        break;
-      }
+        if ($field_values->isEmpty()) {
+          $include = FALSE;
+          break;
+        }
 
-      $entity_has_value = FALSE;
-      foreach ($field_values as $item) {
-        if (isset($item->target_id) && in_array($item->target_id, $selected_values)) {
-          $entity_has_value = TRUE;
+        $entity_has_value = FALSE;
+        foreach ($field_values as $item) {
+          if (isset($item->target_id) && in_array($item->target_id, $selected_values)) {
+            $entity_has_value = TRUE;
+            break;
+          }
+        }
+
+        if (!$entity_has_value) {
+          $include = FALSE;
           break;
         }
       }
 
-      if (!$entity_has_value) {
-        $include = FALSE;
-        break;
+      if ($include) {
+        $filtered_entities[] = $entity;
       }
     }
 
-    if ($include) {
-      $filtered_entities[] = $entity;
-    }
+    return $filtered_entities;
   }
 
-  return $filtered_entities;
-}
+  /**
+   * Prepare dynamic global filters based on actual search results.
+   */
+  protected function prepareGlobalFiltersFromResults(array $entities, array $filters_config, Request $request)
+  {
+    $grouped_filters = [];
 
-/**
- * Prepare dynamic global filters based on actual search results.
- */
-protected function prepareGlobalFiltersFromResults(array $entities, array $filters_config, Request $request)
-{
-  $grouped_filters = [];
+    foreach ($filters_config as $filter_key => $filter_config) {
+      $filter_type = $filter_config['type'] ?? 'taxonomy';
 
-  foreach ($filters_config as $filter_key => $filter_config) {
-    $filter_type = $filter_config['type'] ?? 'taxonomy';
-    
-    if ($filter_type !== 'taxonomy') {
-      continue; // Only taxonomy filters supported for now
-    }
-
-    $field_name = 'field_' . $filter_key;
-    $vocabulary = $filter_config['vocabulary'] ?? '';
-    
-    if (empty($vocabulary)) {
-      continue;
-    }
-
-    // Collect all term IDs from results
-    $term_counts = [];
-    
-    foreach ($entities as $entity) {
-      if (!$entity->hasField($field_name)) {
+      if ($filter_type !== 'taxonomy') {
         continue;
       }
 
-      $field_values = $entity->get($field_name);
-      
-      if ($field_values->isEmpty()) {
+      $field_name = 'field_' . $filter_key;
+      $vocabulary = $filter_config['vocabulary'] ?? '';
+
+      if (empty($vocabulary)) {
         continue;
       }
 
-      foreach ($field_values as $item) {
-        if (isset($item->target_id)) {
-          $tid = $item->target_id;
-          $term_counts[$tid] = ($term_counts[$tid] ?? 0) + 1;
+      $term_counts = [];
+
+      foreach ($entities as $entity) {
+        if (!$entity->hasField($field_name)) {
+          continue;
+        }
+
+        $field_values = $entity->get($field_name);
+
+        if ($field_values->isEmpty()) {
+          continue;
+        }
+
+        foreach ($field_values as $item) {
+          if (isset($item->target_id)) {
+            $tid = $item->target_id;
+            $term_counts[$tid] = ($term_counts[$tid] ?? 0) + 1;
+          }
         }
       }
-    }
 
-    if (empty($term_counts)) {
-      continue; // No terms found, skip this filter
-    }
-
-    // Load term entities
-    $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
-    $terms = $term_storage->loadMultiple(array_keys($term_counts));
-
-    // Get selected values
-    $selected_values = $request->query->get($filter_key);
-    if (!is_array($selected_values)) {
-      $selected_values = $selected_values ? [$selected_values] : [];
-    }
-    
-    // Convert to integers for comparison
-    $selected_values = array_map('intval', $selected_values);
-
-    // Build filter options with counts
-    $options = [];
-    $language_manager = \Drupal::languageManager();
-    $current_language = $language_manager->getCurrentLanguage()->getId();
-
-    foreach ($terms as $term) {
-      // Get translated term
-      if ($term->hasTranslation($current_language)) {
-        $term = $term->getTranslation($current_language);
+      if (empty($term_counts)) {
+        continue;
       }
 
-      $tid = $term->id();
-      $count = $term_counts[$tid] ?? 0;
+      $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
+      $terms = $term_storage->loadMultiple(array_keys($term_counts));
 
-      $options[$tid] = [
-        'label' => $term->getName(),
-        'count' => $count,
-        'selected' => in_array((int)$tid, $selected_values, TRUE), // strict comparison con cast
+      $selected_values = $request->query->get($filter_key);
+      if (!is_array($selected_values)) {
+        $selected_values = $selected_values ? [$selected_values] : [];
+      }
+      $selected_values = array_map('intval', $selected_values);
+
+      $options = [];
+      $language_manager = \Drupal::languageManager();
+      $current_language = $language_manager->getCurrentLanguage()->getId();
+
+      foreach ($terms as $term) {
+        if ($term->hasTranslation($current_language)) {
+          $term = $term->getTranslation($current_language);
+        }
+
+        $tid = $term->id();
+        $count = $term_counts[$tid] ?? 0;
+
+        $options[$tid] = [
+          'label' => $term->getName(),
+          'count' => $count,
+          'selected' => in_array((int) $tid, $selected_values, TRUE),
+        ];
+      }
+
+      uasort($options, function ($a, $b) {
+        return strcmp($a['label'], $b['label']);
+      });
+
+      $grouped_filters[$filter_key] = [
+        'label' => $filter_config['label'] ?? ucfirst($filter_key),
+        'type' => 'taxonomy',
+        'options' => $options,
+        'selected' => $selected_values,
+        'is_open' => !empty($selected_values),
       ];
     }
 
-    // Sort by name
-    uasort($options, function($a, $b) {
-      return strcmp($a['label'], $b['label']);
-    });
-
-    $grouped_filters[$filter_key] = [
-      'label' => $filter_config['label'] ?? ucfirst($filter_key),
-      'type' => 'taxonomy',
-      'options' => $options,
-      'selected' => $selected_values,
-      'is_open' => !empty($selected_values),
-    ];
+    return $grouped_filters;
   }
-
-  return $grouped_filters;
-}
-
-
 
   /**
    * Apply content type specific filters to search results.
@@ -1672,11 +1601,9 @@ protected function prepareGlobalFiltersFromResults(array $entities, array $filte
     foreach ($entities as $entity) {
       $include = TRUE;
 
-      // Check each filter
       foreach ($filters_config as $filter_key => $filter_config) {
         $filter_type = $filter_config['type'] ?? 'taxonomy';
 
-        // Skip century/date filters (handled separately)
         if ($filter_key === 'century_selector' || $filter_key === 'date_selector') {
           continue;
         }
@@ -1684,14 +1611,13 @@ protected function prepareGlobalFiltersFromResults(array $entities, array $filte
         $selected_values = $request->query->get($filter_key);
 
         if (empty($selected_values)) {
-          continue; // No filter applied
+          continue;
         }
 
         if (!is_array($selected_values)) {
           $selected_values = [$selected_values];
         }
 
-        // Apply taxonomy filter
         if ($filter_type === 'taxonomy') {
           $field_name = $entity_type === 'user' ? $filter_key : 'field_' . $filter_key;
 
@@ -1743,13 +1669,12 @@ protected function prepareGlobalFiltersFromResults(array $entities, array $filte
     foreach ($filters_config as $filter_key => $filter_config) {
       $filter_type = $filter_config['type'] ?? 'taxonomy';
 
-      // Skip century/date selectors
       if ($filter_key === 'century_selector' || $filter_key === 'date_selector') {
         continue;
       }
 
       if ($filter_type !== 'taxonomy') {
-        continue; // Only taxonomy filters for now
+        continue;
       }
 
       $field_name = $entity_type === 'user' ? $filter_key : 'field_' . $filter_key;
@@ -1759,7 +1684,6 @@ protected function prepareGlobalFiltersFromResults(array $entities, array $filte
         continue;
       }
 
-      // Collect all term IDs from results
       $term_counts = [];
 
       foreach ($entities as $entity) {
@@ -1785,21 +1709,17 @@ protected function prepareGlobalFiltersFromResults(array $entities, array $filte
         continue;
       }
 
-      // Load term entities
       $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
       $terms = $term_storage->loadMultiple(array_keys($term_counts));
 
-      // Get selected values
       $selected_values = $request->query->get($filter_key);
       if (!is_array($selected_values)) {
         $selected_values = $selected_values ? [$selected_values] : [];
       }
       $selected_values = array_map('intval', $selected_values);
 
-      // Build filter options with counts
       $options = [];
       foreach ($terms as $term) {
-        // Get translated term
         if ($term->hasTranslation($current_language)) {
           $term = $term->getTranslation($current_language);
         }
@@ -1814,7 +1734,6 @@ protected function prepareGlobalFiltersFromResults(array $entities, array $filte
         ];
       }
 
-      // Sort by name
       uasort($options, function ($a, $b) {
         return strcmp($a['label'], $b['label']);
       });
