@@ -58,7 +58,8 @@
  * - Per label dinamiche, creare un type custom
  */
 
-function teasearch_translations(){
+function teasearch_translations()
+{
   $people = [
     "it" => [
       "paragraph1" => "Profilo",
@@ -175,32 +176,35 @@ function teasearch_translations(){
       "field_place_of_publication" => "Luogo di pubblicazione",
       "field_publisher" => "Editore",
       "field_country" => "Paese",
-      "paragraph1" => "Risorse digitali",
-      "pdf" => "PDF",
-      "field_source" => "Fonte",
-      "field_usage_rights" => "Diritti d'uso",
-      "field_notes" => "Note",
-      "paragraph2" => "Descrizione",
       "field_text_types" => "Formato",
       "field_collected_in" => "Raccolto in",
       "field_archive" => "Luogo di conservazione",
       "field_catalogue_number" => "Numero di catalogo",
-      "field_description" => "Note del curatore",
+      "paragraph1" => "Risorse digitali",
+      "pdf" => "PDF",
+      "field_digital_resource_original" => "Titolo originale risorsa digitale",
+      "field_credit_liine" => "Crediti",
+      "field_source" => "Fonte",
+      "field_file_creator" => "Creatore del PDF",
+      "field_usage_rights" => "Tipo di riutilizzo",
+      "field_file_licence" => "Licenza di riutilizzo",
+      "field_notes" => "Note",
+      "paragraph2" => "Contenuto e Riferimenti",
+      "field_description" => "Descrizione del curatore",
       "field_text_excerpts" => "Estratti del testo",
+      "curated_references" => "Riferimenti nella Bibliografia di Teasearch",
+      "field_links" => "Riferimenti esterni alla Bibliografia di Teasearch",
+      "paragraph3" => "Tags",
       "field_keywords" => "Parole chiave",
-
-      "paragraph3" => "Riferimenti",
-      "curated_references" => "Bibliografia",
-      "related resources" => "Risorse correlate su Teasearch",
-      "field_links" => "Risorse esterne",
-
-      "paragraph4" => "Dettagli della scheda",
       "field_subjects" => "Temi",
       "field_country2" => "Ambito geografico",
+      "paragraph4" => "Risorse di Teaserach correlate",
+      "related resources" => "Risorse correlate in Teasearch",
+      "referenced_in" => "Citato in",
+      "paragraph5" => "Dettagli della scheda",
       "people" => "Persone",
       "field_license" => "Licenza editoriale",
       "systemdate" => "Date",
-      "referenced_in" => "Citato in",
     ],
   ];
 
@@ -354,7 +358,7 @@ function teasearch_translations(){
     "news" => $news,
   ];
 }
-
+// Schede
 function teasearch_get_detail_schemas()
 {
   $people = [
@@ -640,7 +644,7 @@ function teasearch_get_detail_schemas()
         "field" => "field_editors",
         "options" => [
           "no_editor_label" => true,
-          "is_author"=>false,
+          "is_author" => false,
         ]
       ],
       "authors_general" => [
@@ -709,7 +713,7 @@ function teasearch_get_detail_schemas()
         "label" => "Libraries",
       ],
 
-      "paragraph3" => "Description",
+      "paragraph3" => "Content",
 
       "field_original_abstract" => [
         "label" => "Abstract",
@@ -809,31 +813,12 @@ function teasearch_get_detail_schemas()
         'label' => 'Country',
       ],
 
-      'paragraph1' => 'Digital Resources',
-
-      'pdf' => [
-        'label' => 'PDF',
-        'type' => 'pdf',
-        'file' => 'field_pdf_file'
-      ],
-
-      'field_source' => [
-        'label' => 'Source',
-      ],
-
-      'field_usage_rights' => [
-        'label' => 'usage rights',
-      ],
-      'field_notes' => [
-        'label' => 'Notes',
-      ],
-      'paragraph2' => 'Description',
-
       'field_text_types' => [
         'label' => 'Format',
       ],
+
       'field_collected_in' => [
-        'label' => 'Collected in',
+        'label' => 'Included in',
       ],
 
       'field_archive' => [
@@ -844,35 +829,90 @@ function teasearch_get_detail_schemas()
         'label' => 'Catalogue number',
       ],
 
+      'paragraph1' => 'Digital Resources',
+
+      'pdf' => [
+        'label' => 'PDF',
+        'type' => 'pdf',
+        'file' => 'field_pdf_file'
+      ],
+
+      'field_digital_resource_original' => [
+        'label' => 'Digital resource original title',
+      ],
+
+      'field_credit_liine' => [
+        'label' => 'Credit Line',
+      ],
+
+      'field_source' => [
+        'label' => 'Source',
+      ],
+
+      'field_file_creator' => [
+        'label' => 'PDF creator',
+      ],
+
+      'field_usage_rights' => [
+        'label' => 'Reuse Category',
+      ],
+      'field_file_licence' => [
+        "label" => "Reuse Licence/Terms"
+      ],
+
+      'field_notes' => [
+        'label' => 'Notes',
+      ],
+
+      'field_alternative_links' => [
+        'label' => 'Additional Online Resources',
+      ],
+      // INSERIRE PEZZI DATI BIBLIO DA QUI
+
+      'paragraph2' => 'Content & References',
+
       'field_description' => [
-        'label' => 'Curators\' note',
+        'label' => 'Curated description',
       ],
 
       'field_text_excerpts' => [
         'label' => 'Text Excerpts',
       ],
+
+      "curated_references" => [
+        "label" => "References in Teasearch Bibliography",
+        "type" => "curated_references"
+      ],
+      "field_links" => [
+        "label" => "References Not in Teasearch Bibliography",
+      ],
+
+
+      'paragraph3' => 'Tags',
+
       'field_keywords' => [
         'label' => 'Keywords',
       ],
-      'paragraph3' => 'References',
-      "curated_references" => [
-        "label" => "Bibliography",
-        "type" => "curated_references"
-      ],
-      "related resources" => [
-        "label" => "Teasearch related resources",
-        "type" => "teasearch_references"
-      ],
-      "field_links" => [
-        "label" => "External Resources",
-      ],
-      'paragraph4' => 'Entry Details',
+
       "field_subjects" => [
         "label" => "Subjects",
       ],
       "field_country2" => [
         "label" => "Geographic Focus",
       ],
+
+      'paragraph4' => 'Realated Teasearch Resources',
+      "related resources" => [
+        "label" => "Curator-Selected Links",
+        "type" => "teasearch_references"
+      ],
+      "referenced_in" => [
+        "type" => "referenced_in",
+        "label" => "Links to this Resource",
+      ],
+
+      'paragraph5' => 'Entry Details',
+
       "people" => [
         "label" => "People",
         "type" => "people_roles"
@@ -883,10 +923,6 @@ function teasearch_get_detail_schemas()
       "systemdate" => [
         "type" => "systemdate",
         "label" => "Dates",
-      ],
-      "referenced_in" => [
-        "type" => "referenced_in",
-        "label" => "Referenced in",
       ],
     ]
   ];
@@ -1229,10 +1265,10 @@ function teasearch_get_detail_schemas()
       'date' => [
         'label' => 'Date',
         'position' => 'right',
-        'type'=>'aggregator',
-        'template'=>'{field_event_start_date} {hyphen} {field_event_end_date}',
-        "options"=> [
-          "date_format"=>"j F Y"
+        'type' => 'aggregator',
+        'template' => '{field_event_start_date} {hyphen} {field_event_end_date}',
+        "options" => [
+          "date_format" => "j F Y"
         ]
       ],
       'field_deadline' => [
@@ -1250,13 +1286,13 @@ function teasearch_get_detail_schemas()
       'attendance' => [
         'label' => 'Attendance mode',
         'position' => 'right',
-        'type'=>'aggregator',
-        'template'=>'{field_attendance_mode}{break}{field_fee_cost}{break}{field_notes}'
+        'type' => 'aggregator',
+        'template' => '{field_attendance_mode}{break}{field_fee_cost}{break}{field_notes}'
       ],
       'media' => [
         'label' => 'Media',
         'position' => 'right',
-        'type'=>'aggregator',
+        'type' => 'aggregator',
         "template" => "Type: {field_media_type}{break}{field_pub_title}",
       ],
       'field_language' => [
@@ -1266,12 +1302,12 @@ function teasearch_get_detail_schemas()
       'location' => [
         'label' => 'Location',
         'position' => 'right',
-        'type'=>'aggregator',
-        'template'=>'{field_venue}{break}{field_address}{break}{field_map_view}'
+        'type' => 'aggregator',
+        'template' => '{field_venue}{break}{field_address}{break}{field_map_view}'
       ],
       'field_country' => [
         'label' => 'Country',
-        'position' => 'right',        
+        'position' => 'right',
       ],
       'field_link' => [
         'label' => 'Link',
@@ -1328,8 +1364,8 @@ function teasearch_get_detail_schemas()
       ],
 
       "people" => [
-        "label" => "People", 
-        "type" => "people_roles" 
+        "label" => "People",
+        "type" => "people_roles"
       ],
 
       "field_license" => [
@@ -1344,7 +1380,7 @@ function teasearch_get_detail_schemas()
         "type" => "systemdate",
         "label" => "Dates",
       ],
-    
+
     ],
   ];
 

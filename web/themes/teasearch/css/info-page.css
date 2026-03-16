@@ -178,3 +178,9 @@
     font-size: 1.25rem;
   }
 }
+
+/* Link attivo nella sidebar about */
+.info-menu a.info-menu-active {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

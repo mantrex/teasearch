@@ -163,7 +163,7 @@ function teasearch_get_taxonomy_detail_schema($vocabulary_id = NULL)
       ],
 
       // Scope note
-      'field_description' => [
+      'description' => [
         'label' => 'Scope Note',
       ],
 

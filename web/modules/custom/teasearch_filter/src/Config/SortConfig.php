@@ -145,6 +145,7 @@ class SortConfig
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
           ],
+          /*
           'internal_refs_desc' => [
             'label' => 'Internal references (High to Low)',
             'label_it' => 'Riferimenti interni (decrescente)',
@@ -162,7 +163,7 @@ class SortConfig
             'tiebreakers' => [
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
-          ],
+          ],*/
         ],
       ],
 
@@ -229,6 +230,7 @@ class SortConfig
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
           ],
+          /*
           'internal_refs_desc' => [
             'label' => 'Internal references (High to Low)',
             'label_it' => 'Riferimenti interni (decrescente)',
@@ -246,7 +248,7 @@ class SortConfig
             'tiebreakers' => [
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
-          ],
+          ],*/
         ],
       ],
 
@@ -311,6 +313,7 @@ class SortConfig
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
           ],
+          /*
           'internal_refs_desc' => [
             'label' => 'Internal references (High to Low)',
             'label_it' => 'Riferimenti interni (decrescente)',
@@ -328,7 +331,7 @@ class SortConfig
             'tiebreakers' => [
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
-          ],
+          ],*/
         ],
       ],
 
@@ -342,7 +345,7 @@ class SortConfig
             'label' => 'Year (newest first)',
             'label_it' => 'Anno (più recenti)',
             'type' => 'field',
-            'field' => 'field_year',
+            'field' => 'field_production_year',
             'direction' => 'DESC',
             'tiebreakers' => [
               ['type' => 'last_updated', 'direction' => 'DESC'],
@@ -354,7 +357,7 @@ class SortConfig
             'label' => 'Year (oldest first)',
             'label_it' => 'Anno (meno recenti)',
             'type' => 'field',
-            'field' => 'field_year',
+            'field' => 'field_production_year',
             'direction' => 'ASC',
             'tiebreakers' => [
               ['type' => 'last_updated', 'direction' => 'DESC'],
@@ -393,6 +396,8 @@ class SortConfig
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
           ],
+
+          /*
           'internal_refs_desc' => [
             'label' => 'Internal references (High to Low)',
             'label_it' => 'Riferimenti interni (decrescente)',
@@ -410,7 +415,9 @@ class SortConfig
             'tiebreakers' => [
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
-          ],
+          ],*/
+
+
         ],
       ],
 
@@ -452,6 +459,7 @@ class SortConfig
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
           ],
+          /*
           'internal_refs_desc' => [
             'label' => 'Internal references (High to Low)',
             'label_it' => 'Riferimenti interni (decrescente)',
@@ -469,7 +477,7 @@ class SortConfig
             'tiebreakers' => [
               ['field' => 'nid', 'direction' => 'ASC'],
             ],
-          ],
+          ],*/
         ],
       ],
 

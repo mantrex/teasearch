@@ -70,14 +70,14 @@
 					</div>
 				</div>
 
-				{# COLONNA DESTRA: Menu altri about #}
+				{# COLONNA DESTRA: Menu about #}
 				<div class="col-lg-3">
 					{% if related_pages %}
 						<div class="info-sidebar">
 							<ul class="info-menu">
 								{% for page in related_pages %}
 									<li>
-										<a href="{{ page.url }}">
+										<a href="{{ page.url }}" class="{{ page.is_current ? 'info-menu-active' : '' }}">
 											{{ page.title }}
 										</a>
 									</li>

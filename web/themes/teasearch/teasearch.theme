@@ -371,18 +371,17 @@ function teasearch_preprocess_node__info(array &$variables): void
   $other_nodes = [];
   $query = \Drupal::entityQuery('node')
     ->condition('type', $content_type)
-    ->condition('nid', $node->id(), '!=')
     ->condition('status', 1)
-    ->condition('langcode', $current_language) // considera solo traduzioni nella lingua corrente
+    ->condition('langcode', $current_language)
     ->accessCheck(TRUE)
-    ->sort('title', 'ASC')
     ->range(0, 20);
 
   $nids = $query->execute();
 
+  $current_nid = $node->id();
+
   if (!empty($nids)) {
     $storage = \Drupal::entityTypeManager()->getStorage('node');
-    /** @var \Drupal\node\NodeInterface[] $nodes */
     $nodes = $storage->loadMultiple($nids);
 
     foreach ($nodes as $other_node) {
@@ -390,11 +389,23 @@ function teasearch_preprocess_node__info(array &$variables): void
         $other_node = $other_node->getTranslation($current_language);
       }
 
+      $weight = 0;
+      if ($other_node->hasField('field_weight') && !$other_node->get('field_weight')->isEmpty()) {
+        $weight = (int) $other_node->get('field_weight')->value;
+      }
+
       $other_nodes[] = [
         'title' => $other_node->label(),
-        'url'   => $other_node->toUrl()->toString(),
+        'url' => $other_node->toUrl()->toString(),
+        'is_current' => ($other_node->id() === $current_nid),
+        'weight' => $weight,
       ];
     }
+
+    // Ordina per peso decrescente (peso maggiore = prima posizione)
+    usort($other_nodes, function ($a, $b) {
+      return $b['weight'] <=> $a['weight'];
+    });
   }
 
   $variables['related_pages'] = $other_nodes;
