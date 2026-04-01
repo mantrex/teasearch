@@ -356,7 +356,7 @@ function teasearch_get_taxonomy_detail_schema($vocabulary_id = NULL)
       // ===================================================================
       // PRIMA SEZIONE RESOURCES: GEOGRAPHICAL FOCUS (field_country2)
       // ===================================================================
-      'resources_separator_geo' => 'Resources - Geographical Focus',
+      'resources_separator_geo' => 'Resources - Geographical Scope',
 
       // Essentials con field_country2
       'essentials_geo' => [

@@ -262,7 +262,7 @@ class SortConfig
             'label' => 'Year (newest first)',
             'label_it' => 'Anno (più recenti)',
             'type' => 'field',
-            'field' => 'field_year',
+            'field' => 'field_year_range.year_to',
             'direction' => 'DESC',
             'tiebreakers' => [
               ['type' => 'last_updated', 'direction' => 'DESC'],
@@ -274,7 +274,7 @@ class SortConfig
             'label' => 'Year (oldest first)',
             'label_it' => 'Anno (meno recenti)',
             'type' => 'field',
-            'field' => 'field_year',
+            'field' => 'field_year_range.year_from',
             'direction' => 'ASC',
             'tiebreakers' => [
               ['type' => 'last_updated', 'direction' => 'DESC'],

@@ -114,7 +114,7 @@ content_types:
       usage_rights:
         type: taxonomy
         vocabulary: usage_rights
-        label: 'Usage Rights'
+        label: 'Reuse category'
       century_selector:
         from: field_year_range.year_from
         to: field_year_range.year_to

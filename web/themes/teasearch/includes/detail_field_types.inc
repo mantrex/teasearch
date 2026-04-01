@@ -58,6 +58,7 @@ function teasearch_get_field_type_registry()
     'taxonomy_alternatives' => 'teasearch_render_field_taxonomy_alternatives',
     'taxonomy_external_mapping' => 'teasearch_render_field_taxonomy_external_mapping',
     'taxonomy_resources' => 'teasearch_render_field_taxonomy_resources',
+    'taxonomy_linked' => 'teasearch_render_field_taxonomy_linked',
   ];
 }
 
@@ -1402,8 +1403,8 @@ function teasearch_render_field_people_roles($node, $field_config, $field_identi
   // Definizione dei campi e delle loro label tradotte
   $fields_config = [
     'field_authors_ref' => [
-      'en' => 'Publication author',
-      'it' => 'Autore della pubblicazione',
+      'en' => 'Author',
+      'it' => 'Autore',
     ],
     'field_featured_ref' => [
       'en' => 'Person featured',
@@ -4129,4 +4130,73 @@ function teasearch_render_field_taxonomy_resources($term, $field_config, $field_
   }
 
   return !empty($items) ? implode('<br>', $items) : NULL;
+}
+
+
+/**
+ * TYPE: taxonomy_linked
+ * Renderizza un campo entity reference a tassonomia mostrando il nome del termine
+ * seguito da un'icona di link esterno che punta al campo field_link del termine.
+ * Il link si apre in una nuova pagina.
+ */
+function teasearch_render_field_taxonomy_linked($node, $field_config, $field_identifier)
+{
+  $field_name = $field_config['field'] ?? $field_identifier;
+  $field = teasearch_get_field_value($node, $field_name);
+
+  if (!$field || $field->isEmpty()) {
+    return NULL;
+  }
+
+  $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  $items = [];
+
+  foreach ($field as $item) {
+    if ($item->isEmpty() || !$item->entity) {
+      continue;
+    }
+
+    $term = $item->entity;
+
+    // Ottieni la traduzione del termine se esiste
+    if ($term->hasTranslation($current_language)) {
+      $term = $term->getTranslation($current_language);
+    }
+
+    $name = htmlspecialchars($term->getName());
+
+    // Controlla se il termine ha field_link valorizzato
+
+    $external_url = NULL;
+    if ($term->hasField('field_link') && !$term->get('field_link')->isEmpty()) {
+      $link_field = $term->get('field_link')->first();
+      if ($link_field) {
+        // Controlla il tipo del campo
+        $field_type = $term->getFieldDefinition('field_link')->getType();
+        if ($field_type === 'link') {
+          $external_url = $link_field->getUrl()->toString();
+        } else {
+          // Campo stringa/text: usa direttamente il valore
+          $external_url = $link_field->value;
+        }
+      }
+    }
+    if ($external_url) {
+      $icon = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:middle;margin-left:4px;">'
+        . '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>'
+        . '<polyline points="15 3 21 3 21 9"/>'
+        . '<line x1="10" y1="14" x2="21" y2="3"/>'
+        . '</svg>';
+
+      $internal_url = $term->toUrl()->toString();
+      $items[] = '<a href="' . htmlspecialchars($internal_url) . '">' . $name . '</a>'
+        . '<a href="' . htmlspecialchars($external_url) . '" target="_blank" rel="noopener" class="taxonomy-external-link" title="External link">' . $icon . '</a>';
+    } else {
+      // Nessun link esterno: link interno alla pagina del termine
+      $internal_url = $term->toUrl()->toString();
+      $items[] = '<a href="' . htmlspecialchars($internal_url) . '">' . $name . '</a>';
+    }
+  }
+
+  return !empty($items) ? implode(', ', $items) : NULL;
 }
