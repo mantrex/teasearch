@@ -1,0 +1,29 @@
+uuid: 4da9b43e-e190-4431-8b8c-7b3817c50bf7
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_country
+    - node.type.news
+    - taxonomy.vocabulary.countries
+id: node.news.field_country
+field_name: field_country
+entity_type: node
+bundle: news
+label: Countries
+description: 'Enter geographical areas if relevant to the content of the resource'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      countries: countries
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

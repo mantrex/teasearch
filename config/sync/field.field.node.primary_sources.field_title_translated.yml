@@ -1,0 +1,19 @@
+uuid: 060fbf00-1cef-46c3-b609-1c050e6437c2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_title_translated
+    - node.type.primary_sources
+id: node.primary_sources.field_title_translated
+field_name: field_title_translated
+entity_type: node
+bundle: primary_sources
+label: 'Translated Title'
+description: 'English translation of the title.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

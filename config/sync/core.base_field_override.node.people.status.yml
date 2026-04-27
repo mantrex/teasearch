@@ -1,0 +1,22 @@
+uuid: 6c6beb2e-8668-4527-acb7-e8b3f50555fd
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.people
+id: node.people.status
+field_name: status
+entity_type: node
+bundle: people
+label: Published
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 1
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

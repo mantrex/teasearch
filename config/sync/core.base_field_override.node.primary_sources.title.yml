@@ -1,0 +1,18 @@
+uuid: b27865c9-02db-43e3-83d3-3fe3c50d029f
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.primary_sources
+id: node.primary_sources.title
+field_name: title
+entity_type: node
+bundle: primary_sources
+label: 'Title in Latin'
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

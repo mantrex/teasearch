@@ -1,0 +1,24 @@
+uuid: a10b6e1c-3ffe-4c03-88b3-c5a6e88f3779
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_content
+    - filter.format.full_html
+    - paragraphs.paragraphs_type.about
+  module:
+    - text
+id: paragraph.about.field_content
+field_name: field_content
+entity_type: paragraph
+bundle: about
+label: Content
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - full_html
+field_type: text_long

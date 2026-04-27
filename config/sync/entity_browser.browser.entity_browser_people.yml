@@ -1,0 +1,47 @@
+uuid: 3d9a5d36-0c81-4b48-8d9b-31d14a4534c8
+langcode: en
+status: true
+dependencies:
+  config:
+    - views.view.entity_browser_authors
+  module:
+    - entity_browser_entity_form
+    - views
+name: entity_browser_people
+label: 'Entity browser People'
+display: modal
+display_configuration:
+  width: '1000'
+  height: '500'
+  link_text: 'Manage Authors'
+  auto_open: false
+selection_display: multi_step_display
+selection_display_configuration:
+  entity_type: node
+  display: label
+  display_settings: {  }
+  select_text: 'Use selected'
+  selection_hidden: false
+widget_selector: tabs
+widget_selector_configuration: {  }
+widgets:
+  f02e070e-e1d0-4e19-919e-f2de7b5b445e:
+    id: view
+    uuid: f02e070e-e1d0-4e19-919e-f2de7b5b445e
+    label: 'Select Authors'
+    weight: 1
+    settings:
+      submit_text: 'Select Author'
+      auto_select: false
+      view: entity_browser_authors
+      view_display: entity_browser_1
+  2c2bca4d-dd33-4aa8-829e-e4511191784c:
+    id: entity_form
+    uuid: 2c2bca4d-dd33-4aa8-829e-e4511191784c
+    label: 'Add Author'
+    weight: 2
+    settings:
+      submit_text: 'Save Author'
+      entity_type: node
+      bundle: people
+      form_mode: entity_browser_minimal

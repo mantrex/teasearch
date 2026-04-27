@@ -1,0 +1,22 @@
+uuid: 6f306f68-b979-446c-9f36-cab65c188b92
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.images
+id: node.images.display_updated
+field_name: display_updated
+entity_type: node
+bundle: images
+label: 'Display updated date'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

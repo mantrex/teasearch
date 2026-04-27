@@ -1,0 +1,18 @@
+uuid: 65585258-7174-4d98-bade-2a5a2a17809f
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.images
+id: node.images.created
+field_name: created
+entity_type: node
+bundle: images
+label: 'Authored on'
+description: 'The date and time that the content was created.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: created

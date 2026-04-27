@@ -1,0 +1,22 @@
+uuid: cb0fd128-4486-4599-aea1-a3c7a4802ad8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_curated_abstract
+    - node.type.bibliography
+  module:
+    - text
+id: node.bibliography.field_curated_abstract
+field_name: field_curated_abstract
+entity_type: node
+bundle: bibliography
+label: 'Teasearch curated abstract'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

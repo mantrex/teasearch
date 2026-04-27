@@ -1,0 +1,22 @@
+uuid: 1dd18194-3ed9-40b9-8260-04cb06637145
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_table_of_content
+    - node.type.bibliography
+  module:
+    - text
+id: node.bibliography.field_table_of_content
+field_name: field_table_of_content
+entity_type: node
+bundle: bibliography
+label: 'Table of Content'
+description: 'Summary in the original language.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

@@ -1,0 +1,23 @@
+uuid: 3e95b756-aa1a-4db3-a316-cb9c1b7efbc1
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_is_anonymous
+    - node.type.images
+id: node.images.field_is_anonymous
+field_name: field_is_anonymous
+entity_type: node
+bundle: images
+label: Anonymous
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'Yes'
+  off_label: 'No'
+field_type: boolean

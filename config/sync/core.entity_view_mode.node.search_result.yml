@@ -1,0 +1,13 @@
+uuid: 44b854ac-3809-4f65-b973-5224b37ba700
+langcode: it
+status: false
+dependencies:
+  module:
+    - node
+_core:
+  default_config_hash: d8wBEm7XvJ6H3S0IneDD9PfTBklPIH7GMpxElVemPf8
+id: node.search_result
+label: 'Highlighting dei risultati di ricerca'
+description: ''
+targetEntityType: node
+cache: true

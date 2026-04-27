@@ -1,0 +1,27 @@
+uuid: a0545ff9-efd0-4fbf-a95b-e1e0857b7ce9
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_project_type
+field_name: field_project_type
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: book
+      label: 'Edited book'
+    -
+      value: journal
+      label: Journal
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,23 @@
+uuid: 2babcdc1-8533-4bdb-91a3-9b09a8a5d537
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_is_org
+    - paragraphs.paragraphs_type.creators
+id: paragraph.creators.field_is_org
+field_name: field_is_org
+entity_type: paragraph
+bundle: creators
+label: 'Is Organization'
+description: 'Check if the responsible party is an organisation.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'Yes'
+  off_label: 'No'
+field_type: boolean

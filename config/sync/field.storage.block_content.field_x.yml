@@ -1,0 +1,19 @@
+uuid: 5a53a7da-27a1-4457-9105-1451636ef6c1
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_content
+    - link
+id: block_content.field_x
+field_name: field_x
+entity_type: block_content
+type: link
+settings: {  }
+module: link
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

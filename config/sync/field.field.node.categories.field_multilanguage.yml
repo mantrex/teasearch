@@ -1,0 +1,21 @@
+uuid: 6b4ada6a-940f-47ff-8958-d151bf9ad73d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_multilanguage
+    - node.type.categories
+  module:
+    - mfd
+id: node.categories.field_multilanguage
+field_name: field_multilanguage
+entity_type: node
+bundle: categories
+label: MultiLanguage
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: multilingual_form_display

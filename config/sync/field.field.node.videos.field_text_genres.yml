@@ -1,0 +1,29 @@
+uuid: 3d825ed1-2f2b-4f6d-ba1a-3ed4383bf16c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_text_genres
+    - node.type.videos
+    - taxonomy.vocabulary.text_genres
+id: node.videos.field_text_genres
+field_name: field_text_genres
+entity_type: node
+bundle: videos
+label: Genre
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      text_genres: text_genres
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

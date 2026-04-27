@@ -1,0 +1,10 @@
+uuid: cab5b236-e2b5-49fa-ae86-2f19754b804b
+langcode: en
+status: true
+dependencies: {  }
+id: fullname_latin
+label: 'Full Name (latin)'
+icon_uuid: null
+icon_default: null
+description: ''
+behavior_plugins: {  }

@@ -1,0 +1,25 @@
+uuid: 30fff7a6-9cc4-475e-aa3f-f21d03de9033
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_teasearch_references
+    - node.type.first_reference
+id: node.first_reference.field_teasearch_references
+field_name: field_teasearch_references
+entity_type: node
+bundle: first_reference
+label: 'Teasearch related resources'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: views
+  handler_settings:
+    view:
+      view_name: er_labels_content_types
+      display_name: entity_reference_1
+      arguments: {  }
+field_type: entity_reference

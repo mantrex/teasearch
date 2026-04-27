@@ -1,0 +1,31 @@
+uuid: da8290b0-9daa-4671-8d4c-df44830f2abb
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.taxonomy_term.countries.field_key
+    - taxonomy.vocabulary.countries
+  module:
+    - text
+id: taxonomy_term.countries.default
+targetEntityType: taxonomy_term
+bundle: countries
+mode: default
+content:
+  description:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_key:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  langcode: true

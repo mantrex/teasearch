@@ -1,0 +1,18 @@
+uuid: a258b2f1-d0d8-473f-9a05-a1cefbbbdf20
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.field_surname_first
+field_name: field_surname_first
+entity_type: node
+type: boolean
+settings: {  }
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

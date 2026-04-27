@@ -1,0 +1,9 @@
+uuid: bb447842-ea7f-445b-bdeb-a36e827f37c6
+langcode: en
+status: true
+dependencies: {  }
+name: Licenses
+vid: licenses
+description: null
+weight: 0
+new_revision: false

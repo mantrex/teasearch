@@ -1,0 +1,74 @@
+uuid: ba950841-03d3-43bf-8ac3-753b5ec0c46d
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.news.field_address
+    - field.field.node.news.field_contacts
+    - field.field.node.news.field_content
+    - field.field.node.news.field_country
+    - field.field.node.news.field_date
+    - field.field.node.news.field_end_date
+    - field.field.node.news.field_hide
+    - field.field.node.news.field_image
+    - field.field.node.news.field_keywords
+    - field.field.node.news.field_links
+    - field.field.node.news.field_location
+    - field.field.node.news.field_news_type
+    - field.field.node.news.field_organizer
+    - field.field.node.news.field_square_thumbnail
+    - field.field.node.news.field_start_date
+    - field.field.node.news.field_subjects
+    - field.field.node.news.field_teasearch_contributors
+    - field.field.node.news.field_teasearch_references
+    - field.field.node.news.field_teaserch_resources
+    - field.field.node.news.field_venue
+    - image.style.medium
+    - node.type.news
+  module:
+    - image
+    - user
+id: node.news.teaser
+targetEntityType: node
+bundle: news
+mode: teaser
+content:
+  field_image:
+    type: image
+    label: hidden
+    settings:
+      image_link: content
+      image_style: medium
+      image_loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: -1
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  display_updated: true
+  field_address: true
+  field_contacts: true
+  field_content: true
+  field_country: true
+  field_date: true
+  field_end_date: true
+  field_hide: true
+  field_keywords: true
+  field_links: true
+  field_location: true
+  field_news_type: true
+  field_organizer: true
+  field_square_thumbnail: true
+  field_start_date: true
+  field_subjects: true
+  field_teasearch_contributors: true
+  field_teasearch_references: true
+  field_teaserch_resources: true
+  field_venue: true
+  langcode: true

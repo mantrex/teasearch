@@ -1,0 +1,492 @@
+uuid: 077440c1-8d17-4096-91e5-42f787104189
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.bibliography.field_access_type
+    - field.field.node.bibliography.field_authors_ref
+    - field.field.node.bibliography.field_country
+    - field.field.node.bibliography.field_curated_abstract
+    - field.field.node.bibliography.field_curated_references
+    - field.field.node.bibliography.field_curators_ref
+    - field.field.node.bibliography.field_date
+    - field.field.node.bibliography.field_degree
+    - field.field.node.bibliography.field_dewey
+    - field.field.node.bibliography.field_doi
+    - field.field.node.bibliography.field_edition
+    - field.field.node.bibliography.field_editors
+    - field.field.node.bibliography.field_featured_ref
+    - field.field.node.bibliography.field_frequency
+    - field.field.node.bibliography.field_is_anonymous
+    - field.field.node.bibliography.field_isbn
+    - field.field.node.bibliography.field_issn
+    - field.field.node.bibliography.field_issues
+    - field.field.node.bibliography.field_journal
+    - field.field.node.bibliography.field_journal_latin
+    - field.field.node.bibliography.field_keywords
+    - field.field.node.bibliography.field_language
+    - field.field.node.bibliography.field_library_links
+    - field.field.node.bibliography.field_license
+    - field.field.node.bibliography.field_links
+    - field.field.node.bibliography.field_notes
+    - field.field.node.bibliography.field_online_links
+    - field.field.node.bibliography.field_online_links2
+    - field.field.node.bibliography.field_original_abstract
+    - field.field.node.bibliography.field_pages
+    - field.field.node.bibliography.field_project_type
+    - field.field.node.bibliography.field_pub_place
+    - field.field.node.bibliography.field_pub_title
+    - field.field.node.bibliography.field_pub_title_latin
+    - field.field.node.bibliography.field_publisher
+    - field.field.node.bibliography.field_pubtype
+    - field.field.node.bibliography.field_responsibles
+    - field.field.node.bibliography.field_reviewers_ref
+    - field.field.node.bibliography.field_status
+    - field.field.node.bibliography.field_subjects
+    - field.field.node.bibliography.field_table_of_content
+    - field.field.node.bibliography.field_teasearch_references
+    - field.field.node.bibliography.field_texts_reference
+    - field.field.node.bibliography.field_title_original
+    - field.field.node.bibliography.field_title_translated
+    - field.field.node.bibliography.field_university
+    - field.field.node.bibliography.field_volume
+    - field.field.node.bibliography.field_year
+    - node.type.bibliography
+  module:
+    - datetime
+    - entity_reference_revisions
+    - field_group
+    - link
+    - options
+    - text
+    - user
+third_party_settings:
+  field_group:
+    group_bibliographic_data:
+      children: {  }
+      label: 'Bibliographic Data'
+      parent_name: ''
+      region: content
+      weight: 0
+      format_type: tab
+      format_settings:
+        classes: ''
+        show_empty_fields: false
+        id: ''
+        label_as_html: false
+        formatter: open
+        description: ''
+id: node.bibliography.default
+targetEntityType: node
+bundle: bibliography
+mode: default
+content:
+  field_access_type:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 127
+    region: content
+  field_authors_ref:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 132
+    region: content
+  field_country:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 105
+    region: content
+  field_curated_abstract:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 34
+    region: content
+  field_curated_references:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 38
+    region: content
+  field_curators_ref:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 133
+    region: content
+  field_date:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 5
+    region: content
+  field_degree:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 37
+    region: content
+  field_dewey:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 22
+    region: content
+  field_doi:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 15
+    region: content
+  field_edition:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 21
+    region: content
+  field_editors:
+    type: entity_reference_revisions_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 25
+    region: content
+  field_featured_ref:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 135
+    region: content
+  field_frequency:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 36
+    region: content
+  field_is_anonymous:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 18
+    region: content
+  field_isbn:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 14
+    region: content
+  field_issn:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 17
+    region: content
+  field_issues:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 29
+    region: content
+  field_journal:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 27
+    region: content
+  field_journal_latin:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 26
+    region: content
+  field_keywords:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 122
+    region: content
+  field_language:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 9
+    region: content
+  field_library_links:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 43
+    region: content
+  field_license:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 130
+    region: content
+  field_links:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 10
+    region: content
+  field_notes:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 126
+    region: content
+  field_online_links:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 42
+    region: content
+  field_online_links2:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 136
+    region: content
+  field_original_abstract:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 33
+    region: content
+  field_pages:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 6
+    region: content
+  field_project_type:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 125
+    region: content
+  field_pub_place:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 20
+    region: content
+  field_pub_title:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 24
+    region: content
+  field_pub_title_latin:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 23
+    region: content
+  field_publisher:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 7
+    region: content
+  field_pubtype:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_responsibles:
+    type: entity_reference_revisions_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 19
+    region: content
+  field_reviewers_ref:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 134
+    region: content
+  field_status:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 30
+    region: content
+  field_subjects:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 112
+    region: content
+  field_table_of_content:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 35
+    region: content
+  field_teasearch_references:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 39
+    region: content
+  field_texts_reference:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 40
+    region: content
+  field_title_original:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_title_translated:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 4
+    region: content
+  field_university:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 32
+    region: content
+  field_volume:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 28
+    region: content
+  field_year:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 16
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  display_updated: true
+  langcode: true

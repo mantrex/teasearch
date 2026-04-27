@@ -1,0 +1,19 @@
+uuid: c9bbd05b-081f-4e8a-ac5a-aea28fce2e67
+langcode: en
+status: true
+dependencies:
+  module:
+    - mfd
+    - node
+id: node.field_people_multilanguage
+field_name: field_people_multilanguage
+entity_type: node
+type: multilingual_form_display
+settings: {  }
+module: mfd
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,52 @@
+uuid: 2f718b2b-e4a7-4fe9-b490-5ad2778c1b2c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_responsibles
+    - node.type.bibliography
+    - paragraphs.paragraphs_type.authors_general
+  module:
+    - entity_reference_revisions
+id: node.bibliography.field_responsibles
+field_name: field_responsibles
+entity_type: node
+bundle: bibliography
+label: Authors
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      authors_general: authors_general
+    negate: 0
+    target_bundles_drag_drop:
+      about:
+        weight: 10
+        enabled: false
+      authors:
+        weight: 2
+        enabled: false
+      authors_general:
+        weight: 9
+        enabled: true
+      creators:
+        weight: 12
+        enabled: false
+      editor:
+        weight: 13
+        enabled: false
+      fullname_latin:
+        weight: 14
+        enabled: false
+      speakers:
+        weight: 15
+        enabled: false
+      texts_authors:
+        weight: 16
+        enabled: false
+field_type: entity_reference_revisions

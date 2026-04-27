@@ -1,0 +1,25 @@
+uuid: a7b60eef-3699-482c-9553-2685a2e78cda
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+    - teasearch_carousel
+  theme:
+    - teasearch
+id: teasearch_carouselblock
+theme: teasearch
+region: hero
+weight: 0
+provider: null
+plugin: carousel_block
+settings:
+  id: carousel_block
+  label: 'Carousel Block'
+  label_display: '0'
+  provider: teasearch_carousel
+visibility:
+  request_path:
+    id: request_path
+    negate: false
+    pages: '<front>'

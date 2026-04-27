@@ -1,0 +1,19 @@
+uuid: a4d0bc23-6e42-477a-989a-d4da3b6fbc97
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_affiliation
+    - node.type.people
+id: node.people.field_affiliation
+field_name: field_affiliation
+entity_type: node
+bundle: people
+label: Affiliation
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

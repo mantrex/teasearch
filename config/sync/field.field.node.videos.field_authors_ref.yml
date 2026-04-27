@@ -1,0 +1,29 @@
+uuid: 3824978f-16fc-495a-88c1-fbd473ca906c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_authors_ref
+    - node.type.people
+    - node.type.videos
+id: node.videos.field_authors_ref
+field_name: field_authors_ref
+entity_type: node
+bundle: videos
+label: 'Video Creator Ref'
+description: 'Ref to People.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      people: people
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

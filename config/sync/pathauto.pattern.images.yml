@@ -1,0 +1,22 @@
+uuid: b64acc5d-eebf-49a2-bc0f-ff7ad3e8cd4e
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: images
+label: Images
+type: 'canonical_entities:node'
+pattern: 'images/[node:title]'
+selection_criteria:
+  13fa3d69-0c4d-465e-a042-55009abc4ea7:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: 13fa3d69-0c4d-465e-a042-55009abc4ea7
+    context_mapping:
+      node: node
+    bundles:
+      images: images
+selection_logic: and
+weight: -5
+relationships: {  }

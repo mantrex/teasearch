@@ -1,0 +1,10 @@
+uuid: 99e6e9f0-dd0c-475a-93d6-15bb97556bf4
+langcode: en
+status: true
+dependencies: {  }
+id: authors_general
+label: 'Authors General'
+icon_uuid: null
+icon_default: null
+description: 'Paragraph generico per Bibilography Texts Images Video'
+behavior_plugins: {  }

@@ -1,0 +1,27 @@
+uuid: 2f062209-ffb3-4db5-99c9-58aa188ad3bc
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_portion_of_work
+field_name: field_portion_of_work
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: selection
+      label: Selection
+    -
+      value: excerpt
+      label: Excerpt
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

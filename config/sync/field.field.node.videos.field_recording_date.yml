@@ -1,0 +1,21 @@
+uuid: 1e542b74-a405-43d5-97b0-4036bdc593e9
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_recording_date
+    - node.type.videos
+  module:
+    - datetime
+id: node.videos.field_recording_date
+field_name: field_recording_date
+entity_type: node
+bundle: videos
+label: 'Recording date'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

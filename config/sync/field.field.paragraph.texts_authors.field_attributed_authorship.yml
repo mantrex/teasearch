@@ -1,0 +1,23 @@
+uuid: a07c3dd4-d4a4-49bc-b2ac-dcc446d1232d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_attributed_authorship
+    - paragraphs.paragraphs_type.texts_authors
+id: paragraph.texts_authors.field_attributed_authorship
+field_name: field_attributed_authorship
+entity_type: paragraph
+bundle: texts_authors
+label: 'Attributed Authorship'
+description: 'Check if this responsible part served as a translator for the work.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

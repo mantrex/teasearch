@@ -1,0 +1,21 @@
+uuid: 32a96204-8b12-4b59-901c-37596f2a051f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_is_portion
+    - node.type.videos
+id: node.videos.field_is_portion
+field_name: field_is_portion
+entity_type: node
+bundle: videos
+label: 'Portion of work'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

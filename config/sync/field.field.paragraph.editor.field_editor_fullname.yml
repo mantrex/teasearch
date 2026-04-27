@@ -1,0 +1,19 @@
+uuid: 0b4d40a2-0ce0-45ec-86ea-0c50cf01e7c2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_editor_fullname
+    - paragraphs.paragraphs_type.editor
+id: paragraph.editor.field_editor_fullname
+field_name: field_editor_fullname
+entity_type: paragraph
+bundle: editor
+label: 'Editor Full Name (Original NON Latin)'
+description: 'Enter the original non-Latin script full name of the individual or organisation.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

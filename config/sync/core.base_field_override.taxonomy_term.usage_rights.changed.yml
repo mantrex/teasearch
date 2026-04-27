@@ -1,0 +1,18 @@
+uuid: 528dde9d-abd2-468d-90a4-bcecf35b215c
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.usage_rights
+id: taxonomy_term.usage_rights.changed
+field_name: changed
+entity_type: taxonomy_term
+bundle: usage_rights
+label: Changed
+description: 'The time that the term was last edited.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: changed

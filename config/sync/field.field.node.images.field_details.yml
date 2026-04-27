@@ -1,0 +1,30 @@
+uuid: f58e62e8-3ff2-4c88-adbf-5d489500289a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_details
+    - filter.format.basic_html
+    - filter.format.full_html
+    - filter.format.plain_text
+    - filter.format.restricted_html
+    - node.type.images
+  module:
+    - text
+id: node.images.field_details
+field_name: field_details
+entity_type: node
+bundle: images
+label: Details
+description: 'Paste images of deatils. Add numbering if needed for references in the content description.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - basic_html
+    - restricted_html
+    - full_html
+    - plain_text
+field_type: text_long

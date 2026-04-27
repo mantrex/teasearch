@@ -1,0 +1,19 @@
+uuid: 84c5943d-89db-4758-98db-632ed3b719a8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_catalogue_number
+    - node.type.images
+id: node.images.field_catalogue_number
+field_name: field_catalogue_number
+entity_type: node
+bundle: images
+label: 'Catalogue number'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

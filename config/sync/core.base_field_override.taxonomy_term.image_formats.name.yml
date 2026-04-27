@@ -1,0 +1,18 @@
+uuid: 8e685c4b-b3fb-442d-a9fb-e15da647d3d1
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.image_formats
+id: taxonomy_term.image_formats.name
+field_name: name
+entity_type: taxonomy_term
+bundle: image_formats
+label: Name
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

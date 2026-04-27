@@ -1,0 +1,20 @@
+uuid: 08af2142-03bd-40f2-bfd2-7312e025bb70
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_affilitation
+  module:
+    - user
+id: user.user.field_affilitation
+field_name: field_affilitation
+entity_type: user
+bundle: user
+label: Affiliation
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

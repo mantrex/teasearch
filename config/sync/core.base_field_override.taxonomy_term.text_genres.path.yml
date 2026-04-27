@@ -1,0 +1,20 @@
+uuid: ee109f27-2c9f-459c-ac4f-5203ebfdb8b4
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.text_genres
+  module:
+    - path
+id: taxonomy_term.text_genres.path
+field_name: path
+entity_type: taxonomy_term
+bundle: text_genres
+label: 'URL alias'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: path

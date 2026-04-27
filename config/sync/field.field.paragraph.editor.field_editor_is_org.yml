@@ -1,0 +1,23 @@
+uuid: 5acc665e-a12b-4a3b-9807-28bed4b47cfa
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_editor_is_org
+    - paragraphs.paragraphs_type.editor
+id: paragraph.editor.field_editor_is_org
+field_name: field_editor_is_org
+entity_type: paragraph
+bundle: editor
+label: 'Editor is an Organization'
+description: 'Check if the editor party is an organization.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'yes'
+  off_label: 'no'
+field_type: boolean

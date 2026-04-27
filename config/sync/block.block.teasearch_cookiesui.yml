@@ -1,0 +1,20 @@
+uuid: 15bbe688-a37e-47d5-8012-185ed6701a24
+langcode: en
+status: true
+dependencies:
+  module:
+    - cookies
+  theme:
+    - teasearch
+id: teasearch_cookiesui
+theme: teasearch
+region: footer
+weight: 0
+provider: null
+plugin: cookies_ui_block
+settings:
+  id: cookies_ui_block
+  label: 'Cookies UI'
+  label_display: '0'
+  provider: cookies
+visibility: {  }

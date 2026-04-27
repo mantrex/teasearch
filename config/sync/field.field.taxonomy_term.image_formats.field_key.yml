@@ -1,0 +1,19 @@
+uuid: bb226a84-c5ce-422d-b7ed-49a01b102970
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_key
+    - taxonomy.vocabulary.image_formats
+id: taxonomy_term.image_formats.field_key
+field_name: field_key
+entity_type: taxonomy_term
+bundle: image_formats
+label: Key
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

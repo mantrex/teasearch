@@ -1,0 +1,19 @@
+uuid: 7bdb7746-cb60-4fad-b35d-a566136c8ec1
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_key
+    - taxonomy.vocabulary.video_genres
+id: taxonomy_term.video_genres.field_key
+field_name: field_key
+entity_type: taxonomy_term
+bundle: video_genres
+label: Key
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

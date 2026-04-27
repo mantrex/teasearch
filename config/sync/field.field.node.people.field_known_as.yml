@@ -1,0 +1,19 @@
+uuid: fa1770e2-f63c-4b2a-8a97-8f9e27bf959a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_known_as
+    - node.type.people
+id: node.people.field_known_as
+field_name: field_known_as
+entity_type: node
+bundle: people
+label: 'Also known as'
+description: 'Check if the original name follows "surname first" order.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,19 @@
+uuid: f2a87004-8aee-49fc-8def-a90617aa6b4a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_link_title
+    - node.type.categories
+id: node.categories.field_link_title
+field_name: field_link_title
+entity_type: node
+bundle: categories
+label: 'Link title'
+description: 'Insert the title for the link'
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

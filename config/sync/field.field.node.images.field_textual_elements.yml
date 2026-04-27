@@ -1,0 +1,22 @@
+uuid: 63cba235-7d95-4650-9a33-59a65534a378
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_textual_elements
+    - node.type.images
+  module:
+    - text
+id: node.images.field_textual_elements
+field_name: field_textual_elements
+entity_type: node
+bundle: images
+label: 'Textual elements'
+description: 'Text in the original language. Add numbering or indexing if needed for references in the content description.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

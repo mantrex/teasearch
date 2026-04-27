@@ -1,0 +1,20 @@
+uuid: 43d116e9-88bb-4629-ae05-b21c967c76e0
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.first_reference
+  module:
+    - path
+id: node.first_reference.path
+field_name: path
+entity_type: node
+bundle: first_reference
+label: 'URL alias'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: path

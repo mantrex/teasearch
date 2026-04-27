@@ -1,0 +1,23 @@
+uuid: e8b3c445-1f38-447e-9a59-92dd7c4ccb77
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_is_translator
+    - paragraphs.paragraphs_type.authors
+id: paragraph.authors.field_is_translator
+field_name: field_is_translator
+entity_type: paragraph
+bundle: authors
+label: 'Is translator'
+description: 'Check if this responsible party served as a translator for the work.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'yes'
+  off_label: 'no'
+field_type: boolean

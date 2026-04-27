@@ -1,0 +1,26 @@
+uuid: 3e8fc3ba-b2e4-4d62-a79d-05e75d81b5f8
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+    - node_save_redirect
+third_party_settings:
+  menu_ui:
+    available_menus:
+      - main
+    parent: 'main:'
+  node_save_redirect:
+    save_type: 3
+    save_location: ''
+    save_destination: false
+    edit_type: 3
+    edit_location: ''
+    edit_destination: false
+name: People
+type: people
+description: null
+help: 'Please fill the form below'
+new_revision: false
+preview_mode: 0
+display_submitted: true

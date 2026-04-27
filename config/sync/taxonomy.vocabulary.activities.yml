@@ -1,0 +1,9 @@
+uuid: 0503898b-3254-4246-a023-6fbd14c20800
+langcode: en
+status: true
+dependencies: {  }
+name: Activities
+vid: activities
+description: null
+weight: 0
+new_revision: false

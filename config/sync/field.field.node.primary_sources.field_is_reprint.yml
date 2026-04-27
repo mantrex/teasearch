@@ -1,0 +1,21 @@
+uuid: 117f15e7-3fa2-4ba1-9ff1-212137b1e72c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_is_reprint
+    - node.type.primary_sources
+id: node.primary_sources.field_is_reprint
+field_name: field_is_reprint
+entity_type: node
+bundle: primary_sources
+label: 'Is Reprint'
+description: 'Check if this the text is reproductions or dedicated reprints of an earlier work'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: 'Yes'
+  off_label: 'No'
+field_type: boolean

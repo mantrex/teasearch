@@ -1,0 +1,29 @@
+uuid: 609edf6b-44c6-495c-8217-72f4ba63dbbf
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_teasearch_contributors
+    - node.type.news
+    - node.type.people
+id: node.news.field_teasearch_contributors
+field_name: field_teasearch_contributors
+entity_type: node
+bundle: news
+label: 'Teasearch contributors'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      people: people
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

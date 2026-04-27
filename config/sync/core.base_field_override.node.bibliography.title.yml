@@ -1,0 +1,18 @@
+uuid: 60d807ab-0487-43a8-9239-85ff4700a458
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.bibliography
+id: node.bibliography.title
+field_name: title
+entity_type: node
+bundle: bibliography
+label: 'Title in Latin'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

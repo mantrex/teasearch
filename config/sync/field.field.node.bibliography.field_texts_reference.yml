@@ -1,0 +1,29 @@
+uuid: b377afec-9b9d-4d62-9021-edd9772b57bd
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_texts_reference
+    - node.type.bibliography
+    - node.type.primary_sources
+id: node.bibliography.field_texts_reference
+field_name: field_texts_reference
+entity_type: node
+bundle: bibliography
+label: 'PDF in texts section'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      primary_sources: primary_sources
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

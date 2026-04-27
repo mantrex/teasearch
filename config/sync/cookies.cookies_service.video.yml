@@ -1,0 +1,24 @@
+uuid: 34de085e-5588-43c3-8f24-cdce8d341ebf
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - cookies_video
+_core:
+  default_config_hash: iwaHmTJMLoZx7mRsDI0tPU1JgG2K9UHeNOvDNtNKFdI
+id: video
+label: 'Video provided by YouTube, Vimeo'
+group: video
+info:
+  format: full_html
+  value: ''
+consentRequired: true
+purpose: ''
+processor: ''
+processorContact: ''
+processorUrl: ''
+processorPrivacyPolicyUrl: ''
+processorCookiePolicyUrl: 'https://policies.google.com/privacy'
+placeholderMainText: 'This content is blocked because Video cookies have not been accepted.'
+placeholderAcceptText: 'Only accept Video cookies'

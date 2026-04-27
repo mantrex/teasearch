@@ -1,0 +1,19 @@
+uuid: 49cb9ce6-6860-4537-90de-d7c248907f02
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_editor_firstname
+    - paragraphs.paragraphs_type.editor
+id: paragraph.editor.field_editor_firstname
+field_name: field_editor_firstname
+entity_type: paragraph
+bundle: editor
+label: 'Editor Given Name (Latin)'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

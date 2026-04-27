@@ -1,0 +1,26 @@
+uuid: 1750ed99-e7cc-4250-92f9-f3d11ca6607e
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+    - node_save_redirect
+third_party_settings:
+  menu_ui:
+    available_menus:
+      - main
+    parent: 'main:'
+  node_save_redirect:
+    save_type: 3
+    save_location: ''
+    save_destination: false
+    edit_type: 3
+    edit_location: ''
+    edit_destination: false
+name: Images
+type: images
+description: null
+help: null
+new_revision: true
+preview_mode: 0
+display_submitted: false

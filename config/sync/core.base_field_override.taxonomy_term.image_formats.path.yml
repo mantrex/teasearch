@@ -1,0 +1,20 @@
+uuid: b60013b5-31d4-4446-b89c-3273a2e84dcd
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.image_formats
+  module:
+    - path
+id: taxonomy_term.image_formats.path
+field_name: path
+entity_type: taxonomy_term
+bundle: image_formats
+label: 'URL alias'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: path

@@ -1,0 +1,19 @@
+uuid: c075615a-afa2-4de2-b096-9db978a5f0bc
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_journal
+    - node.type.bibliography
+id: node.bibliography.field_journal
+field_name: field_journal
+entity_type: node
+bundle: bibliography
+label: Journal
+description: 'Original title in writing systems other than the Latin alphabet.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

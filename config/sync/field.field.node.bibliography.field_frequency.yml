@@ -1,0 +1,29 @@
+uuid: 403027d4-4733-4d5f-9e24-f44ee308a300
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_frequency
+    - node.type.bibliography
+    - taxonomy.vocabulary.periodical_frequency
+id: node.bibliography.field_frequency
+field_name: field_frequency
+entity_type: node
+bundle: bibliography
+label: Frequency
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      periodical_frequency: periodical_frequency
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

@@ -1,0 +1,9 @@
+uuid: 1d08b961-39a3-4200-9bf5-a22a6825e54d
+langcode: en
+status: true
+dependencies: {  }
+name: 'Usage Rights'
+vid: usage_rights
+description: null
+weight: 0
+new_revision: false

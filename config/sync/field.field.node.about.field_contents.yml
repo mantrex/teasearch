@@ -1,0 +1,49 @@
+uuid: 182f6128-6c86-48a9-985b-12c5191e0599
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_contents
+    - node.type.about
+    - paragraphs.paragraphs_type.about
+  module:
+    - entity_reference_revisions
+id: node.about.field_contents
+field_name: field_contents
+entity_type: node
+bundle: about
+label: Contents
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      about: about
+    negate: 0
+    target_bundles_drag_drop:
+      about:
+        weight: 8
+        enabled: true
+      authors:
+        weight: 9
+        enabled: false
+      creators:
+        weight: 10
+        enabled: false
+      editor:
+        weight: 11
+        enabled: false
+      fullname_latin:
+        weight: 12
+        enabled: false
+      speakers:
+        weight: 13
+        enabled: false
+      texts_authors:
+        weight: 14
+        enabled: false
+field_type: entity_reference_revisions

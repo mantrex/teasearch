@@ -1,0 +1,9 @@
+uuid: 7fc8d9c7-9125-4a51-bea4-738a3a6a712e
+langcode: en
+status: true
+dependencies: {  }
+name: 'Text Types'
+vid: text_types
+description: null
+weight: 0
+new_revision: false

@@ -1,0 +1,39 @@
+uuid: a9f0a8dd-4175-4ee1-a6c4-cb6ff7ba5208
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_category_menu_list
+field_name: field_category_menu_list
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: first_reference
+      label: texts
+    -
+      value: primary_sources
+      label: essentials
+    -
+      value: images
+      label: images
+    -
+      value: video
+      label: video
+    -
+      value: bibliography
+      label: bibliography
+    -
+      value: contributors
+      label: people
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

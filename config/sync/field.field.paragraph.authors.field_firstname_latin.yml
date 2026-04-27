@@ -1,0 +1,19 @@
+uuid: c17fa29c-edd5-46d1-a0a1-5b2ff86f3dc6
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_firstname_latin
+    - paragraphs.paragraphs_type.authors
+id: paragraph.authors.field_firstname_latin
+field_name: field_firstname_latin
+entity_type: paragraph
+bundle: authors
+label: 'Given Name (latin)'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

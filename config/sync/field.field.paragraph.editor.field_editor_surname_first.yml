@@ -1,0 +1,23 @@
+uuid: 8887fd52-15b8-4716-98d8-e1d3d9f82bb6
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_editor_surname_first
+    - paragraphs.paragraphs_type.editor
+id: paragraph.editor.field_editor_surname_first
+field_name: field_editor_surname_first
+entity_type: paragraph
+bundle: editor
+label: 'Surname first'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'yes'
+  off_label: 'no'
+field_type: boolean

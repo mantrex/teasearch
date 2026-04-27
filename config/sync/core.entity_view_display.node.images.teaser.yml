@@ -1,0 +1,96 @@
+uuid: cff52c64-1bd3-4484-b0d4-540bcf87b22f
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.images.field_archive_museum
+    - field.field.node.images.field_attributed_authorship
+    - field.field.node.images.field_authors_ref
+    - field.field.node.images.field_catalogue_number
+    - field.field.node.images.field_country
+    - field.field.node.images.field_country2
+    - field.field.node.images.field_curated_references
+    - field.field.node.images.field_curators_ref
+    - field.field.node.images.field_description
+    - field.field.node.images.field_details
+    - field.field.node.images.field_dimensions
+    - field.field.node.images.field_featured_ref
+    - field.field.node.images.field_image_category
+    - field.field.node.images.field_is_anonymous
+    - field.field.node.images.field_is_copy
+    - field.field.node.images.field_is_portion
+    - field.field.node.images.field_keywords
+    - field.field.node.images.field_language
+    - field.field.node.images.field_large_image
+    - field.field.node.images.field_license
+    - field.field.node.images.field_links
+    - field.field.node.images.field_location
+    - field.field.node.images.field_main_image
+    - field.field.node.images.field_medium
+    - field.field.node.images.field_notes
+    - field.field.node.images.field_portion_of_work
+    - field.field.node.images.field_responsibles
+    - field.field.node.images.field_reviewers_ref
+    - field.field.node.images.field_source
+    - field.field.node.images.field_square_thumbnail
+    - field.field.node.images.field_subjects
+    - field.field.node.images.field_teasearch_references
+    - field.field.node.images.field_textual_elements
+    - field.field.node.images.field_title_original
+    - field.field.node.images.field_title_translated
+    - field.field.node.images.field_usage_rights
+    - field.field.node.images.field_year_range
+    - node.type.images
+  module:
+    - user
+id: node.images.teaser
+targetEntityType: node
+bundle: images
+mode: teaser
+content:
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  display_updated: true
+  field_archive_museum: true
+  field_attributed_authorship: true
+  field_authors_ref: true
+  field_catalogue_number: true
+  field_country: true
+  field_country2: true
+  field_curated_references: true
+  field_curators_ref: true
+  field_description: true
+  field_details: true
+  field_dimensions: true
+  field_featured_ref: true
+  field_image_category: true
+  field_is_anonymous: true
+  field_is_copy: true
+  field_is_portion: true
+  field_keywords: true
+  field_language: true
+  field_large_image: true
+  field_license: true
+  field_links: true
+  field_location: true
+  field_main_image: true
+  field_medium: true
+  field_notes: true
+  field_portion_of_work: true
+  field_responsibles: true
+  field_reviewers_ref: true
+  field_source: true
+  field_square_thumbnail: true
+  field_subjects: true
+  field_teasearch_references: true
+  field_textual_elements: true
+  field_title_original: true
+  field_title_translated: true
+  field_usage_rights: true
+  field_year_range: true
+  langcode: true

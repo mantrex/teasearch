@@ -1,0 +1,19 @@
+uuid: 75c7d53e-7a2e-48bd-99e9-1e2010bd171a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_lastname_latin
+    - paragraphs.paragraphs_type.authors
+id: paragraph.authors.field_lastname_latin
+field_name: field_lastname_latin
+entity_type: paragraph
+bundle: authors
+label: 'Surname (latin)'
+description: 'Responsible party: If an individual, enter family name including any particles. If an organisation, enter the full name.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

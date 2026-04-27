@@ -1,0 +1,9 @@
+uuid: 06f09ffa-4ed7-46cc-a76c-a632fac74c0e
+langcode: en
+status: true
+dependencies: {  }
+name: 'Image Formats'
+vid: image_formats
+description: null
+weight: 0
+new_revision: false

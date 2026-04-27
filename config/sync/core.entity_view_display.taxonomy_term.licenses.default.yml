@@ -1,0 +1,31 @@
+uuid: 3bbcfcd3-9008-498a-8bdb-47212028e0ef
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.taxonomy_term.licenses.field_key
+    - taxonomy.vocabulary.licenses
+  module:
+    - text
+id: taxonomy_term.licenses.default
+targetEntityType: taxonomy_term
+bundle: licenses
+mode: default
+content:
+  description:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_key:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  langcode: true

@@ -1,0 +1,20 @@
+uuid: 22c3dee0-6620-4e8c-a2cf-76227960b59c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_firstname_romaji
+  module:
+    - user
+id: user.user.field_firstname_romaji
+field_name: field_firstname_romaji
+entity_type: user
+bundle: user
+label: 'Firstname (a)'
+description: 'Firstname in latinized script or romanized form'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

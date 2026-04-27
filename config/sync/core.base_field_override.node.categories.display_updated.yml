@@ -1,0 +1,22 @@
+uuid: 5c99cd55-0695-4d29-81a7-e5e2753b31b8
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.categories
+id: node.categories.display_updated
+field_name: display_updated
+entity_type: node
+bundle: categories
+label: 'Display updated date'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

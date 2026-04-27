@@ -1,0 +1,9 @@
+uuid: d2292cd0-f2e5-48d9-8812-e32d7688d011
+langcode: en
+status: true
+dependencies: {  }
+name: Subjects
+vid: subjects
+description: null
+weight: 0
+new_revision: false

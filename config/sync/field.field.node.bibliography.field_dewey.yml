@@ -1,0 +1,19 @@
+uuid: 07db2508-5128-48e6-ab1a-fc315f8557ad
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_dewey
+    - node.type.bibliography
+id: node.bibliography.field_dewey
+field_name: field_dewey
+entity_type: node
+bundle: bibliography
+label: Dewey
+description: 'Enter the Dewey Decimal Classification number if listed in the colophon.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

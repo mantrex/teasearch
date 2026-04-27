@@ -1,0 +1,29 @@
+uuid: 22844e2b-a8e4-4003-9f04-5976b2e3b080
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_curated_references
+    - node.type.bibliography
+    - node.type.first_reference
+id: node.first_reference.field_curated_references
+field_name: field_curated_references
+entity_type: node
+bundle: first_reference
+label: 'Curated References'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      bibliography: bibliography
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

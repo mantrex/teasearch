@@ -1,0 +1,29 @@
+uuid: 399fc8ab-bfe1-45b8-945a-3e66c59be348
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_reviewers_ref
+    - node.type.bibliography
+    - node.type.people
+id: node.bibliography.field_reviewers_ref
+field_name: field_reviewers_ref
+entity_type: node
+bundle: bibliography
+label: 'Reviewers Ref'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      people: people
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

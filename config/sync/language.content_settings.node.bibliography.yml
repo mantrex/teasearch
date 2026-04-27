@@ -1,0 +1,18 @@
+uuid: 1c164331-040a-436d-87e5-b8d418885262
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.bibliography
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+    bundle_settings:
+      untranslatable_fields_hide: '1'
+id: node.bibliography
+target_entity_type_id: node
+target_bundle: bibliography
+default_langcode: site_default
+language_alterable: false

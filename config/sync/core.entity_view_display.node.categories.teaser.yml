@@ -1,0 +1,46 @@
+uuid: aa227c05-5d2a-451b-903c-b546c348eadc
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.categories.field_category_menu_list
+    - field.field.node.categories.field_description
+    - field.field.node.categories.field_image
+    - field.field.node.categories.field_link_title
+    - field.field.node.categories.field_multilanguage
+    - field.field.node.categories.field_weight
+    - image.style.medium
+    - node.type.categories
+  module:
+    - image
+    - user
+id: node.categories.teaser
+targetEntityType: node
+bundle: categories
+mode: teaser
+content:
+  field_image:
+    type: image
+    label: hidden
+    settings:
+      image_link: content
+      image_style: medium
+      image_loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: -1
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  display_updated: true
+  field_category_menu_list: true
+  field_description: true
+  field_link_title: true
+  field_multilanguage: true
+  field_weight: true
+  langcode: true

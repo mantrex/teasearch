@@ -1,0 +1,23 @@
+uuid: ce58ca34-626a-4d63-93eb-40af454da6a4
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_year
+    - node.type.bibliography
+id: node.bibliography.field_year
+field_name: field_year
+entity_type: node
+bundle: bibliography
+label: Year
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: -999999
+  max: 9999
+  prefix: ''
+  suffix: ''
+field_type: integer

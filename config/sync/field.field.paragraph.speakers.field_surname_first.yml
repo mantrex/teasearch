@@ -1,0 +1,23 @@
+uuid: a44bb12c-415c-4f27-8273-78633a8fec94
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_surname_first
+    - paragraphs.paragraphs_type.speakers
+id: paragraph.speakers.field_surname_first
+field_name: field_surname_first
+entity_type: paragraph
+bundle: speakers
+label: 'Surname First'
+description: 'Check if the original name follows "surname first" order.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'Yes'
+  off_label: 'No'
+field_type: boolean

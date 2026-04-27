@@ -1,0 +1,21 @@
+uuid: 2e5d1858-f449-4a37-8b91-ff70ad7e7fd1
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_duration
+    - node.type.videos
+  module:
+    - time_field
+id: node.videos.field_duration
+field_name: field_duration
+entity_type: node
+bundle: videos
+label: Duration
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: time

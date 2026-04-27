@@ -1,0 +1,61 @@
+uuid: 933f445a-3260-4df6-a200-24b8ff8c8ee7
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.texts_authors.field_attributed_authorship
+    - field.field.paragraph.texts_authors.field_firstname_latin
+    - field.field.paragraph.texts_authors.field_fullname
+    - field.field.paragraph.texts_authors.field_lastname_latin
+    - field.field.paragraph.texts_authors.field_surname_first
+    - paragraphs.paragraphs_type.texts_authors
+id: paragraph.texts_authors.default
+targetEntityType: paragraph
+bundle: texts_authors
+mode: default
+content:
+  field_attributed_authorship:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 5
+    region: content
+  field_firstname_latin:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_fullname:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_lastname_latin:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_surname_first:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 4
+    region: content
+hidden: {  }

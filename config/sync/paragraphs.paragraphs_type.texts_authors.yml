@@ -1,0 +1,10 @@
+uuid: 72ee121e-9545-483a-8b4f-9a55019e3405
+langcode: en
+status: true
+dependencies: {  }
+id: texts_authors
+label: Authors
+icon_uuid: null
+icon_default: null
+description: ''
+behavior_plugins: {  }

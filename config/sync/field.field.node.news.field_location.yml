@@ -1,0 +1,19 @@
+uuid: 0984c009-3c30-4d28-9945-b3af373335fb
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_location
+    - node.type.news
+id: node.news.field_location
+field_name: field_location
+entity_type: node
+bundle: news
+label: Location
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

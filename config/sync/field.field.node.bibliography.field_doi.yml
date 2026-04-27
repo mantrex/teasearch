@@ -1,0 +1,19 @@
+uuid: 15179568-6bb7-43ae-8933-c3fb27daae69
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_doi
+    - node.type.bibliography
+id: node.bibliography.field_doi
+field_name: field_doi
+entity_type: node
+bundle: bibliography
+label: DOI
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

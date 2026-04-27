@@ -1,0 +1,31 @@
+uuid: 0ae32dd3-5f67-4009-8276-542b985d6b64
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.taxonomy_term.activities.field_key
+    - taxonomy.vocabulary.activities
+  module:
+    - text
+id: taxonomy_term.activities.default
+targetEntityType: taxonomy_term
+bundle: activities
+mode: default
+content:
+  description:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_key:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  langcode: true

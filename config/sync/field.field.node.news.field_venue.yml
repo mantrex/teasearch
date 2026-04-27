@@ -1,0 +1,19 @@
+uuid: 877c49df-d1f5-4f55-80bc-148408adf484
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_venue
+    - node.type.news
+id: node.news.field_venue
+field_name: field_venue
+entity_type: node
+bundle: news
+label: Venue
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

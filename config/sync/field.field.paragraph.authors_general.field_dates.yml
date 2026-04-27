@@ -1,0 +1,19 @@
+uuid: db5e8a60-5060-4c23-a5f1-6ab02d059a61
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_dates
+    - paragraphs.paragraphs_type.authors_general
+id: paragraph.authors_general.field_dates
+field_name: field_dates
+entity_type: paragraph
+bundle: authors_general
+label: Dates
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

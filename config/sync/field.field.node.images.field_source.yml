@@ -1,0 +1,23 @@
+uuid: 9f128bdf-f5d0-4158-908f-48f8f970b3da
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_source
+    - node.type.images
+  module:
+    - link
+id: node.images.field_source
+field_name: field_source
+entity_type: node
+bundle: images
+label: Source
+description: 'Links to the external websites from which the text was taken (if applicable).'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 16
+field_type: link

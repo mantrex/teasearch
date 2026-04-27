@@ -1,0 +1,21 @@
+uuid: 151ad239-ef15-4157-a37b-0f45de2e9a41
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.text_genres
+  module:
+    - text
+id: taxonomy_term.text_genres.description
+field_name: description
+entity_type: taxonomy_term
+bundle: text_genres
+label: Description
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

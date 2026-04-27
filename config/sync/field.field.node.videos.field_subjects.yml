@@ -1,0 +1,29 @@
+uuid: da51de41-6496-4174-99b8-f713f0265ff4
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_subjects
+    - node.type.videos
+    - taxonomy.vocabulary.subjects
+id: node.videos.field_subjects
+field_name: field_subjects
+entity_type: node
+bundle: videos
+label: Subjects
+description: 'Associate all relevant thematic areas.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      subjects: subjects
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

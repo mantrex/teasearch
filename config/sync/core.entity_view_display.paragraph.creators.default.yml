@@ -1,0 +1,61 @@
+uuid: 9f9e695e-9fd0-4db0-81a4-18aa973978ea
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.creators.field_firstname
+    - field.field.paragraph.creators.field_fullname
+    - field.field.paragraph.creators.field_is_org
+    - field.field.paragraph.creators.field_lastname
+    - field.field.paragraph.creators.field_surname_first
+    - paragraphs.paragraphs_type.creators
+id: paragraph.creators.default
+targetEntityType: paragraph
+bundle: creators
+mode: default
+content:
+  field_firstname:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_fullname:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_is_org:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_lastname:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_surname_first:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 4
+    region: content
+hidden: {  }

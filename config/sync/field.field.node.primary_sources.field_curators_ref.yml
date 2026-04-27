@@ -1,0 +1,29 @@
+uuid: e7fdbc41-e9d0-4a8b-af05-2f0218f2e8ea
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_curators_ref
+    - node.type.people
+    - node.type.primary_sources
+id: node.primary_sources.field_curators_ref
+field_name: field_curators_ref
+entity_type: node
+bundle: primary_sources
+label: 'Curators Ref'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      people: people
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

@@ -1,0 +1,35 @@
+uuid: 5ba8d0cd-f703-41cb-bfcb-9e70eabd4d97
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_teasearch_references
+    - node.type.first_reference
+    - node.type.images
+    - node.type.news
+    - node.type.primary_sources
+    - node.type.videos
+id: node.news.field_teasearch_references
+field_name: field_teasearch_references
+entity_type: node
+bundle: news
+label: 'Teasearch related resources'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      first_reference: first_reference
+      images: images
+      primary_sources: primary_sources
+      videos: videos
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: first_reference
+field_type: entity_reference

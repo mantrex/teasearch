@@ -1,0 +1,29 @@
+uuid: 3c3c08a2-800c-4152-bfaf-af94c4e43970
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_usage_rights
+    - node.type.videos
+    - taxonomy.vocabulary.usage_rights
+id: node.videos.field_usage_rights
+field_name: field_usage_rights
+entity_type: node
+bundle: videos
+label: 'Usage rights'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      usage_rights: usage_rights
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

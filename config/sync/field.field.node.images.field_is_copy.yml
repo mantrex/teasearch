@@ -1,0 +1,21 @@
+uuid: 820cd38e-7375-4fbb-b7a9-0196bfee87a0
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_is_copy
+    - node.type.images
+id: node.images.field_is_copy
+field_name: field_is_copy
+entity_type: node
+bundle: images
+label: 'Is Copy / Reproduction'
+description: 'Check if this the text is reproductions or dedicated reprints of an earlier work'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: 'Yes'
+  off_label: 'No'
+field_type: boolean

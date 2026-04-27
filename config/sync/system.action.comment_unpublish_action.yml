@@ -1,0 +1,13 @@
+uuid: c63c9384-8da9-4fe4-b4d2-05c267379c3b
+langcode: it
+status: true
+dependencies:
+  module:
+    - comment
+_core:
+  default_config_hash: tWOIjSMobEWOFZddMkNqb9JySbOVwE1diC6NRqcfLTk
+id: comment_unpublish_action
+label: 'Togli dalla pubblicazione il commento'
+type: comment
+plugin: 'entity:unpublish_action:comment'
+configuration: {  }

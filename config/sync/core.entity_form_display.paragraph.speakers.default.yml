@@ -1,0 +1,49 @@
+uuid: 942ad5a2-a200-419f-a628-8ad3f57f699f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.speakers.field_firstname
+    - field.field.paragraph.speakers.field_fullname
+    - field.field.paragraph.speakers.field_lastname
+    - field.field.paragraph.speakers.field_surname_first
+    - paragraphs.paragraphs_type.speakers
+id: paragraph.speakers.default
+targetEntityType: paragraph
+bundle: speakers
+mode: default
+content:
+  field_firstname:
+    type: string_textfield
+    weight: 1
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_fullname:
+    type: string_textfield
+    weight: 3
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_lastname:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_surname_first:
+    type: boolean_checkbox
+    weight: 4
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

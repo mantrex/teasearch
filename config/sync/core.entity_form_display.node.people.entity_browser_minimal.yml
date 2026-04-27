@@ -1,0 +1,94 @@
+uuid: 220ff528-48e4-487e-b82a-4ef11425d34f
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_form_mode.node.entity_browser_minimal
+    - field.field.node.people.field_activities
+    - field.field.node.people.field_affiliation
+    - field.field.node.people.field_avatar
+    - field.field.node.people.field_bio
+    - field.field.node.people.field_city
+    - field.field.node.people.field_country
+    - field.field.node.people.field_country2
+    - field.field.node.people.field_email
+    - field.field.node.people.field_firstname
+    - field.field.node.people.field_fullname
+    - field.field.node.people.field_known_as
+    - field.field.node.people.field_language
+    - field.field.node.people.field_lastname
+    - field.field.node.people.field_license
+    - field.field.node.people.field_memberships
+    - field.field.node.people.field_online_links
+    - field.field.node.people.field_orcid
+    - field.field.node.people.field_people_multilanguage
+    - field.field.node.people.field_region
+    - field.field.node.people.field_roles
+    - field.field.node.people.field_specific_subjects
+    - field.field.node.people.field_subjects
+    - field.field.node.people.field_surname_first
+    - field.field.node.people.field_title
+    - image.style.medium
+    - node.type.people
+  module:
+    - image
+id: node.people.entity_browser_minimal
+targetEntityType: node
+bundle: people
+mode: entity_browser_minimal
+content:
+  field_avatar:
+    type: image_image
+    weight: 4
+    region: content
+    settings:
+      progress_indicator: throbber
+      preview_image_style: medium
+    third_party_settings: {  }
+  field_roles:
+    type: options_buttons
+    weight: 3
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  created: true
+  display_updated: true
+  field_activities: true
+  field_affiliation: true
+  field_bio: true
+  field_city: true
+  field_country: true
+  field_country2: true
+  field_email: true
+  field_firstname: true
+  field_fullname: true
+  field_known_as: true
+  field_language: true
+  field_lastname: true
+  field_license: true
+  field_memberships: true
+  field_online_links: true
+  field_orcid: true
+  field_people_multilanguage: true
+  field_region: true
+  field_specific_subjects: true
+  field_subjects: true
+  field_surname_first: true
+  field_title: true
+  langcode: true
+  path: true
+  promote: true
+  status: true
+  sticky: true
+  translation: true
+  uid: true
+  url_redirects: true

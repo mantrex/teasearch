@@ -1,0 +1,19 @@
+uuid: 80f0219e-1df5-41ed-a73a-ec36c08a19fa
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_lastname
+    - node.type.people
+id: node.people.field_lastname
+field_name: field_lastname
+entity_type: node
+bundle: people
+label: 'Surname (latin)'
+description: 'Enter family name, including any particles.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

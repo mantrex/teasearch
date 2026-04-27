@@ -1,0 +1,22 @@
+uuid: bfdf1c4a-0329-4d08-8c0a-1078ace675ed
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.bibliography
+id: node.bibliography.sticky
+field_name: sticky
+entity_type: node
+bundle: bibliography
+label: 'Sticky at top of lists'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

@@ -1,0 +1,22 @@
+uuid: c7bdcb9f-a6be-47ff-9ff6-9a42c5ea089b
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.activities
+id: taxonomy_term.activities.status
+field_name: status
+entity_type: taxonomy_term
+bundle: activities
+label: Published
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 1
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

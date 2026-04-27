@@ -1,0 +1,19 @@
+uuid: 2ae2bc23-f16a-49e1-a277-25ff26ea3239
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_journal_latin
+    - node.type.bibliography
+id: node.bibliography.field_journal_latin
+field_name: field_journal_latin
+entity_type: node
+bundle: bibliography
+label: 'Journal (latin)'
+description: 'Original title in Latin characters or transliterated into Latin characters from other writing systems.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

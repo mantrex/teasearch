@@ -1,0 +1,20 @@
+uuid: 6beae4db-b788-424a-b813-b4451f88bed8
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.video_genres
+  module:
+    - path
+id: taxonomy_term.video_genres.path
+field_name: path
+entity_type: taxonomy_term
+bundle: video_genres
+label: 'URL alias'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: path

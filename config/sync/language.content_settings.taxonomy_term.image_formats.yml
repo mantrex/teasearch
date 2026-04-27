@@ -1,0 +1,18 @@
+uuid: de9af9fc-2619-4699-8323-cd9bd511d289
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.image_formats
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+    bundle_settings:
+      untranslatable_fields_hide: '0'
+id: taxonomy_term.image_formats
+target_entity_type_id: taxonomy_term
+target_bundle: image_formats
+default_langcode: site_default
+language_alterable: false

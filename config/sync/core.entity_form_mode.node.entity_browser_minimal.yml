@@ -1,0 +1,11 @@
+uuid: 7330c18c-e506-4ab0-a61b-968de37f66ff
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.entity_browser_minimal
+label: 'Entity Browser minimal'
+description: 'Used to create people nodes in entity browser modal'
+targetEntityType: node
+cache: true

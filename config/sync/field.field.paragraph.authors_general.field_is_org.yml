@@ -1,0 +1,23 @@
+uuid: ddd2618b-0948-40a4-8157-897328191cc1
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_is_org
+    - paragraphs.paragraphs_type.authors_general
+id: paragraph.authors_general.field_is_org
+field_name: field_is_org
+entity_type: paragraph
+bundle: authors_general
+label: 'Is Organization'
+description: 'Check if the responsible party is an organisation.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'Yes'
+  off_label: 'No'
+field_type: boolean

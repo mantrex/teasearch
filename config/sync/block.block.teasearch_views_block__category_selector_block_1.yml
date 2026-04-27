@@ -1,0 +1,29 @@
+uuid: 72854194-c8a4-4476-8366-ae04ffa8fed3
+langcode: en
+status: true
+dependencies:
+  config:
+    - views.view.category_selector
+  module:
+    - system
+    - views
+  theme:
+    - teasearch
+id: teasearch_views_block__category_selector_block_1
+theme: teasearch
+region: hero
+weight: -5
+provider: null
+plugin: 'views_block:category_selector-block_1'
+settings:
+  id: 'views_block:category_selector-block_1'
+  label: ''
+  label_display: visible
+  provider: views
+  views_label: ''
+  items_per_page: null
+visibility:
+  request_path:
+    id: request_path
+    negate: false
+    pages: '<front>'

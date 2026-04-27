@@ -1,0 +1,46 @@
+uuid: 8dc7e41a-606f-457c-80b7-1a081887ee08
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_speaker
+    - node.type.videos
+    - paragraphs.paragraphs_type.speakers
+  module:
+    - entity_reference_revisions
+id: node.videos.field_speaker
+field_name: field_speaker
+entity_type: node
+bundle: videos
+label: Speaker
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      speakers: speakers
+    negate: 0
+    target_bundles_drag_drop:
+      authors:
+        weight: 8
+        enabled: false
+      creators:
+        weight: 9
+        enabled: false
+      editor:
+        weight: 10
+        enabled: false
+      fullname_latin:
+        weight: 11
+        enabled: false
+      speakers:
+        weight: 7
+        enabled: true
+      texts_authors:
+        weight: 12
+        enabled: false
+field_type: entity_reference_revisions

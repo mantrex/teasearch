@@ -1,0 +1,79 @@
+uuid: 2882b8ce-3e38-447c-b3d0-1f39799ba050
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.authors_general.field_dates
+    - field.field.paragraph.authors_general.field_firstname
+    - field.field.paragraph.authors_general.field_fullname
+    - field.field.paragraph.authors_general.field_is_org
+    - field.field.paragraph.authors_general.field_lastname
+    - field.field.paragraph.authors_general.field_pseudonym
+    - field.field.paragraph.authors_general.field_surname_first
+    - paragraphs.paragraphs_type.authors_general
+id: paragraph.authors_general.default
+targetEntityType: paragraph
+bundle: authors_general
+mode: default
+content:
+  field_dates:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 5
+    region: content
+  field_firstname:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_fullname:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_is_org:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_lastname:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_pseudonym:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 7
+    region: content
+  field_surname_first:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 4
+    region: content
+hidden: {  }

@@ -1,0 +1,29 @@
+uuid: 8d3c9a6d-d004-4645-8c09-b109b190dfac
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_usage_rights
+    - node.type.primary_sources
+    - taxonomy.vocabulary.usage_rights
+id: node.primary_sources.field_usage_rights
+field_name: field_usage_rights
+entity_type: node
+bundle: primary_sources
+label: 'Usage rights'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      usage_rights: usage_rights
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

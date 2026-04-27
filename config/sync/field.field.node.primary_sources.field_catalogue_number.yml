@@ -1,0 +1,19 @@
+uuid: 22154358-7832-4d10-bbf3-3cf4139196ee
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_catalogue_number
+    - node.type.primary_sources
+id: node.primary_sources.field_catalogue_number
+field_name: field_catalogue_number
+entity_type: node
+bundle: primary_sources
+label: 'Catalogue number'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

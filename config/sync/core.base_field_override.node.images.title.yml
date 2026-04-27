@@ -1,0 +1,18 @@
+uuid: b799bc89-2e1c-4e1e-a83b-b6339acb1c33
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.images
+id: node.images.title
+field_name: title
+entity_type: node
+bundle: images
+label: 'Title (Latin)'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

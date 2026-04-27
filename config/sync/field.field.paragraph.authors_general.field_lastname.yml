@@ -1,0 +1,19 @@
+uuid: 590eb2e9-abf9-4cf7-a08a-b15ec6ed0edd
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_lastname
+    - paragraphs.paragraphs_type.authors_general
+id: paragraph.authors_general.field_lastname
+field_name: field_lastname
+entity_type: paragraph
+bundle: authors_general
+label: 'Surname (latin)'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

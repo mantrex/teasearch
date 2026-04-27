@@ -1,0 +1,24 @@
+uuid: 429b4462-6cd3-4868-aafe-22ee69903d3f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_notes
+    - filter.format.basic_html
+    - node.type.primary_sources
+  module:
+    - text
+id: node.primary_sources.field_notes
+field_name: field_notes
+entity_type: node
+bundle: primary_sources
+label: Notes
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - basic_html
+field_type: text_long

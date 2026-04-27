@@ -1,0 +1,19 @@
+uuid: 76d6eea5-2112-4dd3-8fae-54e9db69a6af
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_keywords
+    - node.type.bibliography
+id: node.bibliography.field_keywords
+field_name: field_keywords
+entity_type: node
+bundle: bibliography
+label: Keywords
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

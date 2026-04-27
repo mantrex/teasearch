@@ -1,0 +1,19 @@
+uuid: 8e10e658-e7f7-4484-8a11-81acde956464
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_title_translated
+    - node.type.videos
+id: node.videos.field_title_translated
+field_name: field_title_translated
+entity_type: node
+bundle: videos
+label: 'Translated Title'
+description: 'English translation of the title.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

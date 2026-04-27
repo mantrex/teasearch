@@ -1,0 +1,21 @@
+uuid: c14ff61f-bc21-4f16-b5f9-d07c65e3369f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_project_type
+    - node.type.bibliography
+  module:
+    - options
+id: node.bibliography.field_project_type
+field_name: field_project_type
+entity_type: node
+bundle: bibliography
+label: 'Edited Book / Journal'
+description: 'Select type of container: "Edited book", "Journal"'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

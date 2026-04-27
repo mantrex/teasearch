@@ -1,0 +1,82 @@
+uuid: f2b2f52b-741b-4c5e-ae28-b118abf2a348
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.authors.field_firstname_latin
+    - field.field.paragraph.authors.field_fullname
+    - field.field.paragraph.authors.field_is_editor
+    - field.field.paragraph.authors.field_is_org
+    - field.field.paragraph.authors.field_is_translator
+    - field.field.paragraph.authors.field_lastname_latin
+    - field.field.paragraph.authors.field_pseudonym
+    - field.field.paragraph.authors.field_surname_first
+    - paragraphs.paragraphs_type.authors
+id: paragraph.authors.default
+targetEntityType: paragraph
+bundle: authors
+mode: default
+content:
+  field_firstname_latin:
+    type: string_textfield
+    weight: 2
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_fullname:
+    type: string_textfield
+    weight: 3
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_is_editor:
+    type: boolean_checkbox
+    weight: 7
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  field_is_org:
+    type: boolean_checkbox
+    weight: 0
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  field_is_translator:
+    type: boolean_checkbox
+    weight: 6
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  field_lastname_latin:
+    type: string_textfield
+    weight: 1
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_pseudonym:
+    type: string_textfield
+    weight: 5
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_surname_first:
+    type: boolean_checkbox
+    weight: 4
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

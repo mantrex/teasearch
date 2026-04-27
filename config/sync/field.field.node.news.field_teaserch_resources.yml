@@ -1,0 +1,25 @@
+uuid: 14cdcb74-daac-4ede-9d2c-c41c0323dc11
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_teaserch_resources
+    - node.type.news
+id: node.news.field_teaserch_resources
+field_name: field_teaserch_resources
+entity_type: node
+bundle: news
+label: 'Teaserch resources'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: views
+  handler_settings:
+    view:
+      view_name: er_labels_content_types
+      display_name: entity_reference_1
+      arguments: {  }
+field_type: entity_reference

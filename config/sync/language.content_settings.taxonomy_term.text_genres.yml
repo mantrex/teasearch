@@ -1,0 +1,18 @@
+uuid: 54b54192-c323-4ab0-a9d6-1a0f0729aa3c
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.text_genres
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+    bundle_settings:
+      untranslatable_fields_hide: '0'
+id: taxonomy_term.text_genres
+target_entity_type_id: taxonomy_term
+target_bundle: text_genres
+default_langcode: site_default
+language_alterable: false

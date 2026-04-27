@@ -1,0 +1,19 @@
+uuid: 8d06c15f-b850-45a1-9c11-bcb5a0cb42d6
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_keywords
+    - node.type.images
+id: node.images.field_keywords
+field_name: field_keywords
+entity_type: node
+bundle: images
+label: Keywords
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

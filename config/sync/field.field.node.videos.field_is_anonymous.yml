@@ -1,0 +1,23 @@
+uuid: 975c3460-9b58-4bca-87e4-8fb4e7ae4e9d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_is_anonymous
+    - node.type.videos
+id: node.videos.field_is_anonymous
+field_name: field_is_anonymous
+entity_type: node
+bundle: videos
+label: Anonymous
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'Yes'
+  off_label: 'No'
+field_type: boolean

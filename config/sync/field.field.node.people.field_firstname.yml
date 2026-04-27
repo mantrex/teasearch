@@ -1,0 +1,19 @@
+uuid: 21a99f4a-bcee-4c94-9810-c0d78f2ded96
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_firstname
+    - node.type.people
+id: node.people.field_firstname
+field_name: field_firstname
+entity_type: node
+bundle: people
+label: 'Given Name (latin)'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

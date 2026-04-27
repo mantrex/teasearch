@@ -1,0 +1,9 @@
+uuid: 4be96c7d-4345-4853-8a32-388581cd0f44
+langcode: en
+status: true
+dependencies: {  }
+name: 'Periodical Frequency'
+vid: periodical_frequency
+description: null
+weight: 0
+new_revision: false

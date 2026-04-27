@@ -1,0 +1,18 @@
+uuid: 7f82cc1e-52c9-44f2-9836-bc76aa0ab8e6
+langcode: en
+status: true
+dependencies:
+  config:
+    - paragraphs.paragraphs_type.fullname_latin
+id: paragraph.fullname_latin.created
+field_name: created
+entity_type: paragraph
+bundle: fullname_latin
+label: 'Authored on'
+description: 'The time that the Paragraph was created.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: created

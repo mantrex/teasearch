@@ -1,0 +1,24 @@
+uuid: 217765f4-20e3-4975-b073-392859defc5e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_notes
+    - filter.format.basic_html
+    - node.type.bibliography
+  module:
+    - text
+id: node.bibliography.field_notes
+field_name: field_notes
+entity_type: node
+bundle: bibliography
+label: Notes
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - basic_html
+field_type: text_long

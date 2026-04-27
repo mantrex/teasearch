@@ -1,0 +1,29 @@
+uuid: 4d475709-9294-46eb-aad7-7d56dfeb775c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_activities
+    - node.type.people
+    - taxonomy.vocabulary.activities
+id: node.people.field_activities
+field_name: field_activities
+entity_type: node
+bundle: people
+label: Activities
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      activities: activities
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

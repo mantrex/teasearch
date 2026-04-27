@@ -1,0 +1,19 @@
+uuid: 0547bdfc-885d-4150-95bb-a21a0b7cb570
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_key
+    - taxonomy.vocabulary.publication_types
+id: taxonomy_term.publication_types.field_key
+field_name: field_key
+entity_type: taxonomy_term
+bundle: publication_types
+label: Key
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

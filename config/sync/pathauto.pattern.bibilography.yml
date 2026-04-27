@@ -1,0 +1,22 @@
+uuid: ae572be4-ee2d-467c-9788-db07912ebb7a
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: bibilography
+label: Bibilography
+type: 'canonical_entities:node'
+pattern: 'bibliography/[node:title]'
+selection_criteria:
+  57231f05-5c0f-4d93-a7e9-2b6ccfe35529:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: 57231f05-5c0f-4d93-a7e9-2b6ccfe35529
+    context_mapping:
+      node: node
+    bundles:
+      bibliography: bibliography
+selection_logic: and
+weight: -5
+relationships: {  }

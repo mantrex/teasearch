@@ -1,0 +1,19 @@
+uuid: 7a0a71f9-650b-4e15-b3a3-b990e0125ef2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_title_translated
+    - node.type.first_reference
+id: node.first_reference.field_title_translated
+field_name: field_title_translated
+entity_type: node
+bundle: first_reference
+label: 'Translated Title'
+description: 'English translation of the title.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

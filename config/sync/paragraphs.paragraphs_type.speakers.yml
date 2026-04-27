@@ -1,0 +1,10 @@
+uuid: e3e78deb-aaac-47cb-9ed5-13c7751f0229
+langcode: en
+status: true
+dependencies: {  }
+id: speakers
+label: Speakers
+icon_uuid: null
+icon_default: null
+description: ''
+behavior_plugins: {  }

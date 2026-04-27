@@ -1,0 +1,23 @@
+uuid: 190ce6bd-66d9-44af-986a-bb6cba54ca65
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_is_anonymous
+    - node.type.primary_sources
+id: node.primary_sources.field_is_anonymous
+field_name: field_is_anonymous
+entity_type: node
+bundle: primary_sources
+label: Anonymous
+description: 'Check if no author is indicated.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'Yes'
+  off_label: 'No'
+field_type: boolean

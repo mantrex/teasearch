@@ -1,0 +1,29 @@
+uuid: 88be7da4-2d41-424c-bd00-5307d4511e5c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_language
+    - node.type.bibliography
+    - taxonomy.vocabulary.languages
+id: node.bibliography.field_language
+field_name: field_language
+entity_type: node
+bundle: bibliography
+label: Language
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      languages: languages
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

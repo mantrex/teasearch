@@ -1,0 +1,21 @@
+uuid: 5f550c23-182e-4445-bb80-9ca6d9632bc7
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_people_multilanguage
+    - node.type.people
+  module:
+    - mfd
+id: node.people.field_people_multilanguage
+field_name: field_people_multilanguage
+entity_type: node
+bundle: people
+label: people_multilanguage
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: multilingual_form_display

@@ -1,0 +1,19 @@
+uuid: 1f21dd94-9fb4-4756-a681-b8353ece63a2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_fullname
+    - node.type.people
+id: node.people.field_fullname
+field_name: field_fullname
+entity_type: node
+bundle: people
+label: 'Full Name (ORIGINAL non latin)'
+description: 'Enter the original non-Latin script full name if present.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

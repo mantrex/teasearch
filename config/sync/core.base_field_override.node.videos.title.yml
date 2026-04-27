@@ -1,0 +1,18 @@
+uuid: 53449a5a-efb9-4d9c-b9d6-ee2878464acc
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.videos
+id: node.videos.title
+field_name: title
+entity_type: node
+bundle: videos
+label: 'Title (latin)'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

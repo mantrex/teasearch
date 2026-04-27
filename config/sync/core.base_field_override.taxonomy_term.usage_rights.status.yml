@@ -1,0 +1,22 @@
+uuid: f1d43672-cb01-4d59-9acc-da020b85df7b
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.usage_rights
+id: taxonomy_term.usage_rights.status
+field_name: status
+entity_type: taxonomy_term
+bundle: usage_rights
+label: Published
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 1
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

@@ -1,0 +1,21 @@
+uuid: 5c53da76-14de-4d58-a028-9d0573727d33
+langcode: en
+status: true
+dependencies:
+  module:
+    - paragraphs
+id: paragraph.field_dates
+field_name: field_dates
+entity_type: paragraph
+type: string
+settings:
+  max_length: 255
+  case_sensitive: false
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

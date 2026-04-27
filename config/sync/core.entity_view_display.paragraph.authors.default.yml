@@ -1,0 +1,92 @@
+uuid: 1f580155-bebd-4e8a-9084-622f7e54425c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.authors.field_firstname_latin
+    - field.field.paragraph.authors.field_fullname
+    - field.field.paragraph.authors.field_is_editor
+    - field.field.paragraph.authors.field_is_org
+    - field.field.paragraph.authors.field_is_translator
+    - field.field.paragraph.authors.field_lastname_latin
+    - field.field.paragraph.authors.field_pseudonym
+    - field.field.paragraph.authors.field_surname_first
+    - paragraphs.paragraphs_type.authors
+id: paragraph.authors.default
+targetEntityType: paragraph
+bundle: authors
+mode: default
+content:
+  field_firstname_latin:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_fullname:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_is_editor:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 6
+    region: content
+  field_is_org:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_is_translator:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 5
+    region: content
+  field_lastname_latin:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_pseudonym:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 7
+    region: content
+  field_surname_first:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 4
+    region: content
+hidden: {  }

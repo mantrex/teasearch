@@ -1,0 +1,10 @@
+uuid: ab96b561-f2e1-44c0-9228-3a32363e2061
+langcode: en
+status: true
+dependencies: {  }
+id: about
+label: About
+icon_uuid: null
+icon_default: null
+description: 'Content Type for About Contents'
+behavior_plugins: {  }

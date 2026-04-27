@@ -1,0 +1,22 @@
+uuid: 678b693e-9dfc-4be8-97dc-8f7be68ac484
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.videos
+id: node.videos.display_updated
+field_name: display_updated
+entity_type: node
+bundle: videos
+label: 'Display updated date'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

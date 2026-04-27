@@ -1,0 +1,100 @@
+_core:
+  default_config_hash: 1X1G7QXa0iRH1_iTMLNbcgyoJo_66m6OOcMX6ty2LFw
+content_types:
+  texts:
+    machine_name: primary_sources
+    type: node
+    label: Texts
+    results:
+      mainfield: title
+      subfield: field_description
+      content_threshold: 10
+      image: field_main_image
+      altimage: field_square_thumbnail
+    filters:
+      subjects:
+        type: taxonomy
+        vocabulary: subjects
+        label: Subjects
+      century_selector:
+        from: field_year_range.year_from
+        to: field_year_range.year_to
+        display: auto
+  essentials:
+    machine_name: first_reference
+    type: node
+    label: Essentials
+    results:
+      mainfield: title
+      subfield: content
+    filters:
+      keywords:
+        type: free_text
+        label: Keywords
+  video:
+    machine_name: videos
+    type: node
+    label: Videos
+    results:
+      mainfield: title
+      subfield: field_content
+      image: field_image
+    filters:
+      categories:
+        type: taxonomy
+        vocabulary: video_categories
+        label: 'Video categories'
+      keywords:
+        type: free_text
+        label: Keywords
+  images:
+    machine_name: images
+    type: node
+    label: Images
+    results:
+      mainfield: title
+      subfield: field_content
+      image: field_image
+    filters:
+      categories:
+        type: taxonomy
+        vocabulary: image_categories
+        label: 'Image categories'
+      keywords:
+        type: free_text
+        label: Keywords
+      century_selector:
+        from: field_year_range.year_from
+        to: field_year_range.year_to
+        display: auto
+  people:
+    machine_name: people
+    type: node
+    label: People
+    results:
+      function: format_people_display
+      image: field_avatar
+      image_format: rounded
+    filters:
+      skills:
+        type: taxonomy
+        vocabulary: skills
+        label: Skills
+      location:
+        type: taxonomy
+        vocabulary: location
+        label: Location
+      keywords:
+        type: free_text
+        label: Keywords
+  bibliography:
+    machine_name: bibliography
+    results:
+      function: format_bibliography_display
+    filters:
+      subjects:
+        type: taxonomy
+        vocabulary: subjects
+        label: Subjects
+legacy_mappings:
+  people: people

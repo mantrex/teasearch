@@ -1,0 +1,309 @@
+uuid: 5bceee88-de7a-4331-80bd-4d3c82bd51e1
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.videos.field_alternative_links
+    - field.field.node.videos.field_authors_ref
+    - field.field.node.videos.field_country
+    - field.field.node.videos.field_creator_details
+    - field.field.node.videos.field_description
+    - field.field.node.videos.field_duration
+    - field.field.node.videos.field_event
+    - field.field.node.videos.field_featured_ref
+    - field.field.node.videos.field_is_anonymous
+    - field.field.node.videos.field_is_portion
+    - field.field.node.videos.field_keywords
+    - field.field.node.videos.field_language
+    - field.field.node.videos.field_links
+    - field.field.node.videos.field_location
+    - field.field.node.videos.field_main_image
+    - field.field.node.videos.field_original_release_date
+    - field.field.node.videos.field_production_year
+    - field.field.node.videos.field_recording_date
+    - field.field.node.videos.field_responsibles
+    - field.field.node.videos.field_speaker
+    - field.field.node.videos.field_square_thumbnail
+    - field.field.node.videos.field_subjects
+    - field.field.node.videos.field_subtitles
+    - field.field.node.videos.field_teasearch_references
+    - field.field.node.videos.field_text_genres
+    - field.field.node.videos.field_title_original
+    - field.field.node.videos.field_title_translated
+    - field.field.node.videos.field_usage_rights
+    - field.field.node.videos.field_youtube_code
+    - node.type.videos
+  module:
+    - datetime
+    - entity_reference_revisions
+    - image
+    - link
+    - text
+    - time_field
+    - user
+id: node.videos.default
+targetEntityType: node
+bundle: videos
+mode: default
+content:
+  field_alternative_links:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 129
+    region: content
+  field_authors_ref:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 132
+    region: content
+  field_country:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 105
+    region: content
+  field_creator_details:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 137
+    region: content
+  field_description:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 111
+    region: content
+  field_duration:
+    type: time_formatter
+    label: above
+    settings:
+      time_format: 'h:i a'
+    third_party_settings: {  }
+    weight: 124
+    region: content
+  field_event:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 136
+    region: content
+  field_featured_ref:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 135
+    region: content
+  field_is_anonymous:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 18
+    region: content
+  field_is_portion:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 134
+    region: content
+  field_keywords:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 122
+    region: content
+  field_language:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 9
+    region: content
+  field_links:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 10
+    region: content
+  field_location:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  field_main_image:
+    type: image
+    label: above
+    settings:
+      image_link: ''
+      image_style: ''
+      image_loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: 125
+    region: content
+  field_original_release_date:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 131
+    region: content
+  field_production_year:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 130
+    region: content
+  field_recording_date:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 135
+    region: content
+  field_responsibles:
+    type: entity_reference_revisions_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 19
+    region: content
+  field_speaker:
+    type: entity_reference_revisions_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 127
+    region: content
+  field_square_thumbnail:
+    type: image
+    label: above
+    settings:
+      image_link: ''
+      image_style: ''
+      image_loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: 126
+    region: content
+  field_subjects:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 112
+    region: content
+  field_subtitles:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 125
+    region: content
+  field_teasearch_references:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 39
+    region: content
+  field_text_genres:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 123
+    region: content
+  field_title_original:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_title_translated:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 4
+    region: content
+  field_usage_rights:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 122
+    region: content
+  field_youtube_code:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 128
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  display_updated: true
+  langcode: true

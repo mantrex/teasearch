@@ -1,0 +1,18 @@
+uuid: cbdbe888-6967-4962-9b34-b180d4761d0b
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.activities
+id: taxonomy_term.activities.changed
+field_name: changed
+entity_type: taxonomy_term
+bundle: activities
+label: Changed
+description: 'The time that the term was last edited.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: changed

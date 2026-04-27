@@ -1,0 +1,19 @@
+uuid: 7c05969f-527c-4129-88d5-c3eadf0bd6a5
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_keywords
+    - node.type.first_reference
+id: node.first_reference.field_keywords
+field_name: field_keywords
+entity_type: node
+bundle: first_reference
+label: Keywords
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

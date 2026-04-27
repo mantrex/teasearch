@@ -1,0 +1,21 @@
+uuid: bffd834c-c82f-4467-9ee3-cbd58847aa3d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_is_portion
+    - node.type.images
+id: node.images.field_is_portion
+field_name: field_is_portion
+entity_type: node
+bundle: images
+label: 'Portion of work'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

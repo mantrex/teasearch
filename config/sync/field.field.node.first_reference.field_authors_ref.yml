@@ -1,0 +1,29 @@
+uuid: f0662613-8b6b-405a-b421-331a0abc7d18
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_authors_ref
+    - node.type.first_reference
+    - node.type.people
+id: node.first_reference.field_authors_ref
+field_name: field_authors_ref
+entity_type: node
+bundle: first_reference
+label: 'Authors Ref'
+description: 'Ref to People.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      people: people
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

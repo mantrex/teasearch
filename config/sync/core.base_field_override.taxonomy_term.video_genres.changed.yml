@@ -1,0 +1,18 @@
+uuid: 312853b8-f94d-4278-913c-637af9995925
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.video_genres
+id: taxonomy_term.video_genres.changed
+field_name: changed
+entity_type: taxonomy_term
+bundle: video_genres
+label: Changed
+description: 'The time that the term was last edited.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: changed

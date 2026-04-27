@@ -1,0 +1,30 @@
+uuid: 27a87460-fc1e-4927-8ad5-29e32113729a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.fullname_latin.field_firstname
+    - field.field.paragraph.fullname_latin.field_lastname
+    - paragraphs.paragraphs_type.fullname_latin
+id: paragraph.fullname_latin.default
+targetEntityType: paragraph
+bundle: fullname_latin
+mode: default
+content:
+  field_firstname:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_lastname:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden: {  }

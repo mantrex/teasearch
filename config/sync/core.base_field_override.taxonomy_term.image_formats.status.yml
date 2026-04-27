@@ -1,0 +1,22 @@
+uuid: fe218e78-e1e7-472c-80ec-81159df22ec9
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.image_formats
+id: taxonomy_term.image_formats.status
+field_name: status
+entity_type: taxonomy_term
+bundle: image_formats
+label: Published
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 1
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

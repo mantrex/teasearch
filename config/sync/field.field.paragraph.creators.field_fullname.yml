@@ -1,0 +1,19 @@
+uuid: 65af250e-627b-4b3d-98c2-b285b176483d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_fullname
+    - paragraphs.paragraphs_type.creators
+id: paragraph.creators.field_fullname
+field_name: field_fullname
+entity_type: paragraph
+bundle: creators
+label: 'Full Name (Original non Latin)'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,19 @@
+uuid: 5a92476c-17ce-476f-bb49-9a2388dca8d1
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_key
+    - taxonomy.vocabulary.periodical_frequency
+id: taxonomy_term.periodical_frequency.field_key
+field_name: field_key
+entity_type: taxonomy_term
+bundle: periodical_frequency
+label: Key
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

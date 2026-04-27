@@ -1,0 +1,28 @@
+uuid: a5f566a0-7f7a-491b-99c2-1f2059515114
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_content
+    - file
+    - svg_image_field
+id: block_content.field_logo
+field_name: field_logo
+entity_type: block_content
+type: svg_image_field
+settings:
+  target_type: file
+  display_field: false
+  display_default: false
+  uri_scheme: public
+  default_image:
+    uuid: ''
+    alt: ''
+    title: ''
+module: svg_image_field
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

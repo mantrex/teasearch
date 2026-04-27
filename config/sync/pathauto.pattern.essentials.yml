@@ -1,0 +1,22 @@
+uuid: 5c892f23-e183-41d4-9cc9-f5b3ab27f491
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: essentials
+label: Essentials
+type: 'canonical_entities:node'
+pattern: 'first_reference/[node:title]'
+selection_criteria:
+  a0f3d162-2bdb-46f2-a98e-49fbed6f97a5:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: a0f3d162-2bdb-46f2-a98e-49fbed6f97a5
+    context_mapping:
+      node: node
+    bundles:
+      first_reference: first_reference
+selection_logic: and
+weight: -5
+relationships: {  }

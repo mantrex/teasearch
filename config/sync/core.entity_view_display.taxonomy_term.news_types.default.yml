@@ -1,0 +1,31 @@
+uuid: d46d5b87-f935-4265-b7ab-323b5bb784d6
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.taxonomy_term.news_types.field_key
+    - taxonomy.vocabulary.news_types
+  module:
+    - text
+id: taxonomy_term.news_types.default
+targetEntityType: taxonomy_term
+bundle: news_types
+mode: default
+content:
+  description:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_key:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  langcode: true

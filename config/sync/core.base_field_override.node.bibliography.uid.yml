@@ -1,0 +1,20 @@
+uuid: cc05aa6f-8690-490e-a9b5-ef278b10752d
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.bibliography
+id: node.bibliography.uid
+field_name: uid
+entity_type: node
+bundle: bibliography
+label: 'Authored by'
+description: 'The username of the content author.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: 'Drupal\node\Entity\Node::getDefaultEntityOwner'
+settings:
+  handler: default
+  handler_settings: {  }
+field_type: entity_reference

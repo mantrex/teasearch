@@ -1,0 +1,18 @@
+uuid: b15dc703-da92-477e-99df-76b649cba1f1
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.video_genres
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+    bundle_settings:
+      untranslatable_fields_hide: '0'
+id: taxonomy_term.video_genres
+target_entity_type_id: taxonomy_term
+target_bundle: video_genres
+default_langcode: site_default
+language_alterable: false

@@ -1,0 +1,22 @@
+uuid: efe0a014-27b1-4795-a90d-1a23f185845b
+langcode: en
+status: true
+dependencies:
+  config:
+    - paragraphs.paragraphs_type.creators
+id: paragraph.creators.status
+field_name: status
+entity_type: paragraph
+bundle: creators
+label: Published
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 1
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

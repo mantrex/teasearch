@@ -1,0 +1,23 @@
+uuid: 24f482e2-de37-404d-9eb9-0f7f15f3ce08
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_alternative_links
+    - node.type.videos
+  module:
+    - link
+id: node.videos.field_alternative_links
+field_name: field_alternative_links
+entity_type: node
+bundle: videos
+label: 'Alternative links'
+description: 'Link to other platforms where the video is available'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 16
+field_type: link

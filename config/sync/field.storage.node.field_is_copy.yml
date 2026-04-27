@@ -1,0 +1,18 @@
+uuid: 9a5817dc-4594-4eb9-a103-892ecbd60fc2
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.field_is_copy
+field_name: field_is_copy
+entity_type: node
+type: boolean
+settings: {  }
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

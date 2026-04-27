@@ -1,0 +1,19 @@
+uuid: 637be612-7c21-471b-87d1-c6bdc6175f78
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.field_teasearch_references
+field_name: field_teasearch_references
+entity_type: node
+type: entity_reference
+settings:
+  target_type: node
+module: core
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

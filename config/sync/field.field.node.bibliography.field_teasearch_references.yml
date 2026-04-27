@@ -1,0 +1,35 @@
+uuid: 663caef0-4299-4ab3-b923-5cbb65545c56
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_teasearch_references
+    - node.type.bibliography
+    - node.type.first_reference
+    - node.type.images
+    - node.type.primary_sources
+    - node.type.videos
+id: node.bibliography.field_teasearch_references
+field_name: field_teasearch_references
+entity_type: node
+bundle: bibliography
+label: 'Teasearch related resources'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      first_reference: first_reference
+      images: images
+      primary_sources: primary_sources
+      videos: videos
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: first_reference
+field_type: entity_reference

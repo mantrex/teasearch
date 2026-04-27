@@ -1,0 +1,18 @@
+uuid: 576cbe45-4941-4a46-8bf4-bc64416d737d
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.periodical_frequency
+id: taxonomy_term.periodical_frequency.changed
+field_name: changed
+entity_type: taxonomy_term
+bundle: periodical_frequency
+label: Changed
+description: 'The time that the term was last edited.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: changed

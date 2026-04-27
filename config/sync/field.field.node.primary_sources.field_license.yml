@@ -1,0 +1,29 @@
+uuid: 334f5aba-1779-4ce0-81af-3320c9282395
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_license
+    - node.type.primary_sources
+    - taxonomy.vocabulary.licenses
+id: node.primary_sources.field_license
+field_name: field_license
+entity_type: node
+bundle: primary_sources
+label: License
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      licenses: licenses
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

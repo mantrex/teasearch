@@ -1,0 +1,61 @@
+uuid: 8b3f997d-da9b-4fd4-b5fd-b1e8b8856de8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.editor.field_editor_firstname
+    - field.field.paragraph.editor.field_editor_fullname
+    - field.field.paragraph.editor.field_editor_is_org
+    - field.field.paragraph.editor.field_editor_lastname
+    - field.field.paragraph.editor.field_editor_surname_first
+    - paragraphs.paragraphs_type.editor
+id: paragraph.editor.default
+targetEntityType: paragraph
+bundle: editor
+mode: default
+content:
+  field_editor_firstname:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_editor_fullname:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_editor_is_org:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_editor_lastname:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_editor_surname_first:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 4
+    region: content
+hidden: {  }

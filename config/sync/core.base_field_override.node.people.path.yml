@@ -1,0 +1,20 @@
+uuid: 902adeec-b4a0-4351-b0ff-4eaff44860ff
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.people
+  module:
+    - path
+id: node.people.path
+field_name: path
+entity_type: node
+bundle: people
+label: 'URL alias'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: path

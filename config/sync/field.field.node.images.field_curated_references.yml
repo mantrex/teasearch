@@ -1,0 +1,29 @@
+uuid: 2fa2aa6e-1998-457c-9b67-bb18668301ce
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_curated_references
+    - node.type.bibliography
+    - node.type.images
+id: node.images.field_curated_references
+field_name: field_curated_references
+entity_type: node
+bundle: images
+label: References
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      bibliography: bibliography
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

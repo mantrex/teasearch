@@ -1,0 +1,21 @@
+uuid: 29622802-5d00-453c-a462-b84fa9e473d3
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_portion_of_work
+    - node.type.images
+  module:
+    - options
+id: node.images.field_portion_of_work
+field_name: field_portion_of_work
+entity_type: node
+bundle: images
+label: 'Portion of work'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

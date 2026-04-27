@@ -1,0 +1,346 @@
+uuid: 32bd0211-1e7d-4e7a-9d8d-72c185593eb9
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.people.field_activities
+    - field.field.node.people.field_affiliation
+    - field.field.node.people.field_avatar
+    - field.field.node.people.field_bio
+    - field.field.node.people.field_city
+    - field.field.node.people.field_country
+    - field.field.node.people.field_country2
+    - field.field.node.people.field_email
+    - field.field.node.people.field_firstname
+    - field.field.node.people.field_fullname
+    - field.field.node.people.field_known_as
+    - field.field.node.people.field_language
+    - field.field.node.people.field_lastname
+    - field.field.node.people.field_license
+    - field.field.node.people.field_memberships
+    - field.field.node.people.field_online_links
+    - field.field.node.people.field_orcid
+    - field.field.node.people.field_people_multilanguage
+    - field.field.node.people.field_region
+    - field.field.node.people.field_roles
+    - field.field.node.people.field_specific_subjects
+    - field.field.node.people.field_subjects
+    - field.field.node.people.field_surname_first
+    - field.field.node.people.field_title
+    - image.style.medium
+    - node.type.people
+  module:
+    - choices
+    - field_group
+    - image
+    - link
+    - path
+    - text
+third_party_settings:
+  field_group:
+    group_personal_data_and_contacts:
+      children:
+        - field_avatar
+        - field_lastname
+        - field_firstname
+        - field_fullname
+        - field_surname_first
+        - field_known_as
+        - field_title
+        - field_affiliation
+        - field_memberships
+        - field_orcid
+        - field_email
+        - field_online_links
+        - field_country
+        - field_city
+        - field_region
+      label: 'Personal Data and contacts'
+      region: content
+      parent_name: ''
+      weight: 11
+      format_type: tab
+      format_settings:
+        classes: ''
+        show_empty_fields: false
+        id: ''
+        label_as_html: false
+        formatter: closed
+        description: ''
+        required_fields: true
+    group_profile:
+      children:
+        - field_bio
+        - field_activities
+        - field_subjects
+        - field_country2
+        - field_specific_subjects
+        - field_language
+        - field_license
+      label: Profile
+      region: content
+      parent_name: ''
+      weight: 12
+      format_type: tab
+      format_settings:
+        classes: ''
+        show_empty_fields: false
+        id: ''
+        label_as_html: false
+        formatter: closed
+        description: ''
+        required_fields: true
+id: node.people.default
+targetEntityType: node
+bundle: people
+mode: default
+content:
+  created:
+    type: datetime_timestamp
+    weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  display_updated:
+    type: boolean_checkbox
+    weight: 3
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  field_activities:
+    type: choices_widget
+    weight: 4
+    region: content
+    settings:
+      configuration_options: "{\r\n  \"allowHTML\": true,\r\n  \"delimiter\": \"\",\r\n  \"searchFields\": [\"label\", \"value\"],\r\n  \"includeHiddenElement\": false,\r\n  \"removeItemButton\": true\r\n}"
+    third_party_settings: {  }
+  field_affiliation:
+    type: string_textfield
+    weight: 13
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_avatar:
+    type: image_image
+    weight: 6
+    region: content
+    settings:
+      progress_indicator: throbber
+      preview_image_style: medium
+    third_party_settings: {  }
+  field_bio:
+    type: text_textarea_with_summary
+    weight: 3
+    region: content
+    settings:
+      rows: 9
+      summary_rows: 3
+      placeholder: ''
+      show_summary: false
+    third_party_settings: {  }
+  field_city:
+    type: string_textfield
+    weight: 19
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_country:
+    type: choices_widget
+    weight: 18
+    region: content
+    settings:
+      configuration_options: ''
+    third_party_settings: {  }
+  field_country2:
+    type: choices_widget
+    weight: 6
+    region: content
+    settings:
+      configuration_options: ''
+    third_party_settings: {  }
+  field_email:
+    type: email_default
+    weight: 16
+    region: content
+    settings:
+      placeholder: ''
+      size: 60
+    third_party_settings: {  }
+  field_firstname:
+    type: string_textfield
+    weight: 8
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_fullname:
+    type: string_textfield
+    weight: 9
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_known_as:
+    type: string_textfield
+    weight: 11
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_language:
+    type: choices_widget
+    weight: 8
+    region: content
+    settings:
+      configuration_options: ''
+    third_party_settings: {  }
+  field_lastname:
+    type: string_textfield
+    weight: 7
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_license:
+    type: choices_widget
+    weight: 9
+    region: content
+    settings:
+      configuration_options: ''
+    third_party_settings: {  }
+  field_memberships:
+    type: text_textarea
+    weight: 14
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_online_links:
+    type: link_default
+    weight: 17
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+  field_orcid:
+    type: link_default
+    weight: 15
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+  field_region:
+    type: string_textfield
+    weight: 20
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_specific_subjects:
+    type: string_textfield
+    weight: 7
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_subjects:
+    type: choices_widget
+    weight: 5
+    region: content
+    settings:
+      configuration_options: "{\r\n  \"allowHTML\": true,\r\n  \"delimiter\": \"\",\r\n  \"searchFields\": [\"label\", \"value\"],\r\n  \"includeHiddenElement\": false,\r\n  \"removeItemButton\": true\r\n}"
+    third_party_settings: {  }
+  field_surname_first:
+    type: boolean_checkbox
+    weight: 10
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  field_title:
+    type: string_textfield
+    weight: 12
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  langcode:
+    type: language_select
+    weight: 1
+    region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 7
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  promote:
+    type: boolean_checkbox
+    weight: 5
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 9
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  sticky:
+    type: boolean_checkbox
+    weight: 6
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: 10
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  translation:
+    weight: 4
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 0
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  url_redirects:
+    weight: 8
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  field_people_multilanguage: true
+  field_roles: true

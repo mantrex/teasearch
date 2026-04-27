@@ -1,0 +1,23 @@
+uuid: e77ad636-c423-4b8d-a044-fe3ed99ed716
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_is_anonymous
+    - node.type.bibliography
+id: node.bibliography.field_is_anonymous
+field_name: field_is_anonymous
+entity_type: node
+bundle: bibliography
+label: Anonymous
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'Yes'
+  off_label: 'No'
+field_type: boolean

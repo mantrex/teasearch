@@ -1,0 +1,23 @@
+uuid: 10c3d952-d79f-4825-a5d0-4a48cb6647d4
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_is_editor
+    - paragraphs.paragraphs_type.authors
+id: paragraph.authors.field_is_editor
+field_name: field_is_editor
+entity_type: paragraph
+bundle: authors
+label: 'Is Editor'
+description: 'Check if this responsible party served as an editor for the work.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'yes'
+  off_label: 'no'
+field_type: boolean

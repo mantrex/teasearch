@@ -1,0 +1,19 @@
+uuid: 3596fcc8-928b-43e5-992c-c71bb1800681
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_fullname
+    - paragraphs.paragraphs_type.texts_authors
+id: paragraph.texts_authors.field_fullname
+field_name: field_fullname
+entity_type: paragraph
+bundle: texts_authors
+label: 'Full Name (Original non Latin)'
+description: 'Enter the original non-Latin script full name of the individual or organisation.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,24 @@
+uuid: 9f156178-9e02-4ec7-91bb-67ee8007b4f3
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_notes
+    - filter.format.basic_html
+    - node.type.images
+  module:
+    - text
+id: node.images.field_notes
+field_name: field_notes
+entity_type: node
+bundle: images
+label: Notes
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - basic_html
+field_type: text_long

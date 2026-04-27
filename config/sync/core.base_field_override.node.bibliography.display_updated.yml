@@ -1,0 +1,22 @@
+uuid: c58e2703-9fc8-4398-9ed5-0791de03101e
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.bibliography
+id: node.bibliography.display_updated
+field_name: display_updated
+entity_type: node
+bundle: bibliography
+label: 'Display updated date'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

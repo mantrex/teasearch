@@ -1,0 +1,20 @@
+uuid: 52e72995-fcea-4d63-b5be-201180289052
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.bibliography
+  module:
+    - path
+id: node.bibliography.path
+field_name: path
+entity_type: node
+bundle: bibliography
+label: 'URL alias'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: path

@@ -1,0 +1,18 @@
+uuid: 443c9c4a-3e01-4155-8b91-7b4091faad36
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.bibliography
+id: node.bibliography.changed
+field_name: changed
+entity_type: node
+bundle: bibliography
+label: Changed
+description: 'The time that the node was last edited.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: changed

@@ -1,0 +1,19 @@
+uuid: 4cdf33b3-6dd9-438e-b7c2-9d625040773e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_archive_museum
+    - node.type.images
+id: node.images.field_archive_museum
+field_name: field_archive_museum
+entity_type: node
+bundle: images
+label: 'Archive museum ref. data'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

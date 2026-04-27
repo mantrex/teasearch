@@ -1,0 +1,21 @@
+uuid: 4d72713a-d11a-43d5-ba37-2ba63112858b
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.image_formats
+  module:
+    - text
+id: taxonomy_term.image_formats.description
+field_name: description
+entity_type: taxonomy_term
+bundle: image_formats
+label: Description
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

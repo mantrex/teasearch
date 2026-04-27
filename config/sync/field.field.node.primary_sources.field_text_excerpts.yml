@@ -1,0 +1,22 @@
+uuid: 63a01bf0-a5ff-4de0-a0de-f8aab3d241d0
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_text_excerpts
+    - node.type.primary_sources
+  module:
+    - text
+id: node.primary_sources.field_text_excerpts
+field_name: field_text_excerpts
+entity_type: node
+bundle: primary_sources
+label: 'Text excerpts'
+description: 'Excerpts of the text in the original language. Add numbering if needed for references in the content description.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

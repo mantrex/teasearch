@@ -1,0 +1,22 @@
+uuid: e0d667e0-62f0-4fb5-a3b1-8e87b37552be
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.page
+id: node.page.display_updated
+field_name: display_updated
+entity_type: node
+bundle: page
+label: 'Display updated date'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

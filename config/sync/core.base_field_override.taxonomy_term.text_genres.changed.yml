@@ -1,0 +1,18 @@
+uuid: de8771b1-9e58-4d66-a9f3-e89d62f82454
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.text_genres
+id: taxonomy_term.text_genres.changed
+field_name: changed
+entity_type: taxonomy_term
+bundle: text_genres
+label: Changed
+description: 'The time that the term was last edited.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: changed

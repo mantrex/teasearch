@@ -1,0 +1,10 @@
+uuid: df4f99f6-3c11-4930-b5f1-69ddc49bd888
+langcode: en
+status: true
+dependencies: {  }
+id: editor
+label: Editor
+icon_uuid: null
+icon_default: null
+description: ''
+behavior_plugins: {  }

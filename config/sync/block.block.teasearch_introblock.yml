@@ -1,0 +1,30 @@
+uuid: 75f07687-6e75-445c-a5e0-b89074802182
+langcode: it
+status: true
+dependencies:
+  content:
+    - 'block_content:intro:77666c2a-b634-4fff-8dab-1a109b52d2d4'
+  module:
+    - block_content
+    - system
+  theme:
+    - teasearch
+id: teasearch_introblock
+theme: teasearch
+region: intro
+weight: -5
+provider: null
+plugin: 'block_content:77666c2a-b634-4fff-8dab-1a109b52d2d4'
+settings:
+  id: 'block_content:77666c2a-b634-4fff-8dab-1a109b52d2d4'
+  label: 'Intro Block'
+  label_display: '0'
+  provider: block_content
+  status: true
+  info: ''
+  view_mode: full
+visibility:
+  request_path:
+    id: request_path
+    negate: false
+    pages: '<front>'

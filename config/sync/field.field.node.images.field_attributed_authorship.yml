@@ -1,0 +1,21 @@
+uuid: 9d906621-12d6-40aa-b422-76a644f74861
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_attributed_authorship
+    - node.type.images
+id: node.images.field_attributed_authorship
+field_name: field_attributed_authorship
+entity_type: node
+bundle: images
+label: 'Attributed Authorship'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

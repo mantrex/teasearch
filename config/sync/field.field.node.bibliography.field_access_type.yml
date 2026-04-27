@@ -1,0 +1,29 @@
+uuid: bb3978f8-4118-47c6-8b37-885b7450e1f0
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_access_type
+    - node.type.bibliography
+    - taxonomy.vocabulary.access_type
+id: node.bibliography.field_access_type
+field_name: field_access_type
+entity_type: node
+bundle: bibliography
+label: 'Access type'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      access_type: access_type
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

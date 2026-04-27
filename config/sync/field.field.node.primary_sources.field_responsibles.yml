@@ -1,0 +1,52 @@
+uuid: ed51e12d-0b7f-4946-bde3-6b674225976b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_responsibles
+    - node.type.primary_sources
+    - paragraphs.paragraphs_type.authors_general
+  module:
+    - entity_reference_revisions
+id: node.primary_sources.field_responsibles
+field_name: field_responsibles
+entity_type: node
+bundle: primary_sources
+label: Authors
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      authors_general: authors_general
+    negate: 0
+    target_bundles_drag_drop:
+      about:
+        weight: 10
+        enabled: false
+      authors:
+        weight: 2
+        enabled: false
+      authors_general:
+        weight: 9
+        enabled: true
+      creators:
+        weight: 12
+        enabled: false
+      editor:
+        weight: 13
+        enabled: false
+      fullname_latin:
+        weight: 14
+        enabled: false
+      speakers:
+        weight: 15
+        enabled: false
+      texts_authors:
+        weight: 16
+        enabled: false
+field_type: entity_reference_revisions

@@ -1,0 +1,23 @@
+uuid: bfa221f8-77bc-44e8-8d23-cccda7984688
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_surname_first
+    - node.type.people
+id: node.people.field_surname_first
+field_name: field_surname_first
+entity_type: node
+bundle: people
+label: 'Surname first'
+description: 'Check if the original name follows "surname first" order.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'yes'
+  off_label: 'no'
+field_type: boolean

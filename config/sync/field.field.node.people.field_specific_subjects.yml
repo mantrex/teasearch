@@ -1,0 +1,19 @@
+uuid: 8c9e8b8a-93e1-4ba9-98e0-15a8a0176434
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_specific_subjects
+    - node.type.people
+id: node.people.field_specific_subjects
+field_name: field_specific_subjects
+entity_type: node
+bundle: people
+label: 'Specific Subjects'
+description: 'Enter keywords related to your area of interest or expertise.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

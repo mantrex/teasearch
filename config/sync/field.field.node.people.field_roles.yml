@@ -1,0 +1,23 @@
+uuid: d17de595-5ea0-4db6-aa06-b175ed32f92e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_roles
+    - node.type.people
+  module:
+    - options
+id: node.people.field_roles
+field_name: field_roles
+entity_type: node
+bundle: people
+label: Roles
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: authors
+default_value_callback: ''
+settings: {  }
+field_type: list_string

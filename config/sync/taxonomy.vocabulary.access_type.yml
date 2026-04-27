@@ -1,0 +1,9 @@
+uuid: 2fa6c77f-4b2e-4255-abdc-e0039d832d12
+langcode: en
+status: true
+dependencies: {  }
+name: 'Access type'
+vid: access_type
+description: null
+weight: 0
+new_revision: false

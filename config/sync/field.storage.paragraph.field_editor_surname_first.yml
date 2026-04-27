@@ -1,0 +1,18 @@
+uuid: 4388a9bb-c01b-419a-817f-f08bdcd51b58
+langcode: en
+status: true
+dependencies:
+  module:
+    - paragraphs
+id: paragraph.field_editor_surname_first
+field_name: field_editor_surname_first
+entity_type: paragraph
+type: boolean
+settings: {  }
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

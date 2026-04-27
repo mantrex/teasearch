@@ -1,0 +1,19 @@
+uuid: 911d0450-7662-459b-81c6-0d8b8f49041f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_title_original
+    - node.type.bibliography
+id: node.bibliography.field_title_original
+field_name: field_title_original
+entity_type: node
+bundle: bibliography
+label: 'Original language title'
+description: 'Original title in writing systems other than the Latin alphabet.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

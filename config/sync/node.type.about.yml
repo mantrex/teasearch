@@ -1,0 +1,26 @@
+uuid: aea99d23-42e2-4426-9034-d97662eda142
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+    - node_save_redirect
+third_party_settings:
+  menu_ui:
+    available_menus:
+      - main
+    parent: 'main:'
+  node_save_redirect:
+    save_type: 3
+    save_location: ''
+    save_destination: false
+    edit_type: 1
+    edit_location: ''
+    edit_destination: false
+name: About
+type: about
+description: null
+help: null
+new_revision: false
+preview_mode: 0
+display_submitted: true

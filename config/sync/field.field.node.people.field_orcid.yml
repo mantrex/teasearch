@@ -1,0 +1,23 @@
+uuid: 8e79af2b-6baa-46fb-869c-77b9accf0d5e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_orcid
+    - node.type.people
+  module:
+    - link
+id: node.people.field_orcid
+field_name: field_orcid
+entity_type: node
+bundle: people
+label: Orcid
+description: 'Enter Orcid number and link'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 17
+field_type: link

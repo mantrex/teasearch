@@ -1,0 +1,24 @@
+uuid: 17882ee1-bd42-4c88-a185-30ae97349033
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_memberships
+    - filter.format.plain_text
+    - node.type.people
+  module:
+    - text
+id: node.people.field_memberships
+field_name: field_memberships
+entity_type: node
+bundle: people
+label: Memberships
+description: 'Insert your memberships if any.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - plain_text
+field_type: text_long

@@ -1,0 +1,25 @@
+uuid: 72656325-ebaf-4d44-b80c-4a0c3c6b6e4c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_teasearch_references
+    - node.type.videos
+id: node.videos.field_teasearch_references
+field_name: field_teasearch_references
+entity_type: node
+bundle: videos
+label: 'Teasearch related resources'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: views
+  handler_settings:
+    view:
+      view_name: er_labels_content_types
+      display_name: entity_reference_1
+      arguments: {  }
+field_type: entity_reference

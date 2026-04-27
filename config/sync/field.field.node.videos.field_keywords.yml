@@ -1,0 +1,19 @@
+uuid: 41a63ed6-88b0-42d1-8a29-a7c10c2d5d42
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_keywords
+    - node.type.videos
+id: node.videos.field_keywords
+field_name: field_keywords
+entity_type: node
+bundle: videos
+label: Keywords
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

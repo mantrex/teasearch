@@ -1,0 +1,9 @@
+uuid: ad1174f6-8a73-429d-b9fe-d61af091c818
+langcode: en
+status: true
+dependencies: {  }
+name: 'Text Genres'
+vid: text_genres
+description: null
+weight: 0
+new_revision: false

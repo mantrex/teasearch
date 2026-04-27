@@ -1,0 +1,19 @@
+uuid: f0beb4bb-7a16-4928-badc-6e6d28fd7979
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_pseudonym
+    - paragraphs.paragraphs_type.authors_general
+id: paragraph.authors_general.field_pseudonym
+field_name: field_pseudonym
+entity_type: paragraph
+bundle: authors_general
+label: Pseudonym
+description: 'Enter any relevant pseudonyms of the author, including those in the original script, and separate them with commas.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string
