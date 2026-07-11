@@ -9,16 +9,13 @@
 		<div class="col-12 col-md-4 order-2 order-md-1">
 			<div class="column1">
 				<div class="d-flex flex-column footer-cf-logo-wrapper">
-					<div class='university-logo'>
-						<img src="{{ uni }}" alt="University Logo" class="img-fluid"/>
+					<div class='teasearch-logo'>
+						<img src="{{ logo }}" alt="Teasearch" class="footer-logo-img"/>
 					</div>
-					<div class="cf-text">
-						{{'Department of Asian and North African Studies' | t}}
+					<div class="column2">
+						Tea Science & Culture Hub
 					</div>
 
-					<div class='tea-association'>
-						<img src='{{ ass }}'/>
-					</div>
 				</div>
 			</div>
 
@@ -29,16 +26,8 @@
 
 		<!-- COLONNA 2: Main Logo + Body Content -->
 		<div class="col-12 col-md-4 order-1 order-md-2">
-			<div class="column2">
-				<div class='teasearch-logo'>
-					<img src="{{ logo }}" alt="Teasearch" class="footer-logo-img"/>
-				</div>
-				<div class='association-text'>
-					Tea Science & Culture Hub
-				</div>
-			</div>
 
-			<div class="project-description">
+			<div class="project-description footer-project-description">
 				{{ content.body }}
 			</div>
 		</div>
@@ -60,3 +49,10 @@
 		</div>
 	</div>
 </div>
+<style>
+	.footer-project-description a {
+		color: #fff;
+		text-decoration: underline;
+		margin-bottom: 1rem;
+	}
+</style>
