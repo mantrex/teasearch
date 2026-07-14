@@ -134,8 +134,8 @@ a {
     background: var(--header);
     border: none;
     box-shadow: none;
-    position: static;
-    /* importantissimo per evitare overlay strani */
+    position: relative;
+    /* relative (non static) per aprirsi subito sotto la voce cliccata, non in fondo alla lista */
   }
 
   .navbar-collapse .dropdown-menu .nav-item a {

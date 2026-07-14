@@ -21,6 +21,7 @@
 				{% if item.below %}
 					{% set link_attributes = link_attributes|merge({
             'data-bs-toggle': 'dropdown',
+            'data-bs-display': 'static',
             'role': 'button',
             'aria-expanded': 'false',
             'tabindex': '0'

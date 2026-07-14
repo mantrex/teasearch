@@ -163,6 +163,16 @@
     position: static;
     margin-top: 1rem;
   }
+
+  /* Su schermo stretto Bootstrap impila le colonne nell'ordine del markup
+     (contenuto, poi menu): forziamo il menu in cima. */
+  .info-main .left-col-wrapper {
+    order: 2;
+  }
+
+  .info-main .col-lg-3 {
+    order: 1;
+  }
 }
 
 @media (max-width: 768px) {
