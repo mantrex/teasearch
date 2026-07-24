@@ -60,117 +60,44 @@
 
 function teasearch_translations()
 {
-  $people = [
-    "it" => [
-      "paragraph1" => "Profilo",
-      "paragraph2" => "Contatti",
-      "paragraph3" => "Pubblicazioni relative al tè",
-      "paragraph4" => "Contributi a Teasearch",
-      "paragraph5" => "Dettagli",
-      "name" => "Nome",
-      "field_known_as" => "Altri nomi",
-      "field_title" => "Posizione",
-      "field_affiliation" => "Affiliazione",
-      "field_orcid" => "ORCID",
-      "field_bio" => "Presentazione",
-      "field_activities" => "Attività legate al tè",
-      "field_subjects" => "Ambito tematico",
-      "field_country2" => "Ambito geografico",
-      "field_specific_subjects" => "Argomenti di ricerca",
-      "field_language" => "Lingue",
-      "field_memberships" => "Membership",
-      "location" => "Sede",
-      "field_country" => "Paese",
-      "field_email" => "Email",
-      "field_online_links" => "Presenza oline",
-      "books" => "Libri",
-      "book_chapters" => "Capitoli di libri",
-      "journal_articles" => "Articoli di rivista",
-      "dissertation" => "Tesi",
-      "book_review" => "Recensioni di libro",
-      "reviews" => "Recensioni",
-      "conference_proceedings" => "Atti di convegno",
-      "patents" => "Brevetti",
-      "legal_and_policy" => "Documenti legali e normativi",
-      "standard" => "Standard",
-      "datasets" => "Datasets",
-      "periodicals" => "Testate di periodici",
-      "newspaper_articles" => "Article di giornale",
-      "webpages" => "Pagine web / contenuti online",
-      "reference_works" => "Opere di consultazione",
-      "other_documents" => "Altri documenti",
-      "essentials" => "Fondamenti",
-      "texts" => "Testi",
-      "videos" => "Video",
-      "images" => "Immagini",
-      "bibliography" => "Bibliografia",
-      "field_license" => "Licenza editoriale",
-      "systemdate" => "Date",
-    ],
-  ];
 
-  $bibliography = [
+// Traduzione Essentials
+  $first_reference = [
     "it" => [
-      "field_pubtype" => "Tipo",
-      "authors" => "Autori",
       "title" => "Titolo",
-      "field_title_original" => "Titolo originale",
-      "field_title_translated" => "Titolo tradotto",
-      "field_year" => "Anno",
-      "field_date" => "Data",
-      "field_language" => "Lingua",
-      "contained_in" => "Contenuto in",
-      "field_pub_place" => "Luogo di pubblicazione",
-      "field_publisher" => "Editore",
-      "field_country" => "Paese",
-      "editors" => "Curatori",
-      "field_edition" => "Edizione",
-      "project_name_journal" => "Rivista",
-      "project_name_book" => "Volume",
-      "volissue" => "Vol. (N.)",
-      "field_pages" => "Pagine",
-      "field_issn" => "issn",
-      "field_doi" => "DOI",
-      "field_dewey" => "Dewey",
-      "field_isbn" => "ISBN",
-      "field_status" => "Stato",
-      "field_frequency" => "Frequenza",
-      "field_university" => "Università",
-      "field_degree" => "Titolo accademico",
+      "field_short_description" => "Sintesi",
+      "field_original_abstract" => "Abstract",
 
-      "paragraph2" => "Informazioni di accesso",
-      "field_texts_reference" => "PDF nella sezione Testi",
-      "field_online_links" => "Accesso online",
-      "field_access_type" => "Tipo di accesso",
-      "field_notes" => "Note",
-      "field_online_links2" => "Accessi online addizionali",
-      "field_library_links" => "Biblioteche",
+      "paragraph2" => "Contenuto",
+      "field_content" => "Testo",
 
-      "paragraph3" => "Panoramica del contenuto",
-      "field_original_abstract" => "Abstract originale",
-      "field_translated_abstract" => "Abstract tradotto",
-      "field_table_of_content" => "Sommario",
-      "field_translated_table_of_conten" => "Sommario tradotto",
-      "field_curated_abstract" => "Note del curatore",
+      "paragraph3" => "Ambiti tematici",
+      "field_subjects" => "Soggetti",
+      "field_country2" => "Focus geografico",
       "field_keywords" => "Parole chiave",
 
-      "paragraph4" => "Risorse correlate selezionate",
+      "paragraph4" => "Riferimenti e risorse correlate",
       "curated_references" => "Bibliografia",
-      "related resources" => "Risorse correlate su Teasearch",
+      "related resources" => "Altre risorse in Teasearch",
       "field_links" => "Risorse esterne",
 
-      "paragraph5" => "Tag",
-      "field_subjects" => "Ambito tematico",
-      "field_country2" => "Ambito geografico",
+      "paragraph5" => "Contributori",
+      "people" => "Persone",
 
-      "paragraph6" => "Dettagli della scheda",
-      "people" => "Contributori",
+      "paragraph6" => "Collegamenti da",
+      "referenced_in" => "Schede di Teasearch",
+      "field_backlink_esterni" => "Siti esterni",
+
+      "paragraph7" => "Dettagli della scheda",
       "field_license" => "Licenza editoriale",
       "systemdate" => "Date",
-      "referenced_in" => "Link da",
+
+      
+
     ],
   ];
 
+// Traduzione Texts
   $primary_sources = [
     "it" => [
       "field_text_genres" => "Genere",
@@ -202,53 +129,36 @@ function teasearch_translations()
       "field_notes" => "Note",
       "field_alternative_links" => "Risorse online aggiuntive",
 
-      "paragraph2" => "Panoramica del contenuto",
+      "paragraph2" => "Contenuto e contesto",
       "field_description" => "Descrizione del curatore",
       "field_text_excerpts" => "Estratti del testo",
+
+      "paragraph3" => "Ambiti tematici",
+      "field_subjects" => "Soggetti",
+      "field_country2" => "Focus geografico",
       "field_keywords" => "Parole chiave",
 
-      "paragraph3" => "Riferimenti e risorse correlate",
-      "curated_references" => "Bibliografia",
-      "related resources" => "Altre risorse in Teasearch",
-      "field_external_references_link" => "Risorse esterne",
-
-      "paragraph4" => "Tag",
-      "field_subjects" => "Ambito tematico",
-      "field_country2" => "Ambito geografico",
-
-      "paragraph5" => "Dettagli della scheda",
-      "people" => "Contributori",
-      "field_license" => "Licenza editoriale",
-      "referenced_in" => "Link da",
-      "systemdate" => "Date",
-    ],
-  ];
-
-  $first_reference = [
-    "it" => [
-      "title" => "Titolo",
-      "field_short_description" => "Sintesi",
-      "field_original_abstract" => "Abstract",
-      "field_content" => "Testo",
-      "field_keywords" => "Parole chiave",
-
-      "paragraph3" => "Riferimenti e risorse correlate",
+      "paragraph4" => "Riferimenti e risorse correlate",
       "curated_references" => "Bibliografia",
       "related resources" => "Altre risorse in Teasearch",
       "field_links" => "Risorse esterne",
 
-      "paragraph4" => "Tag",
-      "field_subjects" => "Ambito tematico",
-      "field_country2" => "Ambito geografico",
+      "paragraph5" => "Contributori",
+      "people" => "Persone",
 
-      "paragraph5" => "Dettagli della scheda",
-      "people" => "Contributori",
+      "paragraph6" => "Collegamenti da",
+      "referenced_in" => "Schede di Teasearch",
+      "field_backlink_esterni" => "Siti esterni",
+
+      "paragraph7" => "Dettagli della scheda",
       "field_license" => "Licenza editoriale",
-      "referenced_in" => "Link da",
       "systemdate" => "Date",
-    ],
+
+
+      ],
   ];
 
+// Traduzione Images
   $images = [
     "it" => [
       "field_image_category" => "Categoria",
@@ -278,29 +188,35 @@ function teasearch_translations()
       "field_notes" => "Note",
       "field_alternative_links" => "Risorse online aggiuntive",
 
-      "paragraph2" => "Panoramica del contenuto",
+      "paragraph2" => "Contenuto e contesto",
       "field_description" => "Descrizione del curatore",
       "field_details" => "Dettagli dell'immagine",
       "field_textual_elements" => "Elementi testuali",
+
+      "paragraph3" => "Ambiti tematici",
+      "field_subjects" => "Soggetti",
+      "field_country2" => "Focus geografico",
       "field_keywords" => "Parole chiave",
 
-      "paragraph3" => "Riferimenti e risorse correlate",
+      "paragraph4" => "Riferimenti e risorse correlate",
       "curated_references" => "Bibliografia",
       "related resources" => "Altre risorse in Teasearch",
-      "field_external_references_link" => "Risorse esterne",
+      "field_links" => "Risorse esterne",
 
-      "paragraph4" => "Tag",
-      "field_subjects" => "Ambito tematico",
-      "field_country2" => "Ambito geografico",
+      "paragraph5" => "Contributori",
+      "people" => "Persone",
 
-      "paragraph5" => "Dettagli della scheda",
-      "people" => "Contributori",
+      "paragraph6" => "Collegamenti da",
+      "referenced_in" => "Schede di Teasearch",
+      "field_backlink_esterni" => "Siti esterni",
+
+      "paragraph7" => "Dettagli della scheda",
       "field_license" => "Licenza editoriale",
-      "referenced_in" => "Link da",
       "systemdate" => "Date",
-    ],
+      ],
   ];
 
+// Traduzione Videos
   $videos = [
     "it" => [
       "field_image_category" => "Categoria",
@@ -319,7 +235,7 @@ function teasearch_translations()
       "field_original_release_date" => "Data di pubblicazione",
       "field_duration" => "Durata",
 
-      "paragraph2" => "Risorse digitali",
+      "paragraph1" => "Risorse digitali",
       "video" => "Video",
       "field_resource_type" => "Tipo di risorsa",
       "field_digital_resource_original" => "Titolo originale risorsa",
@@ -330,28 +246,160 @@ function teasearch_translations()
       "field_notes" => "Note",
       "field_alternative_links" => "Risorse online aggiuntive",
 
-      "paragraph3" => "Panoramica del contenuto",
+      "paragraph2" => "Contenuto e contesto",
       "field_original_abstract" => "Descrizione originale",
       "field_description" => "Descrizione del curatore",
+
+      "paragraph3" => "Ambiti tematici",
+      "field_subjects" => "Soggetti",
+      "field_country2" => "Focus geografico",
       "field_keywords" => "Parole chiave",
 
       "paragraph4" => "Riferimenti e risorse correlate",
       "curated_references" => "Bibliografia",
-      "related resources" => "Risorse correlate su Teasearch",
+      "related resources" => "Altre risorse in Teasearch",
       "field_links" => "Risorse esterne",
 
-      "paragraph5" => "Dettagli della scheda",
-      "field_subjects" => "Ambito tematico",
-      "field_country2" => "Ambito geografico",
+      "paragraph5" => "Contributori",
+      "people" => "Persone",
 
-      "paragraph6" => "Dettagli della scheda",
-      "people" => "Contributori",
+      "paragraph6" => "Collegamenti da",
+      "referenced_in" => "Schede di Teasearch",
+      "field_backlink_esterni" => "Siti esterni",
+
+      "paragraph7" => "Dettagli della scheda",
       "field_license" => "Licenza editoriale",
       "systemdate" => "Date",
-      "referenced_in" => "Link da",
     ],
   ];
 
+
+// Traduzione Bibliography
+  $bibliography = [
+    "it" => [
+      "field_pubtype" => "Tipo",
+      "authors" => "Autori",
+      "title" => "Titolo",
+      "field_title_original" => "Titolo originale",
+      "field_title_translated" => "Titolo tradotto",
+      "field_year" => "Anno",
+      "field_date" => "Data",
+      "field_language" => "Lingua",
+      "contained_in" => "Contenuto in",
+      "field_pub_place" => "Luogo di pubblicazione",
+      "field_publisher" => "Editore",
+      "field_country" => "Paese",
+      "editors" => "Curatori",
+      "field_edition" => "Edizione",
+      "project_name_journal" => "Rivista",
+      "project_name_book" => "Volume",
+      "volissue" => "Vol. (N.)",
+      "field_pages" => "Pagine",
+      "field_issn" => "issn",
+      "field_doi" => "DOI",
+      "field_dewey" => "Dewey",
+      "field_isbn" => "ISBN",
+      "field_status" => "Stato",
+      "field_frequency" => "Frequenza",
+      "field_university" => "Università",
+      "field_degree" => "Titolo accademico",
+
+      "paragraph1" => "Informazioni di accesso",
+      "field_texts_reference" => "PDF nella sezione Testi",
+      "field_online_links" => "Accesso online",
+      "field_access_type" => "Tipo di accesso",
+      "field_notes" => "Note",
+      "field_online_links2" => "Accessi online addizionali",
+      "field_library_links" => "Biblioteche",
+
+      "paragraph2" => "Contenuto e contesto",
+      "field_original_abstract" => "Abstract originale",
+      "field_translated_abstract" => "Abstract tradotto",
+      "field_table_of_content" => "Sommario",
+      "field_translated_table_of_conten" => "Sommario tradotto",
+      "field_curated_abstract" => "Note del curatore",
+
+      "paragraph3" => "Ambiti tematici",
+      "field_subjects" => "Soggetti",
+      "field_country2" => "Focus geografico",
+      "field_keywords" => "Parole chiave",
+
+      "paragraph4" => "Risorse correlate selezionate",
+      "curated_references" => "Bibliografia",
+      "related resources" => "Altre risorse in Teasearch",
+      "field_links" => "Risorse esterne",
+
+      "paragraph5" => "Contributori",
+      "people" => "Persone",
+
+      "paragraph6" => "Collegamenti da",
+      "referenced_in" => "Schede di Teasearch",
+      "field_backlink_esterni" => "Siti esterni",
+
+      "paragraph7" => "Dettagli della scheda",
+      "field_license" => "Licenza editoriale",
+      "systemdate" => "Date",
+    ],
+  ];
+
+// Traduzione People
+  $people = [
+    "it" => [
+      "name" => "Nome",
+      "field_known_as" => "Altri nomi",
+      "field_title" => "Posizione",
+      "field_affiliation" => "Affiliazione",
+      "field_orcid" => "ORCID",
+
+      "paragraph1" => "Contatti",
+
+      "location" => "Sede",
+      "field_country" => "Paese",
+      "field_email" => "Email",
+      "field_online_links" => "Presenza oline",
+
+      "paragraph2" => "Profilo",
+      "field_bio" => "Presentazione",
+      "field_activities" => "Attività legate al tè",
+      "field_language" => "Lingue",
+      "field_memberships" => "Membership",
+
+      "paragraph3" => "Ambiti tematici",
+      "field_subjects" => "Soggetti",
+      "field_country2" => "Focus geografico",
+      "field_keywords" => "Parole chiave",
+
+      "paragraph4" => "Pubblicazioni relative al tè",    
+      "books" => "Libri",
+      "book_chapters" => "Capitoli di libri",
+      "journal_articles" => "Articoli di rivista",
+      "dissertation" => "Tesi",
+      "book_review" => "Recensioni di libro",
+      "reviews" => "Recensioni",
+      "conference_proceedings" => "Atti di convegno",
+      "patents" => "Brevetti",
+      "legal_and_policy" => "Documenti legali e normativi",
+      "standard" => "Standard",
+      "datasets" => "Datasets",
+      "periodicals" => "Testate di periodici",
+      "newspaper_articles" => "Article di giornale",
+      "webpages" => "Pagine web / contenuti online",
+      "reference_works" => "Opere di consultazione",
+      "other_documents" => "Altri documenti",
+
+      "paragraph5" => "Contributi a Teasearch",
+      "essentials" => "Fondamenti",
+      "texts" => "Testi",
+      "videos" => "Video",
+      "images" => "Immagini",
+      "bibliography" => "Bibliografia",
+      "field_license" => "Licenza editoriale",
+      "systemdate" => "Date",
+    ],
+  ];
+
+
+// Traduzione People
   $news = [
     "it" => [
       "news_type_badge" => "Categoria",
@@ -396,212 +444,559 @@ function teasearch_translations()
 // Schede
 function teasearch_get_detail_schemas()
 
-// Schede§people
+// Schede visulizazione
 {
-  $people = [
 
+  //
+  // Schede§ESSENTIALS = first_reference
+
+  $first_reference = [
     'icon' => [
-      'type' => 'image_round',
-      'field' => 'field_avatar',
+      'type' => 'square_or_main',
     ],
-    'fields' => [
-      'maintitle' => [
-        'type' => 'people_main_title',
-
+    "fields" => [
+      "maintitle" => [
+        "type" => "unified_title"
+      ],
+      "title" => [
+        "label" => "Title"
+      ],
+      "	field_author_original" => [
+        "label" => "Authors"
+      ],
+      "field_original_abstract" => [
+        "label" => "Abstract"
+      ],
+      "field_author_original" => [
+        "label" => "Autori"
       ],
 
-      'name' => [
-        'type' => 'people_name',
-        'label' => 'name'
-      ],
-      'field_known_as' => [
-        'label' => 'Other names',
-      ],
-      'field_title' => [
-        'label' => 'Position',
-      ],
-      'field_affiliation' => [
-        'label' => 'Affiliation',
-        //multilanguage
-      ],
-      "field_orcid" => [
-        "label" => "ORCID"
+      'paragraph2' => 'Content',
+      "field_content" => [
+        "label" => "Main Text"
       ],
 
-      "paragraph1" => "PROFILE",
-      "field_bio" => [
-        "label" => "About",
-      ],
-      "field_activities" => [
-        "label" => "Tea-Related Activites"
-        //taxonomy
-      ],
+      'paragraph3' => 'Thematic Coverage',
       "field_subjects" => [
-        "label" => "Subject Scope"
-        //taxonomy
+        "label" => "Subject"
       ],
       "field_country2" => [
-        "label" => "Geographical Scope"
-        //taxonomy
+        "label" => "Geographical Focus"
       ],
-      "field_specific_subjects" => [
-        "label" => "Research Topics"
-        //text multivalues
-      ],
-      "field_language" => [
-        "label" => "Languages"
-      ],
-      "field_memberships" => [
-        "label" => "Memberships"
-      ],
-      "paragraph2" => "Contact Information",
-      "location" => [
-        "type" => "location",
-        "label" => "Location",
-      ],
-      "field_country" => [
-        "label" => "Country",
-      ],
-      "field_email" => [
-        "label" => "Email",
-      ],
-      "field_online_links" => [
-        "label" => "Online Presence",
-      ],
-      "paragraph3" => "Tea-Related Publications",
-      "books" => [
-        "label" => "books",
-        "type" => "publib",
-        "pubtype" => "book",
-      ],
-      "book_chapters" => [
-        "label" => "book chapters",
-        "type" => "publib",
-        "pubtype" => "book_chapters",
-      ],
-      "journal_articles" => [
-        "label" => "Journal Articles",
-        "type" => "publib",
-        "pubtype" => "journal_articles",
-      ],
-      "dissertation" => [
-        "label" => "dissertation",
-        "type" => "publib",
-        "pubtype" => "dissertation",
-      ],
-      "book_review" => [
-        "label" => "Book review",
-        "type" => "publib",
-        "pubtype" => "book_review",
-      ],
-      "reviews" => [
-        "label" => "Reviews",
-        "type" => "publib",
-        "pubtype" => "reviews",
-      ],
-      "conference_proceedings" => [
-        "label" => "Conference Proceedings",
-        "type" => "publib",
-        "pubtype" => "conference_proceedings",
-      ],
-      "patents" => [
-        "label" => "Patents",
-        "type" => "publib",
-        "pubtype" => "patents",
+      'field_keywords' => [
+        'label' => 'Keywords',
       ],
 
-      "legal_and_policy" => [
-        "label" => "Legal & Policy Documents",
-        "type" => "publib",
-        "pubtype" => "legal_and_policy",
-      ],
-      "standard" => [
-        "label" => "Standards",
-        "type" => "publib",
-        "pubtype" => "standard",
-      ],
-      "datasets" => [
-        "label" => "Datasets",
-        "type" => "publib",
-        "pubtype" => "datasets",
-      ],
-      "periodicals" => [
-        "label" => "Periodical Titles",
-        "type" => "publib",
-        "pubtype" => "periodicals",
-      ],
-      "newspaper_articles" => [
-        "label" => "Newspaper articles",
-        "type" => "publib",
-        "pubtype" => "newspaper_articles",
-      ],
-      "webpages" => [
-        "label" => "Webpages / online contents",
-        "type" => "publib",
-        "pubtype" => "webpages",
-      ],
-      "reference_works" => [
-        "label" => "Reference works",
-        "type" => "publib",
-        "pubtype" => "reference_works",
-      ],
-      "other_documents" => [
-        "label" => "Other",
-        "type" => "publib",
-        "pubtype" => "other",
-      ],
-      "paragraph4" => "Teasearch content contributions",
-      "essentials" => [
-        "label" => "Essentials",
-        "type" => "contrib",
-        "content_type" => "first_reference",
-        "no_author" => true,
-
-      ],
-      "texts" => [
-        "label" => "Texts",
-        "type" => "contrib",
-        "content_type" => "primary_sources",
-        "no_author" => true,
-      ],
-      "videos" => [
-        "label" => "Videos",
-        "type" => "contrib",
-        "content_type" => "videos",
-        "no_author" => true,
-      ],
-      "images" => [
-        "label" => "Images",
-        "type" => "contrib",
-        "content_type" => "images",
-        "no_author" => true,
-      ],
-
-
-      "bibliography" => [
+      'paragraph4' => 'References and related resources',
+      "curated_references" => [
         "label" => "Bibliography",
-        "type" => "contrib",
-        "content_type" => "bibliography",
-        "no_author" => true,
+        "type" => "curated_references"
+      ],
+      "related resources" => [
+        "label" => "Other Teasearch Resources",
+        "type" => "teasearch_references"
+      ],
+      "field_external_references_link" => [
+        "label" => "External Resources",
       ],
 
-      "paragraph5" => "Entry Details",
+      "paragraph5" => "Contributors",
+      "people" => [
+        "label" => "Contributori",
+        "type" => "people_roles"
+      ],
+
+      "paragraph6" => "Linked from",
+      "referenced_in" => [
+        "type" => "referenced_in",
+        "label" => "Teasearch entries",
+      ],
+      'field_backlink_esterni' => [
+        'label' => 'External Websites',
+      ],
+
+      "paragraph7" => "Entry Details",
       "field_license" => [
         "label" => "Editorial Licence",
-        "type" => "taxonomy_linked",
-        "no_author" => true,
+        "type" => "taxonomy_linked"
       ],
       "systemdate" => [
         "type" => "systemdate",
         "label" => "Dates",
-        "no_author" => true,
-      ]
-    ],
+      ],
+      
+    ]
   ];
 
+  //
+  // Schede§TEXTS = primary_sources
 
-  // Aggiungi altri content type qui...
+  $primary_sources = [
+    'icon' => [
+      'type' => 'square_or_main',
+    ],
+    'fields' => [
+      // Titolo principale (mostrato nell'header verde)
+      'maintitle' => [
+        'type' => 'unified_title',
+      ],
+      'field_text_genres' => [
+        'label' => 'Genre'
+      ],
+      'authors' => [
+        'label' => 'Authors',
+        'type' => 'authors_general',
+        'field' => 'field_responsibles',
+      ],
+      'title' => [
+        'label' => 'Title',
+      ],
+      'field_title_original' => [
+        'label' => 'Original title',
+      ],
+      'field_title_translated' => [
+        'label' => 'Translated title',
+      ],
+      'date' => [
+        'label' => 'Date',
+        'type' => 'date_label'
+      ],
+      'field_language' => [
+        'label' => 'Language',
+      ],
+      'field_country' => [
+        'label' => 'Country',
+      ],
+      "contained_in" => [
+        "label" => "Included in",
+        "type" => "teasearch_references",
+        "field" => "field_contained_in"
+      ],
+      "field_collected_in" => [
+        "label" => "Included in",
+      ],
+      'field_text_publisher' => [
+        'label' => 'Publisher',
+      ],
+      'field_place_of_publication' => [
+        'label' => 'Place of publication',
+      ],
+      'field_text_types' => [
+        'label' => 'Format',
+      ],
+      'field_archive' => [
+        'label' => 'Repository',
+      ],
+      'field_catalogue_number' => [
+        'label' => 'Catalogue number',
+      ],
 
+      'paragraph1' => 'Digital Resources',
+      'pdf' => [
+        'label' => 'PDF',
+        'type' => 'pdf',
+        'file' => 'field_pdf_file'
+      ],
+      'field_resource_type' => [
+        'label' => 'Resource type',
+      ],
+      'field_digital_resource_original' => [
+        'label' => 'Original resource title',
+      ],
+      'field_source' => [
+        'label' => 'Source',
+      ],
+      '	field_file_version' => [
+        'label' => 'File version',
+      ],
+      'field_right_holder' => [
+        'label' => 'Right holder',
+      ],
+      'field_usage_rights' => [
+        'label' => 'Reuse Category',
+      ],
+      'field_file_licence' => [
+        "label" => "Licence / Reuse Terms",
+        "type" => "taxonomy_linked"
+      ],
+      'field_credit_line' => [
+        'label' => 'Credit Line',
+      ],
+      'field_notes' => [
+        'label' => 'Notes',
+      ],
+      'field_alternative_links' => [
+        'label' => 'Additional Online Resources',
+      ],
+
+      'paragraph2' => 'Content and Context',
+      'field_description' => [
+        'label' => 'Curated description',
+      ],
+      'field_text_excerpts' => [
+        'label' => 'Text Excerpts',
+      ],
+
+      'paragraph3' => 'Thematic Coverage',
+      "field_subjects" => [
+        "label" => "Subject"
+      ],
+      "field_country2" => [
+        "label" => "Geographical Focus"
+      ],
+      'field_keywords' => [
+        'label' => 'Keywords',
+      ],
+
+      'paragraph4' => 'References and related resources',
+      "curated_references" => [
+        "label" => "Bibliography",
+        "type" => "curated_references"
+      ],
+      "related resources" => [
+        "label" => "Other Teasearch Resources",
+        "type" => "teasearch_references"
+      ],
+      "field_external_references_link" => [
+        "label" => "External Resources",
+      ],
+
+      "paragraph5" => "Contributors",
+      "people" => [
+        "label" => "Contributori",
+        "type" => "people_roles"
+      ],
+
+      "paragraph6" => "Linked from",
+      "referenced_in" => [
+        "type" => "referenced_in",
+        "label" => "Teasearch entries",
+      ],
+      'field_backlink_esterni' => [
+        'label' => 'External Websites',
+      ],
+
+      "paragraph7" => "Entry Details",
+      "field_license" => [
+        "label" => "Editorial Licence",
+        "type" => "taxonomy_linked"
+      ],
+      "systemdate" => [
+        "type" => "systemdate",
+        "label" => "Dates",
+      ],
+    ]
+  ];
+
+  //
+  // Schede§IMAGES
+
+  $images = [
+    'icon' => [
+      'type' => 'square_or_main',
+      'field' => 'qualcosa'
+    ],
+    'fields' => [
+      'maintitle' => [
+        'type' => 'unified_title',
+      ],
+      'field_image_category' => [
+        'label' => 'Category'
+      ],
+      'authors' => [
+        'label' => 'Authors',
+        'type' => 'authors_general',
+        'field' => 'field_responsibles',
+      ],
+      'title' => [
+        'label' => 'Title',
+      ],
+      'field_title_original' => [
+        'label' => 'Original title',
+      ],
+      'field_title_translated' => [
+        'label' => 'Translated title',
+      ],
+      'date' => [
+        'label' => 'Date',
+        'type' => 'date_label'
+      ],
+      'field_language' => [
+        'label' => 'Language',
+      ],
+      'field_country' => [
+        'label' => 'Country',
+      ],
+      "contained_in" => [
+        "label" => "Contained in",
+        "type" => "teasearch_references",
+        "field" => "field_contained_in"
+      ],
+      "field_collected_in" => [
+        "label" => "Contained in",
+      ],
+      'field_medium' => [
+        'label' => 'Medium',
+      ],
+      'field_dimensions' => [
+        'label' => 'Dimensions',
+      ],
+      'field_location' => [
+        'label' => 'Repository',
+      ],
+      'field_catalogue_number' => [
+        'label' => 'Catalogue Number',
+      ],
+
+      'paragraph1' => "Digital Resources",
+      'image' => [
+        'label' => 'Image',
+        'type' => 'image',
+        'options' => [
+          'icon' => true
+        ]
+      ],
+      'field_resource_type' => [
+        'label' => 'Resource type',
+      ],
+      'field_digital_resource_original' => [
+        'label' => 'Original resource title',
+      ],
+      'field_source' => [
+        'label' => 'Source',
+      ],
+      '	field_file_version' => [
+        'label' => 'File version',
+      ],
+      'field_right_holder' => [
+        'label' => 'Right holder',
+      ],
+      'field_usage_rights' => [
+        'label' => 'Reuse Category',
+      ],
+      'field_file_licence' => [
+        "label" => "Licence / Reuse Terms",
+        "type" => "taxonomy_linked"
+      ],
+      'field_credit_line' => [
+        'label' => 'Credit Line',
+      ],
+      'field_notes' => [
+        'label' => 'Notes',
+      ],
+      'field_alternative_links' => [
+        'label' => 'Additional Online Resources',
+      ],
+
+      'paragraph2' => "Content and Context",
+      'field_description' => [
+        'label' => 'Curated description',
+      ],
+      'field_details' => [
+        'label' => 'Image Details',
+      ],
+      'field_textual_elements' => [
+        'label' => 'Textual Elements',
+      ],
+      "field_subjects" => [
+        "label" => "Subject"
+      ],
+      "field_country2" => [
+        "label" => "Geographical Focus"
+      ],
+      'field_keywords' => [
+        'label' => 'Keywords',
+      ],
+
+      'paragraph3' => 'References and related resources',
+      "curated_references" => [
+        "label" => "Bibliography",
+        "type" => "curated_references"
+      ],
+      "related resources" => [
+        "label" => "Other Teasearch Resources",
+        "type" => "teasearch_references"
+      ],
+      "field_external_references_link" => [
+        "label" => "External Resources",
+      ],
+
+      "paragraph5" => "Entry Details",
+      "people" => [
+        "label" => "Contributori",
+        "type" => "people_roles"
+      ],
+      "field_license" => [
+        "label" => "Editorial Licence",
+        "type" => "taxonomy_linked"
+
+      ],
+      "systemdate" => [
+        "type" => "systemdate",
+        "label" => "Dates",
+      ],
+      "referenced_in" => [
+        "type" => "referenced_in",
+        "label" => "Linked from",
+      ],
+    ]
+  ];
+
+  //
+  // Schede§videos
+
+  $videos = [
+    'icon' => [
+      'type' => 'square_or_main',
+    ],
+    'fields' => [
+      'maintitle' => [
+        'type' => 'unified_title',
+
+      ],
+      'field_image_category' => [
+        'label' => 'Category'
+      ],
+      'authors' => [
+        'label' => 'Authors',
+        'type' => 'authors_general',
+        'field' => 'field_responsibles',
+      ],
+      'title' => [
+        'label' => 'Title',
+      ],
+      'field_title_original' => [
+        'label' => 'Original title',
+      ],
+      'field_title_translated' => [
+        'label' => 'Translated title',
+      ],
+      'field_production_year' => [
+        'label' => 'Year',
+      ],
+      'field_language' => [
+        'label' => 'Language',
+      ],
+      'field_subtitles' => [
+        'label' => 'Subtitles',
+      ],
+      'field_country' => [
+        'label' => 'Country',
+      ],
+      'field_event' => [
+        'label' => 'Event / Context',
+      ],
+      'field_location' => [
+        'label' => 'Venue',
+      ],
+      'field_place_of_publication' => [
+        'label' => 'Place of creation',
+      ],
+      'field_recording_date' => [
+        'label' => 'Recording Date',
+      ],
+      'field_original_release_date' => [
+        'label' => 'Release Date',
+      ],
+      'field_duration' => [
+        'label' => 'Duration',
+      ],
+
+      "paragraph1" => "Digital Resources",
+      'video' => [
+        'label' => 'Video',
+        'type' => 'video'
+      ],
+      'field_resource_type' => [
+        'label' => 'Resource type',
+      ],
+      'field_digital_resource_original' => [
+        'label' => 'Original resource title',
+      ],
+      'field_source' => [
+        'label' => 'Source',
+      ],
+      'field_right_holder' => [
+        'label' => 'Right holder',
+      ],
+      'field_usage_rights' => [
+        'label' => 'Reuse Category',
+      ],
+      'field_file_licence' => [
+        "label" => "Licence / Reuse Terms",
+        "type" => "taxonomy_linked"
+      ],
+      'field_credit_line' => [
+        'label' => 'Credit Line',
+      ],
+      'field_notes' => [
+        'label' => 'Notes',
+      ],
+      'field_alternative_links' => [
+        'label' => 'Additional Online Resources',
+      ],
+
+      "paragraph2" => "Content and Context",
+      'field_original_abstract' => [
+        'label' => 'Original Description',
+      ],
+      'field_description' => [
+        'label' => 'Curated Description',
+      ],
+
+      'paragraph3' => 'Thematic Coverage',
+      "field_subjects" => [
+        "label" => "Subject"
+      ],
+      "field_country2" => [
+        "label" => "Geographical Focus"
+      ],
+      'field_keywords' => [
+        'label' => 'Keywords',
+      ],
+
+      'paragraph4' => 'References and related resources',
+      "curated_references" => [
+        "label" => "Bibliography",
+        "type" => "curated_references"
+      ],
+      "related resources" => [
+        "label" => "Other Teasearch Resources",
+        "type" => "teasearch_references"
+      ],
+      "field_external_references_link" => [
+        "label" => "External Resources",
+      ],
+
+      "paragraph5" => "Contributors",
+      "people" => [
+        "label" => "Contributori",
+        "type" => "people_roles"
+      ],
+
+      "paragraph6" => "Linked from",
+      "referenced_in" => [
+        "type" => "referenced_in",
+        "label" => "Teasearch entries",
+      ],
+      'field_backlink_esterni' => [
+        'label' => 'External Websites',
+      ],
+
+      "paragraph7" => "Entry Details",
+      "field_license" => [
+        "label" => "Editorial Licence",
+        "type" => "taxonomy_linked"
+      ],
+      "systemdate" => [
+        "type" => "systemdate",
+        "label" => "Dates",
+      ],
+
+    ]
+  ];
+
+  //
   // Schede§bibliography
 
   $bibliography = [
@@ -619,12 +1014,10 @@ function teasearch_get_detail_schemas()
       "field_pubtype" => [
         "label" => "Type",
       ],
-
       "authors" => [
         "type" => "authors_general",
         "field" => "field_responsibles",
         "label" => "Authors",
-
       ],
       "title" => [
         "label" => "title",
@@ -712,7 +1105,6 @@ function teasearch_get_detail_schemas()
       "field_isbn" => [
         "label" => "ISBN",
       ],
-
       "field_status" => [
         "label" => "Status",
       ],
@@ -726,7 +1118,7 @@ function teasearch_get_detail_schemas()
         "label" => "Degree",
       ],
 
-      "paragraph2" => "Access Information",
+      "paragraph1" => "Access Information",
       "field_texts_reference" => [
         "label" => "PDF in texts session",
       ],
@@ -746,7 +1138,7 @@ function teasearch_get_detail_schemas()
         "label" => "Libraries",
       ],
 
-      "paragraph3" => "Content overview",
+      "paragraph2" => "Content and Context",
       "field_original_abstract" => [
         "label" => "Original Abstract",
       ],
@@ -762,11 +1154,13 @@ function teasearch_get_detail_schemas()
       "field_curated_abstract" => [
         "label" => "Curator's Note",
       ],
+
+      'paragraph3' => 'Thematic Coverage',
       "field_subjects" => [
-        "label" => "Subject Scope"
+        "label" => "Subject"
       ],
       "field_country2" => [
-        "label" => "Geographical Scope"
+        "label" => "Geographical Focus"
       ],
       'field_keywords' => [
         'label' => 'Keywords',
@@ -784,557 +1178,236 @@ function teasearch_get_detail_schemas()
       "field_external_references_link" => [
         "label" => "External Resources",
       ],
-
-      "paragraph6" => "Entry Details",
+      "paragraph5" => "Contributors",
       "people" => [
         "label" => "Contributori",
         "type" => "people_roles"
       ],
+
+      "paragraph6" => "Linked from",
+      "referenced_in" => [
+        "type" => "referenced_in",
+        "label" => "Teasearch entries",
+      ],
+      'field_backlink_esterni' => [
+        'label' => 'External Websites',
+      ],
+
+      "paragraph7" => "Entry Details",
       "field_license" => [
         "label" => "Editorial Licence",
         "type" => "taxonomy_linked"
-
       ],
       "systemdate" => [
         "type" => "systemdate",
         "label" => "Dates",
       ],
-      "referenced_in" => [
-        "type" => "referenced_in",
-        "label" => "Linked from",
-      ],
     ],
   ];
 
-  // Schede§TEXTS = primary_sources
+  //
+  // Schede§PEOPLE
 
-  $primary_sources = [
+$people = [
+
     'icon' => [
-      'type' => 'square_or_main',
-    ],
-    'fields' => [
-      // Titolo principale (mostrato nell'header verde)
-      'maintitle' => [
-        'type' => 'unified_title',
-      ],
-      'field_text_genres' => [
-        'label' => 'Genre'
-      ],
-      'authors' => [
-        'label' => 'Authors',
-        'type' => 'authors_general',
-        'field' => 'field_responsibles',
-      ],
-      'title' => [
-        'label' => 'Title',
-      ],
-      'field_title_original' => [
-        'label' => 'Original title',
-      ],
-      'field_title_translated' => [
-        'label' => 'Translated title',
-      ],
-
-      'date' => [
-        'label' => 'Date',
-        'type' => 'date_label'
-      ],
-
-      'field_language' => [
-        'label' => 'Language',
-      ],
-
-      'field_country' => [
-        'label' => 'Country',
-      ],
-
-      "contained_in" => [
-        "label" => "Included in",
-        "type" => "teasearch_references",
-        "field" => "field_contained_in"
-      ],
-
-      "field_collected_in" => [
-        "label" => "Included in",
-      ],
-
-      'field_text_publisher' => [
-        'label' => 'Publisher',
-      ],
-
-      'field_place_of_publication' => [
-        'label' => 'Place of publication',
-      ],
-
-      'field_text_types' => [
-        'label' => 'Format',
-      ],
-
-      'field_archive' => [
-        'label' => 'Repository',
-      ],
-
-      'field_catalogue_number' => [
-        'label' => 'Catalogue number',
-      ],
-
-      'paragraph1' => 'Digital Resources',
-
-      'pdf' => [
-        'label' => 'PDF',
-        'type' => 'pdf',
-        'file' => 'field_pdf_file'
-      ],
-      'field_resource_type' => [
-        'label' => 'Resource type',
-      ],
-      'field_digital_resource_original' => [
-        'label' => 'Original resource title',
-      ],
-      'field_source' => [
-        'label' => 'Source',
-      ],
-      '	field_file_version' => [
-        'label' => 'File version',
-      ],
-      'field_right_holder' => [
-        'label' => 'Right holder',
-      ],
-      'field_usage_rights' => [
-        'label' => 'Reuse Category',
-      ],
-      'field_file_licence' => [
-        "label" => "Licence / Reuse Terms",
-        "type" => "taxonomy_linked"
-
-      ],
-      'field_credit_line' => [
-        'label' => 'Credit Line',
-      ],
-      'field_notes' => [
-        'label' => 'Notes',
-      ],
-      'field_alternative_links' => [
-        'label' => 'Additional Online Resources',
-      ],
-
-      'paragraph2' => 'Content overview',
-      'field_description' => [
-        'label' => 'Curated description',
-      ],
-      'field_text_excerpts' => [
-        'label' => 'Text Excerpts',
-      ],
-      "field_subjects" => [
-        "label" => "Subject Scope"
-      ],
-      "field_country2" => [
-        "label" => "Geographical Scope"
-      ],
-      'field_keywords' => [
-        'label' => 'Keywords',
-      ],
-
-      'paragraph3' => 'References and related resources',
-      "curated_references" => [
-        "label" => "Bibliography",
-        "type" => "curated_references"
-      ],
-      "related resources" => [
-        "label" => "Other Teasearch Resources",
-        "type" => "teasearch_references"
-      ],
-      "field_external_references_link" => [
-        "label" => "External Resources",
-      ],
-
-      "paragraph5" => "Entry Details",
-      "people" => [
-        "label" => "Contributori",
-        "type" => "people_roles"
-      ],
-      "field_license" => [
-        "label" => "Editorial Licence",
-        "type" => "taxonomy_linked"
-
-      ],
-      "systemdate" => [
-        "type" => "systemdate",
-        "label" => "Dates",
-      ],
-      "referenced_in" => [
-        "type" => "referenced_in",
-        "label" => "Linked from",
-      ],
-    ]
-  ];
-
-  // Schede§ESSENTIALS = first_reference
-
-  $first_reference = [
-    'icon' => [
-      'type' => 'square_or_main',
-    ],
-    "fields" => [
-      "maintitle" => [
-        "type" => "unified_title"
-      ],
-      "title" => [
-        "label" => "Title"
-      ],
-      "field_short_description" => [
-        "label" => "Short Description"
-      ],
-      "field_original_abstract" => [
-        "label" => "Abstract"
-      ],
-      "field_content" => [
-        "label" => "Main Text"
-      ],
-      "field_subjects" => [
-        "label" => "Subject Scope"
-      ],
-      "field_country2" => [
-        "label" => "Geographical Scope"
-      ],
-      'field_keywords' => [
-        'label' => 'Keywords',
-      ],
-
-      'paragraph3' => 'References and related resources',
-      "curated_references" => [
-        "label" => "Bibliography",
-        "type" => "curated_references"
-      ],
-      "related resources" => [
-        "label" => "Other Teasearch Resources",
-        "type" => "teasearch_references"
-      ],
-      "field_external_references_link" => [
-        "label" => "External Resources",
-      ],
-
-      "paragraph5" => "Entry Details",
-      "people" => [
-        "label" => "Contributori",
-        "type" => "people_roles"
-      ],
-      "field_license" => [
-        "label" => "Editorial Licence",
-        "type" => "taxonomy_linked"
-
-      ],
-      "systemdate" => [
-        "type" => "systemdate",
-        "label" => "Dates",
-      ],
-      "referenced_in" => [
-        "type" => "referenced_in",
-        "label" => "Linked from",
-      ],
-    ]
-  ];
-
-  // Schede§IMAGES
-
-  $images = [
-    'icon' => [
-      'type' => 'square_or_main',
-      'field' => 'qualcosa'
+      'type' => 'image_round',
+      'field' => 'field_avatar',
     ],
     'fields' => [
       'maintitle' => [
-        'type' => 'unified_title',
+        'type' => 'people_main_title',
 
       ],
-      'field_image_category' => [
-        'label' => 'Category'
+      'name' => [
+        'type' => 'people_name',
+        'label' => 'name'
       ],
-      'authors' => [
-        'label' => 'Authors',
-        'type' => 'authors_general',
-        'field' => 'field_responsibles',
+      'field_known_as' => [
+        'label' => 'Other names',
       ],
-      'title' => [
-        'label' => 'Title',
+      'field_title' => [
+        'label' => 'Position',
       ],
-      'field_title_original' => [
-        'label' => 'Original title',
+      'field_affiliation' => [
+        'label' => 'Affiliation',
+        //multilanguage
       ],
-      'field_title_translated' => [
-        'label' => 'Translated title',
-      ],
-      'date' => [
-        'label' => 'Date',
-        'type' => 'date_label'
-      ],
-      'field_language' => [
-        'label' => 'Language',
+      "field_orcid" => [
+        "label" => "ORCID"
       ],
 
-      'field_country' => [
-        'label' => 'Country',
+      "paragraph1" => "Contact Information",
+      "location" => [
+        "type" => "location",
+        "label" => "Location",
+      ],
+      "field_country" => [
+        "label" => "Country",
+      ],
+      "field_email" => [
+        "label" => "Email",
+      ],
+      "field_online_links" => [
+        "label" => "Online Presence",
       ],
 
-      "contained_in" => [
-        "label" => "Contained in",
-        "type" => "teasearch_references",
-        "field" => "field_contained_in"
+      "paragraph2" => "PROFILE",
+      "field_bio" => [
+        "label" => "About",
+      ],
+      "field_activities" => [
+        "label" => "Tea-Related Activites"
+        //taxonomy
+      ],
+      "field_language" => [
+        "label" => "Languages"
+      ],
+      "field_memberships" => [
+        "label" => "Memberships"
       ],
 
-      "field_collected_in" => [
-        "label" => "Contained in",
-      ],
-
-
-      'field_medium' => [
-        'label' => 'Medium',
-      ],
-      'field_dimensions' => [
-        'label' => 'Dimensions',
-      ],
-      'field_location' => [
-        'label' => 'Repository',
-      ],
-      'field_catalogue_number' => [
-        'label' => 'Catalogue Number',
-      ],
-
-      'paragraph1' => "Digital Resources",
-      'image' => [
-        'label' => 'Image',
-        'type' => 'image',
-        'options' => [
-          'icon' => true
-        ]
-      ],
-      'field_resource_type' => [
-        'label' => 'Resource type',
-      ],
-      'field_digital_resource_original' => [
-        'label' => 'Original resource title',
-      ],
-      'field_source' => [
-        'label' => 'Source',
-      ],
-      '	field_file_version' => [
-        'label' => 'File version',
-      ],
-      'field_right_holder' => [
-        'label' => 'Right holder',
-      ],
-      'field_usage_rights' => [
-        'label' => 'Reuse Category',
-      ],
-      'field_file_licence' => [
-        "label" => "Licence / Reuse Terms",
-        "type" => "taxonomy_linked"
-      ],
-      'field_credit_line' => [
-        'label' => 'Credit Line',
-      ],
-      'field_notes' => [
-        'label' => 'Notes',
-      ],
-      'field_alternative_links' => [
-        'label' => 'Additional Online Resources',
-      ],
-
-      'paragraph2' => "Content overview",
-      'field_description' => [
-        'label' => 'Curated description',
-      ],
-      'field_details' => [
-        'label' => 'Image Details',
-      ],
-      'field_textual_elements' => [
-        'label' => 'Textual Elements',
-      ],
+      'paragraph3' => 'Thematic Coverage',
       "field_subjects" => [
-        "label" => "Subject Scope"
+        "label" => "Subject"
       ],
       "field_country2" => [
-        "label" => "Geographical Scope"
+        "label" => "Geographical Focus"
       ],
       'field_keywords' => [
         'label' => 'Keywords',
       ],
 
-      'paragraph3' => 'References and related resources',
-      "curated_references" => [
-        "label" => "Bibliography",
-        "type" => "curated_references"
+      "paragraph4" => "Tea-Related Publications",
+      "books" => [
+        "label" => "books",
+        "type" => "publib",
+        "pubtype" => "book",
       ],
-      "related resources" => [
-        "label" => "Other Teasearch Resources",
-        "type" => "teasearch_references"
+      "book_chapters" => [
+        "label" => "book chapters",
+        "type" => "publib",
+        "pubtype" => "book_chapters",
       ],
-      "field_external_references_link" => [
-        "label" => "External Resources",
+      "journal_articles" => [
+        "label" => "Journal Articles",
+        "type" => "publib",
+        "pubtype" => "journal_articles",
+      ],
+      "dissertation" => [
+        "label" => "dissertation",
+        "type" => "publib",
+        "pubtype" => "dissertation",
+      ],
+      "book_review" => [
+        "label" => "Book review",
+        "type" => "publib",
+        "pubtype" => "book_review",
+      ],
+      "reviews" => [
+        "label" => "Reviews",
+        "type" => "publib",
+        "pubtype" => "reviews",
+      ],
+      "conference_proceedings" => [
+        "label" => "Conference Proceedings",
+        "type" => "publib",
+        "pubtype" => "conference_proceedings",
+      ],
+      "patents" => [
+        "label" => "Patents",
+        "type" => "publib",
+        "pubtype" => "patents",
+      ],
+      "legal_and_policy" => [
+        "label" => "Legal & Policy Documents",
+        "type" => "publib",
+        "pubtype" => "legal_and_policy",
+      ],
+      "standard" => [
+        "label" => "Standards",
+        "type" => "publib",
+        "pubtype" => "standard",
+      ],
+      "datasets" => [
+        "label" => "Datasets",
+        "type" => "publib",
+        "pubtype" => "datasets",
+      ],
+      "periodicals" => [
+        "label" => "Periodical Titles",
+        "type" => "publib",
+        "pubtype" => "periodicals",
+      ],
+      "newspaper_articles" => [
+        "label" => "Newspaper articles",
+        "type" => "publib",
+        "pubtype" => "newspaper_articles",
+      ],
+      "webpages" => [
+        "label" => "Webpages / online contents",
+        "type" => "publib",
+        "pubtype" => "webpages",
+      ],
+      "reference_works" => [
+        "label" => "Reference works",
+        "type" => "publib",
+        "pubtype" => "reference_works",
+      ],
+      "other_documents" => [
+        "label" => "Other",
+        "type" => "publib",
+        "pubtype" => "other",
       ],
 
-      "paragraph5" => "Entry Details",
-      "people" => [
-        "label" => "Contributori",
-        "type" => "people_roles"
+      "paragraph5" => "Teasearch content contributions",
+      "essentials" => [
+        "label" => "Essentials",
+        "type" => "contrib",
+        "content_type" => "first_reference",
+        "no_author" => true,
       ],
+      "texts" => [
+        "label" => "Texts",
+        "type" => "contrib",
+        "content_type" => "primary_sources",
+        "no_author" => true,
+      ],
+      "videos" => [
+        "label" => "Videos",
+        "type" => "contrib",
+        "content_type" => "videos",
+        "no_author" => true,
+      ],
+      "images" => [
+        "label" => "Images",
+        "type" => "contrib",
+        "content_type" => "images",
+        "no_author" => true,
+      ],
+
+
+      "bibliography" => [
+        "label" => "Bibliography",
+        "type" => "contrib",
+        "content_type" => "bibliography",
+        "no_author" => true,
+      ],
+
+      "paragraph7" => "Entry Details",
       "field_license" => [
         "label" => "Editorial Licence",
         "type" => "taxonomy_linked"
-
       ],
       "systemdate" => [
         "type" => "systemdate",
         "label" => "Dates",
       ],
-      "referenced_in" => [
-        "type" => "referenced_in",
-        "label" => "Linked from",
-      ],
-    ]
-  ];
-
-  // Schede§videos
-
-  $videos = [
-    'icon' => [
-      'type' => 'square_or_main',
     ],
-    'fields' => [
-      'maintitle' => [
-        'type' => 'unified_title',
-
-      ],
-      'field_image_category' => [
-        'label' => 'Category'
-      ],
-      'authors' => [
-        'label' => 'Authors',
-        'type' => 'authors_general',
-        'field' => 'field_responsibles',
-      ],
-      'title' => [
-        'label' => 'Title',
-      ],
-      'field_title_original' => [
-        'label' => 'Original title',
-      ],
-      'field_title_translated' => [
-        'label' => 'Translated title',
-      ],
-      'field_production_year' => [
-        'label' => 'Year',
-      ],
-      'field_language' => [
-        'label' => 'Language',
-      ],
-      'field_subtitles' => [
-        'label' => 'Subtitles',
-      ],
-      'field_country' => [
-        'label' => 'Country',
-      ],
-      'field_event' => [
-        'label' => 'Event / Context',
-      ],
-      'field_location' => [
-        'label' => 'Venue',
-      ],
-      'field_place_of_publication' => [
-        'label' => 'Place of creation',
-      ],
-      'field_recording_date' => [
-        'label' => 'Recording Date',
-      ],
-      'field_original_release_date' => [
-        'label' => 'Release Date',
-      ],
-      'field_duration' => [
-        'label' => 'Duration',
-      ],
-
-      "paragraph2" => "Digital Resources",
-      'video' => [
-        'label' => 'Video',
-        'type' => 'video'
-      ],
-      'field_resource_type' => [
-        'label' => 'Resource type',
-      ],
-      'field_digital_resource_original' => [
-        'label' => 'Original resource title',
-      ],
-      'field_source' => [
-        'label' => 'Source',
-      ],
-      'field_right_holder' => [
-        'label' => 'Right holder',
-      ],
-      'field_usage_rights' => [
-        'label' => 'Reuse Category',
-      ],
-      'field_file_licence' => [
-        "label" => "Licence / Reuse Terms",
-        "type" => "taxonomy_linked"
-
-      ],
-      'field_credit_line' => [
-        'label' => 'Credit Line',
-      ],
-      'field_notes' => [
-        'label' => 'Notes',
-      ],
-      'field_alternative_links' => [
-        'label' => 'Additional Online Resources',
-      ],
-
-      "paragraph3" => "Content overview",
-      'field_original_abstract' => [
-        'label' => 'Original Description',
-      ],
-      'field_description' => [
-        'label' => 'Curated Description',
-      ],
-      "field_subjects" => [
-        "label" => "Subject Scope"
-      ],
-      "field_country2" => [
-        "label" => "Geographical Scope"
-      ],
-      'field_keywords' => [
-        'label' => 'Keywords',
-      ],
-
-      "paragraph4" => "References and related resources",
-      "curated_references" => [
-        "label" => "Bibliography",
-        "type" => "curated_references"
-      ],
-      "related resources" => [
-        "label" => "Other Teasearch resources",
-        "type" => "teasearch_references"
-      ],
-
-      "paragraph6" => "Entry Details",
-      "people" => [
-        "label" => "Contributori",
-        "type" => "people_roles"
-      ],
-      "field_license" => [
-        "label" => "Editorial Licence",
-        "type" => "taxonomy_linked"
-
-      ],
-      "systemdate" => [
-        "type" => "systemdate",
-        "label" => "Dates",
-      ],
-      "referenced_in" => [
-        "type" => "referenced_in",
-        "label" => "Linked from",
-      ],
-    ]
   ];
+
+
+  // Aggiungi altri content type qui...
 
 
 
@@ -1460,11 +1533,11 @@ function teasearch_get_detail_schemas()
       "paragraph1" => "Entry Details",
 
       "field_subjects" => [
-        "label" => "Subject Scope",
+        "label" => "Subject",
       ],
 
       "field_country2" => [
-        "label" => "Geographical Scope",
+        "label" => "Geographical Focus",
       ],
 
       "field_keywords" => [
