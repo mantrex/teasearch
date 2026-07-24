@@ -146,7 +146,7 @@
 
 .info-menu a {
   display: block;
-  padding: 0.75rem 0;
+  padding: 0.3rem 0;
   color: var(--item-link);
   text-decoration: none;
   font-size: 1.2rem;

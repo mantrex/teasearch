@@ -420,12 +420,24 @@ function teasearch_translations()
       "image" => "Immagine",
       "field_content" => "Body Texts",
 
-      "paragraph1" => "Dettagli della scheda",
-      "field_subjects" => "Ambito tematico",
-      "field_country2" => "Ambito geografico",
+      "paragraph3" => "Ambiti tematici",
+      "field_subjects" => "Soggetti",
+      "field_country2" => "Focus geografico",
       "field_keywords" => "Parole chiave",
+
+      "paragraph4" => "Riferimenti e risorse correlate",
+      "curated_references" => "Bibliografia",
+      "related resources" => "Altre risorse in Teasearch",
+      "field_links" => "Risorse esterne",
+
+      "paragraph5" => "Contributori",
       "people" => "Persone",
-      "field_teasearch_contributors" => "Persone",
+
+      "paragraph6" => "Collegamenti da",
+      "referenced_in" => "Schede di Teasearch",
+      "field_backlink_esterni" => "Siti esterni",
+
+      "paragraph7" => "Dettagli della scheda",
       "field_license" => "Licenza editoriale",
       "systemdate" => "Date",
     ],
@@ -467,63 +479,60 @@ function teasearch_get_detail_schemas()
       "field_original_abstract" => [
         "label" => "Abstract"
       ],
-      "field_author_original" => [
-        "label" => "Autori"
-      ],
 
       'paragraph2' => 'Content',
-      "field_content" => [
-        "label" => "Main Text"
-      ],
+        "field_content" => [
+          "label" => "Main Text"
+        ],
 
       'paragraph3' => 'Thematic Coverage',
-      "field_subjects" => [
-        "label" => "Subject"
-      ],
-      "field_country2" => [
-        "label" => "Geographical Focus"
-      ],
-      'field_keywords' => [
-        'label' => 'Keywords',
-      ],
+        "field_subjects" => [
+          "label" => "Subject"
+        ],
+        "field_country2" => [
+          "label" => "Geographical Focus"
+        ],
+        'field_keywords' => [
+          'label' => 'Keywords',
+        ],
 
       'paragraph4' => 'References and related resources',
-      "curated_references" => [
-        "label" => "Bibliography",
-        "type" => "curated_references"
-      ],
-      "related resources" => [
-        "label" => "Other Teasearch Resources",
-        "type" => "teasearch_references"
-      ],
-      "field_external_references_link" => [
-        "label" => "External Resources",
-      ],
+        "curated_references" => [
+          "label" => "Bibliography",
+          "type" => "curated_references"
+        ],
+        "related resources" => [
+          "label" => "Other Teasearch Resources",
+          "type" => "teasearch_references"
+        ],
+        "field_external_references_link" => [
+          "label" => "External Resources",
+        ],
 
       "paragraph5" => "Contributors",
-      "people" => [
-        "label" => "Contributori",
-        "type" => "people_roles"
-      ],
+        "people" => [
+          "label" => "People",
+          "type" => "people_roles"
+        ],
 
       "paragraph6" => "Linked from",
-      "referenced_in" => [
-        "type" => "referenced_in",
-        "label" => "Teasearch entries",
-      ],
-      'field_backlink_esterni' => [
-        'label' => 'External Websites',
-      ],
+        "referenced_in" => [
+          "type" => "referenced_in",
+          "label" => "Teasearch entries",
+        ],
+        'field_backlink_esterni' => [
+          'label' => 'External Websites',
+        ],
 
       "paragraph7" => "Entry Details",
-      "field_license" => [
-        "label" => "Editorial Licence",
-        "type" => "taxonomy_linked"
-      ],
-      "systemdate" => [
-        "type" => "systemdate",
-        "label" => "Dates",
-      ],
+        "field_license" => [
+          "label" => "Editorial Licence",
+          "type" => "taxonomy_linked"
+        ],
+        "systemdate" => [
+          "type" => "systemdate",
+          "label" => "Dates",
+        ],
       
     ]
   ];
@@ -592,99 +601,99 @@ function teasearch_get_detail_schemas()
       ],
 
       'paragraph1' => 'Digital Resources',
-      'pdf' => [
-        'label' => 'PDF',
-        'type' => 'pdf',
-        'file' => 'field_pdf_file'
-      ],
-      'field_resource_type' => [
-        'label' => 'Resource type',
-      ],
-      'field_digital_resource_original' => [
-        'label' => 'Original resource title',
-      ],
-      'field_source' => [
-        'label' => 'Source',
-      ],
-      '	field_file_version' => [
-        'label' => 'File version',
-      ],
-      'field_right_holder' => [
-        'label' => 'Right holder',
-      ],
-      'field_usage_rights' => [
-        'label' => 'Reuse Category',
-      ],
-      'field_file_licence' => [
-        "label" => "Licence / Reuse Terms",
-        "type" => "taxonomy_linked"
-      ],
-      'field_credit_line' => [
-        'label' => 'Credit Line',
-      ],
-      'field_notes' => [
-        'label' => 'Notes',
-      ],
-      'field_alternative_links' => [
-        'label' => 'Additional Online Resources',
-      ],
+        'pdf' => [
+          'label' => 'PDF',
+          'type' => 'pdf',
+          'file' => 'field_pdf_file'
+        ],
+        'field_resource_type' => [
+          'label' => 'Resource type',
+        ],
+        'field_digital_resource_original' => [
+          'label' => 'Original resource title',
+        ],
+        'field_source' => [
+          'label' => 'Source',
+        ],
+        '	field_file_version' => [
+          'label' => 'File version',
+        ],
+        'field_right_holder' => [
+          'label' => 'Right holder',
+        ],
+        'field_usage_rights' => [
+          'label' => 'Reuse Category',
+        ],
+        'field_file_licence' => [
+          "label" => "Licence / Reuse Terms",
+          "type" => "taxonomy_linked"
+        ],
+        'field_credit_line' => [
+          'label' => 'Credit Line',
+        ],
+        'field_notes' => [
+          'label' => 'Notes',
+        ],
+        'field_alternative_links' => [
+          'label' => 'Additional Online Resources',
+        ],
 
       'paragraph2' => 'Content and Context',
-      'field_description' => [
-        'label' => 'Curated description',
-      ],
-      'field_text_excerpts' => [
-        'label' => 'Text Excerpts',
-      ],
+        'field_description' => [
+          'label' => 'Curated description',
+        ],
+        'field_text_excerpts' => [
+          'label' => 'Text Excerpts',
+        ],
 
       'paragraph3' => 'Thematic Coverage',
-      "field_subjects" => [
-        "label" => "Subject"
-      ],
-      "field_country2" => [
-        "label" => "Geographical Focus"
-      ],
-      'field_keywords' => [
-        'label' => 'Keywords',
-      ],
+        "field_subjects" => [
+          "label" => "Subject"
+        ],
+        "field_country2" => [
+          "label" => "Geographical Focus"
+        ],
+        'field_keywords' => [
+          'label' => 'Keywords',
+        ],
 
       'paragraph4' => 'References and related resources',
-      "curated_references" => [
-        "label" => "Bibliography",
-        "type" => "curated_references"
-      ],
-      "related resources" => [
-        "label" => "Other Teasearch Resources",
-        "type" => "teasearch_references"
-      ],
-      "field_external_references_link" => [
-        "label" => "External Resources",
-      ],
+        "curated_references" => [
+          "label" => "Bibliography",
+          "type" => "curated_references"
+        ],
+        "related resources" => [
+          "label" => "Other Teasearch Resources",
+          "type" => "teasearch_references"
+        ],
+        "field_external_references_link" => [
+          "label" => "External Resources",
+        ],
 
       "paragraph5" => "Contributors",
-      "people" => [
-        "label" => "Contributori",
-        "type" => "people_roles"
-      ],
+        "people" => [
+          "label" => "People",
+          "type" => "people_roles"
+        ],
 
       "paragraph6" => "Linked from",
-      "referenced_in" => [
-        "type" => "referenced_in",
-        "label" => "Teasearch entries",
-      ],
-      'field_backlink_esterni' => [
-        'label' => 'External Websites',
-      ],
+        "referenced_in" => [
+          "type" => "referenced_in",
+          "label" => "Teasearch entries",
+        ],
+        'field_backlink_esterni' => [
+          'label' => 'External Websites',
+        ],
 
       "paragraph7" => "Entry Details",
-      "field_license" => [
-        "label" => "Editorial Licence",
-        "type" => "taxonomy_linked"
-      ],
-      "systemdate" => [
-        "type" => "systemdate",
-        "label" => "Dates",
-      ],
+        "field_license" => [
+          "label" => "Editorial Licence",
+          "type" => "taxonomy_linked"
+        ],
+        "systemdate" => [
+          "type" => "systemdate",
+          "label" => "Dates",
+        ],
     ]
   ];
 
@@ -749,96 +758,104 @@ function teasearch_get_detail_schemas()
       ],
 
       'paragraph1' => "Digital Resources",
-      'image' => [
-        'label' => 'Image',
-        'type' => 'image',
-        'options' => [
-          'icon' => true
-        ]
-      ],
-      'field_resource_type' => [
-        'label' => 'Resource type',
-      ],
-      'field_digital_resource_original' => [
-        'label' => 'Original resource title',
-      ],
-      'field_source' => [
-        'label' => 'Source',
-      ],
-      '	field_file_version' => [
-        'label' => 'File version',
-      ],
-      'field_right_holder' => [
-        'label' => 'Right holder',
-      ],
-      'field_usage_rights' => [
-        'label' => 'Reuse Category',
-      ],
-      'field_file_licence' => [
-        "label" => "Licence / Reuse Terms",
-        "type" => "taxonomy_linked"
-      ],
-      'field_credit_line' => [
-        'label' => 'Credit Line',
-      ],
-      'field_notes' => [
-        'label' => 'Notes',
-      ],
-      'field_alternative_links' => [
-        'label' => 'Additional Online Resources',
-      ],
+        'image' => [
+          'label' => 'Image',
+          'type' => 'image',
+          'options' => [
+            'icon' => true
+          ]
+        ],
+        'field_resource_type' => [
+          'label' => 'Resource type',
+        ],
+        'field_digital_resource_original' => [
+          'label' => 'Original resource title',
+        ],
+        'field_source' => [
+          'label' => 'Source',
+        ],
+        '	field_file_version' => [
+          'label' => 'File version',
+        ],
+        'field_right_holder' => [
+          'label' => 'Right holder',
+        ],
+        'field_usage_rights' => [
+          'label' => 'Reuse Category',
+        ],
+        'field_file_licence' => [
+          "label" => "Licence / Reuse Terms",
+          "type" => "taxonomy_linked"
+        ],
+        'field_credit_line' => [
+          'label' => 'Credit Line',
+        ],
+        'field_notes' => [
+          'label' => 'Notes',
+        ],
+        'field_alternative_links' => [
+          'label' => 'Additional Online Resources',
+        ],
 
       'paragraph2' => "Content and Context",
-      'field_description' => [
-        'label' => 'Curated description',
-      ],
-      'field_details' => [
-        'label' => 'Image Details',
-      ],
-      'field_textual_elements' => [
-        'label' => 'Textual Elements',
-      ],
-      "field_subjects" => [
-        "label" => "Subject"
-      ],
-      "field_country2" => [
-        "label" => "Geographical Focus"
-      ],
-      'field_keywords' => [
-        'label' => 'Keywords',
-      ],
+        'field_description' => [
+          'label' => 'Curated description',
+        ],
+        'field_details' => [
+          'label' => 'Image Details',
+        ],
+        'field_textual_elements' => [
+          'label' => 'Textual Elements',
+        ],
 
-      'paragraph3' => 'References and related resources',
-      "curated_references" => [
-        "label" => "Bibliography",
-        "type" => "curated_references"
-      ],
-      "related resources" => [
-        "label" => "Other Teasearch Resources",
-        "type" => "teasearch_references"
-      ],
-      "field_external_references_link" => [
-        "label" => "External Resources",
-      ],
+      'paragraph3' => 'Thematic Coverage',
+        "field_subjects" => [
+          "label" => "Subject"
+        ],
+        "field_country2" => [
+          "label" => "Geographical Focus"
+        ],
+        'field_keywords' => [
+          'label' => 'Keywords',
+        ],
+      
+      'paragraph4' => 'References and related resources',
+        "curated_references" => [
+          "label" => "Bibliography",
+          "type" => "curated_references"
+        ],
+        "related resources" => [
+          "label" => "Other Teasearch Resources",
+          "type" => "teasearch_references"
+        ],
+        "field_external_references_link" => [
+          "label" => "External Resources",
+        ],
 
-      "paragraph5" => "Entry Details",
-      "people" => [
-        "label" => "Contributori",
-        "type" => "people_roles"
-      ],
-      "field_license" => [
-        "label" => "Editorial Licence",
-        "type" => "taxonomy_linked"
+      "paragraph5" => "Contributors",
+        "people" => [
+          "label" => "People",
+          "type" => "people_roles"
+        ],
 
-      ],
-      "systemdate" => [
-        "type" => "systemdate",
-        "label" => "Dates",
-      ],
-      "referenced_in" => [
-        "type" => "referenced_in",
-        "label" => "Linked from",
-      ],
+      "paragraph6" => "Linked from",
+        "referenced_in" => [
+          "type" => "referenced_in",
+          "label" => "Teasearch entries",
+        ],
+        'field_backlink_esterni' => [
+          'label' => 'External Websites',
+        ],
+
+      "paragraph7" => "Entry Details",
+        "field_license" => [
+          "label" => "Editorial Licence",
+          "type" => "taxonomy_linked"
+        ],
+        "systemdate" => [
+          "type" => "systemdate",
+          "label" => "Dates",
+        ],
     ]
   ];
 
@@ -970,7 +987,7 @@ function teasearch_get_detail_schemas()
 
       "paragraph5" => "Contributors",
       "people" => [
-        "label" => "Contributori",
+        "label" => "People",
         "type" => "people_roles"
       ],
 
@@ -1180,7 +1197,7 @@ function teasearch_get_detail_schemas()
       ],
       "paragraph5" => "Contributors",
       "people" => [
-        "label" => "Contributori",
+        "label" => "People",
         "type" => "people_roles"
       ],
 
@@ -1530,40 +1547,31 @@ $people = [
       // Usa le stesse classi CSS degli altri content type
       // =======================================================
 
-      "paragraph1" => "Entry Details",
 
-      "field_subjects" => [
-        "label" => "Subject",
-      ],
+      "paragraph5" => "Contributors",
+        "people" => [
+          "label" => "People",
+          "type" => "people_roles"
+        ],
 
-      "field_country2" => [
-        "label" => "Geographical Focus",
-      ],
+      "paragraph6" => "Linked from",
+        "referenced_in" => [
+          "type" => "referenced_in",
+          "label" => "Teasearch entries",
+        ],
+        'field_backlink_esterni' => [
+          'label' => 'External Websites',
+        ],
 
-      "field_keywords" => [
-        "label" => "Keywords",
-      ],
-
-      "people" => [
-        "label" => "People",
-        "type" => "people_roles"
-      ],
-
-      "field_license" => [
-        "label" => "Editorial Licence",
-        "type" => "taxonomy_linked"
-      ],
-
-      "field_teasearch_contributors" => [
-        "label" => "People",
-        "type" => "people_reference_list"
-      ],
-
-      "systemdate" => [
-        "type" => "systemdate",
-        "label" => "Dates",
-      ],
-
+      "paragraph7" => "Entry Details",
+        "field_license" => [
+          "label" => "Editorial Licence",
+          "type" => "taxonomy_linked"
+        ],
+        "systemdate" => [
+          "type" => "systemdate",
+          "label" => "Dates",
+        ],
     ],
   ];
 
