@@ -127,6 +127,20 @@
 
   update(); // stato iniziale
   window.addEventListener('scroll', onScroll, { passive: true });
+
+  // Se il menu mobile (hamburger) viene aperto mentre la barra e' compatta,
+  // il menu espanso non deve restare schiacciato in 70px: rimuoviamo
+  // temporaneamente is-compact cosi' la barra si adatta all'altezza del
+  // menu invece di sovrapporsi al contenuto sottostante.
+  var mainMenu = document.getElementById('mainMenu');
+  if (mainMenu) {
+    mainMenu.addEventListener('show.bs.collapse', function () {
+      bar.classList.add('menu-open');
+    });
+    mainMenu.addEventListener('hidden.bs.collapse', function () {
+      bar.classList.remove('menu-open');
+    });
+  }
 })();
 </script>
 </body></html>

@@ -197,6 +197,24 @@ a {
   height: 70px;
 }
 
+/* Quando il menu mobile e' aperto (hamburger), la barra compatta non deve
+   restare a 70px fissi: il menu espanso deve poter spingere giu' il
+   contenuto invece di sovrapporsi (altrimenti trabocca visivamente sul
+   testo sottostante su mobile, sia Chrome che Firefox).
+   .menu-open e' impostata via JS su show.bs.collapse/hidden.bs.collapse;
+   :has() resta come fallback per i browser che lo supportano. */
+.site-green-bar.is-compact.menu-open,
+.site-green-bar.is-compact:has(.navbar-collapse.show),
+.site-green-bar.is-compact:has(.navbar-collapse.collapsing) {
+  height: auto;
+}
+
+.site-green-bar.is-compact.menu-open .navbar,
+.site-green-bar.is-compact:has(.navbar-collapse.show) .navbar,
+.site-green-bar.is-compact:has(.navbar-collapse.collapsing) .navbar {
+  height: auto;
+}
+
 /* Riduzione logo/brand quando compatto (se presente) */
 .site-green-bar.is-compact .navbar-brand img {
   width: 100px;
