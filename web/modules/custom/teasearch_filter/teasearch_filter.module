@@ -24,6 +24,7 @@ function teasearch_filter_theme($existing, $type, $theme, $path)
         'has_filters' => NULL,
         'module_path' => NULL,
         'page_title' => NULL,
+        'page_description' => NULL,
         'century_data' => NULL,
         'date_data' => NULL,
         'paginator_config' => NULL,

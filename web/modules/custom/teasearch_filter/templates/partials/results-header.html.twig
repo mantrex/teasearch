@@ -10,34 +10,43 @@
  * - current_lang:   lingua corrente ('it' | 'en')
  * - is_free_search: boolean
  * - current_query:  array query params
+ * - page_description: testo descrittivo della categoria (stesso campo delle card homepage)
  */
 #}
 
 <header class="results-header">
 
-	<div class="results-title">
-		{{ page_title }}
+	<div class="results-header-top">
+		<div class="results-title-wrapper">
+			<div class="results-title">
+				{{ page_title }}
+			</div>
+			{% if page_description %}
+				<div class="results-description">
+					{{ page_description }}
+				</div>
+			{% endif %}
+		</div>
+
+		{% if has_filters %}
+			<div class="results-status">
+				<span class="status-text">
+					{{ 'Filtered results'|t }}
+				</span>
+			</div>
+		{% endif %}
+
+		{# Sort dropdown — mostrato solo se ci sono opzioni per questo content type #}
+		{% if sort_options %}
+			{% include 'modules/custom/teasearch_filter/templates/partials/sort-dropdown.html.twig' with {
+        'sort_options':   sort_options,
+        'current_sort':   current_sort,
+        'content_type':   content_type,
+        'is_free_search': is_free_search|default(false),
+        'current_query':  current_query|default({}),
+        'current_lang':   current_lang|default('en')
+      } %}
+		{% endif %}
 	</div>
 
-	{% if has_filters %}
-		<div class="results-status">
-			<span class="status-text">
-				{{ 'Filtered results'|t }}
-			</span>
-		</div>
-	{% endif %}
-
-	{# Sort dropdown — mostrato solo se ci sono opzioni per questo content type #}
-	{% if sort_options %}
-		{% include 'modules/custom/teasearch_filter/templates/partials/sort-dropdown.html.twig' with {
-      'sort_options':   sort_options,
-      'current_sort':   current_sort,
-      'content_type':   content_type,
-      'is_free_search': is_free_search|default(false),
-      'current_query':  current_query|default({}),
-      'current_lang':   current_lang|default('en')
-    } %}
-	{% endif %}
-
 </header>
-

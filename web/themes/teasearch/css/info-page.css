@@ -146,16 +146,21 @@
 
 .info-menu a {
   display: block;
-  padding: 0.3rem 0;
+  padding: 0.2rem 0;
   color: var(--item-link);
   text-decoration: none;
-  font-size: 1.2rem;
-  font-weight:800;
+  font-size: 1rem;
+  
 }
 
 .info-menu a:hover {
   color: var(--item-link-hover);
 }
+  .col-lg-3 .info-sidebar {
+    margin-top: 0;
+    padding-top: 0;
+  }
+
 
 /* RESPONSIVE */
 @media (max-width: 991px) {
@@ -164,14 +169,13 @@
     margin-top: 1rem;
   }
 
-  /* Su schermo stretto Bootstrap impila le colonne nell'ordine del markup
-     (contenuto, poi menu): forziamo il menu in cima. */
+  /* Su schermo stretto vogliamo il contenuto prima e il menu about sotto. */
   .info-main .left-col-wrapper {
-    order: 2;
+    order: 1;
   }
 
   .info-main .col-lg-3 {
-    order: 1;
+    order: 2;
   }
 }
 
@@ -191,6 +195,7 @@
 
 /* Link attivo nella sidebar about */
 .info-menu a.info-menu-active {
+  font-weight: bold;
   text-decoration: underline;
   text-underline-offset: 3px;
 }

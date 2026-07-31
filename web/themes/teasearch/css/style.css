@@ -190,11 +190,11 @@ a {
 
 .site-green-bar.is-compact {
   box-shadow: 0 2px 6px var(--box-shadow);
-  height: 70px;
+  height: 72px;
 }
 
 .site-green-bar.is-compact .navbar {
-  height: 70px;
+  height: 72px;
 }
 
 /* Quando il menu mobile e' aperto (hamburger), la barra compatta non deve
@@ -220,6 +220,11 @@ a {
   width: 100px;
   /* da 120px a 96px */
   transition: width 180ms ease;
+}
+
+.site-green-bar.is-compact .text-below-logo {
+  font-size: 0.85rem;
+  transition: font-size 180ms ease;
 }
 
 /*FOOTER RELATED*/
@@ -416,6 +421,33 @@ a {
   width: 180px;
 }
 
+/* Su schermi molto stretti evita che il toggler venga spinto in basso:
+   il container del navbar non deve andare a capo e il brand (logo +
+   testo sotto) deve poter restringersi invece di forzare l'overflow. */
+@media (max-width: 480px) {
+  .main-menu .container-fluid {
+    flex-wrap: nowrap;
+  }
+
+  .navbar-brand {
+    min-width: 0;
+    flex-shrink: 1;
+  }
+
+  .navbar-brand img {
+    width: 120px;
+  }
+
+  .navbar-brand .text-below-logo {
+    white-space: normal;
+    font-size: 0.8rem;
+  }
+
+  .navbar-toggler {
+    flex-shrink: 0;
+  }
+}
+
 .navbar-nav {
   text-transform: uppercase;
 }
@@ -504,7 +536,8 @@ a {
 }
 
 .text-below-logo {
-  font-size: 14px;
+  font-size: 1.1rem;
+  padding-left: 0.85rem;
   opacity: 1;
   transition: opacity 0.4s ease;
   /* durata e easing */
@@ -515,6 +548,14 @@ a {
   display: none;
   pointer-events: none;
   /* opzionale: evita click */
+}
+
+@media (max-width: 768px) {
+  .text-below-logo {
+    font-size: 0.9rem;
+    padding-left: 0.45rem;
+  }
+
 }
 
 .teasearch-introblock {
@@ -595,4 +636,7 @@ a {
   text-transform: uppercase;
   font-size: 1.2em;
   font-weight: bold;
+}
+.href-underline {
+  text-decoration: underline!important;
 }

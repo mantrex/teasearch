@@ -19,6 +19,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\node\NodeInterface;
 use Drupal\teasearch_filter\Config\SortConfig;
 use Drupal\teasearch_filter\Helper\SortHelper;
+use Drupal\taxonomy\TermStorageInterface;
 
 /**
  * Search controller for teasearch_filter module.
@@ -140,8 +141,9 @@ class SearchController extends ControllerBase
     $content_type_config = $content_types[$content_type];
     $filters = $content_type_config['filters'] ?: [];
 
-    // Get page title
+    // Get page title and description
     $page_title = $this->getCategoryTitle($content_type);
+    $page_description = $this->getCategoryDescription($content_type);
 
     // Build filter form
     $form = $this->formBuilder()->getForm(
@@ -216,6 +218,7 @@ class SearchController extends ControllerBase
       '#total_results' => $total,
       '#has_filters' => $this->hasActiveFilters($request, $filters),
       '#page_title' => $page_title,
+      '#page_description' => $page_description,
       '#century_data' => $century_data,
       '#date_data' => $date_data,
       '#module_path' => $request->getBasePath() . '/' . \Drupal::service('extension.list.module')->getPath('teasearch_filter'),
@@ -248,50 +251,16 @@ class SearchController extends ControllerBase
   private function getCategoryTitle(string $content_type): string
   {
     try {
-      $content_type_lower = trim(strtolower($content_type));
+      $node = $this->findCategoryNode($content_type);
 
-      $storage = $this->entityTypeManager->getStorage('node');
-      $all_nids = $storage->getQuery()
-        ->accessCheck(TRUE)
-        ->condition('type', 'categories')
-        ->condition('status', 1)
-        ->execute();
+      if ($node && $node->hasField('field_link_title') && !$node->get('field_link_title')->isEmpty()) {
+        $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+        $translated = $node->hasTranslation($langcode)
+          ? $node->getTranslation($langcode)
+          : $node;
 
-      if (!$all_nids) {
-        return $this->getCategoryTitleFallback($content_type);
+        return $translated->get('field_link_title')->value;
       }
-
-      $all_nodes = $storage->loadMultiple($all_nids);
-      $lm = \Drupal::languageManager();
-      $langcode = $lm->getCurrentLanguage()->getId();
-
-      foreach ($all_nodes as $node) {
-        if (!$node->hasField('field_category_menu_list') || $node->get('field_category_menu_list')->isEmpty()) {
-          continue;
-        }
-
-        $menu_field = $node->get('field_category_menu_list');
-        $field_definition = $menu_field->getFieldDefinition();
-        $allowed_values = $field_definition->getSetting('allowed_values');
-
-        foreach ($menu_field as $item) {
-          $machine_name = $item->value;
-          $label = $allowed_values[$machine_name] ?? '';
-
-          if (strtolower($label) === $content_type_lower) {
-            if (!$node->hasField('field_link_title') || $node->get('field_link_title')->isEmpty()) {
-              continue;
-            }
-
-            $translated = $node->hasTranslation($langcode)
-              ? $node->getTranslation($langcode)
-              : $node;
-
-            return $translated->get('field_link_title')->value;
-          }
-        }
-      }
-
     } catch (\Throwable $e) {
       \Drupal::logger('teasearch_filter')->error('Error in getCategoryTitle: @message', [
         '@message' => $e->getMessage()
@@ -306,6 +275,74 @@ class SearchController extends ControllerBase
     $config = $this->configFactory->get('teasearch_filter.settings');
     $content_types = $config->get('content_types') ?: [];
     return $content_types[$content_type]['label'] ?? ucfirst($content_type);
+  }
+
+  /**
+   * Get category description (same source as homepage cards) for the given content type.
+   */
+  private function getCategoryDescription(string $content_type): string
+  {
+    try {
+      $node = $this->findCategoryNode($content_type);
+
+      if ($node && $node->hasField('field_description') && !$node->get('field_description')->isEmpty()) {
+        $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+        $translated = $node->hasTranslation($langcode)
+          ? $node->getTranslation($langcode)
+          : $node;
+
+        return $translated->get('field_description')->value;
+      }
+    } catch (\Throwable $e) {
+      \Drupal::logger('teasearch_filter')->error('Error in getCategoryDescription: @message', [
+        '@message' => $e->getMessage()
+      ]);
+    }
+
+    return '';
+  }
+
+  /**
+   * Find the 'categories' node matching the given content type, via field_category_menu_list.
+   */
+  private function findCategoryNode(string $content_type): ?NodeInterface
+  {
+    $content_type_lower = trim(strtolower($content_type));
+
+    $storage = $this->entityTypeManager->getStorage('node');
+    $all_nids = $storage->getQuery()
+      ->accessCheck(TRUE)
+      ->condition('type', 'categories')
+      ->condition('status', 1)
+      ->execute();
+
+    if (!$all_nids) {
+      return NULL;
+    }
+
+    $all_nodes = $storage->loadMultiple($all_nids);
+
+    /** @var NodeInterface $node */
+    foreach ($all_nodes as $node) {
+      if (!$node->hasField('field_category_menu_list') || $node->get('field_category_menu_list')->isEmpty()) {
+        continue;
+      }
+
+      $menu_field = $node->get('field_category_menu_list');
+      $field_definition = $menu_field->getFieldDefinition();
+      $allowed_values = $field_definition->getSetting('allowed_values');
+
+      foreach ($menu_field as $item) {
+        $machine_name = $item->value;
+        $label = $allowed_values[$machine_name] ?? '';
+
+        if (strtolower($label) === $content_type_lower) {
+          return $node;
+        }
+      }
+    }
+
+    return NULL;
   }
 
   /**
@@ -999,7 +1036,10 @@ class SearchController extends ControllerBase
       return [];
     }
 
-    $terms = $this->entityTypeManager->getStorage('taxonomy_term')->loadTree($filter['vocabulary']);
+    /** @var TermStorageInterface $term_storage */
+    $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
+    $terms = $term_storage->loadTree($filter['vocabulary']);
+    $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
     $options = [];
 
     foreach ($terms as $term) {
@@ -1022,8 +1062,14 @@ class SearchController extends ControllerBase
         }
 
         if ($count > 0) {
+          $label = $term->name ?? '';
+          $term_entity = $term_storage->load($term->tid);
+          if ($term_entity && $term_entity->hasTranslation($current_language)) {
+            $label = $term_entity->getTranslation($current_language)->getName();
+          }
+
           $options[$term->tid] = [
-            'label' => $term->name ?? '',
+            'label' => $label,
             'count' => $count,
             'selected' => in_array((string) $term->tid, $selected, true)
           ];
@@ -1329,6 +1375,7 @@ class SearchController extends ControllerBase
 
     $filters = $content_type_config['filters'] ?: [];
     $page_title = $this->getCategoryTitle($content_type);
+    $page_description = $this->getCategoryDescription($content_type);
 
     $form = $this->formBuilder()->getForm(
       'Drupal\teasearch_filter\Form\SearchFilterForm',
@@ -1376,6 +1423,7 @@ class SearchController extends ControllerBase
       '#paginator_data' => $paginator_data,
       '#current_query' => $request->query->all(),
       '#page_title' => $page_title,
+      '#page_description' => $page_description,
       '#search_query' => $search_query,
       '#attached' => [
         'library' => ['teasearch_filter/teasearch_filter_styles'],

@@ -55,6 +55,9 @@
 		{% if entities %}
 			{% if not mixed_content_types %}
 				{% include 'modules/custom/teasearch_filter/templates/partials/results-header.html.twig' with {
+    'page_title':       page_title,
+    'page_description': page_description,
+    'has_filters':      has_filters,
     'sort_options':   sort_options,
     'current_sort':   current_sort,
     'current_lang':   current_lang|default('en'),
