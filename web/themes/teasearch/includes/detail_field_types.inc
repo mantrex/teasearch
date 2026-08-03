@@ -1349,6 +1349,7 @@ function teasearch_render_field_people_reference_list($node, $field_config, $fie
   }
 
   $show_link = $field_config['options']['show_link'] ?? TRUE;
+  $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
   $items = [];
 
   // Itera su ogni nodo People referenziato
@@ -1361,6 +1362,11 @@ function teasearch_render_field_people_reference_list($node, $field_config, $fie
 
     if (!$person_node || !$person_node->access('view')) {
       continue;
+    }
+
+    // Ottieni traduzione nella lingua corrente
+    if ($person_node->hasTranslation($current_language)) {
+      $person_node = $person_node->getTranslation($current_language);
     }
 
     // Ottieni il nome usando la stessa logica di people_name
@@ -3846,6 +3852,10 @@ function teasearch_render_field_news_type_badge($node, $field_config, $field_ide
       if (isset($first_item->entity)) {
         $term = $first_item->entity;
         if ($term) {
+          $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+          if ($term->hasTranslation($current_language)) {
+            $term = $term->getTranslation($current_language);
+          }
           $news_type = $term->getName();
         }
       }

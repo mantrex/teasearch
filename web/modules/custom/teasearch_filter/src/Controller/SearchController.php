@@ -278,20 +278,28 @@ class SearchController extends ControllerBase
   }
 
   /**
-   * Get category description (same source as homepage cards) for the given content type.
+   * Get category description for the given content type.
+   * Prefers field_description_full, falls back to field_description (homepage cards field).
    */
   private function getCategoryDescription(string $content_type): string
   {
     try {
       $node = $this->findCategoryNode($content_type);
 
-      if ($node && $node->hasField('field_description') && !$node->get('field_description')->isEmpty()) {
-        $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
-        $translated = $node->hasTranslation($langcode)
-          ? $node->getTranslation($langcode)
-          : $node;
+      if (!$node) {
+        return '';
+      }
 
-        return $translated->get('field_description')->value;
+      $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+      $translated = $node->hasTranslation($langcode)
+        ? $node->getTranslation($langcode)
+        : $node;
+
+      foreach (['field_description_full', 'field_description'] as $field_name) {
+        if ($translated->hasField($field_name) && !$translated->get($field_name)->isEmpty()) {
+          $item = $translated->get($field_name)->first();
+          return check_markup($item->value, $item->format ?? 'basic_html');
+        }
       }
     } catch (\Throwable $e) {
       \Drupal::logger('teasearch_filter')->error('Error in getCategoryDescription: @message', [
@@ -1188,11 +1196,12 @@ class SearchController extends ControllerBase
       foreach ($content_types as $content_type => $content_type_config) {
         $entities = $this->searchInContentType($content_type, $content_type_config, $search_query);
 
-        foreach ($entities as $entity) {
-          $this->processEntityForDisplay($entity, $content_type_config);
+        foreach ($entities as &$entity) {
+          $entity = $this->processEntityForDisplay($entity, $content_type_config);
           $entity->teasearch_content_type_label = $content_type_config['label'] ?? ucfirst($content_type);
           $entity->teasearch_results_config = $content_type_config['results'] ?? [];
         }
+        unset($entity);
 
         $all_entities = array_merge($all_entities, $entities);
       }
@@ -1229,10 +1238,11 @@ class SearchController extends ControllerBase
       }
 
       // Process entities
-      foreach ($all_entities as $entity) {
-        $this->processEntityForDisplay($entity, $content_type_config);
+      foreach ($all_entities as &$entity) {
+        $entity = $this->processEntityForDisplay($entity, $content_type_config);
         $entity->teasearch_results_config = $content_type_config['results'] ?? [];
       }
+      unset($entity);
 
       $filters_config = $content_type_config['filters'] ?? [];
 
@@ -1357,9 +1367,10 @@ class SearchController extends ControllerBase
 
     $entities = $this->entityTypeManager->getStorage($entity_type)->loadMultiple($entity_ids);
 
-    foreach ($entities as $entity) {
-      $this->processEntityForDisplay($entity, $content_type_config);
+    foreach ($entities as &$entity) {
+      $entity = $this->processEntityForDisplay($entity, $content_type_config);
     }
+    unset($entity);
 
     return $entities;
   }
@@ -1437,6 +1448,11 @@ class SearchController extends ControllerBase
 
   protected function processEntityForDisplay($entity, array $config)
   {
+    $langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    if ($entity->hasTranslation($langcode)) {
+      $entity = $entity->getTranslation($langcode);
+    }
+
     $results_config = $config['results'] ?? [];
 
     if (!empty($results_config['function'])) {

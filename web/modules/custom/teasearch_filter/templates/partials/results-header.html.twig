@@ -16,18 +16,18 @@
 
 <header class="results-header">
 
-	<div class="results-header-top">
-		<div class="results-title-wrapper">
-			<div class="results-title">
-				{{ page_title }}
-			</div>
-			{% if page_description %}
-				<div class="results-description">
-					{{ page_description }}
-				</div>
-			{% endif %}
+	<div class="results-title-wrapper">
+		<div class="results-title">
+			{{ page_title }}
 		</div>
+		{% if page_description %}
+			<div class="results-description">
+				{{ page_description|raw }}
+			</div>
+		{% endif %}
+	</div>
 
+	<div class="results-header-bottom">
 		{% if has_filters %}
 			<div class="results-status">
 				<span class="status-text">

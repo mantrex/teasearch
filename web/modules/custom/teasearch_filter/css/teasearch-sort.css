@@ -13,19 +13,10 @@
 .results-header {
   padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--details-border, #ddd);
-  margin-bottom: 1rem;
-}
-
-.results-header-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  flex-wrap: nowrap;
-  gap: 0.5rem;
+  margin-bottom: 0.7rem;
 }
 
 .results-title-wrapper {
-  flex: 1 1 auto;
   min-width: 0;
 }
 
@@ -38,8 +29,20 @@
 
 .results-description {
   font-size: 0.9rem;
-  color: var(--light-text, #666);
-  
+  color: #666;
+}
+
+.results-description p {
+  margin: 0;
+}
+
+.results-header-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
 }
 
 /* =========================================================
@@ -51,6 +54,7 @@
   align-items: center;
   gap: 0.4rem;
   flex: 0 0 auto;
+  margin-left: auto;
 }
 
 .sort-label {
@@ -113,14 +117,6 @@
    ========================================================= */
 
 @media (max-width: 600px) {
-  .teasearch-sort-wrapper {
-    flex-shrink: 0;
-  }
-
-  .sort-label {
-    display: none;
-  }
-
   .sort-select {
     min-width: 0;
     max-width: 130px;

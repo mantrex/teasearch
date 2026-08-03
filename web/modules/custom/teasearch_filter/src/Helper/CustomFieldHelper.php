@@ -40,6 +40,24 @@ class CustomFieldHelper
   }
 
   /**
+   * Returns the given entity's translation for the current language, if one exists.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity (typically a taxonomy term) to translate.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   The translated entity, or the original if no translation exists.
+   */
+  private static function translateEntity(EntityInterface $entity): EntityInterface
+  {
+    $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    if ($entity->hasTranslation($current_language)) {
+      return $entity->getTranslation($current_language);
+    }
+    return $entity;
+  }
+
+  /**
    * Execute a custom function by name.
    *
    * @param string $function_name
@@ -194,7 +212,7 @@ class CustomFieldHelper
       if ($country_field && !$country_field->isEmpty()) {
         $field_country = $country_field->entity;
         if ($field_country) {
-          $location_parts[] = $field_country->getName();
+          $location_parts[] = self::translateEntity($field_country)->getName();
         }
       }
     }
@@ -497,7 +515,7 @@ class CustomFieldHelper
       if ($pubtype_field && !$pubtype_field->isEmpty()) {
         $field_pubtype = $pubtype_field->entity;
         if ($field_pubtype) {
-          $type_lang_parts[] = $field_pubtype->getName();
+          $type_lang_parts[] = self::translateEntity($field_pubtype)->getName();
 
           // =============================================================================
           // GESTIONE ICONA BIBLIOGRAFIA
@@ -527,7 +545,7 @@ class CustomFieldHelper
         // Itera su tutti i valori (supporta sia singolo che multivalore)
         foreach ($language_field as $language_item) {
           if ($language_item->entity) {
-            $languages[] = $language_item->entity->getName();
+            $languages[] = self::translateEntity($language_item->entity)->getName();
           }
         }
 
@@ -812,7 +830,7 @@ class CustomFieldHelper
       if ($genre_field && !$genre_field->isEmpty()) {
         $field_text_genres = $genre_field->entity;
         if ($field_text_genres) {
-          $genre_lang_parts[] = $field_text_genres->getName();
+          $genre_lang_parts[] = self::translateEntity($field_text_genres)->getName();
         }
       }
     }
@@ -823,7 +841,7 @@ class CustomFieldHelper
       if ($language_field && !$language_field->isEmpty()) {
         $field_language = $language_field->entity;
         if ($field_language) {
-          $genre_lang_parts[] = $field_language->getName();
+          $genre_lang_parts[] = self::translateEntity($field_language)->getName();
         }
       }
     }
@@ -1098,7 +1116,7 @@ class CustomFieldHelper
       if ($category_field && !$category_field->isEmpty()) {
         $field_image_category = $category_field->entity;
         if ($field_image_category) {
-          $category_country_parts[] = $field_image_category->getName();
+          $category_country_parts[] = self::translateEntity($field_image_category)->getName();
         }
       }
     }
@@ -1109,7 +1127,7 @@ class CustomFieldHelper
       if ($country_field && !$country_field->isEmpty()) {
         $field_country = $country_field->entity;
         if ($field_country) {
-          $category_country_parts[] = $field_country->getName();
+          $category_country_parts[] = self::translateEntity($field_country)->getName();
         }
       }
     }
@@ -1401,7 +1419,7 @@ class CustomFieldHelper
       if ($genre_field && !$genre_field->isEmpty()) {
         $field_text_genres = $genre_field->entity;
         if ($field_text_genres) {
-          $genre_lang_parts[] = $field_text_genres->getName();
+          $genre_lang_parts[] = self::translateEntity($field_text_genres)->getName();
         }
       }
     }
@@ -1412,7 +1430,7 @@ class CustomFieldHelper
       if ($language_field && !$language_field->isEmpty()) {
         $field_language = $language_field->entity;
         if ($field_language) {
-          $genre_lang_parts[] = $field_language->getName();
+          $genre_lang_parts[] = self::translateEntity($field_language)->getName();
         }
       }
     }
