@@ -521,6 +521,7 @@ function teasearch_get_detail_schemas()
           "label" => "Teasearch entries",
         ],
         'field_backlink_esterni' => [
+          'type' => 'link',
           'label' => 'External Websites',
         ],
 
@@ -682,6 +683,7 @@ function teasearch_get_detail_schemas()
           "label" => "Teasearch entries",
         ],
         'field_backlink_esterni' => [
+          'type' => 'link',
           'label' => 'External Websites',
         ],
 
@@ -844,6 +846,7 @@ function teasearch_get_detail_schemas()
           "label" => "Teasearch entries",
         ],
         'field_backlink_esterni' => [
+          'type' => 'link',
           'label' => 'External Websites',
         ],
 
@@ -997,6 +1000,7 @@ function teasearch_get_detail_schemas()
         "label" => "Teasearch entries",
       ],
       'field_backlink_esterni' => [
+        'type' => 'link',
         'label' => 'External Websites',
       ],
 
@@ -1207,6 +1211,7 @@ function teasearch_get_detail_schemas()
         "label" => "Teasearch entries",
       ],
       'field_backlink_esterni' => [
+        'type' => 'link',
         'label' => 'External Websites',
       ],
 
@@ -1560,6 +1565,7 @@ $people = [
           "label" => "Teasearch entries",
         ],
         'field_backlink_esterni' => [
+          'type' => 'link',
           'label' => 'External Websites',
         ],
 
