@@ -176,23 +176,25 @@ function teasearch_get_type_render_function($type)
  */
 function teasearch_get_content_type_label($content_type)
 {
+  // Fonte primaria: field_link_title del nodo 'categories' corrispondente
+  // (stesso campo usato per le card homepage e per i titoli pagina di ricerca),
+  // così la label segue automaticamente la traduzione editoriale.
+  $category_label = teasearch_get_category_link_title($content_type);
+  if ($category_label !== NULL) {
+    return $category_label;
+  }
+
   $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
 
-  // Mappa statica per le label dei content type
+  // Mappa statica di fallback per content type senza una scheda 'categories'.
   $labels = [
     'en' => [
-      'people' => 'People',
-      'primary_sources' => 'Texts',
-      'first_reference' => "Essentials",
       'article' => 'Article',
       'event' => 'Event',
       'about' => 'About',
       // Aggiungi altri content type qui...
     ],
     'it' => [
-      'people' => 'Persone',
-      'primary_sources' => 'Texts',
-      'first_reference' => "Essentials",
       'article' => 'Articolo',
       'event' => 'Evento',
       'about' => 'Chi siamo'
@@ -207,6 +209,52 @@ function teasearch_get_content_type_label($content_type)
 
   // Fallback: usa il nome del content type con prima lettera maiuscola
   return ucfirst(str_replace('_', ' ', $content_type));
+}
+
+/**
+ * Helper: Cerca il nodo 'categories' il cui field_category_menu_list
+ * corrisponde al machine name del content type, e ne restituisce
+ * field_link_title tradotto nella lingua corrente.
+ *
+ * @param string $content_type
+ *   Il machine name del content type (es. 'first_reference').
+ *
+ * @return string|null
+ *   La label tradotta, o NULL se non esiste una scheda categories corrispondente.
+ */
+function teasearch_get_category_link_title($content_type)
+{
+  try {
+    $storage = \Drupal::entityTypeManager()->getStorage('node');
+    $nids = $storage->getQuery()
+      ->accessCheck(TRUE)
+      ->condition('type', 'categories')
+      ->condition('status', 1)
+      ->condition('field_category_menu_list', $content_type)
+      ->execute();
+
+    if (!$nids) {
+      return NULL;
+    }
+
+    $node = $storage->load(reset($nids));
+
+    if (!$node || !$node->hasField('field_link_title') || $node->get('field_link_title')->isEmpty()) {
+      return NULL;
+    }
+
+    $current_language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    $translated = $node->hasTranslation($current_language)
+      ? $node->getTranslation($current_language)
+      : $node;
+
+    return $translated->get('field_link_title')->value;
+  } catch (\Throwable $e) {
+    \Drupal::logger('teasearch')->error('Error in teasearch_get_category_link_title: @message', [
+      '@message' => $e->getMessage(),
+    ]);
+    return NULL;
+  }
 }
 
 function teasearch_get_taxonomy_field_label($field_config, $field_identifier, $vocabulary_id)

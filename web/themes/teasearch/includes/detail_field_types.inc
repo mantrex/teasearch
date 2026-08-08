@@ -1513,7 +1513,7 @@ function teasearch_render_field_referenced_in($node, $field_config, $field_ident
   // Configurazione content types da cercare
   $content_types_config = [
     'first_reference' => [
-      'field' => 'field_teasearch_references',
+      'fields' => ['field_teasearch_references', 'field_curated_references'],
       'template' => 'box4',
     ],
     'primary_sources' => [
@@ -1521,11 +1521,11 @@ function teasearch_render_field_referenced_in($node, $field_config, $field_ident
       'template' => 'box4',
     ],
     'images' => [
-      'field' => 'field_teasearch_references',
+      'fields' => ['field_teasearch_references', 'field_curated_references'],
       'template' => 'box4',
     ],
     'videos' => [
-      'field' => 'field_teasearch_references',
+      'fields' => ['field_teasearch_references', 'field_curated_references'],
       'template' => 'box4',
     ],
     'bibliography' => [

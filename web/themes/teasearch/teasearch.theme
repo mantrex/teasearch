@@ -473,9 +473,19 @@ function teasearch_preprocess_node(&$variables)
         $variables['detail_icon'] = teasearch_render_icon($node, $schema['icon']);
       }
 
+      // La sezione "Linked from" (referenced_in) dipende da campi di ALTRI nodi
+      // (chi referenzia questo nodo), quindi il render cache di questa pagina va
+      // invalidato quando quei nodi vengono salvati, non solo quando cambia $node.
+      if (isset($schema['fields']['referenced_in'])) {
+        $variables['#cache']['tags'] = array_merge(
+          $variables['#cache']['tags'] ?? [],
+          ['node_list:first_reference', 'node_list:primary_sources', 'node_list:images', 'node_list:videos', 'node_list:bibliography']
+        );
+      }
+
       // Processare fields
       if (isset($schema['fields'])) {
-        
+
         // ===================================================================
         // NEWS: Layout speciale con separazione per posizione
         // ===================================================================

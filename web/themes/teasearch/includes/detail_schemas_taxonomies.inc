@@ -23,7 +23,7 @@ function teasearch_taxonomy_translations()
   $subjects = [
     'it' => [
       'name' => 'Etichetta',
-      'field_description' => 'Nota d\'ambito',
+      'description' => 'Nota d\'ambito',
       'field_alternative_labels' => 'Varianti',
       'field_related_concepts' => 'Concetti correlati',
       'field_external_authority_mapping' => 'Corrispondenze con schemi esterni',
